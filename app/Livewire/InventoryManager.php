@@ -1,0 +1,152 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Category;
+use App\Models\Item;
+use App\Models\Location;
+use App\Models\Supplier;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+
+class InventoryManager extends Component
+{
+    use WithFileUploads;
+
+    public $items;
+    public $search = '';
+    public $name = '';
+    public $description = '';
+    public $category_id = '';
+    public $location_id = '';
+    public $supplier_id = '';
+    public $brand = '';
+    public $type = '';
+    public $purchase_year = '';
+    public $price = '';
+    public $condition = 'Baik';
+    public $status = 'Tersedia';
+    public $stock = 1;
+    public $photo;
+    public $editingId = null;
+
+    protected $rules = [
+        'name' => 'required|string|min:3',
+        'description' => 'nullable|string',
+        'category_id' => 'nullable|exists:categories,id',
+        'location_id' => 'nullable|exists:locations,id',
+        'supplier_id' => 'nullable|exists:suppliers,id',
+        'brand' => 'nullable|string',
+        'type' => 'nullable|string',
+        'purchase_year' => 'nullable|digits:4',
+        'price' => 'nullable|numeric',
+        'condition' => 'required|string',
+        'status' => 'required|string',
+        'stock' => 'required|integer|min:1',
+        'photo' => 'nullable|image|max:2048',
+    ];
+
+    public function mount(): void
+    {
+        $this->loadItems();
+    }
+
+    public function render()
+    {
+        return view('livewire.inventory-manager', [
+            'categories' => Category::latest()->get(),
+            'locations' => Location::latest()->get(),
+            'suppliers' => Supplier::latest()->get(),
+        ]);
+    }
+
+    public function loadItems(): void
+    {
+        $this->items = Item::query()
+            ->with(['category', 'location', 'supplier'])
+            ->when($this->search !== '', fn ($query) => $query->where('name', 'like', "%{$this->search}%"))
+            ->latest()
+            ->get();
+    }
+
+    public function save(): void
+    {
+        $this->validate();
+
+        $path = null;
+        if ($this->photo) {
+            $path = $this->photo->store('items', 'public');
+        }
+
+        $data = [
+            'name' => $this->name,
+            'description' => $this->description,
+            'category_id' => $this->category_id ?: null,
+            'location_id' => $this->location_id ?: null,
+            'supplier_id' => $this->supplier_id ?: null,
+            'brand' => $this->brand,
+            'type' => $this->type,
+            'purchase_year' => $this->purchase_year ?: null,
+            'price' => $this->price ?: 0,
+            'condition' => $this->condition,
+            'status' => $this->status,
+            'stock' => $this->stock,
+            'photo_path' => $path,
+            'code' => strtoupper('BRG-'.substr(md5(uniqid()), 0, 6)),
+            'inventory_number' => 'INV-'.str_pad((Item::count() + 1), 4, '0', STR_PAD_LEFT),
+        ];
+
+        if ($this->editingId) {
+            Item::findOrFail($this->editingId)->update($data);
+        } else {
+            Item::create($data);
+        }
+
+        $this->resetForm();
+        $this->loadItems();
+        session()->flash('message', 'Inventaris berhasil disimpan.');
+    }
+
+    public function edit($id): void
+    {
+        $item = Item::findOrFail($id);
+        $this->editingId = $item->id;
+        $this->name = $item->name;
+        $this->description = $item->description;
+        $this->category_id = $item->category_id;
+        $this->location_id = $item->location_id;
+        $this->supplier_id = $item->supplier_id;
+        $this->brand = $item->brand;
+        $this->type = $item->type;
+        $this->purchase_year = $item->purchase_year;
+        $this->price = $item->price;
+        $this->condition = $item->condition;
+        $this->status = $item->status;
+        $this->stock = $item->stock;
+    }
+
+    public function delete($id): void
+    {
+        Item::findOrFail($id)->delete();
+        $this->loadItems();
+        session()->flash('message', 'Inventaris berhasil dihapus.');
+    }
+
+    public function resetForm(): void
+    {
+        $this->name = '';
+        $this->description = '';
+        $this->category_id = '';
+        $this->location_id = '';
+        $this->supplier_id = '';
+        $this->brand = '';
+        $this->type = '';
+        $this->purchase_year = '';
+        $this->price = '';
+        $this->condition = 'Baik';
+        $this->status = 'Tersedia';
+        $this->stock = 1;
+        $this->photo = null;
+        $this->editingId = null;
+    }
+}
