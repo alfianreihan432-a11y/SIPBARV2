@@ -15,8 +15,7 @@ class DashboardController extends Controller
         }
 
         if ($user->hasRole('guru')) {
-            // Sementara pakai dashboard admin, nanti bisa dibuat terpisah
-            return view('dashboard');
+            return view('dashboard-guru');
         }
 
         // admin / super-admin / petugas
