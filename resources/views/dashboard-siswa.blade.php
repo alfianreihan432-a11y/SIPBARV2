@@ -4,18 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Siswa – SIPBAR</title>
+    {{-- Anti-flash --}}
+    <script>
+    (function(){
+        var s=localStorage.getItem('sipbar-siswa-theme');
+        var d=window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if(s==='dark'||(s===null&&d)) document.documentElement.classList.add('dark');
+    })();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-        body { display: flex; background: #f0f4ff; color: #1e293b; overflow: hidden; }
+
+        /* ══════ LIGHT MODE TOKENS (default) ══════ */
+        :root {
+            --bg:          #f0f7ff;
+            --bg2:         #ffffff;
+            --bg3:         #e2eeff;
+            --card:        #ffffff;
+            --border:      #dbeafe;
+            --border2:     #e2e8f0;
+            --text:        #0f172a;
+            --text2:       #1e293b;
+            --muted:       #64748b;
+            --subtle:      #94a3b8;
+            --topbar-bg:   #ffffff;
+            --topbar-bdr:  #e2e8f0;
+            --content-bg:  #f0f7ff;
+            --panel-bg:    #ffffff;
+            --input-bg:    #f8fafc;
+            --scrollbar:   #cbd5e1;
+            --sidebar-bg:  #1d4ed8;
+        }
+
+        /* ══════ DARK MODE TOKENS ══════ */
+        html.dark {
+            --bg:          #0d1117;
+            --bg2:         #111827;
+            --bg3:         #1a2535;
+            --card:        #111827;
+            --border:      #1e3a5f;
+            --border2:     #1e293b;
+            --text:        #f1f5f9;
+            --text2:       #e2e8f0;
+            --muted:       #94a3b8;
+            --subtle:      #64748b;
+            --topbar-bg:   #0d1117;
+            --topbar-bdr:  #1e293b;
+            --content-bg:  #080e18;
+            --panel-bg:    #111827;
+            --input-bg:    #0d1117;
+            --scrollbar:   #334155;
+            --sidebar-bg:  #162040;
+        }
+
+        body { display: flex; background: var(--content-bg); color: var(--text); overflow: hidden; transition: background .25s, color .25s; }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
             width: 200px; flex-shrink: 0;
-            background: #1d4ed8;
+            background: var(--sidebar-bg);
             display: flex; flex-direction: column;
             height: 100vh; position: fixed; left: 0; top: 0; z-index: 40;
+            transition: background .25s, transform .3s;
         }
         .sidebar-brand {
             display: flex; align-items: center; gap: 10px;
@@ -79,38 +131,40 @@
 
         /* ===== TOPBAR ===== */
         .topbar {
-            height: 58px; background: #fff;
-            border-bottom: 1px solid #e2e8f0;
+            height: 58px; background: var(--topbar-bg);
+            border-bottom: 1px solid var(--topbar-bdr);
             display: flex; align-items: center;
             padding: 0 24px; gap: 12px; flex-shrink: 0;
+            transition: background .25s;
         }
         .topbar-search {
             display: flex; align-items: center; gap: 8px;
-            background: #f8fafc; border: 1px solid #e2e8f0;
+            background: var(--input-bg); border: 1px solid var(--border2);
             border-radius: 10px; padding: 7px 14px; width: 260px;
         }
         .topbar-search input {
             background: none; border: none; outline: none;
-            font-size: 13px; color: #334155; width: 100%;
+            font-size: 13px; color: var(--text); width: 100%;
         }
-        .topbar-search input::placeholder { color: #94a3b8; }
+        .topbar-search input::placeholder { color: var(--subtle); }
         .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
         .topbar-icon {
-            width: 36px; height: 36px; background: #f1f5f9;
-            border: 1px solid #e2e8f0; border-radius: 10px;
+            width: 36px; height: 36px; background: var(--bg3);
+            border: 1px solid var(--border2); border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: #64748b; transition: all .15s; position: relative;
+            cursor: pointer; color: var(--muted); transition: all .15s; position: relative;
         }
-        .topbar-icon:hover { background: #e2e8f0; color: #334155; }
+        .topbar-icon:hover { background: var(--border2); color: var(--text); }
         .notif-dot {
             position: absolute; top: 7px; right: 8px;
             width: 7px; height: 7px; background: #ef4444;
-            border-radius: 50%; border: 2px solid #fff;
+            border-radius: 50%; border: 2px solid var(--topbar-bg);
+            transition: border-color .25s;
         }
         .topbar-user {
             display: flex; align-items: center; gap: 8px;
             padding: 4px 10px 4px 4px;
-            background: #f8fafc; border: 1px solid #e2e8f0;
+            background: var(--bg3); border: 1px solid var(--border2);
             border-radius: 999px; cursor: pointer;
         }
         .topbar-avatar {
@@ -119,15 +173,20 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 11px; font-weight: 700; color: #fff;
         }
-        .topbar-uname { font-size: 13px; font-weight: 600; color: #334155; }
+        .topbar-uname { font-size: 13px; font-weight: 600; color: var(--text2); }
+        /* Theme toggle icon visibility */
+        .t-sun { display: none }
+        .t-moon { display: block }
+        html.dark .t-sun  { display: block }
+        html.dark .t-moon { display: none }
     </style>
 </head>
 <body>
     <style>
         /* ===== CONTENT LAYOUT ===== */
-        .content { flex: 1; overflow-y: auto; padding: 22px 24px; background: #f0f4ff; }
+        .content { flex: 1; overflow-y: auto; padding: 22px 24px; background: var(--content-bg); transition: background .25s; }
         .content::-webkit-scrollbar { width: 4px; }
-        .content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        .content::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
 
         .content-grid {
             display: grid;
@@ -166,9 +225,8 @@
         /* ===== STAT CARDS ===== */
         .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
         .stat-card {
-            background: #fff; border-radius: 14px; padding: 18px 20px;
-            border: 1px solid #e2e8f0;
-            transition: box-shadow .2s, transform .2s;
+            background: var(--card); border-radius: 14px; padding: 18px 20px;
+            border: 1px solid var(--border2); transition: box-shadow .2s, transform .2s;
         }
         .stat-card:hover { box-shadow: 0 8px 24px rgba(29,78,216,.1); transform: translateY(-2px); }
         .stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
@@ -176,27 +234,24 @@
             width: 40px; height: 40px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
         }
-        .stat-num   { font-size: 26px; font-weight: 800; color: #0f172a; line-height: 1; }
-        .stat-label { font-size: 12px; color: #64748b; margin-top: 4px; }
+        .stat-num   { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1; }
+        .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
         .stat-badge {
             font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
         }
 
         /* ===== PERFORMANCE ===== */
         .panel {
-            background: #fff; border-radius: 16px;
-            border: 1px solid #e2e8f0; padding: 18px 20px;
+            background: var(--panel-bg); border-radius: 16px;
+            border: 1px solid var(--border2); padding: 18px 20px;
             margin-bottom: 18px;
         }
         .panel:last-child { margin-bottom: 0; }
         .panel-header {
             display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
         }
-        .panel-title { font-size: 14px; font-weight: 700; color: #0f172a; }
-        .panel-action {
-            font-size: 12px; color: #1d4ed8; font-weight: 600;
-            text-decoration: none; cursor: pointer;
-        }
+        .panel-title { font-size: 14px; font-weight: 700; color: var(--text); }
+        .panel-action { font-size: 12px; color: #2563eb; font-weight: 600; text-decoration: none; cursor: pointer; }
 
         /* Bar chart */
         .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-bottom: 10px; }
