@@ -199,6 +199,9 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 700;
+            position: relative;
+            z-index: 2;
+            pointer-events: auto;
         }
         .sidebar-cta .cta-button:hover {
             background: #1d4ed8;

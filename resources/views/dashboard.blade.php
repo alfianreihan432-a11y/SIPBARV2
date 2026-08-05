@@ -160,6 +160,9 @@
             border-radius: 10px; text-decoration: none;
             box-shadow: 0 4px 12px rgba(29,78,216,.4);
             transition: all .2s;
+            position: relative;
+            z-index: 2;
+            pointer-events: auto;
         }
         .sidebar-cta-btn:hover {
             background: linear-gradient(135deg, #1e40af, #1d4ed8);

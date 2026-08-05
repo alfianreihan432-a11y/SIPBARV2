@@ -28,9 +28,11 @@ class UserManager extends Component
     // ── Siswa only ──
     public $nis   = '';
     public $kelas = '';
+    public $jurusan = '';
 
     // ── Guru only ──
     public $nip = '';
+    public $jabatan = '';
 
     // ── Internal (auto-generated, not shown) ──
     public $email    = '';
@@ -76,10 +78,12 @@ class UserManager extends Component
         ];
 
         if ($role === 'siswa') {
-            $rules['nis']   = 'required|string|max:20';
-            $rules['kelas'] = 'required|string|max:50';
+            $rules['nis']     = 'required|string|max:20';
+            $rules['kelas']   = 'required|string|max:50';
+            $rules['jurusan'] = 'required|string|max:50';
         } elseif ($role === 'guru') {
-            $rules['nip'] = 'required|string|max:30';
+            $rules['nip']     = 'required|string|max:30';
+            $rules['jabatan'] = 'required|string|max:50';
         }
 
         $this->validate($rules);
@@ -100,10 +104,12 @@ class UserManager extends Component
         ];
 
         if ($role === 'siswa') {
-            $data['nis']   = $this->nis;
-            $data['kelas'] = $this->kelas;
+            $data['nis']     = $this->nis;
+            $data['kelas']   = $this->kelas;
+            $data['jurusan'] = $this->jurusan;
         } elseif ($role === 'guru') {
-            $data['nip'] = $this->nip;
+            $data['nip']     = $this->nip;
+            $data['jabatan'] = $this->jabatan;
         }
 
         if ($this->editingId) {
@@ -134,13 +140,16 @@ class UserManager extends Component
     {
         $user = User::with('roles')->findOrFail($id);
 
-        $this->editingId    = $user->id;
-        $this->name         = $user->name;
+        $this->editingId      = $user->id;
+        $this->name           = $user->name;
         $this->tanggal_lahir = $user->tanggal_lahir ?? '';
-        $this->nis          = $user->nis   ?? '';
-        $this->kelas        = $user->kelas ?? '';
-        $this->nip          = $user->nip   ?? '';
-        $this->email        = $user->email;
+        $this->phone          = $user->phone ?? '';
+        $this->nis            = $user->nis   ?? '';
+        $this->kelas          = $user->kelas ?? '';
+        $this->jurusan        = $user->jurusan ?? '';
+        $this->nip            = $user->nip   ?? '';
+        $this->jabatan        = $user->jabatan ?? '';
+        $this->email          = $user->email;
 
         $roleSlug = $user->roles->first()?->name ?? 'siswa';
         $this->activeTab = in_array($roleSlug, ['guru']) ? 'guru' : 'siswa';
@@ -158,9 +167,12 @@ class UserManager extends Component
         $this->editingId     = null;
         $this->name          = '';
         $this->tanggal_lahir = '';
+        $this->phone          = '';
         $this->nis           = '';
         $this->kelas         = '';
+        $this->jurusan       = '';
         $this->nip           = '';
+        $this->jabatan       = '';
         $this->email         = '';
         $this->password      = '';
     }
