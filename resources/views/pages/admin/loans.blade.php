@@ -6,7 +6,10 @@
 @section('content')
     <div class="panel">
         <div class="panel-title">Halaman Peminjaman</div>
-        <p class="panel-text">Di sini akan ditampilkan daftar peminjaman barang. Halaman ini sudah aktif dan dapat diakses.</p>
-        <a href="{{ route('dashboard') }}" class="action-link">Kembali ke Dashboard</a>
+        <p class="panel-text">Hanya siswa yang terdaftar di database dapat meminjam barang melalui panel admin.</p>
+    </div>
+
+    <div class="mt-6">
+        @livewire('loan-manager')
     </div>
 @endsection
