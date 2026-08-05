@@ -10,21 +10,32 @@ use Spatie\Permission\Models\Role;
 
 class UserManager extends Component
 {
+    protected $listeners = ['userUpdated' => 'loadUsers'];
+
     public $users;
     public $roles;
 
-    public $name = '';
-    public $email = '';
-    public $password = '';
-    public $role = '';
+    // Active tab: 'siswa' | 'guru'
+    public $activeTab = 'siswa';
+
     public $editingId = null;
 
-    protected $rules = [
-        'name' => 'required|string|min:3',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|string|min:6',
-        'role' => 'required|string|exists:roles,name',
-    ];
+    // ── Shared ──
+    public $name = '';
+    public $tanggal_lahir = '';
+    public $phone = '';
+
+    // ── Siswa only ──
+    public $nis   = '';
+    public $kelas = '';
+
+    // ── Guru only ──
+    public $nip = '';
+
+    // ── Internal (auto-generated, not shown) ──
+    public $email    = '';
+    public $password = '';
+    public $alamat   = '';
 
     public function mount(): void
     {
@@ -47,67 +58,110 @@ class UserManager extends Component
         $this->roles = Role::orderBy('name')->pluck('name');
     }
 
+    public function setTab(string $tab): void
+    {
+        $this->activeTab = $tab;
+        $this->resetForm();
+    }
+
     public function save(): void
     {
-        $rules = $this->rules;
+        $role = $this->activeTab;
 
-        if ($this->editingId) {
-            $rules['email'] = 'required|email|unique:users,email,'.$this->editingId;
-            $rules['password'] = 'nullable|string|min:6';
+        // Dynamic validation
+        $rules = [
+            'name'          => 'required|string|min:2',
+            'tanggal_lahir' => 'required|date',
+            'phone'         => 'required|string|min:9|max:20',
+        ];
+
+        if ($role === 'siswa') {
+            $rules['nis']   = 'required|string|max:20';
+            $rules['kelas'] = 'required|string|max:50';
+        } elseif ($role === 'guru') {
+            $rules['nip'] = 'required|string|max:30';
         }
 
         $this->validate($rules);
 
+        // Auto-generate email & password if creating new
+        if (! $this->editingId) {
+            $slug  = Str::slug($this->name, '.');
+            $base  = strtolower($role === 'siswa' ? ($this->nis ?: $slug) : ($this->nip ?: $slug));
+            $this->email    = $base . '@sipbar.sch.id';
+            $this->password = $role === 'siswa' ? 'siswa' . $this->nis : 'guru' . $this->nip;
+        }
+
         $data = [
-            'name' => $this->name,
-            'email' => $this->email,
+            'name'              => $this->name,
+            'tanggal_lahir'     => $this->tanggal_lahir,
+            'phone'             => $this->phone,
+            'email_verified_at' => now(), // siswa & guru tidak butuh verifikasi email
         ];
 
-        if ($this->password) {
-            $data['password'] = Hash::make($this->password);
+        if ($role === 'siswa') {
+            $data['nis']   = $this->nis;
+            $data['kelas'] = $this->kelas;
+        } elseif ($role === 'guru') {
+            $data['nip'] = $this->nip;
         }
 
         if ($this->editingId) {
             $user = User::findOrFail($this->editingId);
             $user->update($data);
         } else {
+            $data['email']    = $this->email;
             $data['password'] = Hash::make($this->password);
             $user = User::create($data);
         }
 
-        $user->syncRoles([$this->role]);
+        $user->syncRoles([$role]);
 
         $this->resetForm();
         $this->loadUsers();
-        session()->flash('message', 'Pengguna berhasil disimpan.');
+
+        session()->flash('message', $this->editingId
+            ? 'Data pengguna berhasil diperbarui.'
+            : 'Pengguna berhasil ditambahkan. Email: ' . $this->email . ' | Password: ' . $this->password
+        );
+
+        // Re-flash with generated creds before reset clears them
+        session()->flash('generated_email',    $this->email);
+        session()->flash('generated_password', $this->password);
     }
 
     public function edit(int $id): void
     {
-        $user = User::findOrFail($id);
+        $user = User::with('roles')->findOrFail($id);
 
-        $this->editingId = $user->id;
-        $this->name = $user->name;
-        $this->email = $user->email;
-        $this->role = $user->roles->first()?->name ?? '';
-        $this->password = '';
+        $this->editingId    = $user->id;
+        $this->name         = $user->name;
+        $this->tanggal_lahir = $user->tanggal_lahir ?? '';
+        $this->nis          = $user->nis   ?? '';
+        $this->kelas        = $user->kelas ?? '';
+        $this->nip          = $user->nip   ?? '';
+        $this->email        = $user->email;
+
+        $roleSlug = $user->roles->first()?->name ?? 'siswa';
+        $this->activeTab = in_array($roleSlug, ['guru']) ? 'guru' : 'siswa';
     }
 
     public function delete(int $id): void
     {
-        $user = User::findOrFail($id);
-        $user->delete();
-
+        User::findOrFail($id)->delete();
         $this->loadUsers();
         session()->flash('message', 'Pengguna berhasil dihapus.');
     }
 
     public function resetForm(): void
     {
-        $this->name = '';
-        $this->email = '';
-        $this->password = '';
-        $this->role = '';
-        $this->editingId = null;
+        $this->editingId     = null;
+        $this->name          = '';
+        $this->tanggal_lahir = '';
+        $this->nis           = '';
+        $this->kelas         = '';
+        $this->nip           = '';
+        $this->email         = '';
+        $this->password      = '';
     }
 }

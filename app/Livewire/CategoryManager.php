@@ -7,12 +7,17 @@ use Livewire\Component;
 
 class CategoryManager extends Component
 {
+    protected $listeners = ['categoryUpdated' => 'loadCategories'];
+    
+    public $poll = '5s';
+    
     public $categories;
     public $name = '';
     public $icon = '';
     public $color = '#2563eb';
     public $description = '';
     public $editingId = null;
+    public $search = '';
 
     protected $rules = [
         'name' => 'required|string|min:3',
@@ -28,12 +33,17 @@ class CategoryManager extends Component
 
     public function render()
     {
+        $this->categories = Category::withCount('items')
+            ->when($this->search, fn($q) => $q->where('name', 'like', '%'.$this->search.'%'))
+            ->latest()->get();
         return view('livewire.category-manager');
     }
 
     public function loadCategories(): void
     {
-        $this->categories = Category::latest()->get();
+        $this->categories = Category::withCount('items')
+            ->when($this->search, fn($q) => $q->where('name', 'like', '%'.$this->search.'%'))
+            ->latest()->get();
     }
 
     public function save(): void
@@ -57,6 +67,7 @@ class CategoryManager extends Component
 
         $this->resetForm();
         $this->loadCategories();
+        $this->dispatch('categoryUpdated');
     }
 
     public function edit(int $id): void
@@ -73,6 +84,7 @@ class CategoryManager extends Component
     public function delete(int $id): void
     {
         Category::findOrFail($id)->delete();
+        $this->dispatch('categoryUpdated');
         $this->loadCategories();
         session()->flash('message', 'Kategori berhasil dihapus.');
     }
