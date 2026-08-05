@@ -11,8 +11,8 @@ class AuthenticateUser
     /**
      * Login berdasarkan role:
      *   admin  → email   + password
-     *   guru   → nip     + nomor HP
-     *   siswa  → nis     + nomor HP
+     *   guru   → nip     + tanggal lahir
+     *   siswa  → nis     + tanggal lahir
      */
     public function __invoke(Request $request): ?User
     {
@@ -35,55 +35,39 @@ class AuthenticateUser
         return $user;
     }
 
-    /* ── Guru: NIP + nomor HP ── */
+    /* ── Guru: NIP + tanggal lahir ── */
     private function loginGuru(Request $request): ?User
     {
-        $nip   = trim($request->input('nip', ''));
-        $phone = $this->normalizePhone($request->input('phone', ''));
+        $nip = trim($request->input('nip', ''));
+        $tanggal_lahir = $request->input('tanggal_lahir', '');
 
-        if (! $nip || ! $phone) return null;
+        if (! $nip || ! $tanggal_lahir) return null;
 
         $user = User::where('nip', $nip)->first();
 
         if (! $user) return null;
 
-        // Bandingkan nomor HP (sudah dinormalisasi)
-        if ($this->normalizePhone($user->phone ?? '') !== $phone) return null;
+        // Bandingkan tanggal lahir
+        if ($user->tanggal_lahir !== $tanggal_lahir) return null;
 
         return $user;
     }
 
-    /* ── Siswa: NIS + nomor HP ── */
+    /* ── Siswa: NIS + tanggal lahir ── */
     private function loginSiswa(Request $request): ?User
     {
-        $nis   = trim($request->input('nis', ''));
-        $phone = $this->normalizePhone($request->input('phone', ''));
+        $nis = trim($request->input('nis', ''));
+        $tanggal_lahir = $request->input('tanggal_lahir', '');
 
-        if (! $nis || ! $phone) return null;
+        if (! $nis || ! $tanggal_lahir) return null;
 
         $user = User::where('nis', $nis)->first();
 
         if (! $user) return null;
 
-        if ($this->normalizePhone($user->phone ?? '') !== $phone) return null;
+        // Bandingkan tanggal lahir
+        if ($user->tanggal_lahir !== $tanggal_lahir) return null;
 
         return $user;
-    }
-
-    /**
-     * Normalisasi nomor HP agar fleksibel:
-     * 08xxx, 8xxx, +628xxx, 628xxx → semua jadi 08xxx
-     */
-    private function normalizePhone(string $phone): string
-    {
-        $phone = preg_replace('/\D/', '', $phone); // hapus non-digit
-
-        if (str_starts_with($phone, '628')) {
-            $phone = '0' . substr($phone, 2);
-        } elseif (str_starts_with($phone, '8')) {
-            $phone = '0' . $phone;
-        }
-
-        return $phone;
     }
 }

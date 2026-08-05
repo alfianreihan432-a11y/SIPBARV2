@@ -283,12 +283,12 @@
                 <div class="dummy-row">
                     <span class="dummy-chip role">Guru</span>
                     <span class="dummy-chip">NIP: 198505152010011001</span>
-                    <span class="dummy-chip">No. HP: sesuai data guru</span>
+                    <span class="dummy-chip">Tgl Lahir: sesuai data guru</span>
                 </div>
                 <div class="dummy-row">
                     <span class="dummy-chip role">Siswa</span>
                     <span class="dummy-chip">NIS: 2024001</span>
-                    <span class="dummy-chip">No. HP: sesuai data siswa</span>
+                    <span class="dummy-chip">Tgl Lahir: sesuai data siswa</span>
                 </div>
             </div>
 
@@ -379,18 +379,17 @@
                     </div>@enderror
                 </div>
 
-                {{-- Nomor HP (guru & siswa only) --}}
+                {{-- Tanggal Lahir (guru & siswa only) --}}
                 <div class="form-group" id="tgl-lahir-group" style="{{ old('role','admin') === 'admin' ? 'display:none' : '' }}">
-                    <label class="form-label" for="phone">Nomor HP (WhatsApp)</label>
+                    <label class="form-label" for="tanggal_lahir">Tanggal Lahir</label>
                     <div class="password-wrap">
-                        <input type="tel" id="phone" name="phone"
-                            class="form-control {{ $errors->has('phone') ? 'is-invalid' : '' }}"
-                            placeholder="Contoh: 08123456789"
-                            value="{{ old('phone') }}"
-                            autocomplete="tel">
+                        <input type="date" id="tanggal_lahir" name="tanggal_lahir"
+                            class="form-control {{ $errors->has('tanggal_lahir') ? 'is-invalid' : '' }}"
+                            value="{{ old('tanggal_lahir') }}"
+                            autocomplete="off">
                     </div>
-                    @error('phone')<div class="error-msg">{{ $message }}</div>@enderror
-                    <div style="font-size:11px;color:#94a3b8;margin-top:4px">Format: 08xxx, 628xxx, atau +628xxx</div>
+                    @error('tanggal_lahir')<div class="error-msg">{{ $message }}</div>@enderror
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px">Gunakan tanggal lahir sesuai data di sistem</div>
                 </div>
 
                 {{-- Remember + Forgot --}}

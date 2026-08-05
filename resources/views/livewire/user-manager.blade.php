@@ -191,6 +191,19 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     @error('kelas')<div class="um-error">{{ $message }}</div>@enderror
                 </div>
 
+                {{-- Jurusan --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13"/></svg>
+                        Jurusan <span class="um-req">*</span>
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        <input wire:model="jurusan" type="text" class="um-input" placeholder="Contoh: IPA / IPS / Kejuruan">
+                    </div>
+                    @error('jurusan')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+
                 {{-- Tanggal Lahir --}}
                 <div class="um-field">
                     <label class="um-label">
@@ -202,6 +215,20 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                         <input wire:model="tanggal_lahir" type="date" class="um-input">
                     </div>
                     @error('tanggal_lahir')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+
+                {{-- Nomor HP --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        Nomor HP <span class="um-req">*</span>
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        <input wire:model="phone" type="tel" class="um-input" placeholder="Contoh: 08123456789">
+                    </div>
+                    @error('phone')<div class="um-error">{{ $message }}</div>@enderror
+                    <div class="um-hint">Format: 08xxx, 628xxx, atau +628xxx</div>
                 </div>
             </div>
 
@@ -215,7 +242,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
 
             @elseif($activeTab === 'guru')
             {{-- ══ GURU FIELDS ══ --}}
-            <div class="um-grid um-grid-3">
+            <div class="um-grid um-grid-2">
                 {{-- Nama --}}
                 <div class="um-field" style="grid-column:1/-1">
                     <label class="um-label">
@@ -230,7 +257,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                 </div>
 
                 {{-- NIP --}}
-                <div class="um-field" style="grid-column:span 2">
+                <div class="um-field">
                     <label class="um-label">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1"/></svg>
                         NIP (Nomor Induk Pegawai) <span class="um-req">*</span>
@@ -241,6 +268,19 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     </div>
                     @error('nip')<div class="um-error">{{ $message }}</div>@enderror
                     <div class="um-hint">NIP digunakan sebagai username login guru</div>
+                </div>
+
+                {{-- Jabatan --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        Jabatan <span class="um-req">*</span>
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        <input wire:model="jabatan" type="text" class="um-input" placeholder="Contoh: Guru Matematika / Kepala Sekolah">
+                    </div>
+                    @error('jabatan')<div class="um-error">{{ $message }}</div>@enderror
                 </div>
 
                 {{-- Tanggal Lahir --}}
@@ -254,6 +294,20 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                         <input wire:model="tanggal_lahir" type="date" class="um-input">
                     </div>
                     @error('tanggal_lahir')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+
+                {{-- Nomor HP --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        Nomor HP <span class="um-req">*</span>
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        <input wire:model="phone" type="tel" class="um-input" placeholder="Contoh: 08123456789">
+                    </div>
+                    @error('phone')<div class="um-error">{{ $message }}</div>@enderror
+                    <div class="um-hint">Format: 08xxx, 628xxx, atau +628xxx</div>
                 </div>
             </div>
 
