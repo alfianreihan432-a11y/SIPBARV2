@@ -166,6 +166,39 @@
         }
         .topbar-button:hover { background: rgba(255,255,255,.1); transform: translateY(-1px); }
         .topbar-button[title] { position: relative; }
+        .sidebar-cta {
+            margin: 16px 18px 0;
+            padding: 16px;
+            background: rgba(37,99,235,.08);
+            border: 1px solid rgba(37,99,235,.18);
+            border-radius: 16px;
+            color: #eff6ff;
+        }
+        .sidebar-cta .cta-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #bfdbfe;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .sidebar-cta .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: #2563eb;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .sidebar-cta .cta-button:hover {
+            background: #1d4ed8;
+        }
         @media(max-width: 960px) {
             .sidebar { position: fixed; transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
@@ -224,6 +257,10 @@
                 Pengaturan
             </a>
         </nav>
+        <div class="sidebar-cta">
+            <span class="cta-label">Tambah Guru / Siswa</span>
+            <a href="{{ route('users.index') }}" class="cta-button">Kelola akun pengguna</a>
+        </div>
         <div class="sidebar-footer">
             <div class="user-card">
                 <div class="user-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name, 0, 1)) : 'A' }}</div>

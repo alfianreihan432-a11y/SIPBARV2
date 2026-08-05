@@ -5,8 +5,11 @@
 
 @section('content')
     <div class="panel">
-        <div class="panel-title">Halaman Kategori</div>
-        <p class="panel-text">Di sini akan ditampilkan daftar kategori inventaris. Untuk sementara ini adalah halaman placeholder yang sudah aktif.</p>
-        <a href="{{ route('dashboard') }}" class="action-link">Kembali ke Dashboard</a>
+        <div class="panel-title">Manajemen Kategori</div>
+        <p class="panel-text">Tambahkan, edit, atau hapus kategori inventaris. Kategori yang dibuat akan muncul di form tambah barang.</p>
+    </div>
+
+    <div class="mt-6">
+        @livewire('category-manager')
     </div>
 @endsection

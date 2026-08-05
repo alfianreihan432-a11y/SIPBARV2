@@ -5,8 +5,11 @@
 
 @section('content')
     <div class="panel">
-        <div class="panel-title">Halaman Pengguna</div>
-        <p class="panel-text">Di sini akan ditampilkan daftar pengguna dan manajemen hak akses. Halaman ini sudah aktif dan dapat diakses.</p>
-        <a href="{{ route('dashboard') }}" class="action-link">Kembali ke Dashboard</a>
+        <div class="panel-title">Manajemen Pengguna</div>
+        <p class="panel-text">Tambahkan siswa atau guru baru langsung ke database. Hanya akun siswa dan guru terdaftar yang dapat mengakses halaman peminjaman dan dashboard masing-masing.</p>
+    </div>
+
+    <div class="mt-6">
+        @livewire('user-manager')
     </div>
 @endsection
