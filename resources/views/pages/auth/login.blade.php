@@ -277,18 +277,18 @@
                 </div>
                 <div class="dummy-row">
                     <span class="dummy-chip role">Admin</span>
-                    <span class="dummy-chip">admin@sipbar.sch.id</span>
-                    <span class="dummy-chip">password: admin123</span>
+                    <span class="dummy-chip">Email: admin@sipbar.sch.id</span>
+                    <span class="dummy-chip">Password: admin123</span>
                 </div>
                 <div class="dummy-row">
                     <span class="dummy-chip role">Guru</span>
-                    <span class="dummy-chip">guru@sipbar.sch.id</span>
-                    <span class="dummy-chip">password: guru123</span>
+                    <span class="dummy-chip">NIP: 198505152010011001</span>
+                    <span class="dummy-chip">No. HP: sesuai data guru</span>
                 </div>
                 <div class="dummy-row">
                     <span class="dummy-chip role">Siswa</span>
-                    <span class="dummy-chip">siswa@sipbar.sch.id</span>
-                    <span class="dummy-chip">password: siswa123</span>
+                    <span class="dummy-chip">NIS: 2024001</span>
+                    <span class="dummy-chip">No. HP: sesuai data siswa</span>
                 </div>
             </div>
 
@@ -317,48 +317,80 @@
 
                 {{-- Dynamic Identifier Field --}}
                 <div class="form-group" id="identifierGroup">
-                    <label class="form-label" id="identifierLabel" for="identifier">Email</label>
-                    <input
-                        type="email"
-                        id="identifier"
-                        name="email"
-                        class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-                        placeholder="admin@sipbar.sch.id"
-                        value="{{ old('email') }}"
-                        autocomplete="email"
-                        required
-                    />
-                    @error('email')
-                        <div class="error-msg">
+
+                    {{-- ADMIN: Email --}}
+                    <div id="field-admin" style="{{ old('role','admin') !== 'admin' ? 'display:none' : '' }}">
+                        <label class="form-label" for="email">Email</label>
+                        <div class="password-wrap">
+                            <input type="email" id="email" name="email"
+                                class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                                placeholder="admin@sipbar.sch.id"
+                                value="{{ old('email') }}"
+                                autocomplete="email">
+                        </div>
+                        @error('email')<div class="error-msg">
                             <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             {{ $message }}
+                        </div>@enderror
+                    </div>
+
+                    {{-- GURU: NIP --}}
+                    <div id="field-guru" style="{{ old('role','admin') !== 'guru' ? 'display:none' : '' }}">
+                        <label class="form-label" for="nip">NIP (Nomor Induk Pegawai)</label>
+                        <div class="password-wrap">
+                            <input type="text" id="nip" name="nip"
+                                class="form-control {{ $errors->has('nip') ? 'is-invalid' : '' }}"
+                                placeholder="Contoh: 198505152010011001"
+                                value="{{ old('nip') }}"
+                                autocomplete="off">
                         </div>
-                    @enderror
+                        @error('nip')<div class="error-msg">{{ $message }}</div>@enderror
+                    </div>
+
+                    {{-- SISWA: NIS --}}
+                    <div id="field-siswa" style="{{ old('role','admin') !== 'siswa' ? 'display:none' : '' }}">
+                        <label class="form-label" for="nis">NIS (Nomor Induk Siswa)</label>
+                        <div class="password-wrap">
+                            <input type="text" id="nis" name="nis"
+                                class="form-control {{ $errors->has('nis') ? 'is-invalid' : '' }}"
+                                placeholder="Contoh: 2024001"
+                                value="{{ old('nis') }}"
+                                autocomplete="off">
+                        </div>
+                        @error('nis')<div class="error-msg">{{ $message }}</div>@enderror
+                    </div>
                 </div>
 
-                {{-- Password --}}
-                <div class="form-group">
+                {{-- Password (admin only) --}}
+                <div class="form-group" id="password-group" style="{{ old('role','admin') !== 'admin' ? 'display:none' : '' }}">
                     <label class="form-label" for="password">Password</label>
                     <div class="password-wrap">
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
+                        <input type="password" id="password" name="password"
                             class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
                             placeholder="••••••••••"
-                            autocomplete="current-password"
-                            required
-                        />
+                            autocomplete="current-password">
                         <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Tampilkan password">
                             <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         </button>
                     </div>
-                    @error('password')
-                        <div class="error-msg">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            {{ $message }}
-                        </div>
-                    @enderror
+                    @error('password')<div class="error-msg">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ $message }}
+                    </div>@enderror
+                </div>
+
+                {{-- Nomor HP (guru & siswa only) --}}
+                <div class="form-group" id="tgl-lahir-group" style="{{ old('role','admin') === 'admin' ? 'display:none' : '' }}">
+                    <label class="form-label" for="phone">Nomor HP (WhatsApp)</label>
+                    <div class="password-wrap">
+                        <input type="tel" id="phone" name="phone"
+                            class="form-control {{ $errors->has('phone') ? 'is-invalid' : '' }}"
+                            placeholder="Contoh: 08123456789"
+                            value="{{ old('phone') }}"
+                            autocomplete="tel">
+                    </div>
+                    @error('phone')<div class="error-msg">{{ $message }}</div>@enderror
+                    <div style="font-size:11px;color:#94a3b8;margin-top:4px">Format: 08xxx, 628xxx, atau +628xxx</div>
                 </div>
 
                 {{-- Remember + Forgot --}}
@@ -379,44 +411,25 @@
 </div>
 
 <script>
-    const roleConfig = {
-        admin: {
-            label: 'Email',
-            placeholder: 'admin@sipbar.sch.id',
-            inputType: 'email',
-            inputName: 'email',
-            autocomplete: 'email'
-        },
-        guru: {
-            label: 'NIP (Nomor Induk Pegawai)',
-            placeholder: 'Contoh: 198505152010011001',
-            inputType: 'text',
-            inputName: 'nip',
-            autocomplete: 'off'
-        },
-        siswa: {
-            label: 'NIS (Nomor Induk Siswa)',
-            placeholder: 'Contoh: 2024001',
-            inputType: 'text',
-            inputName: 'nis',
-            autocomplete: 'off'
-        }
-    };
-
+    // ── Role switcher ──
     function handleRoleChange(role) {
-        const cfg = roleConfig[role];
-        if (!cfg) return;
+        // Reset semua field visibility
+        document.getElementById('field-admin').style.display    = 'none';
+        document.getElementById('field-guru').style.display     = 'none';
+        document.getElementById('field-siswa').style.display    = 'none';
+        document.getElementById('password-group').style.display = 'none';
+        document.getElementById('tgl-lahir-group').style.display= 'none';
 
-        const label = document.getElementById('identifierLabel');
-        const input = document.getElementById('identifier');
-
-        label.textContent = cfg.label;
-        input.type = cfg.inputType;
-        input.name = cfg.inputName;
-        input.placeholder = cfg.placeholder;
-        input.autocomplete = cfg.autocomplete;
-        input.value = '';
-        input.focus();
+        if (role === 'admin') {
+            document.getElementById('field-admin').style.display    = '';
+            document.getElementById('password-group').style.display = '';
+        } else if (role === 'guru') {
+            document.getElementById('field-guru').style.display      = '';
+            document.getElementById('tgl-lahir-group').style.display = '';
+        } else if (role === 'siswa') {
+            document.getElementById('field-siswa').style.display     = '';
+            document.getElementById('tgl-lahir-group').style.display = '';
+        }
     }
 
     function togglePassword() {
@@ -429,20 +442,10 @@
             : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
     }
 
-    // Restore role on page load (e.g. after validation error)
+    // Init on page load
     document.addEventListener('DOMContentLoaded', function () {
-        const roleSelect = document.getElementById('role');
-        // Always apply role config on load (default is admin)
-        handleRoleChange(roleSelect.value || 'admin');
-
-        // Restore old value if available (after validation error)
-        @if(old('email'))
-        document.getElementById('identifier').value = "{{ old('email') }}";
-        @elseif(old('nip'))
-        document.getElementById('identifier').value = "{{ old('nip') }}";
-        @elseif(old('nis'))
-        document.getElementById('identifier').value = "{{ old('nis') }}";
-        @endif
+        const role = document.getElementById('role').value || 'admin';
+        handleRoleChange(role);
     });
 </script>
 </body>

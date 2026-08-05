@@ -3,36 +3,17 @@
 namespace App\Livewire;
 
 use App\Models\Borrowing;
-use App\Models\BorrowingDetail;
 use App\Models\Item;
 use App\Models\User;
-use Illuminate\Support\Str;
 use Livewire\Component;
 
 class LoanManager extends Component
 {
-    public $students;
-    public $items;
     public $borrowings;
-
-    public $student_id = '';
-    public $item_id = '';
-    public $quantity = 1;
-    public $due_at = '';
-    public $notes = '';
-
-    protected $rules = [
-        'student_id' => 'required|exists:users,id',
-        'item_id' => 'required|exists:items,id',
-        'quantity' => 'required|integer|min:1',
-        'due_at' => 'nullable|date',
-        'notes' => 'nullable|string',
-    ];
+    public $filterStatus = 'semua';
 
     public function mount(): void
     {
-        $this->loadStudents();
-        $this->loadItems();
         $this->loadBorrowings();
     }
 
@@ -41,63 +22,53 @@ class LoanManager extends Component
         return view('livewire.loan-manager');
     }
 
-    public function loadStudents(): void
+    public function updatedFilterStatus(): void
     {
-        $this->students = User::role('siswa')->orderBy('name')->get();
-    }
-
-    public function loadItems(): void
-    {
-        $this->items = Item::where('stock', '>', 0)->orderBy('name')->get();
+        $this->loadBorrowings();
     }
 
     public function loadBorrowings(): void
     {
-        $this->borrowings = Borrowing::with(['user', 'details.item'])->latest()->take(20)->get();
-    }
+        $query = Borrowing::with(['user', 'details.item'])->latest();
 
-    public function save(): void
-    {
-        $this->validate();
-
-        $item = Item::findOrFail($this->item_id);
-
-        if ($this->quantity > $item->stock) {
-            $this->addError('quantity', 'Jumlah melebihi stok yang tersedia.');
-            return;
+        if ($this->filterStatus !== 'semua') {
+            $query->where('status', $this->filterStatus);
         }
 
-        $borrowing = Borrowing::create([
-            'number' => strtoupper('PNJ-'.str_pad((Borrowing::count() + 1), 4, '0', STR_PAD_LEFT)),
-            'user_id' => $this->student_id,
-            'borrowed_at' => now(),
-            'due_at' => $this->due_at ?: null,
-            'status' => 'pending',
-            'notes' => $this->notes,
-        ]);
-
-        BorrowingDetail::create([
-            'borrowing_id' => $borrowing->id,
-            'item_id' => $item->id,
-            'quantity' => $this->quantity,
-            'status' => 'pending',
-        ]);
-
-        $item->decrement('stock', $this->quantity);
-
-        $this->resetForm();
-        $this->loadItems();
-        $this->loadBorrowings();
-
-        session()->flash('message', 'Peminjaman siswa berhasil ditambahkan.');
+        $this->borrowings = $query->get();
     }
 
-    public function resetForm(): void
+    /**
+     * Setujui peminjaman (pending → approved)
+     */
+    public function approve(int $id): void
     {
-        $this->student_id = '';
-        $this->item_id = '';
-        $this->quantity = 1;
-        $this->due_at = '';
-        $this->notes = '';
+        $borrowing = Borrowing::findOrFail($id);
+        $borrowing->update(['status' => 'borrowed']);
+
+        $this->loadBorrowings();
+        session()->flash('message', 'Peminjaman #' . $borrowing->number . ' telah disetujui.');
+    }
+
+    /**
+     * Tandai dikembalikan (approved/borrowed → returned)
+     */
+    public function markReturned(int $id): void
+    {
+        $borrowing = Borrowing::with('details.item')->findOrFail($id);
+        $borrowing->update([
+            'status'      => 'returned',
+            'returned_at' => now(),
+        ]);
+
+        // Kembalikan stok
+        foreach ($borrowing->details as $detail) {
+            if ($detail->item) {
+                $detail->item->increment('stock', $detail->quantity);
+            }
+        }
+
+        $this->loadBorrowings();
+        session()->flash('message', 'Peminjaman #' . $borrowing->number . ' berhasil dikembalikan.');
     }
 }

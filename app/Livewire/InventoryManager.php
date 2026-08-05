@@ -13,6 +13,10 @@ class InventoryManager extends Component
 {
     use WithFileUploads;
 
+    protected $listeners = ['itemUpdated' => 'loadItems'];
+    
+    public $poll = '5s';
+    
     public $items;
     public $search = '';
     public $name = '';
@@ -129,6 +133,7 @@ class InventoryManager extends Component
     {
         Item::findOrFail($id)->delete();
         $this->loadItems();
+        $this->dispatch('itemUpdated');
         session()->flash('message', 'Inventaris berhasil dihapus.');
     }
 

@@ -138,6 +138,35 @@
         .user-role  { font-size: 10px; color: #64748b; }
         .user-caret { margin-left: auto; color: #475569; }
 
+        /* ===== SIDEBAR CTA ===== */
+        .sidebar-cta {
+            margin: 0 12px 12px;
+            padding: 14px 16px;
+            background: rgba(29,78,216,.12);
+            border: 1px solid rgba(59,130,246,.25);
+            border-radius: 14px;
+        }
+        .sidebar-cta-label {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 700; color: #93c5fd;
+            letter-spacing: .08em; text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .sidebar-cta-btn {
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+            width: 100%; padding: 10px 14px;
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            color: #fff; font-size: 12px; font-weight: 700;
+            border-radius: 10px; text-decoration: none;
+            box-shadow: 0 4px 12px rgba(29,78,216,.4);
+            transition: all .2s;
+        }
+        .sidebar-cta-btn:hover {
+            background: linear-gradient(135deg, #1e40af, #1d4ed8);
+            box-shadow: 0 6px 16px rgba(29,78,216,.5);
+            transform: translateY(-1px);
+        }
+
         /* ========== MAIN ========== */
         .main {
             margin-left: 220px;
@@ -389,6 +418,18 @@
         </a>
     </nav>
 
+    {{-- ===== SIDEBAR CTA ===== --}}
+    <div class="sidebar-cta">
+        <div class="sidebar-cta-label">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Tambah Guru / Siswa
+        </div>
+        <a href="{{ route('users.index') }}" class="sidebar-cta-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Kelola Akun Pengguna
+        </a>
+    </div>
+
     <div class="sidebar-footer">
         <div class="user-card">
             <div class="user-avatar">{{ auth()->check() ? auth()->user()->initials() : 'AD' }}</div>
@@ -440,291 +481,7 @@
 
     {{-- CONTENT --}}
     <div class="content">
-
-        {{-- Greeting + Gauge --}}
-        <div class="greeting-row">
-            <div>
-                <div class="greeting-title">
-                    @php
-                        $hour = now()->hour;
-                        $greet = $hour < 12 ? 'Selamat Pagi' : ($hour < 17 ? 'Selamat Siang' : 'Selamat Malam');
-                    @endphp
-                    {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Admin' }} 👋
-                </div>
-                <div class="greeting-sub">{{ now()->translatedFormat('l, d F Y') }}</div>
-            </div>
-            <div class="gauge-card">
-                <div class="gauge-title">Kondisi Barang Baik</div>
-                <svg class="gauge-svg" viewBox="0 0 120 70">
-                    <defs>
-                        <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="#1d4ed8"/>
-                            <stop offset="100%" stop-color="#06b6d4"/>
-                        </linearGradient>
-                    </defs>
-                    <path d="M10,65 A50,50 0 0,1 110,65" fill="none" stroke="#1e293b" stroke-width="10" stroke-linecap="round"/>
-                    <path d="M10,65 A50,50 0 0,1 110,65" fill="none" stroke="url(#gaugeGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="32"/>
-                    <text x="60" y="58" text-anchor="middle" font-size="16" font-weight="800" fill="#f1f5f9">80%</text>
-                    <text x="12" y="70" font-size="7" fill="#475569">0</text>
-                    <text x="104" y="70" font-size="7" fill="#475569">100</text>
-                </svg>
-                <div class="gauge-label">Kondisi Barang Baik</div>
-            </div>
-        </div>
-
-        {{-- Stat Cards --}}
-        <div class="stat-grid">
-            @php
-            $stats = [
-                ['1.256', 'Total Barang', '+17%', true,  '#1d4ed8', '#dbeafe', 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'],
-                ['234',   'Sedang Dipinjam', '+5%', true, '#0891b2', '#cffafe', 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'],
-                ['892',   'Barang Tersedia', '-3%', false,'#059669', '#d1fae5', 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
-                ['24',    'Kategori', '—', null,   '#7c3aed', '#ede9fe', 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'],
-            ];
-            @endphp
-            @foreach($stats as $s)
-            <div class="stat-card">
-                <div class="stat-icon-box" style="background:{{ $s[4] }}1a">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px;color:{{ $s[4] }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $s[6] }}"/>
-                    </svg>
-                </div>
-                <div>
-                    <div class="stat-num">{{ $s[0] }}</div>
-                    <div class="stat-label">{{ $s[1] }}</div>
-                    @if($s[3] !== null)
-                    <div class="stat-change {{ $s[3] ? 'up' : 'down' }}">
-                        {{ $s[3] ? '↑' : '↓' }} {{ $s[2] }} bulan ini
-                    </div>
-                    @else
-                    <div class="stat-change" style="color:#475569">Total keseluruhan</div>
-                    @endif
-                </div>
-            </div>
-            @endforeach
-        </div>
-
-        {{-- Bottom Grid: Transaksi | Chart | Status Bar --}}
-        <div class="bottom-grid">
-
-            {{-- Transaksi Terbaru --}}
-            <div class="panel">
-                <div class="panel-header">
-                    <div>
-                        <div class="panel-title">Transaksi Terbaru</div>
-                        <div style="font-size:11px;color:#475569;margin-top:2px">Peminjaman hari ini</div>
-                    </div>
-                    <button class="panel-more">··· </button>
-                </div>
-
-                {{-- Tabs --}}
-                <div style="display:flex;gap:6px;margin-bottom:14px">
-                    @foreach(['Semua','Dipinjam','Kembali'] as $t)
-                    <button onclick="setTab(this)" style="padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid #334155;cursor:pointer;transition:all .15s;background:{{ $t === 'Semua' ? '#1d4ed8' : '#0f172a' }};color:{{ $t === 'Semua' ? '#fff' : '#64748b' }}">{{ $t }}</button>
-                    @endforeach
-                </div>
-
-                @php
-                $txns = [
-                    ['Proyektor Epson', 'Dipinjam – Ruang Kelas 9A', 'Hari ini 08:00 – 10:00', 'Ahmad S.', 'AS', '#1d4ed8'],
-                    ['Bola Basket x3', 'Dipinjam – Ekstrakurikuler', 'Hari ini 14:00 – 16:00', 'Budi R.', 'BR', '#059669'],
-                    ['Laptop Dell x2', 'Dipinjam – Lab Komputer', 'Hari ini 10:00 – 12:00', 'Citra L.', 'CL', '#7c3aed'],
-                ];
-                @endphp
-                @foreach($txns as $txn)
-                <div class="txn-item">
-                    <div class="txn-top">
-                        <div>
-                            <div class="txn-name">{{ $txn[0] }}</div>
-                            <div class="txn-type">{{ $txn[1] }}</div>
-                        </div>
-                        <div class="txn-link-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                        </div>
-                    </div>
-                    <div class="txn-meta">
-                        <div style="display:flex;align-items:center;gap:5px;color:#475569">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            {{ $txn[2] }}
-                        </div>
-                        <div class="txn-user">
-                            <div class="txn-avatar" style="background:linear-gradient(135deg,{{ $txn[5] }},#06b6d4)">{{ $txn[4] }}</div>
-                            <span style="font-size:11px;color:#64748b">{{ $txn[3] }}</span>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-
-            {{-- Chart --}}
-            <div class="panel">
-                <div class="panel-header">
-                    <div>
-                        <div class="panel-title">Grafik Peminjaman</div>
-                        <div style="font-size:11px;color:#475569;margin-top:2px">6 Bulan Terakhir</div>
-                    </div>
-                    <button class="panel-more">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    </button>
-                </div>
-                <div class="chart-big-num">70,32%</div>
-                <div class="chart-big-label">Rata-rata Utilisasi Barang</div>
-
-                <svg class="chart-svg" viewBox="0 0 280 110" preserveAspectRatio="none">
-                    <defs>
-                        <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#1d4ed8" stop-opacity=".25"/>
-                            <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0"/>
-                        </linearGradient>
-                    </defs>
-                    {{-- Grid lines --}}
-                    @foreach([20,45,70,95] as $y)
-                    <line x1="0" y1="{{ $y }}" x2="280" y2="{{ $y }}" stroke="#1e293b" stroke-width="1"/>
-                    @endforeach
-                    {{-- Area --}}
-                    <polygon fill="url(#lineGrad)" points="0,85 46,70 92,75 138,35 184,50 230,20 280,35 280,110 0,110"/>
-                    {{-- Line --}}
-                    <polyline fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="0,85 46,70 92,75 138,35 184,50 230,20 280,35"/>
-                    {{-- Dots --}}
-                    @foreach([[0,85],[46,70],[92,75],[138,35],[184,50],[230,20],[280,35]] as $p)
-                    <circle cx="{{ $p[0] }}" cy="{{ $p[1] }}" r="4" fill="#1d4ed8" stroke="#0f172a" stroke-width="2"/>
-                    @endforeach
-                    {{-- Labels --}}
-                    @foreach(['Jul','Agu','Sep','Okt','Nov','Des'] as $i => $m)
-                    <text x="{{ 23 + $i * 46 }}" y="108" text-anchor="middle" font-size="8" fill="#475569">{{ $m }}</text>
-                    @endforeach
-                </svg>
-            </div>
-
-            {{-- Status Bar --}}
-            <div class="panel">
-                <div class="panel-header">
-                    <div class="panel-title">Status Barang</div>
-                    <button class="panel-more">···</button>
-                </div>
-                <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:16px">
-                    <span style="font-size:28px;font-weight:800;color:#f1f5f9">892</span>
-                    <span style="font-size:12px;color:#34d399;font-weight:600">Tersedia</span>
-                </div>
-                <div class="status-grid">
-                    @php
-                    $bars = [
-                        ['Tersedia', 892, 70, '#1d4ed8'],
-                        ['Dipinjam', 234, 46, '#06b6d4'],
-                        ['Rusak',     98, 28, '#334155'],
-                    ];
-                    @endphp
-                    @foreach($bars as $b)
-                    <div class="status-bar-item">
-                        <div class="bar-wrap">
-                            <div class="bar" style="height:{{ $b[2] }}px;background:{{ $b[3] }};width:32px;border-radius:6px 6px 0 0"></div>
-                        </div>
-                        <div class="bar-val">{{ $b[1] }}</div>
-                        <div class="bar-label">{{ $b[0] }}</div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-
-        {{-- Info Mini Cards --}}
-        <div class="info-grid">
-            @php
-            $infos = [
-                ['Barang Masuk Bulan Ini', '48 Unit',  'Lihat Detail', '#1d4ed8'],
-                ['Barang Keluar Bulan Ini','32 Unit',  'Lihat Detail', '#0891b2'],
-                ['Peminjaman Aktif',       '12 Transaksi','Lihat Semua','#059669'],
-                ['Jatuh Tempo Hari Ini',   '3 Item',   'Cek Sekarang', '#f59e0b'],
-                ['Total Pengguna Aktif',   '156 Orang','Kelola User',  '#7c3aed'],
-            ];
-            @endphp
-            @foreach($infos as $inf)
-            <div class="info-card">
-                <div class="info-card-label">{{ $inf[0] }}</div>
-                <div class="info-card-val" style="color:{{ $inf[3] }}">{{ $inf[1] }}</div>
-                <a href="#" class="info-card-link" style="color:{{ $inf[3] }}">
-                    {{ $inf[2] }}
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                </a>
-            </div>
-            @endforeach
-        </div>
-
-        {{-- Table: Daftar Barang --}}
-        <div class="table-panel">
-            <div class="table-header-row">
-                <div class="panel-title">Daftar Barang</div>
-                <div style="display:flex;align-items:center;gap:10px">
-                    <div class="table-search">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;color:#475569" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        <input type="text" placeholder="Cari barang...">
-                    </div>
-                    <button class="panel-more">···</button>
-                </div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nama Barang</th>
-                        <th>Kode</th>
-                        <th>Kategori</th>
-                        <th>Lokasi</th>
-                        <th>Status</th>
-                        <th>Terakhir Diperbarui</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                    $items = [
-                        ['Proyektor Epson EB-S41', 'BRG-0001', 'Elektronik',    'Ruang AV',        'available',   '03 Agu 2026'],
-                        ['Meja Guru Jati',          'BRG-0002', 'Furnitur',      'Kelas X-IPA-1',   'available',   '01 Agu 2026'],
-                        ['Bola Basket Spalding',    'BRG-0003', 'Olahraga',      'Gudang Olahraga', 'borrowed',    '02 Agu 2026'],
-                        ['Laptop Dell Inspiron',    'BRG-0004', 'Elektronik',    'Lab Komputer',    'borrowed',    '03 Agu 2026'],
-                        ['Mikroskop Olympus',       'BRG-0005', 'Laboratorium',  'Lab IPA',         'available',   '31 Jul 2026'],
-                        ['Kursi Plastik',           'BRG-0006', 'Furnitur',      'Kelas XII-IPS-2', 'maintenance', '30 Jul 2026'],
-                    ];
-                    $icons = [
-                        'Elektronik'   => 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-                        'Furnitur'     => 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
-                        'Olahraga'     => 'M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0',
-                        'Laboratorium' => 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
-                    ];
-                    $statusMap = ['available' => ['Tersedia','badge-available'], 'borrowed' => ['Dipinjam','badge-borrowed'], 'maintenance' => ['Perbaikan','badge-maintenance']];
-                    @endphp
-                    @foreach($items as $item)
-                    <tr>
-                        <td>
-                            <div class="td-name">
-                                <div class="td-avatar">
-                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:#1d4ed8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $icons[$item[2]] ?? $icons['Elektronik'] }}"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="td-name-text">{{ $item[0] }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td style="font-family:monospace;font-size:12px;color:#64748b">{{ $item[1] }}</td>
-                        <td>{{ $item[2] }}</td>
-                        <td>{{ $item[3] }}</td>
-                        <td>
-                            <span class="badge {{ $statusMap[$item[4]][1] }}">
-                                <span style="width:5px;height:5px;border-radius:50%;background:currentColor;display:inline-block"></span>
-                                {{ $statusMap[$item[4]][0] }}
-                            </span>
-                        </td>
-                        <td>{{ $item[5] }}</td>
-                        <td>
-                            <button class="action-btn">···</button>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
+        <livewire:dashboard />
     </div>{{-- /content --}}
 </div>{{-- /main --}}
 
