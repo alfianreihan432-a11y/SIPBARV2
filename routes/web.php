@@ -17,17 +17,34 @@ Route::middleware(['auth'])->group(function () {
     Route::view('reports', 'pages.admin.reports')->name('reports.index');
     Route::view('statistics', 'pages.admin.statistics')->name('statistics.index');
     Route::view('users', 'pages.admin.users')->name('users.index');
+    
+    // Admin QR Scanner
+    Route::get('admin/qr-scanner', function() {
+        return view('pages.admin.qr-scanner');
+    })->name('admin.qr-scanner')->middleware('role:admin');
 
     // Student pages
-    Route::view('siswa/dashboard', 'dashboard-siswa')->name('student.dashboard');
-    Route::view('siswa/katalog', 'pages.siswa.katalog')->name('student.catalog');
+    Route::get('siswa/dashboard', function() {
+        return view('dashboard-siswa');
+    })->name('student.dashboard');
+    
+    Route::get('siswa/katalog', function() {
+        return view('pages.siswa.katalog');
+    })->name('student.catalog');
+    
     Route::view('siswa/peminjaman', 'pages.siswa.loans')->name('student.loans');
     Route::view('siswa/riwayat', 'pages.siswa.history')->name('student.history');
     Route::view('siswa/pengumuman', 'pages.siswa.announcements')->name('student.announcements');
 
     // Teacher pages
-    Route::view('guru/dashboard', 'dashboard-guru')->name('teacher.dashboard');
-    Route::view('guru/permohonan', 'pages.guru.requests')->name('teacher.requests');
+    Route::get('guru/dashboard', function() {
+        return view('dashboard-guru');
+    })->name('teacher.dashboard');
+    
+    Route::get('guru/permohonan', function() {
+        return view('pages.guru.requests');
+    })->name('teacher.requests');
+    
     Route::view('guru/siswa-bimbingan', 'pages.guru.students')->name('teacher.students');
     Route::view('guru/peminjaman-aktif', 'pages.guru.loans')->name('teacher.loans');
     Route::view('guru/pengembalian', 'pages.guru.returns')->name('teacher.returns');

@@ -172,7 +172,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     </label>
                     <div class="um-input-wrap">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/></svg>
-                        <input wire:model="nis" type="text" class="um-input" placeholder="Contoh: 2024001">
+                        <input wire:model="nis" type="text" class="um-input" placeholder="Contoh: 2024001" name="siswa_nis">
                     </div>
                     @error('nis')<div class="um-error">{{ $message }}</div>@enderror
                     <div class="um-hint">NIS digunakan sebagai username login siswa</div>
@@ -186,7 +186,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     </label>
                     <div class="um-input-wrap">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1"/></svg>
-                        <input wire:model="kelas" type="text" class="um-input" placeholder="Contoh: XII IPA 1">
+                        <input wire:model="kelas" type="text" class="um-input" placeholder="Contoh: XII IPA 1" name="siswa_kelas">
                     </div>
                     @error('kelas')<div class="um-error">{{ $message }}</div>@enderror
                 </div>
@@ -199,7 +199,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     </label>
                     <div class="um-input-wrap">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                        <input wire:model="jurusan" type="text" class="um-input" placeholder="Contoh: IPA / IPS / Kejuruan">
+                        <input wire:model="jurusan" type="text" class="um-input" placeholder="Contoh: IPA / IPS / Kejuruan" name="siswa_jurusan">
                     </div>
                     @error('jurusan')<div class="um-error">{{ $message }}</div>@enderror
                 </div>
@@ -212,7 +212,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     </label>
                     <div class="um-input-wrap">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <input wire:model="tanggal_lahir" type="date" class="um-input">
+                        <input wire:model="tanggal_lahir" type="date" class="um-input" autocomplete="off" name="siswa_tanggal_lahir">
                     </div>
                     @error('tanggal_lahir')<div class="um-error">{{ $message }}</div>@enderror
                 </div>
@@ -225,7 +225,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     </label>
                     <div class="um-input-wrap">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                        <input wire:model="phone" type="tel" class="um-input" placeholder="Contoh: 08123456789">
+                        <input wire:model="phone" type="text" class="um-input" placeholder="Contoh: 08123456789" autocomplete="off" name="siswa_phone" id="siswa_phone">
                     </div>
                     @error('phone')<div class="um-error">{{ $message }}</div>@enderror
                     <div class="um-hint">Format: 08xxx, 628xxx, atau +628xxx</div>
@@ -264,7 +264,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     </label>
                     <div class="um-input-wrap">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/></svg>
-                        <input wire:model="nip" type="text" class="um-input" placeholder="Contoh: 198505152010011001">
+                        <input wire:model="nip" type="text" class="um-input" placeholder="Contoh: 198505152010011001" name="guru_nip">
                     </div>
                     @error('nip')<div class="um-error">{{ $message }}</div>@enderror
                     <div class="um-hint">NIP digunakan sebagai username login guru</div>
@@ -278,7 +278,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     </label>
                     <div class="um-input-wrap">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        <input wire:model="jabatan" type="text" class="um-input" placeholder="Contoh: Guru Matematika / Kepala Sekolah">
+                        <input wire:model="jabatan" type="text" class="um-input" placeholder="Contoh: Guru Matematika / Kepala Sekolah" name="guru_jabatan">
                     </div>
                     @error('jabatan')<div class="um-error">{{ $message }}</div>@enderror
                 </div>
@@ -291,7 +291,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     </label>
                     <div class="um-input-wrap">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <input wire:model="tanggal_lahir" type="date" class="um-input">
+                        <input wire:model="tanggal_lahir" type="date" class="um-input" autocomplete="off" name="guru_tanggal_lahir">
                     </div>
                     @error('tanggal_lahir')<div class="um-error">{{ $message }}</div>@enderror
                 </div>
@@ -304,7 +304,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:#64748b;vertical-align
                     </label>
                     <div class="um-input-wrap">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                        <input wire:model="phone" type="tel" class="um-input" placeholder="Contoh: 08123456789">
+                        <input wire:model="phone" type="text" class="um-input" placeholder="Contoh: 08123456789" autocomplete="off" name="guru_phone" id="guru_phone">
                     </div>
                     @error('phone')<div class="um-error">{{ $message }}</div>@enderror
                     <div class="um-hint">Format: 08xxx, 628xxx, atau +628xxx</div>

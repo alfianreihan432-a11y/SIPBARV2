@@ -48,10 +48,10 @@
                 </svg>
             </div>
             <div>
-                <div class="stat-num">{{ $overdueItems }}</div>
-                <div class="stat-label">Terlambat Kembali</div>
-                <div class="stat-change {{ $overdueItems > 0 ? 'down' : 'up' }}">
-                    {{ $overdueItems > 0 ? 'Perlu Perhatian' : 'Aman' }}
+                <div class="stat-num">{{ $pendingRequests }}</div>
+                <div class="stat-label">Menunggu Persetujuan</div>
+                <div class="stat-change {{ $pendingRequests > 0 ? 'down' : 'up' }}">
+                    {{ $pendingRequests > 0 ? 'Perlu Perhatian' : 'Aman' }}
                 </div>
             </div>
         </div>
@@ -80,29 +80,40 @@
             <button class="panel-more">··· </button>
         </div>
 
-        @if($myBorrowings->count() > 0)
-            @foreach($myBorrowings as $borrowing)
+        @if($myRequests->count() > 0)
+            @foreach($myRequests as $request)
             <div class="txn-item">
                 <div class="txn-top">
                     <div>
-                        <div class="txn-name">{{ $borrowing->details->first()?->item->name ?? 'Unknown Item' }}</div>
-                        <div class="txn-type">Peminjaman #{{ $borrowing->number ?? $borrowing->id }}</div>
+                        <div class="txn-name">{{ $request->item->name }}</div>
+                        <div class="txn-type">Peminjaman #{{ $request->id }}</div>
                     </div>
-                    <span class="badge {{ $borrowing->status === 'borrowed' ? 'badge-borrowed' : ($borrowing->status === 'returned' ? 'badge-available' : 'badge-maintenance') }}">
-                        {{ ucfirst($borrowing->status) }}
+                    <span class="badge 
+                        @if($request->status === 'pending') badge-maintenance
+                        @elseif($request->status === 'approved' || $request->status === 'qr_ready') badge-available
+                        @elseif($request->status === 'rejected') badge-borrowed
+                        @elseif($request->status === 'borrowed') badge-borrowed
+                        @else badge-available @endif">
+                        {{ $request->status_label }}
                     </span>
                 </div>
                 <div class="txn-meta">
                     <div style="display:flex;align-items:center;gap:5px;color:#475569">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        {{ $borrowing->borrowed_at?->diffForHumans() ?? 'Just now' }}
+                        {{ $request->created_at->diffForHumans() }}
                     </div>
                     <div style="font-size:11px;color:#64748b">
-                        @if($borrowing->return_date)
-                            Deadline: {{ $borrowing->return_date->format('d M Y') }}
-                        @endif
+                        Jumlah: {{ $request->quantity }} | {{ $request->borrow_date->format('d M Y') }} - {{ $request->return_date->format('d M Y') }}
                     </div>
                 </div>
+                @if($request->status === 'qr_ready' && $request->qrCode)
+                    <div style="margin-top:8px">
+                        <button wire:click="showQRCode({{ $request->id }})" 
+                                class="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition">
+                            Tampilkan QR Code
+                        </button>
+                    </div>
+                @endif
             </div>
             @endforeach
         @else
@@ -115,4 +126,44 @@
             </div>
         @endif
     </div>
+
+    {{-- QR Code Modal --}}
+    @if($showQRModal && $selectedQR)
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold">QR Code Peminjaman</h3>
+                    <button wire:click="closeQRModal" class="text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="text-center">
+                    @if($selectedQR->image_path)
+                        <img src="{{ asset('storage/' . $selectedQR->image_path) }}" alt="QR Code" class="mx-auto mb-4">
+                    @else
+                        <div class="bg-gray-200 rounded-lg p-8 mb-4">
+                            <p class="text-gray-500">QR Code Image</p>
+                        </div>
+                    @endif
+                    <p class="text-sm text-gray-600 mb-2">Kode: {{ $selectedQR->code }}</p>
+                    <p class="text-xs text-gray-500">Berlaku sampai: {{ $selectedQR->expires_at ? $selectedQR->expires_at->format('d M Y H:i') : 'Tidak terbatas' }}</p>
+                    <p class="text-xs text-gray-500 mt-2">Tunjukkan QR Code ini kepada admin saat mengambil barang.</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @session('success')
+        <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+            {{ session('success') }}
+        </div>
+    @endsession
+
+    @session('error')
+        <div class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+            {{ session('error') }}
+        </div>
+    @endsession
 </div>
