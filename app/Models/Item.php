@@ -17,6 +17,7 @@ class Item extends Model
         'category_id',
         'location_id',
         'supplier_id',
+        'teacher_id',
         'brand',
         'type',
         'purchase_year',
@@ -47,5 +48,10 @@ class Item extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function teacher()
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\Borrowing;
+use App\Models\BorrowingRequest;
 use App\Models\Item;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -12,11 +12,13 @@ class StudentDashboard extends Component
 {
     public $poll = '5s';
     
-    public $myBorrowings;
+    public $myRequests;
     public $availableItems;
     public $totalBorrowed;
     public $totalReturned;
-    public $overdueItems;
+    public $pendingRequests;
+    public $showQRModal = false;
+    public $selectedQR = null;
     
     public function mount(): void
     {
@@ -27,7 +29,7 @@ class StudentDashboard extends Component
     {
         $userId = Auth::id();
         
-        $this->myBorrowings = Borrowing::with(['details.item'])
+        $this->myRequests = BorrowingRequest::with(['item', 'teacher', 'qrCode'])
             ->where('user_id', $userId)
             ->latest()
             ->take(5)
@@ -35,20 +37,44 @@ class StudentDashboard extends Component
             
         $this->availableItems = Item::where('status', 'Tersedia')
             ->where('condition', 'Baik')
+            ->where('stock', '>', 0)
             ->count();
             
-        $this->totalBorrowed = Borrowing::where('user_id', $userId)
-            ->whereIn('status', ['approved', 'borrowed'])
+        $this->totalBorrowed = BorrowingRequest::where('user_id', $userId)
+            ->where('status', 'borrowed')
             ->count();
             
-        $this->totalReturned = Borrowing::where('user_id', $userId)
+        $this->totalReturned = BorrowingRequest::where('user_id', $userId)
             ->where('status', 'returned')
             ->count();
             
-        $this->overdueItems = Borrowing::where('user_id', $userId)
-            ->where('status', 'borrowed')
-            ->where('due_at', '<', now())
+        $this->pendingRequests = BorrowingRequest::where('user_id', $userId)
+            ->where('status', 'pending')
             ->count();
+    }
+    
+    public function showQRCode($requestId)
+    {
+        $request = BorrowingRequest::with('qrCode')->findOrFail($requestId);
+        
+        if ($request->user_id !== Auth::id()) {
+            session()->flash('error', 'Anda tidak memiliki izin untuk melihat QR Code ini.');
+            return;
+        }
+        
+        if (!$request->qrCode || !$request->qrCode->isValid()) {
+            session()->flash('error', 'QR Code tidak tersedia atau tidak valid.');
+            return;
+        }
+        
+        $this->selectedQR = $request->qrCode;
+        $this->showQRModal = true;
+    }
+    
+    public function closeQRModal()
+    {
+        $this->showQRModal = false;
+        $this->selectedQR = null;
     }
     
     public function render()

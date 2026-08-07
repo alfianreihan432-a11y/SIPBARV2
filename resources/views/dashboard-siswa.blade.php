@@ -377,6 +377,18 @@
             @endif
         </a>
         @endforeach
+
+        {{-- CTA Pinjam Barang --}}
+        <a href="{{ route('student.catalog') }}" style="display:flex;align-items:center;gap:10px;padding:12px;margin-top:8px;background:#fff;border-radius:12px;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.1);transition:all .2s;">
+            <div style="width:36px;height:36px;background:linear-gradient(135deg,#1d4ed8,#2563eb);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;fill:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+            </div>
+            <div style="flex:1">
+                <div style="font-size:13px;font-weight:700;color:#0f172a">Pinjam Barang</div>
+                <div style="font-size:10px;color:#64748b;margin-top:1px">Akses katalog sekarang</div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:#1d4ed8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
     </nav>
 
     <div class="sidebar-footer">
