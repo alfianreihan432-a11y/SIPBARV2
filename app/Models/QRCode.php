@@ -17,12 +17,16 @@ class QRCode extends Model
         'is_active',
         'expires_at',
         'scanned_at',
+        'scan_count',
+        'last_scanned_at',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'expires_at' => 'datetime',
         'scanned_at' => 'datetime',
+        'last_scanned_at' => 'datetime',
+        'scan_count' => 'integer',
     ];
 
     public function borrowingRequest(): BelongsTo

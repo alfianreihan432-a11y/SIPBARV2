@@ -3,145 +3,231 @@
 namespace App\Services;
 
 use App\Models\BorrowingRequest;
+use App\Models\WhatsAppNotificationLog;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class WhatsAppNotificationService
 {
-    protected $apiUrl;
-    protected $apiKey;
-
+    private string $baseUrl;
+    private string $apiKey;
+    private int $timeout = 10;
+    
     public function __construct()
     {
-        // Configuration for WhatsApp API (using Twilio or similar service)
-        $this->apiUrl = config('services.whatsapp.api_url');
-        $this->apiKey = config('services.whatsapp.api_key');
+        $this->baseUrl = config('services.whatsapp.base_url') ?? '';
+        $this->apiKey = config('services.whatsapp.api_key') ?? '';
     }
-
-    public function sendBorrowingRequestNotification(BorrowingRequest $request)
+    
+    /**
+     * Notify teacher about new borrowing request
+     */
+    public function notifyNewRequest(BorrowingRequest $request): void
     {
-        $teacher = $request->teacher;
-        $student = $request->user;
-        $item = $request->item;
-
-        if (!$teacher || !$teacher->phone) {
-            Log::warning('Teacher phone not found for borrowing request #' . $request->id);
-            return false;
-        }
-
-        $message = $this->formatBorrowingRequestMessage($request, $student, $item);
+        $payload = [
+            'nomorGuru' => $request->teacher->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'kelas' => $request->user->kelas ?? '',
+            'barang' => $request->item->name,
+            'jumlah' => $request->quantity,
+            'tglPinjam' => $request->borrow_date->format('d-m-Y'),
+            'tglKembali' => $request->return_date->format('d-m-Y'),
+            'keperluan' => $request->purpose,
+            'linkKeputusan' => route('teacher.requests'),
+        ];
         
-        return $this->sendMessage($teacher->phone, $message);
+        $this->sendNotification(
+            $request->id,
+            'pengajuan_baru',
+            $request->teacher->phone ?? '',
+            $payload
+        );
     }
-
-    public function sendApprovalNotification(BorrowingRequest $request)
+    
+    /**
+     * Notify student about rejection
+     */
+    public function notifyRejected(BorrowingRequest $request): void
     {
-        $student = $request->user;
-        $item = $request->item;
-
-        if (!$student || !$student->phone) {
-            Log::warning('Student phone not found for borrowing request #' . $request->id);
-            return false;
-        }
-
-        $message = $this->formatApprovalMessage($request, $student, $item);
+        $payload = [
+            'nomorSiswa' => $request->user->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'barang' => $request->item->name,
+            'alasan' => $request->rejection_reason,
+        ];
         
-        return $this->sendMessage($student->phone, $message);
+        $this->sendNotification(
+            $request->id,
+            'ditolak',
+            $request->user->phone ?? '',
+            $payload
+        );
     }
-
-    public function sendRejectionNotification(BorrowingRequest $request)
+    
+    /**
+     * Notify student about approval with QR code
+     */
+    public function notifyApproved(BorrowingRequest $request, string $qrBase64): void
     {
-        $student = $request->user;
-        $item = $request->item;
-
-        if (!$student || !$student->phone) {
-            Log::warning('Student phone not found for borrowing request #' . $request->id);
-            return false;
-        }
-
-        $message = $this->formatRejectionMessage($request, $student, $item);
+        $payload = [
+            'nomorSiswa' => $request->user->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'barang' => $request->item->name,
+            'tglKembali' => $request->return_date->format('d-m-Y'),
+            'qrBase64' => $qrBase64,
+        ];
         
-        return $this->sendMessage($student->phone, $message);
+        $this->sendNotification(
+            $request->id,
+            'disetujui',
+            $request->user->phone ?? '',
+            $payload
+        );
     }
-
-    protected function formatBorrowingRequestMessage($request, $student, $item)
+    
+    /**
+     * Send H-1 reminder to student
+     */
+    public function notifyReminder(BorrowingRequest $request): void
     {
-        return "🔔 *PERMOHONAN PEMINJAMAN BARANG*\n\n" .
-               "Halo Bapak/Ibu Guru,\n\n" .
-               "Terdapat permohonan peminjaman barang baru:\n\n" .
-               "👤 *Siswa:* {$student->name}\n" .
-               "📚 *Kelas:* {$student->kelas}\n" .
-               "📖 *Jurusan:* {$student->jurusan}\n\n" .
-               "📦 *Barang:* {$item->name}\n" .
-               "🔢 *Jumlah:* {$request->quantity}\n" .
-               "📝 *Keperluan:* {$request->purpose}\n" .
-               "📅 *Tanggal Pinjam:* {$request->borrow_date}\n" .
-               "📅 *Tanggal Kembali:* {$request->return_date}\n\n" .
-               "Silakan login ke sistem untuk menyetujui atau menolak permintaan ini.\n\n" .
-               "_SIPBAR - Sistem Inventaris Barang_";
+        $payload = [
+            'nomorSiswa' => $request->user->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'barang' => $request->item->name,
+            'tglKembali' => $request->return_date->format('d-m-Y'),
+        ];
+        
+        $this->sendNotification(
+            $request->id,
+            'reminder_h1',
+            $request->user->phone ?? '',
+            $payload
+        );
     }
-
-    protected function formatApprovalMessage($request, $student, $item)
+    
+    /**
+     * Notify student about successful checkout
+     */
+    public function notifyCheckout(BorrowingRequest $request): void
     {
-        return "✅ *PERSETUJUAN PEMINJAMAN*\n\n" .
-               "Halo {$student->name},\n\n" .
-               "Permintaan peminjaman Anda telah disetujui!\n\n" .
-               "📦 *Barang:* {$item->name}\n" .
-               "🔢 *Jumlah:* {$request->quantity}\n" .
-               "📅 *Tanggal Pinjam:* {$request->borrow_date}\n" .
-               "📅 *Tanggal Kembali:* {$request->return_date}\n\n" .
-               "QR Code telah dibuat dan siap digunakan. Silakan tunjukkan QR Code kepada admin saat mengambil barang.\n\n" .
-               "_SIPBAR - Sistem Inventaris Barang_";
+        $payload = [
+            'nomorSiswa' => $request->user->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'barang' => $request->item->name,
+            'jumlah' => $request->quantity,
+            'tglKembali' => $request->return_date->format('d-m-Y'),
+        ];
+        
+        $this->sendNotification(
+            $request->id,
+            'checkout',
+            $request->user->phone ?? '',
+            $payload
+        );
     }
-
-    protected function formatRejectionMessage($request, $student, $item)
+    
+    /**
+     * Notify student about successful return
+     */
+    public function notifyReturned(BorrowingRequest $request): void
     {
-        return "❌ *PENOLAKAN PEMINJAMAN*\n\n" .
-               "Halo {$student->name},\n\n" .
-               "Mohon maaf, permintaan peminjaman Anda ditolak.\n\n" .
-               "📦 *Barang:* {$item->name}\n" .
-               "📝 *Alasan:* {$request->rejection_reason}\n\n" .
-               "Silakan hubungi guru penanggung jawab untuk informasi lebih lanjut.\n\n" .
-               "_SIPBAR - Sistem Inventaris Barang_";
+        $payload = [
+            'nomorSiswa' => $request->user->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'barang' => $request->item->name,
+            'waktuKembali' => $request->returned_at ? $request->returned_at->format('d-m-Y H:i') : now()->format('d-m-Y H:i'),
+        ];
+        
+        $this->sendNotification(
+            $request->id,
+            'dikembalikan',
+            $request->user->phone ?? '',
+            $payload
+        );
     }
-
-    protected function sendMessage($phoneNumber, $message)
-    {
+    
+    /**
+     * Send notification to WhatsApp bot
+     * 
+     * @param int $borrowingRequestId
+     * @param string $type
+     * @param string $recipientPhone
+     * @param array $payload
+     * @return void
+     */
+    private function sendNotification(
+        int $borrowingRequestId,
+        string $type,
+        string $recipientPhone,
+        array $payload
+    ): void {
+        // Create log entry
+        $log = WhatsAppNotificationLog::create([
+            'borrowing_request_id' => $borrowingRequestId,
+            'notification_type' => $type,
+            'recipient_phone' => $recipientPhone,
+            'payload' => $payload,
+            'status' => 'pending',
+        ]);
+        
         try {
-            // Normalize phone number
-            $phone = $this->normalizePhoneNumber($phoneNumber);
+            $response = Http::timeout($this->timeout)
+                ->withHeaders(['X-API-Key' => $this->apiKey])
+                ->post("{$this->baseUrl}/notify/{$type}", $payload);
             
-            // Log the message for now (replace with actual API call)
-            Log::info("WhatsApp Message to {$phone}: {$message}");
-            
-            // Example API call (uncomment and configure with actual WhatsApp API)
-            /*
-            $response = Http::post($this->apiUrl, [
-                'api_key' => $this->apiKey,
-                'phone' => $phone,
-                'message' => $message,
+            $log->update([
+                'status' => $response->successful() ? 'success' : 'failed',
+                'http_status_code' => $response->status(),
+                'error_message' => $response->successful() ? null : $response->body(),
+                'sent_at' => now(),
             ]);
             
-            return $response->successful();
-            */
+            if (!$response->successful()) {
+                Log::error("WhatsApp notification failed: {$type}", [
+                    'log_id' => $log->id,
+                    'borrowing_request_id' => $borrowingRequestId,
+                    'status_code' => $response->status(),
+                    'response' => $response->body(),
+                ]);
+            }
             
-            return true; // Return true for now since we're just logging
         } catch (\Exception $e) {
-            Log::error('WhatsApp notification failed: ' . $e->getMessage());
-            return false;
+            $log->update([
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
+            
+            Log::error("WhatsApp notification exception: {$type}", [
+                'log_id' => $log->id,
+                'borrowing_request_id' => $borrowingRequestId,
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
     }
-
-    protected function normalizePhoneNumber($phone)
+    
+    /**
+     * Check WhatsApp bot status
+     * 
+     * @return array
+     */
+    public function checkBotStatus(): array
     {
-        // Remove non-numeric characters
-        $phone = preg_replace('/[^0-9]/', '', $phone);
-        
-        // Add country code if not present
-        if (strlen($phone) === 10 && str_starts_with($phone, '0')) {
-            $phone = '62' . substr($phone, 1);
+        try {
+            $response = Http::timeout(5)
+                ->withHeaders(['X-API-Key' => $this->apiKey])
+                ->get("{$this->baseUrl}/status");
+            
+            return [
+                'online' => $response->successful(),
+                'status_code' => $response->status(),
+                'message' => $response->body(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'online' => false,
+                'error' => $e->getMessage(),
+            ];
         }
-        
-        return $phone;
     }
 }
