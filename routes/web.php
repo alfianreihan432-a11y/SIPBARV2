@@ -4,6 +4,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SipintuAuthController;
 use App\Http\Controllers\SipintuStatusController;
+use App\Http\Controllers\TeacherApprovalController;
+use App\Http\Controllers\TransactionHistoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -24,6 +26,12 @@ Route::middleware(['auth'])->group(function () {
     Route::view('reports', 'pages.admin.reports')->name('reports.index');
     Route::view('statistics', 'pages.admin.statistics')->name('statistics.index');
     Route::view('users', 'pages.admin.users')->name('users.index');
+    
+    // Transaction History (Admin & Teacher)
+    Route::middleware('role:admin|guru')->group(function () {
+        Route::get('transactions', [TransactionHistoryController::class, 'index'])->name('transactions.index');
+        Route::get('transactions/{id}', [TransactionHistoryController::class, 'show'])->name('transactions.show');
+    });
 
     // Admin QR Scanner
     Route::get('admin/qr-scanner', function() {
@@ -48,9 +56,17 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard-guru');
     })->name('teacher.dashboard');
 
-    Route::get('guru/permohonan', function() {
-        return view('pages.guru.requests');
-    })->name('teacher.requests');
+    // Teacher approval routes
+    Route::middleware('role:guru')->prefix('guru')->name('teacher.')->group(function () {
+        Route::get('permohonan', [TeacherApprovalController::class, 'index'])->name('requests');
+        Route::post('permohonan/{id}/approve', [TeacherApprovalController::class, 'approve'])->name('requests.approve');
+        Route::post('permohonan/{id}/reject', [TeacherApprovalController::class, 'reject'])->name('requests.reject');
+        
+        // QR Scanner
+        Route::get('qr/scan', function() {
+            return view('pages.guru.qr-scan');
+        })->name('qr.scan');
+    });
 
     Route::view('guru/siswa-bimbingan', 'pages.guru.students')->name('teacher.students');
     Route::view('guru/peminjaman-aktif', 'pages.guru.loans')->name('teacher.loans');

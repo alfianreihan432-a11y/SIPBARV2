@@ -36,8 +36,9 @@ return [
     ],
 
     'whatsapp' => [
-        'api_url' => env('WHATSAPP_API_URL'),
-        'api_key' => env('WHATSAPP_API_KEY'),
+        'base_url' => env('WA_BOT_URL', env('WHATSAPP_API_URL')),
+        'api_key' => env('WA_BOT_API_KEY', env('WHATSAPP_API_KEY')),
+        'timeout' => env('WA_BOT_TIMEOUT', 10),
     ],
 
 ];

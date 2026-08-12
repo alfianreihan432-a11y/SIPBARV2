@@ -67,8 +67,16 @@ class BorrowingForm extends Component
 
     protected function sendWhatsAppNotification($request)
     {
-        $whatsappService = new \App\Services\WhatsAppNotificationService();
-        $whatsappService->sendBorrowingRequestNotification($request);
+        try {
+            $whatsappService = app(\App\Services\WhatsAppNotificationService::class);
+            $whatsappService->notifyNewRequest($request);
+        } catch (\Exception $e) {
+            // Log error but don't stop the process
+            \Log::error('WhatsApp notification failed for new request', [
+                'borrowing_request_id' => $request->id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     public function render()
