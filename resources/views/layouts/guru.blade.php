@@ -51,7 +51,7 @@
         .topbar-uname{font-size:13px;font-weight:600;color:var(--text2)}
         .t-sun{display:none}.t-moon{display:block}
         html.dark .t-sun{display:block}html.dark .t-moon{display:none}
-        .content{flex:1;overflow-y:auto;padding:22px 24px;background:var(--content-bg);transition:background .25s}
+        .content{flex:1;overflow-y:auto;min-height:0;padding:22px 24px;background:var(--content-bg);transition:background .25s}
         .content::-webkit-scrollbar{width:4px}
         .content::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:2px}
     </style>

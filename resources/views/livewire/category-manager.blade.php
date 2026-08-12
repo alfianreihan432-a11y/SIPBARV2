@@ -7,8 +7,8 @@
 .cm-alert {
     display: flex; align-items: center; gap: 10px;
     padding: 12px 16px; border-radius: 12px;
-    background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.25);
-    color: #34d399; font-size: 13px; font-weight: 600;
+    background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25);
+    color: #10b981; font-size: 13px; font-weight: 600;
     animation: slideIn .3s ease;
 }
 .cm-alert-err { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.25); color: #f87171; }
@@ -16,18 +16,18 @@
 
 /* Form Card */
 .cm-form-card {
-    background: rgba(15,23,42,.8);
-    border: 1px solid rgba(148,163,184,.12);
-    border-radius: 20px;
-    padding: 28px;
-    backdrop-filter: blur(12px);
+    background: var(--bg-card);
+    border: 1px solid var(--border-alt);
+    border-radius: 18px;
+    padding: 24px 28px;
+    box-shadow: var(--card-shadow);
 }
-.cm-form-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
-.cm-form-title { font-size: 18px; font-weight: 800; color: #f1f5f9; margin-bottom: 4px; }
-.cm-form-sub { font-size: 13px; color: #94a3b8; }
+.cm-form-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.cm-form-title { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+.cm-form-sub { font-size: 13px; color: var(--text-muted); }
 .cm-form-icon {
-    width: 46px; height: 46px; background: rgba(37,99,235,.15);
-    border: 1px solid rgba(37,99,235,.25); border-radius: 14px;
+    width: 44px; height: 44px; background: rgba(37,99,235,.12);
+    border: 1px solid rgba(37,99,235,.2); border-radius: 12px;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 
@@ -35,90 +35,90 @@
 .cm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .cm-field { display: flex; flex-direction: column; gap: 6px; }
 .cm-field.full { grid-column: 1 / -1; }
-.cm-label { font-size: 12px; font-weight: 700; color: #94a3b8; letter-spacing: .04em; text-transform: uppercase; }
+.cm-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: .05em; text-transform: uppercase; }
 .cm-input, .cm-select, .cm-textarea {
-    background: rgba(255,255,255,.04);
-    border: 1.5px solid rgba(148,163,184,.15);
-    border-radius: 12px;
-    padding: 11px 14px;
-    font-size: 14px; color: #e2e8f0;
+    background: var(--input-bg);
+    border: 1.5px solid var(--input-border);
+    border-radius: 10px;
+    padding: 10px 13px;
+    font-size: 13px; color: var(--text-primary);
     outline: none; width: 100%;
     transition: border-color .2s, box-shadow .2s;
     font-family: inherit;
 }
 .cm-input:focus, .cm-select:focus, .cm-textarea:focus {
-    border-color: #3b82f6;
+    border-color: var(--blue);
     box-shadow: 0 0 0 3px rgba(59,130,246,.15);
 }
-.cm-input::placeholder, .cm-textarea::placeholder { color: #475569; }
-.cm-select option { background: #0f172a; color: #e2e8f0; }
+.cm-input::placeholder, .cm-textarea::placeholder { color: var(--text-subtle); }
+.cm-select option { background: var(--bg-card); color: var(--text-primary); }
 .cm-textarea { resize: vertical; min-height: 90px; }
 .cm-color-row { display: flex; align-items: center; gap: 10px; }
-.cm-color-input { width: 52px; height: 44px; padding: 4px; border-radius: 10px; border: 1.5px solid rgba(148,163,184,.15); background: rgba(255,255,255,.04); cursor: pointer; }
+.cm-color-input { width: 52px; height: 42px; padding: 3px; border-radius: 8px; border: 1.5px solid var(--input-border); background: var(--input-bg); cursor: pointer; }
 .cm-color-preview {
-    flex: 1; height: 44px; border-radius: 10px;
+    flex: 1; height: 42px; border-radius: 8px;
     display: flex; align-items: center; padding: 0 14px;
-    font-size: 13px; font-weight: 600; color: #fff;
-    border: 1.5px solid rgba(255,255,255,.1);
+    font-size: 13px; font-weight: 600; color: var(--text-primary);
+    border: 1.5px solid var(--input-border);
 }
-.cm-error { font-size: 12px; color: #f87171; margin-top: 2px; }
+.cm-error { font-size: 11px; color: #f87171; margin-top: 2px; }
 
 /* Buttons */
-.cm-actions { display: flex; align-items: center; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.06); }
+.cm-actions { display: flex; align-items: center; gap: 10px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border-subtle); }
 .cm-btn {
     display: inline-flex; align-items: center; gap: 7px;
-    padding: 11px 22px; border-radius: 12px; font-size: 14px; font-weight: 700;
+    padding: 9px 20px; border-radius: 10px; font-size: 13px; font-weight: 700;
     cursor: pointer; border: none; transition: all .2s; text-decoration: none;
 }
-.cm-btn-primary { background: #2563eb; color: #fff; box-shadow: 0 4px 14px rgba(37,99,235,.35); }
-.cm-btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,.45); }
-.cm-btn-secondary { background: rgba(255,255,255,.06); color: #94a3b8; border: 1px solid rgba(255,255,255,.1); }
-.cm-btn-secondary:hover { background: rgba(255,255,255,.1); color: #e2e8f0; }
-.cm-btn-danger { background: rgba(239,68,68,.1); color: #f87171; border: 1px solid rgba(239,68,68,.2); padding: 8px 14px; font-size: 13px; border-radius: 10px; }
+.cm-btn-primary { background: var(--blue-dark); color: #fff; box-shadow: 0 4px 12px rgba(29,78,216,.3); }
+.cm-btn-primary:hover { background: var(--blue); transform: translateY(-1px); }
+.cm-btn-secondary { background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-subtle); }
+.cm-btn-secondary:hover { background: var(--bg-hover); color: var(--text-primary); }
+.cm-btn-danger { background: rgba(239,68,68,.1); color: #f87171; border: 1px solid rgba(239,68,68,.2); padding: 7px 12px; font-size: 12px; border-radius: 8px; }
 .cm-btn-danger:hover { background: #ef4444; color: #fff; }
-.cm-btn-edit { background: rgba(59,130,246,.1); color: #60a5fa; border: 1px solid rgba(59,130,246,.2); padding: 8px 14px; font-size: 13px; border-radius: 10px; }
-.cm-btn-edit:hover { background: #3b82f6; color: #fff; }
-.cm-editing-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.2); color: #fbbf24; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; }
+.cm-btn-edit { background: rgba(59,130,246,.1); color: var(--blue); border: 1px solid rgba(59,130,246,.2); padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+.cm-btn-edit:hover { background: var(--blue); color: #fff; }
+.cm-editing-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.2); color: #f59e0b; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
 
 /* Table Card */
 .cm-table-card {
-    background: rgba(15,23,42,.8);
-    border: 1px solid rgba(148,163,184,.12);
-    border-radius: 20px; overflow: hidden;
-    backdrop-filter: blur(12px);
+    background: var(--bg-card);
+    border: 1px solid var(--border-alt);
+    border-radius: 18px; overflow: hidden;
+    box-shadow: var(--card-shadow);
 }
 .cm-table-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 16px 22px; border-bottom: 1px solid var(--border-subtle);
 }
-.cm-table-title { font-size: 16px; font-weight: 800; color: #f1f5f9; }
-.cm-count { font-size: 12px; background: rgba(37,99,235,.15); color: #60a5fa; border: 1px solid rgba(37,99,235,.2); padding: 3px 10px; border-radius: 999px; font-weight: 700; }
-.cm-table-search { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,.04); border: 1.5px solid rgba(148,163,184,.12); border-radius: 10px; padding: 8px 12px; }
-.cm-table-search input { background: none; border: none; outline: none; font-size: 13px; color: #e2e8f0; width: 200px; }
-.cm-table-search input::placeholder { color: #475569; }
-.cm-empty { padding: 60px 24px; text-align: center; }
-.cm-empty-icon { font-size: 48px; margin-bottom: 14px; }
-.cm-empty-text { font-size: 14px; color: #64748b; }
+.cm-table-title { font-size: 16px; font-weight: 800; color: var(--text-primary); }
+.cm-count { font-size: 11px; background: rgba(37,99,235,.12); color: var(--blue); border: 1px solid rgba(37,99,235,.2); padding: 3px 10px; border-radius: 999px; font-weight: 700; }
+.cm-table-search { display: flex; align-items: center; gap: 8px; background: var(--input-bg); border: 1.5px solid var(--input-border); border-radius: 10px; padding: 7px 12px; }
+.cm-table-search input { background: none; border: none; outline: none; font-size: 13px; color: var(--text-primary); width: 200px; }
+.cm-table-search input::placeholder { color: var(--text-subtle); }
+.cm-empty { padding: 56px 24px; text-align: center; }
+.cm-empty-icon { font-size: 44px; margin-bottom: 12px; }
+.cm-empty-text { font-size: 13px; color: var(--text-muted); }
 
 table.cm-table { width: 100%; border-collapse: collapse; }
 table.cm-table thead th {
-    padding: 12px 20px; font-size: 11px; font-weight: 700;
-    color: #64748b; letter-spacing: .08em; text-transform: uppercase;
-    background: rgba(255,255,255,.02); text-align: left;
-    border-bottom: 1px solid rgba(255,255,255,.05);
+    padding: 11px 18px; font-size: 10px; font-weight: 800;
+    color: var(--text-subtle); letter-spacing: .08em; text-transform: uppercase;
+    background: var(--table-head-bg); text-align: left;
+    border-bottom: 1px solid var(--border-subtle);
 }
-table.cm-table tbody tr { border-bottom: 1px solid rgba(255,255,255,.04); transition: background .15s; }
+table.cm-table tbody tr { border-bottom: 1px solid var(--border-subtle); transition: background .15s; }
 table.cm-table tbody tr:last-child { border-bottom: none; }
-table.cm-table tbody tr:hover { background: rgba(255,255,255,.03); }
-table.cm-table tbody td { padding: 14px 20px; font-size: 14px; color: #94a3b8; vertical-align: middle; }
-.cm-cat-name { font-size: 14px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 8px; }
+table.cm-table tbody tr:hover { background: var(--table-hover); }
+table.cm-table tbody td { padding: 13px 18px; font-size: 13px; color: var(--text-secondary); vertical-align: middle; }
+.cm-cat-name { font-size: 13px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
 .cm-color-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 12px; border-radius: 999px;
-    font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 700;
 }
 .cm-color-dot { width: 8px; height: 8px; border-radius: 50%; }
-.cm-actions-cell { display: flex; gap: 8px; align-items: center; }
+.cm-actions-cell { display: flex; gap: 6px; align-items: center; }
 @media (max-width: 768px) { .cm-grid { grid-template-columns: 1fr; } }
 </style>
 
@@ -166,8 +166,8 @@ table.cm-table tbody td { padding: 14px 20px; font-size: 14px; color: #94a3b8; v
 
                 {{-- Ikon --}}
                 <div class="cm-field">
-                    <label class="cm-label">Ikon / Emoji</label>
-                    <input wire:model="icon" type="text" class="cm-input" placeholder="Contoh: 💻 📚 🔬">
+                    <label class="cm-label">Kode / Nama Ikon</label>
+                    <input wire:model="icon" type="text" class="cm-input" placeholder="Contoh: Tag, Box, Desktop">
                     @error('icon') <div class="cm-error">{{ $message }}</div> @enderror
                 </div>
 
@@ -229,7 +229,11 @@ table.cm-table tbody td { padding: 14px 20px; font-size: 14px; color: #94a3b8; v
 
         @if($categories->isEmpty())
         <div class="cm-empty">
-            <div class="cm-empty-icon">🗂️</div>
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-800 text-blue-400 border border-slate-700/60 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+            </div>
             <div class="cm-empty-text">Belum ada kategori. Tambahkan kategori pertama di atas.</div>
         </div>
         @else
@@ -251,7 +255,9 @@ table.cm-table tbody td { padding: 14px 20px; font-size: 14px; color: #94a3b8; v
                         <td style="color:#475569;font-size:12px">{{ $i + 1 }}</td>
                         <td>
                             <div class="cm-cat-name">
-                                <span style="font-size:20px">{{ $cat->icon ?: '🗂️' }}</span>
+                                <div class="h-7 w-7 rounded-lg flex items-center justify-center text-xs font-bold text-white shrink-0" style="background:{{ $cat->color ?? '#3b82f6' }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                                </div>
                                 {{ $cat->name }}
                             </div>
                         </td>

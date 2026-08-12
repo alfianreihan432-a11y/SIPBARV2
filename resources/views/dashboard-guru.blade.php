@@ -275,11 +275,86 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
         if(btn){btn.style.transform='rotate(20deg) scale(.85)';setTimeout(function(){btn.style.transform=''},250);}
     }
     if(btn) btn.addEventListener('click',toggle);
-    document.addEventListener('keydown',function(e){if(e.altKey&&e.key==='d')toggle();})();
+    document.addEventListener('keydown',function(e){if(e.altKey&&e.key==='d')toggle();});
 })();
 
-// Mobile sidebar
-window.addEventListener('resize',function(){if(window.innerWidth>800)document.getElementById('sidebar').classList.remove('open');});
+// Dropdown functionality
+(function(){
+    var activeDropdown=null;
+
+    function toggleDropdown(btn,dropdown){
+        if(activeDropdown && activeDropdown!==dropdown){
+            activeDropdown.classList.remove('show');
+        }
+        dropdown.classList.toggle('show');
+        activeDropdown=dropdown.classList.contains('show')?dropdown:null;
+    }
+
+    // Profile dropdown
+    var profileBtn=document.getElementById('profileBtn');
+    var profileDropdown=document.getElementById('profileDropdown');
+    if(profileBtn&&profileDropdown){
+        profileBtn.addEventListener('click',function(e){
+            e.stopPropagation();
+            toggleDropdown(profileBtn,profileDropdown);
+        });
+    }
+
+    // Notification dropdown
+    var notifBtn=document.getElementById('notifBtn');
+    var notifDropdown=document.getElementById('notifDropdown');
+    if(notifBtn&&notifDropdown){
+        notifBtn.addEventListener('click',function(e){
+            e.stopPropagation();
+            toggleDropdown(notifBtn,notifDropdown);
+        });
+    }
+
+    // Mail placeholder
+    var mailBtn=document.getElementById('mailBtn');
+    if(mailBtn){
+        mailBtn.addEventListener('click',function(){
+            alert('Fitur Pesan akan segera hadir!\n\nDi sini Anda akan dapat:\n• Mengirim pesan ke siswa\n• Menerima notifikasi pesan\n• Berkomunikasi dengan admin');
+        });
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click',function(){
+        if(activeDropdown){
+            activeDropdown.classList.remove('show');
+            activeDropdown=null;
+        }
+    });
+
+    // Prevent dropdown from closing when clicking inside
+    document.querySelectorAll('.dropdown').forEach(function(dropdown){
+        dropdown.addEventListener('click',function(e){
+            e.stopPropagation();
+        });
+    });
+})();
+
+// Mobile sidebar toggle
+(function(){
+    var hamburger=document.getElementById('hamburgerBtn');
+    var sidebar=document.getElementById('sidebar');
+    var overlay=document.getElementById('sidebarOverlay');
+    
+    if(hamburger){
+        hamburger.addEventListener('click',function(e){
+            e.stopPropagation();
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+    }
+    
+    if(overlay){
+        overlay.addEventListener('click',function(){
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+    }
+})();
 </script>
 </body>
 </html>

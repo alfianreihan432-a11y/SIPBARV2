@@ -1,0 +1,346 @@
+/* ══════════════════════════════════════════════════════════════
+   GLOBAL THEME VARIABLES - SIPBAR
+   Digunakan oleh semua komponen untuk konsistensi theme
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+    /* Dark Mode (Default) */
+    --bg-main: #0f172a;
+    --bg-alt: #1e293b;
+    --bg-hover: #334155;
+    --bg-card: #1e293b;
+    
+    --border-main: #1e293b;
+    --border-alt: #334155;
+    --border-subtle: rgba(148,163,184,.14);
+    
+    --text-primary: #f1f5f9;
+    --text-secondary: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-subtle: #64748b;
+    --text-dim: #475569;
+    
+    --blue: #2563eb;
+    --blue-dark: #1d4ed8;
+    --blue-light: #3b82f6;
+    --cyan: #0891b2;
+    --green: #059669;
+    --red: #ef4444;
+    --orange: #f97316;
+    --yellow: #fbbf24;
+    --purple: #7c3aed;
+    
+    --sidebar-bg: #0f172a;
+    --topbar-bg: #0f172a;
+    --content-bg: #0a1020;
+    --scrollbar: #334155;
+    --notif-border: #0f172a;
+    
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.25);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.3);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,.4);
+    --shadow-blue: 0 4px 12px rgba(29,78,216,.4);
+}
+
+/* Light Mode */
+html.light {
+    --bg-main: #f0f7ff;
+    --bg-alt: #ffffff;
+    --bg-hover: #e8f1fe;
+    --bg-card: #ffffff;
+    
+    --border-main: #dbeafe;
+    --border-alt: #e2e8f0;
+    --border-subtle: rgba(148,163,184,.25);
+    
+    --text-primary: #0f172a;
+    --text-secondary: #1e293b;
+    --text-muted: #64748b;
+    --text-subtle: #94a3b8;
+    --text-dim: #cbd5e1;
+    
+    --blue: #2563eb;
+    --blue-dark: #1d4ed8;
+    --blue-light: #3b82f6;
+    --cyan: #0891b2;
+    --green: #059669;
+    --red: #ef4444;
+    --orange: #f97316;
+    --yellow: #fbbf24;
+    --purple: #7c3aed;
+    
+    --topbar-bg: #ffffff;
+    --sidebar-bg: #0f172a;  /* Sidebar tetap dark di light mode */
+    --content-bg: #f0f7ff;
+    --scrollbar: #cbd5e1;
+    --notif-border: #ffffff;
+    
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.1);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.15);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,.2);
+    --shadow-blue: 0 4px 12px rgba(29,78,216,.3);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UPGRADED RADIX / SHADCN STYLE DROPDOWNS & SELECT CONTROLS
+   Theme: Main Website Blue (#2563eb / #3b82f6)
+   ══════════════════════════════════════════════════════════════ */
+
+select,
+.im-select,
+.im-select-field,
+.cm-select,
+.form-select,
+select.form-control {
+    display: inline-flex !important;
+    align-items: center !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 16px 16px !important;
+    padding: 9px 36px 9px 13px !important;
+    border-radius: 10px !important;
+    border: 1.5px solid var(--border-alt, #e2e8f0) !important;
+    background-color: var(--input-bg, var(--bg-card, #ffffff)) !important;
+    color: var(--text-primary, #0f172a) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    outline: none !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+select:hover,
+.im-select:hover,
+.im-select-field:hover,
+.cm-select:hover,
+.form-select:hover,
+select.form-control:hover {
+    border-color: var(--blue, #2563eb) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12) !important;
+}
+
+select:focus,
+.im-select:focus,
+.im-select-field:focus,
+.cm-select:focus,
+.form-select:focus,
+select.form-control:focus {
+    border-color: var(--blue, #2563eb) !important;
+    box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.18) !important;
+}
+
+html.dark select,
+html.dark .im-select,
+html.dark .im-select-field,
+html.dark .cm-select,
+html.dark .form-select,
+html.dark select.form-control {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+}
+
+select option,
+.im-select option,
+.im-select-field option,
+.cm-select option {
+    background-color: var(--bg-card, #ffffff) !important;
+    color: var(--text-primary, #0f172a) !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+}
+
+/* Flux Dropdowns & Radix-Style Menu Popovers */
+[data-flux-menu],
+ui-menu,
+.dropdown-menu-content {
+    background-color: var(--bg-card, #ffffff) !important;
+    border: 1.5px solid var(--border-alt, #e2e8f0) !important;
+    border-radius: 12px !important;
+    padding: 6px !important;
+    color: var(--text-primary, #0f172a) !important;
+    box-shadow: 0 12px 36px -4px rgba(37, 99, 235, 0.18), 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    animation: dropdownFadeIn 0.15s ease-out !important;
+}
+
+@keyframes dropdownFadeIn {
+    from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+[data-flux-menu-item],
+ui-menu-item,
+.dropdown-menu-item {
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--text-primary, #0f172a) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease-in-out !important;
+}
+
+[data-flux-menu-item]:hover,
+ui-menu-item:hover,
+.dropdown-menu-item:hover,
+[data-flux-menu-item]:focus,
+ui-menu-item:focus,
+.dropdown-menu-item:focus {
+    background-color: rgba(37, 99, 235, 0.12) !important;
+    color: var(--blue, #2563eb) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RADIX / SHADCN CUSTOM DROPDOWN COMPONENT (HTML/JS/BLADE)
+   Matches @radix-ui/react-dropdown-menu React Component
+   ══════════════════════════════════════════════════════════════ */
+.radix-menu {
+    position: relative;
+    width: 100%;
+}
+.radix-menu-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 11px 14px;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.dark .radix-menu-trigger,
+html.dark .radix-menu-trigger {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+.radix-menu-trigger:hover {
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+}
+.radix-menu-trigger:focus,
+.radix-menu.open .radix-menu-trigger {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.18);
+}
+.radix-chevron,
+svg.radix-chevron {
+    width: 16px !important;
+    height: 16px !important;
+    max-width: 16px !important;
+    max-height: 16px !important;
+    color: #2563eb;
+    transition: transform 0.2s ease;
+    flex-shrink: 0 !important;
+}
+.dark .radix-chevron,
+html.dark .radix-chevron,
+.dark svg.radix-chevron,
+html.dark svg.radix-chevron {
+    color: #60a5fa;
+}
+.radix-menu.open .radix-chevron {
+    transform: rotate(180deg);
+}
+.radix-menu-content {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 6px;
+    box-shadow: 0 12px 36px -4px rgba(37, 99, 235, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px) scale(0.97);
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dark .radix-menu-content,
+html.dark .radix-menu-content {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.5);
+}
+.radix-menu.open .radix-menu-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+.radix-menu-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px 9px 34px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+.dark .radix-menu-item,
+html.dark .radix-menu-item {
+    color: #f1f5f9;
+}
+.radix-menu-item:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+    color: #2563eb;
+}
+.dark .radix-menu-item:hover,
+html.dark .radix-menu-item:hover {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+.radix-menu-item.active {
+    background-color: rgba(37, 99, 235, 0.15);
+    color: #2563eb;
+}
+.dark .radix-menu-item.active,
+html.dark .radix-menu-item.active {
+    background-color: rgba(59, 130, 246, 0.25);
+    color: #60a5fa;
+}
+.radix-check,
+svg.radix-check {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px !important;
+    height: 14px !important;
+    max-width: 14px !important;
+    max-height: 14px !important;
+    color: #2563eb;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    flex-shrink: 0 !important;
+}
+
+.dark .radix-check,
+html.dark .radix-check {
+    color: #60a5fa;
+}
+.radix-menu-item.active .radix-check {
+    opacity: 1;
+}
+
+

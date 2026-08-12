@@ -188,19 +188,28 @@ html.dark .icon-moon{display:none}
 .feat-icon-wrap{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
 .feat-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
 .feat-desc{font-size:13px;color:var(--muted);line-height:1.65}
-/* ─── STATS ─── */
-.stats-bg{background:linear-gradient(135deg,var(--hero-from) 0%,var(--hero-via) 50%,var(--blue-light) 100%);position:relative;overflow:hidden}
-.stats-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(34,211,238,.25),transparent 60%)}
-.stats-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
-.stats-eyebrow{font-size:12px;font-weight:700;color:#bfdbfe;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
-.stats-h2{font-size:36px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:14px}
-.stats-p{font-size:15px;color:rgba(255,255,255,.75);line-height:1.7}
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.stat-block{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:24px;backdrop-filter:blur(8px);transition:all .2s}
-.stat-block:hover{background:rgba(255,255,255,.18);transform:translateY(-2px)}
-.stat-icon-b{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
-.stat-num-b{font-size:32px;font-weight:900;color:#fff;line-height:1}
-.stat-lbl-b{font-size:13px;color:rgba(255,255,255,.6);margin-top:6px}
+/* ─── STATS / DATA INVENTARIS ─── */
+.stats-bg{background:linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 35%, #2563eb 70%, #0284c7 100%);position:relative;overflow:hidden;padding:80px 24px}
+.stats-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1;display:grid;grid-template-columns:1fr 1.1fr;gap:50px;align-items:center}
+.stats-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:#ffffff;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px;background:rgba(255,255,255,.2);padding:6px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.35)}
+.stats-eyebrow-pulse{width:6px;height:6px;border-radius:50%;background:#38bdf8;box-shadow:0 0 10px #38bdf8;animation:statPulse 2s infinite}
+@keyframes statPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.stats-h2{font-size:38px;font-weight:900;color:#fff;line-height:1.15;margin-bottom:16px;letter-spacing:-.02em}
+.stats-h2 em{font-style:normal;background:linear-gradient(135deg,#93c5fd,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stats-p{font-size:15px;color:rgba(255,255,255,.9);line-height:1.75;margin-bottom:24px}
+.stats-cta-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:14px;background:#ffffff;color:#1d4ed8;font-size:13px;font-weight:800;text-decoration:none;box-shadow:0 10px 25px -5px rgba(0,0,0,.25);transition:all .25s}
+.stats-cta-btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px -5px rgba(0,0,0,.35);background:#f8fafc;color:#1e40af}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+
+/* Solid Rectangle Cards - No Glassmorphism */
+.stat-block{background:#ffffff;border:1px solid #e2e8f0;border-radius:18px;padding:24px;box-shadow:0 10px 25px -5px rgba(0,0,0,.15);transition:all .25s ease;position:relative;overflow:hidden}
+.stat-block:hover{transform:translateY(-4px);box-shadow:0 18px 35px -5px rgba(0,0,0,.22);border-color:#cbd5e1}
+.stat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.stat-icon-b{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-trend{font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px}
+.stat-num-b{font-size:36px;font-weight:900;color:#0f172a;line-height:1;letter-spacing:-.02em}
+.stat-lbl-b{font-size:14px;font-weight:800;color:#1e293b;margin-top:8px}
+.stat-sub-b{font-size:12px;font-weight:500;color:#64748b;margin-top:3px}
 </style>
 <style>
 /* ─── ABOUT ─── */
@@ -605,27 +614,38 @@ html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.4) }
   </div>
 </section>
 
-{{-- ═══════════════ STATS ═══════════════ --}}
-<section class="section stats-bg">
+{{-- ═══════════════ DATA INVENTARIS STATS ═══════════════ --}}
+<section class="section stats-bg" id="data-inventaris">
   <div class="stats-inner">
     <div class="stats-left">
-      <div class="stats-eyebrow">Data Inventaris</div>
-      <h2 class="stats-h2">Inventaris Sekolah<br>dalam Angka</h2>
-      <p class="stats-p">Kelola ribuan data inventaris dengan sistem yang terintegrasi, terpercaya, dan mudah digunakan.</p>
+      <div class="stats-eyebrow">
+        <span class="stats-eyebrow-pulse"></span>
+        Data Inventaris System
+      </div>
+      <h2 class="stats-h2">Inventaris Sekolah<br><em>dalam Real-Time Data</em></h2>
+      <p class="stats-p">Kelola dan pantau seluruh aset fisik sekolah secara terintegrasi, transparan, dan dapat diakses dari mana saja dengan sistem inventaris modern.</p>
+      <a href="/inventory" class="stats-cta-btn">
+        <span>Jelajahi Data Inventaris</span>
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
     </div>
     <div class="stats-grid">
       @foreach([
-        ['1.256+','Total Barang Terdata','M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4','#3b82f6'],
-        ['24','Kategori Barang','M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z','#06b6d4'],
-        ['156+','Pengguna Aktif','M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z','#a78bfa'],
-        ['892+','Transaksi Peminjaman','M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4','#34d399'],
+        ['1.256+','Total Barang Terdata','Terintegrasi seluruh unit','M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4','#2563eb','#eff6ff','+12% Th ini','#dbeafe','#1e40af'],
+        ['24','Kategori Aset','Elektronik, Olahraga, Lab','M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z','#0284c7','#e0f2fe','Terstruktur','#e0f2fe','#0369a1'],
+        ['156+','Pengguna Aktif','Siswa, Guru, Admin','M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z','#7c3aed','#f3e8ff','Tersinkron','#f3e8ff','#6b21a8'],
+        ['892+','Sirkulasi Pinjam','Proses approval cepat','M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4','#059669','#d1fae5','99.4% Akurat','#d1fae5','#065f46'],
       ] as $s)
       <div class="stat-block">
-        <div class="stat-icon-b">
-          <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:{{ $s[3] }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $s[2] }}"/></svg>
+        <div class="stat-header">
+          <div class="stat-icon-b" style="background:{{ $s[5] }}">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:{{ $s[4] }}" fill="none" viewBox="0 0 24 24" stroke="{{ $s[4] }}"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="{{ $s[3] }}"/></svg>
+          </div>
+          <span class="stat-trend" style="background:{{ $s[7] }};color:{{ $s[8] }}">{{ $s[6] }}</span>
         </div>
         <div class="stat-num-b">{{ $s[0] }}</div>
         <div class="stat-lbl-b">{{ $s[1] }}</div>
+        <div class="stat-sub-b">{{ $s[2] }}</div>
       </div>
       @endforeach
     </div>

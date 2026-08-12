@@ -1,21 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SettingsController;
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
-    Route::livewire('settings/profile', 'pages::settings.profile')->name('profile.edit');
-});
+    // Profile
+    Route::get('settings/profile', [SettingsController::class, 'profile'])->name('profile.edit');
+    Route::patch('settings/profile', [SettingsController::class, 'updateProfile'])->name('settings.profile.update');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::livewire('settings/appearance', 'pages::settings.appearance')->name('appearance.edit');
+    // Security
+    Route::get('settings/security', [SettingsController::class, 'security'])->name('security.edit');
+    Route::put('settings/security', [SettingsController::class, 'updatePassword'])->name('settings.password.update');
 
-    Route::livewire('settings/security', 'pages::settings.security')
-        ->middleware([
-            'password.confirm',
-        ])
-        ->name('security.edit');
+    // Appearance
+    Route::get('settings/appearance', [SettingsController::class, 'appearance'])->name('appearance.edit');
 });
 
 Route::get('.well-known/passkey-endpoints', function () {

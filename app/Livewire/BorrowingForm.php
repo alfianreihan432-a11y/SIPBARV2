@@ -39,7 +39,7 @@ class BorrowingForm extends Component
         $this->validate([
             'quantity' => 'required|integer|min:1|max:' . $this->item->stock,
             'purpose' => 'required|string|min:5',
-            'borrow_date' => 'required|date|after_or:today',
+            'borrow_date' => 'required|date|after_or_equal:today',
             'return_date' => 'required|date|after:borrow_date',
             'teacher_id' => 'required|exists:users,id',
             'notes' => 'nullable|string|max:500',

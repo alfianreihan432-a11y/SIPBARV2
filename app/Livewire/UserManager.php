@@ -39,6 +39,67 @@ class UserManager extends Component
     public $password = '';
     public $alamat   = '';
 
+    // ── SIJUNA Sync State ──
+    public $sijunaLoading = false;
+    public $sijunaMessage = '';
+    public $sijunaSuccess = false;
+
+    public function fetchSijunaData(): void
+    {
+        $this->sijunaLoading = true;
+        $this->sijunaMessage = '';
+        $this->sijunaSuccess = false;
+
+        $sipintu = app(\App\Services\SipintuService::class);
+
+        if ($this->activeTab === 'siswa') {
+            if (empty($this->nis)) {
+                $this->sijunaMessage = 'Masukkan NIS terlebih dahulu untuk mencari data siswa dari SIJUNA.';
+                $this->sijunaLoading = false;
+                return;
+            }
+
+            $result = $sipintu->getStudents(nis: trim($this->nis));
+
+            if ($result['success'] && !empty($result['data'])) {
+                $student = is_array($result['data'][0] ?? null) ? $result['data'][0] : $result['data'];
+                $this->name           = $student['name']          ?? $student['nama']          ?? $this->name;
+                $this->kelas          = $student['kelas']         ?? $student['class']         ?? $this->kelas;
+                $this->jurusan        = $student['jurusan']       ?? $student['major']         ?? $this->jurusan;
+                $this->tanggal_lahir = $student['tanggal_lahir'] ?? $student['birth_date']   ?? $this->tanggal_lahir;
+                $this->phone          = $student['phone']         ?? $student['no_hp']        ?? $this->phone;
+                
+                $this->sijunaSuccess = true;
+                $this->sijunaMessage = 'Data siswa "' . $this->name . '" berhasil diimpor dari SIJUNA!';
+            } else {
+                $this->sijunaMessage = $result['error'] ?? 'Data siswa dengan NIS ' . $this->nis . ' tidak ditemukan di SIJUNA.';
+            }
+        } elseif ($this->activeTab === 'guru') {
+            if (empty($this->nip)) {
+                $this->sijunaMessage = 'Masukkan NIP terlebih dahulu untuk mencari data guru dari SIJUNA.';
+                $this->sijunaLoading = false;
+                return;
+            }
+
+            $result = $sipintu->getTeachers(nip: trim($this->nip));
+
+            if ($result['success'] && !empty($result['data'])) {
+                $teacher = is_array($result['data'][0] ?? null) ? $result['data'][0] : $result['data'];
+                $this->name           = $teacher['name']          ?? $teacher['nama']          ?? $this->name;
+                $this->jabatan        = $teacher['jabatan']       ?? $teacher['position']      ?? $this->jabatan;
+                $this->tanggal_lahir = $teacher['tanggal_lahir'] ?? $teacher['birth_date']   ?? $this->tanggal_lahir;
+                $this->phone          = $teacher['phone']         ?? $teacher['no_hp']        ?? $this->phone;
+                
+                $this->sijunaSuccess = true;
+                $this->sijunaMessage = 'Data guru "' . $this->name . '" berhasil diimpor dari SIJUNA!';
+            } else {
+                $this->sijunaMessage = $result['error'] ?? 'Data guru dengan NIP ' . $this->nip . ' tidak ditemukan di SIJUNA.';
+            }
+        }
+
+        $this->sijunaLoading = false;
+    }
+
     public function mount(): void
     {
         $this->loadUsers();
@@ -94,6 +155,22 @@ class UserManager extends Component
             $base  = strtolower($role === 'siswa' ? ($this->nis ?: $slug) : ($this->nip ?: $slug));
             $this->email    = $base . '@sipbar.sch.id';
             $this->password = $role === 'siswa' ? 'siswa' . $this->nis : 'guru' . $this->nip;
+
+            // Check if email already exists
+            if (User::where('email', $this->email)->exists()) {
+                session()->flash('error', 'Email ' . $this->email . ' sudah terdaftar. Pengguna dengan ' . ($role === 'siswa' ? 'NIS' : 'NIP') . ' ini mungkin sudah ada di sistem.');
+                return;
+            }
+
+            // Check if NIS/NIP already exists
+            if ($role === 'siswa' && User::where('nis', $this->nis)->exists()) {
+                session()->flash('error', 'NIS ' . $this->nis . ' sudah terdaftar di sistem.');
+                return;
+            }
+            if ($role === 'guru' && User::where('nip', $this->nip)->exists()) {
+                session()->flash('error', 'NIP ' . $this->nip . ' sudah terdaftar di sistem.');
+                return;
+            }
         }
 
         $data = [
@@ -175,5 +252,8 @@ class UserManager extends Component
         $this->jabatan       = '';
         $this->email         = '';
         $this->password      = '';
+        $this->sijunaMessage = '';
+        $this->sijunaSuccess = false;
+        $this->sijunaLoading = false;
     }
 }
