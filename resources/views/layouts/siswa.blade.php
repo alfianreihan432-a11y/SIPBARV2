@@ -117,6 +117,7 @@
         .logout-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
 
         .main { margin-left: 200px; flex: 1; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .content { flex: 1; overflow-y: auto; min-height: 0; padding: 22px 24px; }
         .topbar {
             height: 58px; background: var(--topbar-bg);
             border-bottom: 1px solid var(--topbar-bdr);

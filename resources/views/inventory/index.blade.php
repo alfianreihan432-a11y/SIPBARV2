@@ -1,24 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIPBAR - Inventaris</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-slate-50 text-slate-900">
-    <div class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.14),_transparent_40%)] px-4 py-8 sm:px-6 lg:px-8">
-        <div class="mx-auto max-w-7xl">
-            <div class="mb-8 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div>
-                    <p class="text-sm font-semibold uppercase tracking-[0.25em] text-sky-600">SIPBAR</p>
-                    <h1 class="text-3xl font-semibold">Inventaris Barang</h1>
-                    <p class="mt-2 text-slate-600">Modul inventaris siap dipakai untuk memantau aset sekolah.</p>
-                </div>
-                <a href="/" class="inline-flex items-center rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">Kembali ke Landing Page</a>
-            </div>
-            @livewire('inventory-manager')
+@extends('layouts.admin')
+@section('title', 'Inventaris Barang')
+@section('page-heading', 'Barang')
+
+@section('content')
+<div style="display:flex;flex-direction:column;gap:20px">
+    {{-- Hero header --}}
+    <div style="background:var(--bg-card);border:1px solid var(--border-alt);border-radius:18px;padding:24px 28px;display:flex;align-items:center;gap:18px;box-shadow:var(--card-shadow)">
+        <div style="width:52px;height:52px;background:var(--blue-dark);border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+        </div>
+        <div>
+            <div style="font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Inventaris Barang</div>
+            <div style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Kelola Barang</div>
+            <div style="font-size:13px;color:var(--text-muted)">Manajemen dan pemantauan aset serta inventaris sekolah secara terpadu.</div>
         </div>
     </div>
-</body>
-</html>
+
+    @livewire('inventory-manager')
+</div>
+@endsection

@@ -133,17 +133,6 @@
         .form-control.is-invalid { border-color: #ef4444; }
 
         .form-select-wrap { position: relative; }
-        .form-select-wrap::after {
-            content: '';
-            position: absolute;
-            right: 14px; top: 50%;
-            transform: translateY(-50%);
-            width: 0; height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 6px solid #94a3b8;
-            pointer-events: none;
-        }
 
         .password-wrap { position: relative; }
         .password-toggle {
@@ -196,30 +185,6 @@
             accent-color: #6366f1; cursor: pointer;
         }
 
-        /* Dummy creds box */
-        .dummy-box {
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-bottom: 24px;
-        }
-        .dummy-title {
-            font-size: 11px; font-weight: 700;
-            color: #0284c7; margin-bottom: 8px;
-            display: flex; align-items: center; gap: 5px;
-            text-transform: uppercase; letter-spacing: .05em;
-        }
-        .dummy-row {
-            display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 4px;
-        }
-        .dummy-chip {
-            font-size: 11px; background: #e0f2fe;
-            color: #0369a1; padding: 2px 8px;
-            border-radius: 999px; font-weight: 500;
-        }
-        .dummy-chip.role { background: #e0e7ff; color: #4338ca; }
-
         /* Back link */
         .back-link {
             display: inline-flex; align-items: center; gap: 6px;
@@ -238,7 +203,107 @@
             .login-right { padding: 28px 20px; }
             .login-wrapper { padding: 16px; }
         }
+
+        /* ── Radix Dropdown Component ── */
+        .radix-menu {
+            position: relative;
+            width: 100%;
+        }
+        .radix-menu-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 11px 14px;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .radix-menu-trigger:hover {
+            border-color: #6366f1;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+        .radix-menu-trigger:focus,
+        .radix-menu.open .radix-menu-trigger {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+        }
+        .radix-chevron {
+            width: 16px !important;
+            height: 16px !important;
+            color: #6366f1;
+            transition: transform 0.2s ease;
+            flex-shrink: 0 !important;
+        }
+        .radix-menu.open .radix-chevron {
+            transform: rotate(180deg);
+        }
+        .radix-menu-content {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 6px;
+            box-shadow: 0 12px 36px -4px rgba(99, 102, 241, 0.25), 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+        .radix-menu.open .radix-menu-content {
+            display: block;
+            animation: radixFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes radixFadeIn {
+            from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .radix-menu-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px 9px 34px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+        }
+        .radix-menu-item:hover {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+        }
+        .radix-menu-item.active {
+            background-color: rgba(99, 102, 241, 0.15);
+            color: #6366f1;
+        }
+        .radix-check {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px !important;
+            height: 14px !important;
+            color: #6366f1;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            flex-shrink: 0 !important;
+        }
+        .radix-menu-item.active .radix-check {
+            opacity: 1;
+        }
     </style>
+
 </head>
 <body>
 <div class="login-wrapper">
@@ -269,29 +334,6 @@
             <div class="right-title">Masuk ke Akun</div>
             <div class="right-sub">Akses sistem inventaris sekolah dengan mudah, cepat, dan aman.</div>
 
-            {{-- Dummy Credentials Info --}}
-            <div class="dummy-box">
-                <div class="dummy-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Demo Credentials
-                </div>
-                <div class="dummy-row">
-                    <span class="dummy-chip role">Admin</span>
-                    <span class="dummy-chip">Email: admin@sipbar.sch.id</span>
-                    <span class="dummy-chip">Password: admin123</span>
-                </div>
-                <div class="dummy-row">
-                    <span class="dummy-chip role">Guru</span>
-                    <span class="dummy-chip">NIP: 198505152010011001</span>
-                    <span class="dummy-chip">Tgl Lahir: sesuai data guru</span>
-                </div>
-                <div class="dummy-row">
-                    <span class="dummy-chip role">Siswa</span>
-                    <span class="dummy-chip">NIS: 2024001</span>
-                    <span class="dummy-chip">Tgl Lahir: sesuai data siswa</span>
-                </div>
-            </div>
-
             {{-- Session status --}}
             @if (session('status'))
                 <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;font-size:13px;color:#16a34a;margin-bottom:16px">
@@ -303,15 +345,35 @@
             <form method="POST" action="{{ route('login.store') }}" id="loginForm">
                 @csrf
 
-                {{-- Role Dropdown --}}
+                {{-- Role Dropdown (Radix / Shadcn Style) --}}
                 <div class="form-group">
-                    <label class="form-label" for="role">Login sebagai</label>
-                    <div class="form-select-wrap">
-                        <select name="role" id="role" class="form-control" onchange="handleRoleChange(this.value)" required>
-                            <option value="admin" {{ old('role', 'admin') === 'admin' ? 'selected' : '' }}>👤 Admin</option>
-                            <option value="guru"  {{ old('role') === 'guru'  ? 'selected' : '' }}>👨‍🏫 Guru</option>
-                            <option value="siswa" {{ old('role') === 'siswa' ? 'selected' : '' }}>🎓 Siswa</option>
-                        </select>
+                    <label class="form-label">Login sebagai</label>
+                    <input type="hidden" name="role" id="role" value="{{ old('role', 'admin') }}">
+                    
+                    <div class="radix-menu" id="roleRadixMenu">
+                        <button type="button" class="radix-menu-trigger" onclick="toggleRoleDropdown(event)">
+                            <span id="roleRadixLabel">
+                                @if(old('role') === 'guru') 👨‍🏫 Guru
+                                @elseif(old('role') === 'siswa') 🎓 Siswa
+                                @else 👤 Admin
+                                @endif
+                            </span>
+                            <svg class="radix-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" style="width:16px;height:16px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div class="radix-menu-content">
+                            <div class="radix-menu-item {{ old('role', 'admin') === 'admin' ? 'active' : '' }}" data-value="admin" data-label="👤 Admin" onclick="selectRoleOption('admin', '👤 Admin', this)">
+                                <svg class="radix-check" xmlns="http://www.w3.org/2000/svg" width="14" height="14" style="width:14px;height:14px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                <span>👤 Admin</span>
+                            </div>
+                            <div class="radix-menu-item {{ old('role') === 'guru' ? 'active' : '' }}" data-value="guru" data-label="👨‍🏫 Guru" onclick="selectRoleOption('guru', '👨‍🏫 Guru', this)">
+                                <svg class="radix-check" xmlns="http://www.w3.org/2000/svg" width="14" height="14" style="width:14px;height:14px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                <span>👨‍🏫 Guru</span>
+                            </div>
+                            <div class="radix-menu-item {{ old('role') === 'siswa' ? 'active' : '' }}" data-value="siswa" data-label="🎓 Siswa" onclick="selectRoleOption('siswa', '🎓 Siswa', this)">
+                                <svg class="radix-check" xmlns="http://www.w3.org/2000/svg" width="14" height="14" style="width:14px;height:14px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                <span>🎓 Siswa</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -404,12 +466,77 @@
                 </div>
 
                 <button type="submit" class="btn-login">Masuk</button>
+
+                {{-- ── Divider ── --}}
+                <div style="display:flex;align-items:center;gap:12px;margin:20px 0 0">
+                    <div style="flex:1;height:1px;background:#e2e8f0"></div>
+                    <span style="font-size:12px;color:#94a3b8;white-space:nowrap;font-weight:500">atau masuk dengan</span>
+                    <div style="flex:1;height:1px;background:#e2e8f0"></div>
+                </div>
             </form>
+
+            {{-- ── Error SSO ── --}}
+            @if(session('sipintu_error'))
+            <div style="display:flex;align-items:flex-start;gap:10px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;margin-top:12px">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:#ef4444;flex-shrink:0;margin-top:1px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span style="font-size:12px;color:#dc2626;line-height:1.5">{{ session('sipintu_error') }}</span>
+            </div>
+            @endif
+
+            {{-- ── Login dengan SiPintu ── --}}
+            <a href="{{ route('sipintu.oauth.redirect') }}"
+               id="btn-sipintu"
+               style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:12px;padding:12px 16px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;font-weight:700;color:#374151;text-decoration:none;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.05)"
+               onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1';this.style.boxShadow='0 4px 14px rgba(99,102,241,.15)'"
+               onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#374151';this.style.boxShadow='0 2px 8px rgba(0,0,0,.05)'">
+                {{-- SiPintu icon / logo --}}
+                <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:linear-gradient(135deg,#6366f1,#3b82f6);border-radius:6px;flex-shrink:0">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                </span>
+                Login dengan SiPintu
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;margin-left:auto;opacity:.4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+
+            <p style="font-size:11px;color:#94a3b8;text-align:center;margin-top:10px;line-height:1.5">
+                SSO terpusat via <strong style="color:#6366f1">SiPintu Identity Gateway</strong> — masuk sekali untuk semua sistem sekolah.
+            </p>
+
         </div>
     </div>
 </div>
 
 <script>
+    // ── Radix UI Custom Dropdown Handlers ──
+    function toggleRoleDropdown(e) {
+        e.stopPropagation();
+        const menu = document.getElementById('roleRadixMenu');
+        menu.classList.toggle('open');
+    }
+
+    function selectRoleOption(val, label, el) {
+        document.getElementById('role').value = val;
+        document.getElementById('roleRadixLabel').textContent = label;
+
+        // Update active class
+        const items = document.querySelectorAll('#roleRadixMenu .radix-menu-item');
+        items.forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+
+        // Close menu
+        document.getElementById('roleRadixMenu').classList.remove('open');
+
+        // Trigger dynamic form fields update
+        handleRoleChange(val);
+    }
+
+    // Close on click outside
+    document.addEventListener('click', function (e) {
+        const menu = document.getElementById('roleRadixMenu');
+        if (menu && !menu.contains(e.target)) {
+            menu.classList.remove('open');
+        }
+    });
+
     // ── Role switcher ──
     function handleRoleChange(role) {
         // Reset semua field visibility

@@ -19,6 +19,12 @@ class InventoryManager extends Component
     
     public $items;
     public $search = '';
+    public $filterCategory = '';
+    public $filterStatus = '';
+    public $filterCondition = '';
+    public $viewMode = 'grid'; // grid or table
+    public $showForm = false;
+
     public $name = '';
     public $description = '';
     public $category_id = '';
@@ -55,22 +61,83 @@ class InventoryManager extends Component
         $this->loadItems();
     }
 
+    public function updatedSearch(): void
+    {
+        $this->loadItems();
+    }
+
+    public function updatedFilterCategory(): void
+    {
+        $this->loadItems();
+    }
+
+    public function updatedFilterStatus(): void
+    {
+        $this->loadItems();
+    }
+
+    public function updatedFilterCondition(): void
+    {
+        $this->loadItems();
+    }
+
+    public function toggleForm(): void
+    {
+        $this->showForm = !$this->showForm;
+    }
+
+    public function setViewMode($mode): void
+    {
+        $this->viewMode = $mode;
+    }
+
     public function render()
     {
+        $allItems = Item::all();
+        $stats = [
+            'total' => $allItems->count(),
+            'total_stock' => $allItems->sum('stock'),
+            'tersedia' => $allItems->where('status', 'Tersedia')->count(),
+            'dipinjam' => $allItems->where('status', 'Dipinjam')->count(),
+            'maintenance' => $allItems->where('status', 'Maintenance')->count(),
+            'baik' => $allItems->where('condition', 'Baik')->count(),
+        ];
+
         return view('livewire.inventory-manager', [
             'categories' => Category::latest()->get(),
             'locations' => Location::latest()->get(),
             'suppliers' => Supplier::latest()->get(),
+            'stats' => $stats,
         ]);
     }
 
     public function loadItems(): void
     {
-        $this->items = Item::query()
-            ->with(['category', 'location', 'supplier'])
-            ->when($this->search !== '', fn ($query) => $query->where('name', 'like', "%{$this->search}%"))
-            ->latest()
-            ->get();
+        $query = Item::query()->with(['category', 'location', 'supplier']);
+
+        if ($this->search !== '') {
+            $query->where(function ($q) {
+                $q->where('name', 'like', "%{$this->search}%")
+                  ->orWhere('inventory_number', 'like', "%{$this->search}%")
+                  ->orWhere('code', 'like', "%{$this->search}%")
+                  ->orWhere('brand', 'like', "%{$this->search}%")
+                  ->orWhere('type', 'like', "%{$this->search}%");
+            });
+        }
+
+        if ($this->filterCategory !== '') {
+            $query->where('category_id', $this->filterCategory);
+        }
+
+        if ($this->filterStatus !== '') {
+            $query->where('status', $this->filterStatus);
+        }
+
+        if ($this->filterCondition !== '') {
+            $query->where('condition', $this->filterCondition);
+        }
+
+        $this->items = $query->latest()->get();
     }
 
     public function save(): void
@@ -115,6 +182,7 @@ class InventoryManager extends Component
     {
         $item = Item::findOrFail($id);
         $this->editingId = $item->id;
+        $this->showForm = true;
         $this->name = $item->name;
         $this->description = $item->description;
         $this->category_id = $item->category_id;
