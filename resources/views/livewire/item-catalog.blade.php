@@ -9,12 +9,12 @@
     <div style="background: var(--card); border-radius: 16px; border: 1px solid var(--border2); padding: 18px 20px; margin-bottom: 18px;">
         <div style="display: flex; flex-direction: column; gap: 12px;">
             <div style="flex: 1;">
-                <input type="text" wire:model="search" 
+                <input type="text" wire:model.live.debounce.300ms="search" 
                        style="width: 100%; padding: 10px 14px; border: 1px solid var(--border2); border-radius: 10px; background: var(--input-bg); color: var(--text); font-size: 13px;"
                        placeholder="Cari barang...">
             </div>
             <div style="width: 100%;">
-                <select wire:model="categoryFilter" 
+                <select wire:model.live="categoryFilter" 
                         style="width: 100%; padding: 10px 14px; border: 1px solid var(--border2); border-radius: 10px; background: var(--input-bg); color: var(--text); font-size: 13px;">
                     <option value="">Semua Kategori</option>
                     @foreach($categories as $category)

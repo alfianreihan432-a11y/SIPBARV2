@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Item;
 use App\Models\Category;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -39,6 +40,7 @@ class ItemCatalog extends Component
         $this->showBorrowModal = true;
     }
 
+    #[On('close-borrow-modal')]
     public function closeBorrowModal()
     {
         $this->showBorrowModal = false;

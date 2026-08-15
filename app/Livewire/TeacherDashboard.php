@@ -63,15 +63,15 @@ class TeacherDashboard extends Component
         
         // NEW: Pending requests count (for badge in menu)
         $this->pendingRequests = BorrowingRequest::where('teacher_id', $userId)
-            ->where('teacher_approved', false)
-            ->whereNull('teacher_approval_at')
+            ->where('status', 'pending')
+            ->whereNull('approved_at')
             ->count();
         
         // NEW: Upcoming deadlines (return date within 3 days)
         $this->upcomingDeadlines = Borrowing::with(['user', 'details.item'])
             ->where('status', 'borrowed')
-            ->whereBetween('return_date', [Carbon::now(), Carbon::now()->addDays(3)])
-            ->orderBy('return_date', 'asc')
+            ->whereBetween('due_at', [Carbon::now(), Carbon::now()->addDays(3)])
+            ->orderBy('due_at', 'asc')
             ->take(5)
             ->get();
         

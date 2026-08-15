@@ -58,12 +58,23 @@ class QRCodeService
     }
     
     /**
-     * Get QR code image as base64 string
+     * Get QR code image as base64 string.
+     * Accepts a QRCode model or a BorrowingRequest that has an associated QR code.
      */
-    public function getImageBase64(QRCode $qrCode): string
+    public function getImageBase64(QRCode|BorrowingRequest $source, bool $asDataUri = false): string
     {
+        $qrCode = $source instanceof BorrowingRequest
+            ? $source->qrCode ?? QRCode::where('borrowing_request_id', $source->id)->first()
+            : $source;
+
+        if (!$qrCode || !$qrCode->image_path) {
+            throw new \InvalidArgumentException('QR Code image not found for the given source.');
+        }
+
         $imageContents = Storage::disk('public')->get($qrCode->image_path);
-        return base64_encode($imageContents);
+        $base64 = base64_encode($imageContents);
+
+        return $asDataUri ? 'data:image/png;base64,'.$base64 : $base64;
     }
     
     /**

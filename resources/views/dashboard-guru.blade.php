@@ -72,7 +72,7 @@ body{display:flex;background:var(--content-bg);color:var(--text);overflow:hidden
 .topbar-icon:hover{background:var(--border2);color:var(--text)}
 .notif-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;background:#ef4444;border-radius:50%;border:2px solid var(--topbar-bg);transition:border-color .25s}
 .topbar-user{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;background:var(--bg3);border:1px solid var(--border2);border-radius:999px;cursor:pointer}
-.topbar-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.topbar-avatar{width:30px;height:30px;border-radius:50%;background:#0f766e;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
 .topbar-uname{font-size:13px;font-weight:600;color:var(--text2)}
 .t-sun{display:none}.t-moon{display:block}
 html.dark .t-sun{display:block}html.dark .t-moon{display:none}
@@ -84,7 +84,7 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
 .content-grid{display:grid;grid-template-columns:1fr 300px;gap:18px}
 
 /* ══ HERO CARD ══ */
-.hero-card{background:linear-gradient(135deg,#0f766e 0%,#0d9488 55%,#06b6d4 100%);border-radius:18px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;overflow:hidden;position:relative}
+.hero-card{background:#0f766e;border-radius:18px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;overflow:hidden;position:relative;box-shadow:0 4px 14px rgba(15,118,110,.15)}
 .hero-card::before{content:'';position:absolute;top:-40px;right:80px;width:180px;height:180px;background:rgba(255,255,255,.06);border-radius:50%}
 .hero-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:4px}
 .hero-sub{font-size:13px;color:rgba(255,255,255,.8);margin-bottom:14px;max-width:380px;line-height:1.5}
@@ -232,6 +232,12 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
             <input type="text" placeholder="Cari siswa atau permohonan...">
         </div>
         <div class="topbar-right">
+            {{-- CTA Kembali ke Beranda --}}
+            <a href="{{ route('home') }}" class="topbar-icon" title="Kembali ke Beranda" style="text-decoration:none">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+            </a>
             {{-- Theme toggle --}}
             <button class="topbar-icon" id="themeBtn" title="Ganti Mode (Alt+D)">
                 <svg class="t-moon" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>

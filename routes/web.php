@@ -50,6 +50,7 @@ Route::middleware(['auth'])->group(function () {
     Route::view('siswa/peminjaman', 'pages.siswa.loans')->name('student.loans');
     Route::view('siswa/riwayat', 'pages.siswa.history')->name('student.history');
     Route::view('siswa/pengumuman', 'pages.siswa.announcements')->name('student.announcements');
+    Route::view('siswa/profil', 'pages.siswa.profile')->name('student.profile');
 
     // Teacher pages
     Route::get('guru/dashboard', function() {
