@@ -19,44 +19,48 @@
 
         /* ══════ LIGHT MODE TOKENS (default) ══════ */
         :root {
-            --bg:          #f0f7ff;
+            --bg:          #f8fafc;
             --bg2:         #ffffff;
-            --bg3:         #e2eeff;
+            --bg3:         #f1f5f9;
             --card:        #ffffff;
-            --border:      #dbeafe;
+            --border:      #e2e8f0;
             --border2:     #e2e8f0;
             --text:        #0f172a;
-            --text2:       #1e293b;
+            --text2:       #334155;
             --muted:       #64748b;
             --subtle:      #94a3b8;
+            --primary:     #2563eb;
+            --primary-dark:#1d4ed8;
             --topbar-bg:   #ffffff;
             --topbar-bdr:  #e2e8f0;
-            --content-bg:  #f0f7ff;
+            --content-bg:  #f8fafc;
             --panel-bg:    #ffffff;
-            --input-bg:    #f8fafc;
+            --input-bg:    #ffffff;
             --scrollbar:   #cbd5e1;
-            --sidebar-bg:  #1d4ed8;
+            --sidebar-bg:  #1e293b;
         }
 
         /* ══════ DARK MODE TOKENS ══════ */
         html.dark {
-            --bg:          #0d1117;
-            --bg2:         #111827;
-            --bg3:         #1a2535;
-            --card:        #111827;
-            --border:      #1e3a5f;
-            --border2:     #1e293b;
-            --text:        #f1f5f9;
+            --bg:          #0f172a;
+            --bg2:         #1e293b;
+            --bg3:         #334155;
+            --card:        #1e293b;
+            --border:      #334155;
+            --border2:     #334155;
+            --text:        #f8fafc;
             --text2:       #e2e8f0;
             --muted:       #94a3b8;
             --subtle:      #64748b;
-            --topbar-bg:   #0d1117;
-            --topbar-bdr:  #1e293b;
-            --content-bg:  #080e18;
-            --panel-bg:    #111827;
-            --input-bg:    #0d1117;
-            --scrollbar:   #334155;
-            --sidebar-bg:  #162040;
+            --primary:     #3b82f6;
+            --primary-dark:#2563eb;
+            --topbar-bg:   #0f172a;
+            --topbar-bdr:  #334155;
+            --content-bg:  #0f172a;
+            --panel-bg:    #1e293b;
+            --input-bg:    #1e293b;
+            --scrollbar:   #475569;
+            --sidebar-bg:  #0f172a;
         }
 
         body { display: flex; background: var(--content-bg); color: var(--text); overflow: hidden; transition: background .25s, color .25s; }
@@ -95,7 +99,7 @@
         .nav-item.active { background: rgba(255,255,255,.2); color: #fff; font-weight: 700; }
         .nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
         .nav-badge {
-            margin-left: auto; background: #fff; color: #1d4ed8;
+            margin-left: auto; background: var(--primary); color: #fff;
             font-size: 10px; font-weight: 800;
             padding: 1px 7px; border-radius: 999px;
         }
@@ -169,7 +173,7 @@
         }
         .topbar-avatar {
             width: 30px; height: 30px; border-radius: 50%;
-            background: linear-gradient(135deg, #1d4ed8, #06b6d4);
+            background: #1d4ed8;
             display: flex; align-items: center; justify-content: center;
             font-size: 11px; font-weight: 700; color: #fff;
         }
@@ -196,10 +200,11 @@
 
         /* ===== HERO CARD ===== */
         .hero-card {
-            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #06b6d4 100%);
+            background: #1d4ed8;
             border-radius: 18px; padding: 24px 28px;
             display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 18px; overflow: hidden; position: relative;
+            box-shadow: 0 4px 14px rgba(29, 78, 216, 0.15);
         }
         .hero-card::before {
             content: ''; position: absolute;
@@ -379,8 +384,8 @@
         @endforeach
 
         {{-- CTA Pinjam Barang --}}
-        <a href="{{ route('student.catalog') }}" style="display:flex;align-items:center;gap:10px;padding:12px;margin-top:8px;background:#fff;border-radius:12px;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.1);transition:all .2s;">
-            <div style="width:36px;height:36px;background:linear-gradient(135deg,#1d4ed8,#2563eb);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <a href="{{ route('student.catalog') }}" style="display:flex;align-items:center;gap:10px;padding:12px;margin-top:8px;background:#fff;border-radius:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:all .2s;">
+            <div style="width:36px;height:36px;background:#1d4ed8;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;fill:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
             </div>
             <div style="flex:1">
@@ -418,6 +423,22 @@
             <input type="text" placeholder="Cari barang atau riwayat...">
         </div>
         <div class="topbar-right">
+            {{-- CTA Kembali ke Beranda --}}
+            <a href="{{ route('home') }}" class="topbar-icon" title="Kembali ke Beranda" style="text-decoration:none">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+            </a>
+            {{-- Theme Toggle Button --}}
+            <button id="themeToggle" class="topbar-icon" title="Toggle Theme">
+                <svg class="t-sun" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <svg class="t-moon" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+            </button>
+            
             <div class="topbar-icon" style="position:relative">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </div>
@@ -440,6 +461,22 @@
 </div>{{-- /main --}}
 
 <script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const themeKey = 'sipbar-siswa-theme';
+    
+    themeToggle.addEventListener('click', () => {
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            localStorage.setItem(themeKey, 'light');
+        } else {
+            html.classList.add('dark');
+            localStorage.setItem(themeKey, 'dark');
+        }
+    });
+    
+    // Sidebar Toggle for Mobile
     window.addEventListener('resize', () => {
         if (window.innerWidth > 800) document.getElementById('sidebar').classList.remove('open');
     });

@@ -1,7 +1,7 @@
 <div style="background: var(--card); border-radius: 16px; border: 1px solid var(--border2); padding: 24px;">
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
         <h2 style="font-size: 20px; font-weight: 800; color: var(--text);">Form Pengajuan Peminjaman</h2>
-        <button wire:click="$emit('close')" style="background: none; border: none; cursor: pointer; color: var(--subtle); padding: 8px; border-radius: 8px; transition: background .2s;">
+        <button type="button" wire:click="close" style="background: none; border: none; cursor: pointer; color: var(--subtle); padding: 8px; border-radius: 8px; transition: background .2s;">
             <svg xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -114,7 +114,7 @@
 
         {{-- Submit Button --}}
         <div style="display: flex; gap: 12px;">
-            <button type="button" wire:click="$emit('close')" 
+            <button type="button" wire:click="close"
                     style="flex: 1; padding: 12px 16px; border: 1px solid var(--border2); border-radius: 10px; color: var(--text); font-weight: 600; font-size: 13px; cursor: pointer; background: var(--bg3); transition: background .2s;">
                 Batal
             </button>

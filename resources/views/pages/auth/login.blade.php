@@ -257,7 +257,11 @@
             border-radius: 12px;
             padding: 6px;
             box-shadow: 0 12px 36px -4px rgba(99, 102, 241, 0.25), 0 4px 16px rgba(0, 0, 0, 0.08);
+            max-height: 300px;
+            overflow-y: auto;
         }
+        .radix-menu-content::-webkit-scrollbar { width: 4px; }
+        .radix-menu-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .radix-menu.open .radix-menu-content {
             display: block;
             animation: radixFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
@@ -338,6 +342,15 @@
             @if (session('status'))
                 <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;font-size:13px;color:#16a34a;margin-bottom:16px">
                     {{ session('status') }}
+                </div>
+            @endif
+
+            {{-- Error message --}}
+            @if ($errors->any())
+                <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 14px;margin-bottom:16px">
+                    @foreach ($errors->all() as $error)
+                        <div style="font-size:13px;color:#dc2626;margin-bottom:4px">{{ $error }}</div>
+                    @endforeach
                 </div>
             @endif
 

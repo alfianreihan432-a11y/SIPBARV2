@@ -64,36 +64,82 @@
         .db-bar { width: 32px; border-radius: 6px 6px 0 0; transition: height .6s ease; }
         .db-bar-val   { font-size: 13px; font-weight: 800; color: var(--text-primary); }
         .db-bar-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+        /* Hero Section Styles */
+        .hero-section {
+            position: relative;
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.9), rgba(2, 132, 199, 0.8)),
+                        url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            border-radius: 16px;
+            padding: 40px 20px;
+            margin-bottom: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(29, 78, 216, 0.3);
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.85), rgba(2, 132, 199, 0.75));
+            z-index: 1;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+        }
+        .hero-title {
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.5px;
+        }
+        .hero-subtitle {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            opacity: 0.95;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+        }
+        .hero-greeting {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+        }
+        .hero-date {
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.9;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+        }
+        @media (max-width: 768px) {
+            .hero-title { font-size: 28px; }
+            .hero-subtitle { font-size: 14px; }
+            .hero-greeting { font-size: 18px; }
+        }
     </style>
 
-    {{-- Greeting + Gauge --}}
-    <div class="db-greeting-row">
-        <div>
-            <div class="db-greeting-title">
+    {{-- Hero Section with School Background --}}
+    <div class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Sistem Inventaris Modern</h1>
+            <p class="hero-subtitle">Kelola Inventaris Lebih Mudah, Cepat & Terorganisir</p>
+            <div class="hero-greeting">
                 @php
                     $hour = now()->hour;
                     $greet = $hour < 12 ? 'Selamat Pagi' : ($hour < 17 ? 'Selamat Siang' : 'Selamat Malam');
                 @endphp
                 {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Admin' }} 👋
             </div>
-            <div class="db-greeting-sub">{{ now()->translatedFormat('l, d F Y') }}</div>
-        </div>
-        <div class="db-gauge-card">
-            <div class="db-gauge-title">Kondisi Barang Baik</div>
-            <svg style="width:120px;height:70px" viewBox="0 0 120 70">
-                <defs>
-                    <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#1d4ed8"/>
-                        <stop offset="100%" stop-color="#0284c7"/>
-                    </linearGradient>
-                </defs>
-                <path d="M10,65 A50,50 0 0,1 110,65" fill="none" stroke="var(--border-alt)" stroke-width="10" stroke-linecap="round"/>
-                <path d="M10,65 A50,50 0 0,1 110,65" fill="none" stroke="url(#gaugeGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="{{ 157 - (157 * $itemConditionPercentage / 100) }}"/>
-                <text x="60" y="58" text-anchor="middle" font-size="16" font-weight="800" fill="var(--text-primary)">{{ $itemConditionPercentage }}%</text>
-                <text x="12" y="70" font-size="7" fill="var(--text-subtle)">0</text>
-                <text x="104" y="70" font-size="7" fill="var(--text-subtle)">100</text>
-            </svg>
-            <div class="db-gauge-label">Kondisi Baik</div>
+            <div class="hero-date">{{ now()->translatedFormat('l, d F Y') }}</div>
         </div>
     </div>
 

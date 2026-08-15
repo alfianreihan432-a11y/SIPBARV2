@@ -34,6 +34,11 @@ class BorrowingForm extends Component
         }
     }
 
+    public function close(): void
+    {
+        $this->dispatch('close-borrow-modal');
+    }
+
     public function submit()
     {
         $this->validate([

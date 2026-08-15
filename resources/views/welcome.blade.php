@@ -95,7 +95,7 @@ html.dark .icon-moon{display:none}
 </style>
 <style>
 /* ─── HERO ─── */
-.hero{position:relative;background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 30%,#3b82f6 65%,#22d3ee 100%);overflow:hidden;padding:90px 24px 0}
+.hero{position:relative;background:linear-gradient(135deg,rgba(30,58,138,0.92),rgba(29,78,216,0.88),rgba(59,130,246,0.85)),url('/build/assets/smkTop.png');background-size:cover;background-position:center;overflow:hidden;padding:90px 24px 0}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 60% 40%,rgba(96,165,250,.3) 0%,transparent 60%)}
 .hero-blob{position:absolute;border-radius:50%;filter:blur(72px);pointer-events:none}
 .hero-blob-1{width:500px;height:500px;background:rgba(59,130,246,.4);top:-120px;right:5%;animation:float1 8s ease-in-out infinite}
@@ -103,13 +103,13 @@ html.dark .icon-moon{display:none}
 .hero-blob-3{width:200px;height:200px;background:rgba(96,165,250,.35);top:40%;left:30%;animation:float1 12s ease-in-out infinite reverse}
 @keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-28px)}}
 @keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(22px)}}
-.hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:2}
+.hero-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:2}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;font-size:12px;font-weight:600;color:rgba(255,255,255,.85);margin-bottom:24px;backdrop-filter:blur(8px)}
 .hero-badge-pulse{width:8px;height:8px;background:#4ade80;border-radius:50%;box-shadow:0 0 0 0 rgba(74,222,128,.5);animation:pulse-ring 2s infinite}
 @keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(74,222,128,.5)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
-.hero-h1{font-size:52px;font-weight:900;line-height:1.1;letter-spacing:-.02em;color:#fff;margin-bottom:20px}
-.hero-h1 em{font-style:normal;background:linear-gradient(90deg,#93c5fd,#67e8f9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-p{font-size:17px;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:36px;max-width:440px}
+.hero-h1{font-size:56px;font-weight:900;line-height:1.2;letter-spacing:-.03em;color:#fff;margin-bottom:20px;font-family:'Instrument Sans',ui-sans-serif,system-ui,sans-serif}
+.hero-h1 em{font-style:normal;color:#fff}
+.hero-p{font-size:17px;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:36px;max-width:600px;margin-left:auto;margin-right:auto}
 .hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px}
 .hero-btn-main{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:#fff;color:#2563eb;font-size:15px;font-weight:700;border-radius:12px;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:all .2s}
 .hero-btn-main:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.25)}
@@ -154,8 +154,6 @@ html.dark .icon-moon{display:none}
 .mc-pill{font-size:8px;padding:2px 6px;border-radius:999px;font-weight:600}
 .pill-green{background:rgba(52,211,153,.15);color:#34d399}
 .pill-red{background:rgba(248,113,113,.15);color:#f87171}
-/* Hero bottom wave */
-.hero-wave{display:block;width:100%;height:70px;margin-bottom:-2px}
 </style>
 <style>
 /* ─── SECTIONS ─── */
@@ -387,7 +385,6 @@ html.dark .social-btn { background:#1a2540 !important; border-color:#243050 !imp
 html.dark .social-btn:hover { background:#2563eb !important; border-color:#2563eb !important; color:#fff !important }
 
 /* ── MISC ── */
-html.dark .hero-wave path { fill:#0f1117 !important }
 html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.4) }
 /* ─── MOBILE NAV LINKS ─── */
 .nav-mob-login{background:var(--bg3);color:var(--text2)}
@@ -431,11 +428,10 @@ html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.4) }
       @auth
         <a href="{{ route('dashboard') }}" class="btn-primary">Dashboard</a>
       @else
-        <a href="{{ route('login') }}" class="btn-ghost">
+        <a href="{{ route('login') }}" class="btn-primary">
           <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
           Masuk
         </a>
-        <a href="{{ route('register') }}" class="btn-primary">Daftar Gratis</a>
       @endauth
     </div>
     <button class="nav-ham" onclick="document.getElementById('navMob').classList.toggle('open')" aria-label="Menu">
@@ -450,7 +446,6 @@ html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.4) }
     <a href="#kontak">Kontak</a>
     <div class="nav-mobile-actions">
       <a href="{{ route('login') }}" class="nav-mob-login">Masuk</a>
-      <a href="{{ route('register') }}" class="nav-mob-register">Daftar</a>
     </div>
   </div>
 </nav>
@@ -464,90 +459,10 @@ html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.4) }
   <div class="hero-inner">
     <div>
       <div class="hero-badge"><span class="hero-badge-pulse"></span>Sistem Inventaris Modern</div>
-      <h1 class="hero-h1">Kelola Inventaris<br><em>Lebih Mudah,</em><br>Cepat &amp; Terorganisir</h1>
+      <h1 class="hero-h1">Sistem Inventaris<br><em>Modern</em><br>Kelola Lebih Mudah &amp; Cepat</h1>
       <p class="hero-p">Sistem inventaris berbasis web untuk memudahkan pengelolaan barang, peminjaman, dan laporan secara efisien, akurat, dan transparan.</p>
-      <div class="hero-btns">
-        <a href="{{ route('register') }}" class="hero-btn-main">
-          Mulai Sekarang
-          <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-        </a>
-        <a href="#fitur" class="hero-btn-alt">
-          <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Lihat Demo
-        </a>
-      </div>
-      <div class="hero-trust">
-        @foreach([
-          ['M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z','Aman & Terpercaya','Data terenkripsi'],
-          ['M13 10V3L4 14h7v7l9-11h-7z','Efisien','Proses lebih cepat'],
-          ['M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z','Laporan Akurat','Data real-time'],
-          ['M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z','Berbasis Cloud','Akses kapan saja'],
-        ] as $t)
-        <div class="trust-item">
-          <div class="trust-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#93c5fd" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $t[0] }}"/></svg>
-          </div>
-          <div class="trust-label">{{ $t[1] }}</div>
-          <div class="trust-sub">{{ $t[2] }}</div>
-        </div>
-        @endforeach
-      </div>
-    </div>
-    {{-- Dashboard Mockup --}}
-    <div class="hero-mockup">
-      <div class="mockup-glow"></div>
-      <div class="mockup-card">
-        <div class="mc-header">
-          <div class="mc-dots">
-            <div class="mc-dot" style="background:#ff5f56"></div>
-            <div class="mc-dot" style="background:#ffbd2e"></div>
-            <div class="mc-dot" style="background:#27c93f"></div>
-          </div>
-          <div style="font-size:10px;color:rgba(255,255,255,.4)">SIPBAR Dashboard</div>
-          <div style="width:22px;height:22px;border-radius:50%;background:rgba(37,99,235,.5)"></div>
-        </div>
-        <div class="mc-body">
-          <div class="mc-sidebar">
-            @foreach(['Dashboard','Barang','Kategori','Peminjaman','Pengembalian','Laporan','Pengguna','Pengajuan'] as $m)
-            <div class="mc-menu {{ $m==='Dashboard'?'act':'' }}">
-              <div class="mc-menu-dot"></div>{{ $m }}
-            </div>
-            @endforeach
-          </div>
-          <div class="mc-content">
-            <div style="font-size:9px;color:rgba(255,255,255,.5);margin-bottom:8px">Selamat datang, Admin! &nbsp;·&nbsp; Kelola inventaris dengan mudah.</div>
-            <div class="mc-stats">
-              <div class="mc-stat"><div class="mc-stat-label">Total Barang</div><div class="mc-stat-val">1.256</div><div class="mc-stat-chg" style="color:#34d399">+17%</div></div>
-              <div class="mc-stat"><div class="mc-stat-label">Tersedia</div><div class="mc-stat-val">892</div><div class="mc-stat-chg" style="color:#f87171">-8%</div></div>
-              <div class="mc-stat"><div class="mc-stat-label">Dipinjam</div><div class="mc-stat-val">234</div><div class="mc-stat-chg" style="color:#f87171">-1%</div></div>
-              <div class="mc-stat"><div class="mc-stat-label">Kategori</div><div class="mc-stat-val">24</div><div class="mc-stat-chg" style="color:rgba(255,255,255,.4)">Total</div></div>
-            </div>
-            <div class="mc-chart">
-              <div class="mc-chart-label">Grafik Peminjaman – 6 Bulan</div>
-              <svg viewBox="0 0 240 50" style="width:100%;height:44px">
-                <polygon fill="url(#cg)" points="0,44 40,34 80,38 120,16 160,24 200,10 240,16 240,50 0,50"/>
-                <defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#60a5fa" stop-opacity=".4"/><stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/></linearGradient></defs>
-                <polyline fill="none" stroke="#60a5fa" stroke-width="2" stroke-linejoin="round" points="0,44 40,34 80,38 120,16 160,24 200,10 240,16"/>
-                @foreach([[0,44],[40,34],[80,38],[120,16],[160,24],[200,10],[240,16]] as $p)
-                <circle cx="{{ $p[0] }}" cy="{{ $p[1] }}" r="2.5" fill="#60a5fa" stroke="#1e3a8a" stroke-width="1.5"/>
-                @endforeach
-              </svg>
-            </div>
-            <div class="mc-items">
-              <div class="mc-items-label">Barang Terbaru</div>
-              @foreach([['Proyektor Epson','Elektronik','Tersedia',true],['Meja Guru','Furnitur','Tersedia',true],['Bola Basket','Olahraga','Dipinjam',false],['Mikroskop','Laboratorium','Tersedia',true]] as $r)
-              <div class="mc-row">
-                <div class="mc-row-left"><div class="mc-avatar"></div><div><div class="mc-name">{{ $r[0] }}</div><div class="mc-cat">{{ $r[1] }}</div></div></div>
-                <span class="mc-pill {{ $r[3]?'pill-green':'pill-red' }}">{{ $r[2] }}</span>
-              </div>
-              @endforeach
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
-  <svg class="hero-wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 70" preserveAspectRatio="none"><path fill="#ffffff" d="M0,40 C360,80 1080,0 1440,40 L1440,70 L0,70 Z"/></svg>
 </section>
 
 {{-- ═══════════════ KATEGORI ═══════════════ --}}
