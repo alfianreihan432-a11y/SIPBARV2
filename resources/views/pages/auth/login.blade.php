@@ -204,107 +204,137 @@
             .login-wrapper { padding: 16px; }
         }
 
-        /* ── Radix Dropdown Component ── */
-        .radix-menu {
+        /* ── Admin-style Select Component ── */
+        select,
+        .im-select,
+        .im-select-field {
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            background-size: 15px 15px !important;
+            padding-right: 38px !important;
+            background-color: #ffffff !important;
+            border: 1.5px solid #cbd5e1 !important;
+            border-radius: 10px !important;
+            color: #0f172a !important;
+            font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            outline: none !important;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+        }
+        select:hover,
+        .im-select:hover,
+        .im-select-field:hover {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.1) !important;
+        }
+        select:focus,
+        .im-select:focus,
+        .im-select-field:focus {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 3.5px rgba(37,99,235,0.18) !important;
+            background-color: #ffffff !important;
+        }
+        select option {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            font-weight: 500;
+            padding: 8px 12px;
+        }
+        .im-select-field {
+            width: 100% !important;
+            padding-top: 10px !important;
+            padding-bottom: 10px !important;
+            padding-left: 13px !important;
+            font-size: 13px !important;
+        }
+
+        /* ── Custom Admin Select Dropdown with Icons ── */
+        .admin-select-wrap {
             position: relative;
             width: 100%;
         }
-        .radix-menu-trigger {
+        .admin-select-trigger {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             width: 100%;
-            padding: 11px 14px;
+            padding: 10px 38px 10px 13px;
             background: #ffffff;
-            border: 1.5px solid #e2e8f0;
+            border: 1.5px solid #cbd5e1;
             border-radius: 10px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: #0f172a;
             cursor: pointer;
             outline: none;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            /* Custom chevron down SVG arrow in blue */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 15px 15px;
         }
-        .radix-menu-trigger:hover {
-            border-color: #6366f1;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        .admin-select-trigger:hover {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
         }
-        .radix-menu-trigger:focus,
-        .radix-menu.open .radix-menu-trigger {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+        .admin-select-trigger:focus,
+        .admin-select-wrap.open .admin-select-trigger {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3.5px rgba(37,99,235,0.18);
+            background-color: #ffffff;
         }
-        .radix-chevron {
-            width: 16px !important;
-            height: 16px !important;
-            color: #6366f1;
-            transition: transform 0.2s ease;
-            flex-shrink: 0 !important;
-        }
-        .radix-menu.open .radix-chevron {
-            transform: rotate(180deg);
-        }
-        .radix-menu-content {
+        .admin-select-dropdown {
             display: none;
             position: absolute;
-            top: calc(100% + 6px);
+            top: calc(100% + 8px);
             left: 0;
             right: 0;
             z-index: 9999;
             background: #ffffff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
             padding: 6px;
-            box-shadow: 0 12px 36px -4px rgba(99, 102, 241, 0.25), 0 4px 16px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 12px 36px -4px rgba(37,99,235,0.25), 0 4px 16px rgba(0,0,0,0.08);
             max-height: 300px;
             overflow-y: auto;
         }
-        .radix-menu-content::-webkit-scrollbar { width: 4px; }
-        .radix-menu-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .radix-menu.open .radix-menu-content {
+        .admin-select-dropdown::-webkit-scrollbar { width: 4px; }
+        .admin-select-dropdown::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .admin-select-wrap.open .admin-select-dropdown {
             display: block;
-            animation: radixFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: adminSelectFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        @keyframes radixFadeIn {
+        @keyframes adminSelectFadeIn {
             from { opacity: 0; transform: translateY(-6px) scale(0.97); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .radix-menu-item {
-            position: relative;
+        .admin-select-option {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 9px 12px 9px 34px;
+            gap: 8px;
+            padding: 9px 12px;
             border-radius: 8px;
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 600;
             color: #1e293b;
             cursor: pointer;
             transition: all 0.15s ease-in-out;
         }
-        .radix-menu-item:hover {
-            background-color: rgba(99, 102, 241, 0.1);
-            color: #6366f1;
+        .admin-select-option:hover {
+            background-color: rgba(37,99,235,0.08);
+            color: #2563eb;
         }
-        .radix-menu-item.active {
-            background-color: rgba(99, 102, 241, 0.15);
-            color: #6366f1;
-        }
-        .radix-check {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 14px !important;
-            height: 14px !important;
-            color: #6366f1;
-            opacity: 0;
-            transition: opacity 0.15s ease;
-            flex-shrink: 0 !important;
-        }
-        .radix-menu-item.active .radix-check {
-            opacity: 1;
+        .admin-select-option.selected {
+            background-color: rgba(37,99,235,0.12);
+            color: #2563eb;
         }
     </style>
 
@@ -358,33 +388,35 @@
             <form method="POST" action="{{ route('login.store') }}" id="loginForm">
                 @csrf
 
-                {{-- Role Dropdown (Radix / Shadcn Style) --}}
+                {{-- Role Dropdown (Admin-style with icons) --}}
                 <div class="form-group">
                     <label class="form-label">Login sebagai</label>
                     <input type="hidden" name="role" id="role" value="{{ old('role', 'admin') }}">
                     
-                    <div class="radix-menu" id="roleRadixMenu">
-                        <button type="button" class="radix-menu-trigger" onclick="toggleRoleDropdown(event)">
-                            <span id="roleRadixLabel">
-                                @if(old('role') === 'guru') 👨‍🏫 Guru
-                                @elseif(old('role') === 'siswa') 🎓 Siswa
-                                @else 👤 Admin
+                    <div class="admin-select-wrap">
+                        <button type="button" class="admin-select-trigger" id="roleSelectTrigger" onclick="toggleRoleDropdown(event)">
+                            <span id="roleSelectedLabel">
+                                @if(old('role') === 'guru')
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px;vertical-align:middle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Guru
+                                @elseif(old('role') === 'siswa')
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px;vertical-align:middle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg> Siswa
+                                @else
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px;vertical-align:middle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> Admin
                                 @endif
                             </span>
-                            <svg class="radix-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" style="width:16px;height:16px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
-                        <div class="radix-menu-content">
-                            <div class="radix-menu-item {{ old('role', 'admin') === 'admin' ? 'active' : '' }}" data-value="admin" data-label="👤 Admin" onclick="selectRoleOption('admin', '👤 Admin', this)">
-                                <svg class="radix-check" xmlns="http://www.w3.org/2000/svg" width="14" height="14" style="width:14px;height:14px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                <span>👤 Admin</span>
+                        <div class="admin-select-dropdown" id="roleSelectDropdown">
+                            <div class="admin-select-option {{ old('role', 'admin') === 'admin' ? 'selected' : '' }}" data-value="admin" data-label="Admin" onclick="selectRole('admin', 'Admin', this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                <span>Admin</span>
                             </div>
-                            <div class="radix-menu-item {{ old('role') === 'guru' ? 'active' : '' }}" data-value="guru" data-label="👨‍🏫 Guru" onclick="selectRoleOption('guru', '👨‍🏫 Guru', this)">
-                                <svg class="radix-check" xmlns="http://www.w3.org/2000/svg" width="14" height="14" style="width:14px;height:14px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                <span>👨‍🏫 Guru</span>
+                            <div class="admin-select-option {{ old('role') === 'guru' ? 'selected' : '' }}" data-value="guru" data-label="Guru" onclick="selectRole('guru', 'Guru', this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                <span>Guru</span>
                             </div>
-                            <div class="radix-menu-item {{ old('role') === 'siswa' ? 'active' : '' }}" data-value="siswa" data-label="🎓 Siswa" onclick="selectRoleOption('siswa', '🎓 Siswa', this)">
-                                <svg class="radix-check" xmlns="http://www.w3.org/2000/svg" width="14" height="14" style="width:14px;height:14px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                <span>🎓 Siswa</span>
+                            <div class="admin-select-option {{ old('role') === 'siswa' ? 'selected' : '' }}" data-value="siswa" data-label="Siswa" onclick="selectRole('siswa', 'Siswa', this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
+                                <span>Siswa</span>
                             </div>
                         </div>
                     </div>
@@ -519,24 +551,27 @@
 </div>
 
 <script>
-    // ── Radix UI Custom Dropdown Handlers ──
+    // ── Admin Select Dropdown Handlers ──
     function toggleRoleDropdown(e) {
         e.stopPropagation();
-        const menu = document.getElementById('roleRadixMenu');
-        menu.classList.toggle('open');
+        const wrap = document.getElementById('roleSelectTrigger').parentElement;
+        wrap.classList.toggle('open');
     }
 
-    function selectRoleOption(val, label, el) {
+    function selectRole(val, label, el) {
         document.getElementById('role').value = val;
-        document.getElementById('roleRadixLabel').textContent = label;
 
-        // Update active class
-        const items = document.querySelectorAll('#roleRadixMenu .radix-menu-item');
-        items.forEach(item => item.classList.remove('active'));
-        el.classList.add('active');
+        // Get the icon from the selected item
+        const iconHtml = el.querySelector('svg').outerHTML;
+        document.getElementById('roleSelectedLabel').innerHTML = iconHtml + ' ' + label;
 
-        // Close menu
-        document.getElementById('roleRadixMenu').classList.remove('open');
+        // Update selected class
+        const items = document.querySelectorAll('.admin-select-option');
+        items.forEach(item => item.classList.remove('selected'));
+        el.classList.add('selected');
+
+        // Close dropdown
+        document.getElementById('roleSelectTrigger').parentElement.classList.remove('open');
 
         // Trigger dynamic form fields update
         handleRoleChange(val);
@@ -544,9 +579,9 @@
 
     // Close on click outside
     document.addEventListener('click', function (e) {
-        const menu = document.getElementById('roleRadixMenu');
-        if (menu && !menu.contains(e.target)) {
-            menu.classList.remove('open');
+        const wrap = document.getElementById('roleSelectTrigger').parentElement;
+        if (wrap && !wrap.contains(e.target)) {
+            wrap.classList.remove('open');
         }
     });
 

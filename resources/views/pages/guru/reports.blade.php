@@ -202,8 +202,8 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <p class="font-semibold text-gray-900 dark:text-white">{{ $activity->user->name }}</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $activity->item->name }} • {{ $activity->created_at->diffForHumans() }}</p>
+                            <p class="font-semibold text-gray-900 dark:text-white">{{ $activity->user->name ?? 'N/A' }}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">{{ $activity->item->name ?? 'N/A' }} • {{ $activity->created_at->diffForHumans() }}</p>
                         </div>
                     </div>
                     <span class="px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap

@@ -64,9 +64,9 @@ html.dark{
 /* ─── NAVBAR ─── */
 .nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--nav-border);transition:background .3s}
 .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;gap:40px}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.nav-logo{display:flex;align-items:center;gap:0;text-decoration:none;flex-shrink:0}
 .nav-logo-box{width:36px;height:36px;background:linear-gradient(135deg,var(--blue),var(--cyan));border-radius:10px;display:flex;align-items:center;justify-content:center}
-.nav-logo-name{font-size:15px;font-weight:800;color:var(--text)}
+.nav-logo-name{font-size:15px;font-weight:800;color:var(--blue)}
 .nav-logo-sub{font-size:10px;color:var(--muted)}
 .nav-links{display:flex;align-items:center;gap:4px;margin-left:8px}
 .nav-links a{padding:6px 14px;font-size:14px;font-weight:500;color:var(--muted);text-decoration:none;border-radius:8px;transition:all .15s}
@@ -95,7 +95,7 @@ html.dark .icon-moon{display:none}
 </style>
 <style>
 /* ─── HERO ─── */
-.hero{position:relative;background:linear-gradient(135deg,rgba(30,58,138,0.92),rgba(29,78,216,0.88),rgba(59,130,246,0.85)),url('/build/assets/smkTop.png');background-size:cover;background-position:center;overflow:hidden;padding:90px 24px 0}
+.hero{position:relative;background:linear-gradient(135deg,rgba(30,58,138,0.95),rgba(29,78,216,0.92),rgba(59,130,246,0.88)),url('/build/assets/smkTop.png');background-size:cover;background-position:center;overflow:hidden;padding:120px 24px 80px;min-height:600px;display:flex;align-items:center}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 60% 40%,rgba(96,165,250,.3) 0%,transparent 60%)}
 .hero-blob{position:absolute;border-radius:50%;filter:blur(72px);pointer-events:none}
 .hero-blob-1{width:500px;height:500px;background:rgba(59,130,246,.4);top:-120px;right:5%;animation:float1 8s ease-in-out infinite}
@@ -104,17 +104,17 @@ html.dark .icon-moon{display:none}
 @keyframes float1{0%,100%{transform:translateY(0)}50%{transform:translateY(-28px)}}
 @keyframes float2{0%,100%{transform:translateY(0)}50%{transform:translateY(22px)}}
 .hero-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:2}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;font-size:12px;font-weight:600;color:rgba(255,255,255,.85);margin-bottom:24px;backdrop-filter:blur(8px)}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:999px;font-size:12px;font-weight:700;color:rgba(255,255,255,.9);margin-bottom:24px;backdrop-filter:blur(12px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
 .hero-badge-pulse{width:8px;height:8px;background:#4ade80;border-radius:50%;box-shadow:0 0 0 0 rgba(74,222,128,.5);animation:pulse-ring 2s infinite}
 @keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(74,222,128,.5)}70%{box-shadow:0 0 0 8px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
-.hero-h1{font-size:56px;font-weight:900;line-height:1.2;letter-spacing:-.03em;color:#fff;margin-bottom:20px;font-family:'Instrument Sans',ui-sans-serif,system-ui,sans-serif}
+.hero-h1{font-size:52px;font-weight:900;line-height:1.2;letter-spacing:-.03em;color:#fff;margin-bottom:24px;font-family:'Instrument Sans',ui-sans-serif,system-ui,sans-serif;text-shadow:0 4px 24px rgba(0,0,0,.2)}
 .hero-h1 em{font-style:normal;color:#fff}
-.hero-p{font-size:17px;color:rgba(255,255,255,.65);line-height:1.75;margin-bottom:36px;max-width:600px;margin-left:auto;margin-right:auto}
-.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:52px}
-.hero-btn-main{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:#fff;color:#2563eb;font-size:15px;font-weight:700;border-radius:12px;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:all .2s}
-.hero-btn-main:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.25)}
-.hero-btn-alt{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;background:rgba(255,255,255,.1);color:#fff;font-size:15px;font-weight:600;border-radius:12px;border:1.5px solid rgba(255,255,255,.25);text-decoration:none;backdrop-filter:blur(8px);transition:all .2s}
-.hero-btn-alt:hover{background:rgba(255,255,255,.18)}
+.hero-p{font-size:16px;color:rgba(255,255,255,.7);line-height:1.8;margin-bottom:36px;max-width:600px;margin-left:auto;margin-right:auto}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:48px}
+.hero-btn-main{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;background:#fff;color:#2563eb;font-size:15px;font-weight:800;border-radius:14px;text-decoration:none;box-shadow:0 12px 32px rgba(0,0,0,.25);transition:all .25s}
+.hero-btn-main:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.35)}
+.hero-btn-alt{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:rgba(255,255,255,.15);color:#fff;font-size:15px;font-weight:700;border-radius:14px;border:2px solid rgba(255,255,255,.3);text-decoration:none;backdrop-filter:blur(12px);transition:all .25s}
+.hero-btn-alt:hover{background:rgba(255,255,255,.25);transform:translateY(-2px)}
 .hero-trust{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .trust-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
 .trust-icon{width:44px;height:44px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
@@ -398,12 +398,10 @@ html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.4) }
 <nav class="nav">
   <div class="nav-inner">
     <a href="{{ route('home') }}" class="nav-logo">
-      <div class="nav-logo-box">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 42" style="width:18px;height:18px;fill:#fff"><path fill-rule="evenodd" clip-rule="evenodd" d="M17.2 5.633 8.6.855 0 5.633v26.51l16.2 9 16.2-9v-8.442l7.6-4.223V9.856l-8.6-4.777-8.6 4.777V18.3l-5.6 3.111V5.633Z"/></svg>
-      </div>
-      <div>
+      <img src="/build/assets/logosmkn1.png" alt="Logo Sekolah" style="width:75px;height:75px;object-fit:contain;">
+      <div style="margin-left:-2px">
         <div class="nav-logo-name">SIPBAR</div>
-        <div class="nav-logo-sub">Sistem Inventaris</div>
+        <div class="nav-logo-sub">SMKN 1 BANGSRI</div>
       </div>
     </a>
     <div class="nav-links">
@@ -509,21 +507,25 @@ html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.4) }
     <div class="feat-grid">
       @php
       $feats=[
-        ['Manajemen Barang','Kelola data barang dengan mudah — tambah, ubah, hapus, dan lacak stok secara real-time.','M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4','#eff6ff','#2563eb'],
-        ['Peminjaman Barang','Catat dan pantau peminjaman barang secara sistematis dengan notifikasi jatuh tempo.','M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4','#ecfdf5','#059669'],
-        ['Pengembalian','Proses pengembalian lebih cepat dengan verifikasi kondisi barang yang terstruktur.','M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6','#fffbeb','#d97706'],
-        ['Laporan & Statistik','Laporan inventaris lengkap dengan grafik dan statistik penggunaan barang.','M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z','#fdf4ff','#9333ea'],
-        ['Manajemen Pengguna','Atur hak akses pengguna (Admin, Guru, Siswa) sesuai peran dan tanggung jawab.','M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z','#fff1f2','#e11d48'],
+        ['Manajemen Barang','Kelola data barang dengan mudah — tambah, ubah, hapus, dan lacak stok secara real-time.','M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4','#eff6ff','#2563eb','inventory'],
+        ['Peminjaman Barang','Catat dan pantau peminjaman barang secara sistematis dengan notifikasi jatuh tempo.','M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4','#ecfdf5','#059669','loans'],
+        ['Pengembalian','Proses pengembalian lebih cepat dengan verifikasi kondisi barang yang terstruktur.','M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6','#fffbeb','#d97706','returns'],
+        ['Laporan & Statistik','Laporan inventaris lengkap dengan grafik dan statistik penggunaan barang.','M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z','#fdf4ff','#9333ea','reports'],
+        ['Manajemen Pengguna','Atur hak akses pengguna (Admin, Guru, Siswa) sesuai peran dan tanggung jawab.','M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z','#fff1f2','#e11d48','users'],
       ];
       @endphp
       @foreach($feats as $f)
-      <div class="feat-card">
+      @auth
+      <a href="{{ route($f[5] . '.index') }}" class="feat-card" style="text-decoration:none">
+      @else
+      <a href="{{ route('login') }}" class="feat-card" style="text-decoration:none">
+      @endauth
         <div class="feat-icon-wrap" style="background:{{ $f[3] }}">
           <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:{{ $f[4] }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $f[2] }}"/></svg>
         </div>
         <div class="feat-name">{{ $f[0] }}</div>
         <div class="feat-desc">{{ $f[1] }}</div>
-      </div>
+      </a>
       @endforeach
     </div>
   </div>
@@ -539,10 +541,17 @@ html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.4) }
       </div>
       <h2 class="stats-h2">Inventaris Sekolah<br><em>dalam Real-Time Data</em></h2>
       <p class="stats-p">Kelola dan pantau seluruh aset fisik sekolah secara terintegrasi, transparan, dan dapat diakses dari mana saja dengan sistem inventaris modern.</p>
-      <a href="/inventory" class="stats-cta-btn">
+      @auth
+      <a href="{{ route('inventory.index') }}" class="stats-cta-btn">
         <span>Jelajahi Data Inventaris</span>
         <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
       </a>
+      @else
+      <a href="{{ route('login') }}" class="stats-cta-btn">
+        <span>Jelajahi Data Inventaris</span>
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
+      @endauth
     </div>
     <div class="stats-grid">
       @foreach([

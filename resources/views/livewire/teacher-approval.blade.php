@@ -41,7 +41,7 @@
                     <div class="p-5 border-b border-gray-100 dark:border-slate-700">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
-                                <h3 class="font-bold text-lg text-gray-900 dark:text-white">{{ $request->user->name }}</h3>
+                                <h3 class="font-bold text-lg text-gray-900 dark:text-white">{{ $request->user->name ?? 'N/A' }}</h3>
                                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ $request->user->kelas ?? 'N/A' }} - {{ $request->user->jurusan ?? 'N/A' }}</p>
                             </div>
                             {{-- Status Badge --}}
@@ -55,7 +55,7 @@
                     <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Barang</label>
-                            <p class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $request->item->name }}</p>
+                            <p class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $request->item->name ?? 'N/A' }}</p>
                         </div>
                         <div>
                             <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Jumlah</label>
@@ -63,8 +63,8 @@
                         </div>
                         <div>
                             <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Stok Tersedia</label>
-                            <p class="mt-1 font-semibold {{ $request->item->available_stock >= $request->quantity ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' }}">
-                                {{ $request->item->available_stock }} unit
+                            <p class="mt-1 font-semibold {{ $request->item && $request->item->available_stock >= $request->quantity ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400' }}">
+                                {{ $request->item->available_stock ?? 'N/A' }} unit
                             </p>
                         </div>
                         <div>
