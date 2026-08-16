@@ -67,12 +67,21 @@ Route::middleware(['auth'])->group(function () {
         Route::get('qr/scan', function() {
             return view('pages.guru.qr-scan');
         })->name('qr.scan');
+        
+        // Returns processing
+        Route::post('pengembalian/{id}/process', function($id) {
+            // Process return logic here
+            $request = \App\Models\BorrowingRequest::findOrFail($id);
+            $request->update(['status' => 'returned']);
+            return redirect()->route('teacher.returns')->with('success', 'Barang berhasil dikembalikan');
+        })->name('returns.process');
     });
 
     Route::view('guru/siswa-bimbingan', 'pages.guru.students')->name('teacher.students');
     Route::view('guru/peminjaman-aktif', 'pages.guru.loans')->name('teacher.loans');
     Route::view('guru/pengembalian', 'pages.guru.returns')->name('teacher.returns');
     Route::view('guru/laporan', 'pages.guru.reports')->name('teacher.reports');
+    Route::view('guru/profil', 'pages.guru.profile')->name('teacher.profile');
 
     // ─── SIPINTU Internal API (AJAX dari admin panel) ───
     Route::prefix('api/internal/sipintu')->name('sipintu.')->group(function () {

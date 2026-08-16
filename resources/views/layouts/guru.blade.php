@@ -31,7 +31,7 @@
         .nav-icon{width:16px;height:16px;flex-shrink:0}
         .nav-badge{margin-left:auto;background:#fff;color:var(--accent);font-size:10px;font-weight:800;padding:1px 7px;border-radius:999px}
         .sidebar-footer{padding:14px;border-top:1px solid rgba(255,255,255,.12)}
-        .user-card{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.1);cursor:pointer}
+        .user-card{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.1);cursor:pointer;text-decoration:none;color:inherit}
         .user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
         .user-name{font-size:12px;font-weight:700;color:#fff;line-height:1.2}
         .user-role{font-size:10px;color:rgba(255,255,255,.6)}
@@ -46,7 +46,7 @@
         .topbar-icon{width:36px;height:36px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all .15s;position:relative}
         .topbar-icon:hover{background:var(--border2);color:var(--text)}
         .notif-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;background:#ef4444;border-radius:50%;border:2px solid var(--topbar-bg);transition:border-color .25s}
-        .topbar-user{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;background:var(--bg3);border:1px solid var(--border2);border-radius:999px;cursor:pointer}
+        .topbar-user{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;background:var(--bg3);border:1px solid var(--border2);border-radius:999px;text-decoration:none;color:inherit}
         .topbar-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
         .topbar-uname{font-size:13px;font-weight:600;color:var(--text2)}
         .t-sun{display:none}.t-moon{display:block}
@@ -73,7 +73,7 @@
                 ['Peminjaman Aktif', 'teacher.loans',    'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4', '3'],
                 ['Pengembalian',     'teacher.returns',  'M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6', null],
                 ['Laporan',          'teacher.reports',  'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', null],
-                ['Profil',           'profile.edit',     'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', null],
+                ['Profil',           'teacher.profile',  'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', null],
             ];
             @endphp
             @foreach($menus as $m)
@@ -85,13 +85,13 @@
             @endforeach
         </nav>
         <div class="sidebar-footer">
-            <div class="user-card">
+            <a href="{{ route('teacher.profile') }}" class="user-card">
                 <div class="user-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
                 <div>
                     <div class="user-name">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
                     <div class="user-role">Guru Pembimbing</div>
                 </div>
-            </div>
+            </a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="logout-btn">
@@ -120,11 +120,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                     <div class="notif-dot"></div>
                 </div>
-                <div class="topbar-user">
+                <a href="{{ route('teacher.profile') }}" class="topbar-user">
                     <div class="topbar-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
                     <div class="topbar-uname">{{ auth()->check() ? explode(' ',auth()->user()->name)[0] : 'Guru' }}</div>
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;color:var(--subtle);margin-left:2px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                </div>
+                </a>
             </div>
         </div>
         <div class="content">
