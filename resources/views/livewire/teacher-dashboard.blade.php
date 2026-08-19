@@ -1,28 +1,28 @@
 <div>
     <style>
         :root {
-            --text-primary: #0f172a;
-            --text-secondary: #334155;
-            --text-muted: #64748b;
-            --text-subtle: #94a3b8;
+            --text-primary: #0b2220;
+            --text-secondary: #163633;
+            --text-muted: #3f635f;
+            --text-subtle: #5f8783;
             --bg-card: #ffffff;
-            --bg-card-subtle: #f8fafc;
-            --border-subtle: #e2e8f0;
-            --border-alt: #cbd5e1;
+            --bg-card-subtle: #f2faf8;
+            --border-subtle: #cde9e6;
+            --border-alt: #b8deda;
             --card-shadow: 0 1px 3px rgba(0,0,0,.05);
-            --blue: #2563eb;
+            --blue: #1d7068;
         }
         html.dark {
-            --text-primary: #f1f5f9;
-            --text-secondary: #e2e8f0;
-            --text-muted: #94a3b8;
-            --text-subtle: #64748b;
-            --bg-card: #1e293b;
-            --bg-card-subtle: #0f172a;
-            --border-subtle: #334155;
-            --border-alt: #475569;
+            --text-primary: #f0faf8;
+            --text-secondary: #cde9e6;
+            --text-muted: #8ec5be;
+            --text-subtle: #6ba8a1;
+            --bg-card: #142523;
+            --bg-card-subtle: #0e1a19;
+            --border-subtle: #1c3330;
+            --border-alt: #2a4743;
             --card-shadow: 0 1px 3px rgba(0,0,0,.3);
-            --blue: #3b82f6;
+            --blue: #9BCEC1;
         }
 
         .db-greeting-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }

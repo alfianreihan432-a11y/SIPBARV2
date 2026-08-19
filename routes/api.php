@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BorrowingApiController;
+use App\Http\Controllers\Api\BotApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -63,4 +64,19 @@ Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
             ]
         ]);
     })->name('api.me');
+});
+
+// Bot API - untuk WhatsApp Bot (autentikasi via API Key, bukan Sanctum)
+Route::prefix('v1/bot')->middleware('bot.auth')->group(function () {
+    Route::get('cek/{id}', [BotApiController::class, 'cekStatus'])
+        ->name('api.bot.cek');
+
+    Route::post('pinjam', [BotApiController::class, 'ajukanPinjam'])
+        ->name('api.bot.pinjam');
+
+    Route::get('barang', [BotApiController::class, 'daftarBarang'])
+        ->name('api.bot.barang');
+
+    Route::get('riwayat/{phone}', [BotApiController::class, 'riwayat'])
+        ->name('api.bot.riwayat');
 });

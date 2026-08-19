@@ -41,4 +41,8 @@ return [
         'timeout' => env('WA_BOT_TIMEOUT', 10),
     ],
 
+    'bot' => [
+        'key' => env('BOT_API_KEY'),
+    ],
+
 ];
