@@ -18,23 +18,23 @@ html,body{height:100%;font-family:'Instrument Sans',ui-sans-serif,system-ui,sans
 
 /* ══ LIGHT TOKENS ══ */
 :root{
-    --bg:#f0f7ff;--bg2:#fff;--bg3:#e2eeff;
-    --card:#fff;--border:#dbeafe;--border2:#e2e8f0;
-    --text:#0f172a;--text2:#1e293b;--muted:#64748b;--subtle:#94a3b8;
-    --topbar-bg:#fff;--topbar-bdr:#e2e8f0;--content-bg:#f0f7ff;
-    --panel-bg:#fff;--input-bg:#f8fafc;--scrollbar:#cbd5e1;
-    --sidebar-bg:#0f766e; /* teal untuk guru */
-    --accent:#0f766e;--accent-light:#ccfbf1;--accent-text:#0f766e;
+    --bg:#f0faf8;--bg2:#fff;--bg3:#ddf0ed;
+    --card:#fff;--border:#b8deda;--border2:#cde9e6;
+    --text:#0b2220;--text2:#163633;--muted:#41635f;--subtle:#618581;
+    --topbar-bg:#fff;--topbar-bdr:#cde9e6;--content-bg:#f0faf8;
+    --panel-bg:#fff;--input-bg:#f5fcfb;--scrollbar:#9BCEC1;
+    --sidebar-bg:#3b7570; /* mint teal untuk guru */
+    --accent:#9BCEC1;--accent-light:#ddf0ed;--accent-text:#1d524d;
 }
 /* ══ DARK TOKENS ══ */
 html.dark{
-    --bg:#0d1117;--bg2:#111827;--bg3:#1a2535;
-    --card:#111827;--border:#1e3a5f;--border2:#1e293b;
-    --text:#f1f5f9;--text2:#e2e8f0;--muted:#94a3b8;--subtle:#64748b;
-    --topbar-bg:#0d1117;--topbar-bdr:#1e293b;--content-bg:#080e18;
-    --panel-bg:#111827;--input-bg:#0d1117;--scrollbar:#334155;
-    --sidebar-bg:#064e3b;
-    --accent:#10b981;--accent-light:rgba(16,185,129,.15);--accent-text:#34d399;
+    --bg:#0e1a19;--bg2:#142523;--bg3:#1c3330;
+    --card:#142523;--border:#1e3835;--border2:#1c3330;
+    --text:#e0f4f1;--text2:#c5e8e4;--muted:#8ec5be;--subtle:#6ba8a1;
+    --topbar-bg:#0e1a19;--topbar-bdr:#1c3330;--content-bg:#091210;
+    --panel-bg:#142523;--input-bg:#0e1a19;--scrollbar:#2d5550;
+    --sidebar-bg:#234743;
+    --accent:#9BCEC1;--accent-light:rgba(155,206,193,.15);--accent-text:#9BCEC1;
 }
 body{display:flex;background:var(--content-bg);color:var(--text);overflow:hidden;transition:background .25s,color .25s}
 
@@ -50,7 +50,7 @@ body{display:flex;background:var(--content-bg);color:var(--text);overflow:hidden
 .nav-item:hover{background:rgba(255,255,255,.12);color:#fff}
 .nav-item.active{background:rgba(255,255,255,.2);color:#fff;font-weight:700}
 .nav-icon{width:16px;height:16px;flex-shrink:0}
-.nav-badge{margin-left:auto;background:#fff;color:var(--accent);font-size:10px;font-weight:800;padding:1px 7px;border-radius:999px}
+.nav-badge{margin-left:auto;background:#fff;color:#1e5c56;font-size:10px;font-weight:800;padding:1px 7px;border-radius:999px}
 .sidebar-footer{padding:14px;border-top:1px solid rgba(255,255,255,.12)}
 .user-card{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.1);cursor:pointer;text-decoration:none;color:inherit}
 .user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
@@ -72,7 +72,7 @@ body{display:flex;background:var(--content-bg);color:var(--text);overflow:hidden
 .topbar-icon:hover{background:var(--border2);color:var(--text)}
 .notif-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;background:#ef4444;border-radius:50%;border:2px solid var(--topbar-bg);transition:border-color .25s}
 .topbar-user{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;background:var(--bg3);border:1px solid var(--border2);border-radius:999px;text-decoration:none;color:inherit}
-.topbar-avatar{width:30px;height:30px;border-radius:50%;background:#0f766e;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.topbar-avatar{width:30px;height:30px;border-radius:50%;background:#5a9590;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
 .topbar-uname{font-size:13px;font-weight:600;color:var(--text2)}
 .t-sun{display:none}.t-moon{display:block}
 html.dark .t-sun{display:block}html.dark .t-moon{display:none}
@@ -84,8 +84,8 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
 .content-grid{display:grid;grid-template-columns:1fr 300px;gap:18px}
 
 /* ══ HERO CARD ══ */
-.hero-card{background:#0f766e;border-radius:18px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;overflow:hidden;position:relative;box-shadow:0 4px 14px rgba(15,118,110,.15)}
-.hero-card::before{content:'';position:absolute;top:-40px;right:80px;width:180px;height:180px;background:rgba(255,255,255,.06);border-radius:50%}
+.hero-card{background:#5a9590;border-radius:18px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;overflow:hidden;position:relative;box-shadow:0 4px 16px rgba(90,149,144,.2)}
+.hero-card::before{content:'';position:absolute;top:-40px;right:80px;width:180px;height:180px;background:rgba(255,255,255,.08);border-radius:50%}
 .hero-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:4px}
 .hero-sub{font-size:13px;color:rgba(255,255,255,.8);margin-bottom:14px;max-width:380px;line-height:1.5}
 .hero-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#fff;background:rgba(255,255,255,.2);padding:6px 14px;border-radius:999px;text-decoration:none;transition:background .2s}
@@ -115,7 +115,7 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
 .req-item:hover{border-color:var(--accent)}
 .req-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
 .req-student{display:flex;align-items:center;gap:9px}
-.req-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.req-avatar{width:32px;height:32px;border-radius:50%;background:#5a9590;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
 .req-student-name{font-size:13px;font-weight:700;color:var(--text)}
 .req-student-class{font-size:11px;color:var(--muted)}
 .req-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
@@ -135,7 +135,7 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
 /* ══ SISWA BIMBINGAN ══ */
 .student-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border2)}
 .student-item:last-child{border-bottom:none}
-.student-ava{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;background:linear-gradient(135deg,#0f766e,#2563eb)}
+.student-ava{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;background:#5a9590}
 .student-name{font-size:13px;font-weight:700;color:var(--text)}
 .student-nis{font-size:11px;color:var(--muted)}
 .student-status{margin-left:auto;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px}
