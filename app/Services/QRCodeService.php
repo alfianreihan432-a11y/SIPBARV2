@@ -23,16 +23,15 @@ class QRCodeService
         $token = Str::uuid()->toString();
         
         // Create QR code image using endroid/qr-code
-        $result = Builder::create()
-            ->writer(new PngWriter())
-            ->writerOptions([])
-            ->data($token)
-            ->encoding(new Encoding('UTF-8'))
-            ->errorCorrectionLevel(ErrorCorrectionLevel::High)
-            ->size(400)
-            ->margin(10)
-            ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
-            ->build();
+        $result = (new Builder(
+            writer: new PngWriter(),
+            data: $token,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: 400,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+        ))->build();
         
         // Store image
         $filename = "qr-codes/{$request->id}_{$token}.png";

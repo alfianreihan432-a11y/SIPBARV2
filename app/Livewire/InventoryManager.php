@@ -164,7 +164,7 @@ class InventoryManager extends Component
             'stock' => $this->stock,
             'photo_path' => $path,
             'code' => strtoupper('BRG-'.substr(md5(uniqid()), 0, 6)),
-            'inventory_number' => 'INV-'.str_pad((Item::count() + 1), 4, '0', STR_PAD_LEFT),
+            'inventory_number' => $this->generateInventoryNumber(),
         ];
 
         if ($this->editingId) {
@@ -203,6 +203,22 @@ class InventoryManager extends Component
         $this->loadItems();
         $this->dispatch('itemUpdated');
         session()->flash('message', 'Inventaris berhasil dihapus.');
+    }
+
+    protected function generateInventoryNumber(): string
+    {
+        $latest = Item::withTrashed()
+            ->where('inventory_number', 'like', 'INV-%')
+            ->orderByRaw('CAST(SUBSTRING(inventory_number, 5) AS UNSIGNED) DESC')
+            ->value('inventory_number');
+
+        if ($latest) {
+            $number = (int) substr($latest, 4) + 1;
+        } else {
+            $number = 1;
+        }
+
+        return 'INV-' . str_pad($number, 4, '0', STR_PAD_LEFT);
     }
 
     public function resetForm(): void

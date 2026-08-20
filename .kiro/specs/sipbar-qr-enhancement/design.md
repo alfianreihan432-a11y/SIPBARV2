@@ -594,9 +594,10 @@ class WhatsAppNotificationService
         $this->apiKey = config('services.whatsapp.api_key');
     }
     
-    public function notifyNewRequest(BorrowingRequest $request): void
+        public function notifyNewRequest(BorrowingRequest $request): void
     {
         $payload = [
+            'id' => $request->id,
             'nomorGuru' => $request->teacher->phone ?? '',
             'namaSiswa' => $request->user->name,
             'kelas' => $request->user->kelas ?? '',

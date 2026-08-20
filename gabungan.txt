@@ -1,0 +1,826 @@
+
+===== app\Http\Controllers\Api\BotApiController.php =====
+
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Item;
+use App\Models\BorrowingRequest;
+
+class BotApiController extends Controller
+{
+    /**
+     * Ubah nomor WA (62xxx / +62xxx) jadi format yang tersimpan di DB (0xxx)
+     */
+    private function normalizePhone(string $phone): string
+    {
+        $phone = preg_replace('/[^0-9]/', '', $phone); // buang karakter selain angka
+
+        if (str_starts_with($phone, '62')) {
+            $phone = '0' . substr($phone, 2);
+        }
+
+        return $phone;
+    }
+
+    // GET /api/v1/bot/cek/{id}
+    public function cekStatus($id)
+    {
+        $req = BorrowingRequest::with('item')->find($id);
+
+        if (!$req) {
+            return response()->json(['message' => 'Kode peminjaman tidak ditemukan'], 404);
+        }
+
+        return response()->json([
+            'nama_barang' => $req->item->name ?? '-',
+            'status'      => $req->status_label,
+            'jatuh_tempo' => optional($req->return_date)->format('d-m-Y'),
+        ]);
+    }
+
+    // GET /api/v1/bot/riwayat/{phone}
+    public function riwayat($phone)
+    {
+        $phone = $this->normalizePhone($phone);
+        $user = User::where('phone', $phone)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Nomor WhatsApp kamu belum terdaftar di sipbar. Hubungi admin untuk update data.'], 404);
+        }
+
+        $history = BorrowingRequest::with('item')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn ($r) => [
+                'id'          => $r->id,
+                'nama_barang' => $r->item->name ?? '-',
+                'status'      => $r->status_label,
+            ]);
+
+        return response()->json($history);
+    }
+
+    // GET /api/v1/bot/barang
+    public function daftarBarang()
+    {
+        $items = Item::where('stock', '>', 0)
+            ->where('status', 'available') // sesuaikan kalau nilai status berbeda
+            ->get(['name', 'stock']);
+
+        return response()->json($items);
+    }
+
+    // POST /api/v1/bot/pinjam
+    public function ajukanPinjam(Request $request)
+    {
+        $request->validate([
+            'phone'     => 'required|string',
+            'item_name' => 'required|string',
+        ]);
+
+        $phone = $this->normalizePhone($request->phone);
+        $user = User::where('phone', $phone)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Nomor WhatsApp kamu belum terdaftar di sipbar. Hubungi admin untuk update data.'], 404);
+        }
+
+        $item = Item::where('name', 'like', '%' . $request->item_name . '%')
+            ->where('stock', '>', 0)
+            ->first();
+
+        if (!$item) {
+            return response()->json(['message' => 'Barang tidak ditemukan atau stok habis'], 400);
+        }
+
+        $req = BorrowingRequest::create([
+            'user_id'     => $user->id,
+            'item_id'     => $item->id,
+            'teacher_id'  => $item->teacher_id, // penanggung jawab barang, otomatis dari data barang
+            'quantity'    => 1,
+            'purpose'     => 'Diajukan melalui WhatsApp Bot',
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(3)->toDateString(),
+            'status'      => BorrowingRequest::STATUS_PENDING,
+        ]);
+
+        return response()->json([
+            'message' => 'Pengajuan berhasil dibuat, menunggu persetujuan guru',
+            'kode'    => $req->id,
+        ]);
+    }
+}
+
+===== app\Services\WhatsAppNotificationService.php =====
+
+<?php
+
+namespace App\Services;
+
+use App\Models\BorrowingRequest;
+use App\Models\WhatsAppNotificationLog;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class WhatsAppNotificationService
+{
+    private string $baseUrl;
+    private string $apiKey;
+    private int $timeout = 10;
+    
+    public function __construct()
+    {
+        $this->baseUrl = config('services.whatsapp.base_url') ?? '';
+        $this->apiKey = config('services.whatsapp.api_key') ?? '';
+    }
+    
+    /**
+     * Notify teacher about new borrowing request
+     */
+    public function notifyNewRequest(BorrowingRequest $request): void
+    {
+        $payload = [
+            'nomorGuru' => $request->teacher->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'kelas' => $request->user->kelas ?? '',
+            'barang' => $request->item->name,
+            'jumlah' => $request->quantity,
+            'tglPinjam' => $request->borrow_date->format('d-m-Y'),
+            'tglKembali' => $request->return_date->format('d-m-Y'),
+            'keperluan' => $request->purpose,
+            'linkKeputusan' => route('teacher.requests'),
+        ];
+        
+        $this->sendNotification(
+            $request->id,
+            'pengajuan_baru',
+            $request->teacher->phone ?? '',
+            $payload
+        );
+    }
+    
+    /**
+     * Notify student about rejection
+     */
+    public function notifyRejected(BorrowingRequest $request): void
+    {
+        $payload = [
+            'nomorSiswa' => $request->user->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'barang' => $request->item->name,
+            'alasan' => $request->rejection_reason,
+        ];
+        
+        $this->sendNotification(
+            $request->id,
+            'ditolak',
+            $request->user->phone ?? '',
+            $payload
+        );
+    }
+    
+    /**
+     * Notify student about approval with QR code
+     */
+    public function notifyApproved(BorrowingRequest $request, string $qrBase64): void
+    {
+        $payload = [
+            'nomorSiswa' => $request->user->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'barang' => $request->item->name,
+            'tglKembali' => $request->return_date->format('d-m-Y'),
+            'qrBase64' => $qrBase64,
+        ];
+        
+        $this->sendNotification(
+            $request->id,
+            'disetujui',
+            $request->user->phone ?? '',
+            $payload
+        );
+    }
+    
+    /**
+     * Send H-1 reminder to student
+     */
+    public function notifyReminder(BorrowingRequest $request): void
+    {
+        $payload = [
+            'nomorSiswa' => $request->user->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'barang' => $request->item->name,
+            'tglKembali' => $request->return_date->format('d-m-Y'),
+        ];
+        
+        $this->sendNotification(
+            $request->id,
+            'reminder_h1',
+            $request->user->phone ?? '',
+            $payload
+        );
+    }
+    
+    /**
+     * Notify student about successful checkout
+     */
+    public function notifyCheckout(BorrowingRequest $request): void
+    {
+        $payload = [
+            'nomorSiswa' => $request->user->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'barang' => $request->item->name,
+            'jumlah' => $request->quantity,
+            'tglKembali' => $request->return_date->format('d-m-Y'),
+        ];
+        
+        $this->sendNotification(
+            $request->id,
+            'checkout',
+            $request->user->phone ?? '',
+            $payload
+        );
+    }
+    
+    /**
+     * Notify student about successful return
+     */
+    public function notifyReturned(BorrowingRequest $request): void
+    {
+        $payload = [
+            'nomorSiswa' => $request->user->phone ?? '',
+            'namaSiswa' => $request->user->name,
+            'barang' => $request->item->name,
+            'waktuKembali' => $request->returned_at ? $request->returned_at->format('d-m-Y H:i') : now()->format('d-m-Y H:i'),
+        ];
+        
+        $this->sendNotification(
+            $request->id,
+            'dikembalikan',
+            $request->user->phone ?? '',
+            $payload
+        );
+    }
+    
+    /**
+     * Send notification to WhatsApp bot
+     * 
+     * @param int $borrowingRequestId
+     * @param string $type
+     * @param string $recipientPhone
+     * @param array $payload
+     * @return void
+     */
+    private function sendNotification(
+        int $borrowingRequestId,
+        string $type,
+        string $recipientPhone,
+        array $payload
+    ): void {
+        // Create log entry
+        $log = WhatsAppNotificationLog::create([
+            'borrowing_request_id' => $borrowingRequestId,
+            'notification_type' => $type,
+            'recipient_phone' => $recipientPhone,
+            'payload' => $payload,
+            'status' => 'pending',
+        ]);
+        
+        try {
+            $response = Http::timeout($this->timeout)
+                ->withHeaders(['X-API-Key' => $this->apiKey])
+                ->post("{$this->baseUrl}/notify/{$type}", $payload);
+            
+            $log->update([
+                'status' => $response->successful() ? 'success' : 'failed',
+                'http_status_code' => $response->status(),
+                'error_message' => $response->successful() ? null : $response->body(),
+                'sent_at' => now(),
+            ]);
+            
+            if (!$response->successful()) {
+                Log::error("WhatsApp notification failed: {$type}", [
+                    'log_id' => $log->id,
+                    'borrowing_request_id' => $borrowingRequestId,
+                    'status_code' => $response->status(),
+                    'response' => $response->body(),
+                ]);
+            }
+            
+        } catch (\Exception $e) {
+            $log->update([
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
+            
+            Log::error("WhatsApp notification exception: {$type}", [
+                'log_id' => $log->id,
+                'borrowing_request_id' => $borrowingRequestId,
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+        }
+    }
+    
+    /**
+     * Check WhatsApp bot status
+     * 
+     * @return array
+     */
+    public function checkBotStatus(): array
+    {
+        try {
+            $response = Http::timeout(5)
+                ->withHeaders(['X-API-Key' => $this->apiKey])
+                ->get("{$this->baseUrl}/status");
+            
+            return [
+                'online' => $response->successful(),
+                'status_code' => $response->status(),
+                'message' => $response->body(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'online' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+}
+
+===== app\Services\BorrowingApprovalService.php =====
+
+<?php
+
+namespace App\Services;
+
+use App\Models\BorrowingRequest;
+use App\Models\Item;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Exceptions\InsufficientStockException;
+
+class BorrowingApprovalService
+{
+    public function __construct(
+        private QRCodeService $qrCodeService,
+        private WhatsAppNotificationService $whatsAppService,
+        private BorrowingStateMachine $stateMachine
+    ) {}
+    
+    /**
+     * Approve a borrowing request
+     * 
+     * @throws InsufficientStockException
+     * @throws \App\Exceptions\InvalidStateTransitionException
+     */
+    public function approve(BorrowingRequest $request, int $teacherId): void
+    {
+        DB::transaction(function () use ($request, $teacherId) {
+            // 1. Validate stock availability
+            $this->validateStock($request);
+            
+            // 2. Update status to approved
+            $this->stateMachine->transitionTo(
+                $request,
+                BorrowingRequest::STATUS_APPROVED,
+                $teacherId
+            );
+            
+            // 3. Generate QR code
+            $qrCode = $this->qrCodeService->generateForRequest($request);
+            
+            // 4. Send WhatsApp notification (non-blocking - errors only logged)
+            try {
+                $qrBase64 = $this->qrCodeService->getImageBase64($qrCode);
+                $this->whatsAppService->notifyApproved($request, $qrBase64);
+            } catch (\Exception $e) {
+                // Log but don't fail transaction
+                Log::error('WhatsApp notification failed during approval', [
+                    'request_id' => $request->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
+        });
+    }
+    
+    /**
+     * Reject a borrowing request
+     * 
+     * @throws \App\Exceptions\InvalidStateTransitionException
+     */
+    public function reject(BorrowingRequest $request, string $reason, int $teacherId): void
+    {
+        DB::transaction(function () use ($request, $reason, $teacherId) {
+            // 1. Set rejection reason
+            $request->rejection_reason = $reason;
+            
+            // 2. Update status to rejected
+            $this->stateMachine->transitionTo(
+                $request,
+                BorrowingRequest::STATUS_REJECTED,
+                $teacherId
+            );
+            
+            // 3. Send WhatsApp notification (non-blocking)
+            try {
+                $this->whatsAppService->notifyRejected($request);
+            } catch (\Exception $e) {
+                Log::error('WhatsApp notification failed during rejection', [
+                    'request_id' => $request->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        });
+    }
+    
+    /**
+     * Validate that item has sufficient stock
+     * 
+     * @throws InsufficientStockException
+     */
+    private function validateStock(BorrowingRequest $request): void
+    {
+        $item = $request->item;
+        
+        // Calculate reserved stock (approved or borrowed)
+        $reservedStock = BorrowingRequest::whereIn('status', [
+            BorrowingRequest::STATUS_APPROVED,
+            BorrowingRequest::STATUS_BORROWED
+        ])
+        ->where('item_id', $item->id)
+        ->where('id', '!=', $request->id) // Exclude current request
+        ->sum('quantity');
+        
+        $availableStock = $item->stock - $reservedStock;
+        
+        if ($availableStock < $request->quantity) {
+            throw new InsufficientStockException(
+                "Stok tidak mencukupi. Tersedia: {$availableStock}, Diminta: {$request->quantity}"
+            );
+        }
+    }
+    
+    /**
+     * Get available stock for an item
+     */
+    public function getAvailableStock(Item $item): int
+    {
+        $reservedStock = BorrowingRequest::whereIn('status', [
+            BorrowingRequest::STATUS_APPROVED,
+            BorrowingRequest::STATUS_BORROWED
+        ])
+        ->where('item_id', $item->id)
+        ->sum('quantity');
+        
+        return max(0, $item->stock - $reservedStock);
+    }
+}
+
+===== app\Models\BorrowingRequest.php =====
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class BorrowingRequest extends Model
+{
+    protected $fillable = [
+        'user_id',
+        'item_id',
+        'teacher_id',
+        'quantity',
+        'purpose',
+        'borrow_date',
+        'return_date',
+        'notes',
+        'status',
+        'rejection_reason',
+        'qr_token',
+        'reminder_sent_at',
+        'approved_at',
+        'borrowed_at',
+        'returned_at',
+        'return_condition',
+        'return_notes',
+        'checkout_by',
+        'checkin_by',
+    ];
+
+    protected $casts = [
+        'borrow_date' => 'date',
+        'return_date' => 'date',
+        'approved_at' => 'datetime',
+        'borrowed_at' => 'datetime',
+        'returned_at' => 'datetime',
+        'reminder_sent_at' => 'datetime',
+    ];
+    
+    // Status constants
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_BORROWED = 'borrowed';
+    public const STATUS_RETURNED = 'returned';
+    public const STATUS_OVERDUE = 'overdue';
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class);
+    }
+
+    public function teacher(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    public function qrCode()
+    {
+        return $this->hasOne(QRCode::class, 'borrowing_request_id');
+    }
+    
+    public function checkoutBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'checkout_by');
+    }
+    
+    public function checkinBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'checkin_by');
+    }
+    
+    public function whatsappLogs()
+    {
+        return $this->hasMany(WhatsAppNotificationLog::class);
+    }
+
+    // ==========================================
+    // Helper Methods
+    // ==========================================
+    
+    /**
+     * Check if request is overdue
+     */
+    public function isOverdue(): bool
+    {
+        return $this->status === self::STATUS_BORROWED 
+            && $this->return_date->isPast();
+    }
+    
+    /**
+     * Get days until return date
+     */
+    public function daysUntilReturn(): ?int
+    {
+        if ($this->status !== self::STATUS_BORROWED) {
+            return null;
+        }
+        
+        return now()->diffInDays($this->return_date, false);
+    }
+    
+    /**
+     * Check if reminder should be sent (H-1)
+     */
+    public function shouldSendReminder(): bool
+    {
+        return $this->status === self::STATUS_BORROWED
+            && is_null($this->reminder_sent_at)
+            && $this->return_date->isTomorrow();
+    }
+    
+    /**
+     * Check if transaction is in terminal status
+     */
+    public function isTerminal(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_RETURNED,
+            self::STATUS_REJECTED
+        ]);
+    }
+    
+    /**
+     * Check if QR is active (can be scanned for actions)
+     */
+    public function isQRActive(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_APPROVED,
+            self::STATUS_BORROWED
+        ]);
+    }
+    
+    /**
+     * Get human-readable status badge HTML
+     */
+    public function getStatusBadgeAttribute(): string
+    {
+        $colors = [
+            self::STATUS_PENDING => 'amber',
+            self::STATUS_APPROVED => 'emerald',
+            self::STATUS_REJECTED => 'red',
+            self::STATUS_BORROWED => 'blue',
+            self::STATUS_RETURNED => 'gray',
+        ];
+        
+        $color = $colors[$this->status] ?? 'gray';
+        $label = $this->status_label;
+        
+        return "<span class=\"px-2 py-1 rounded text-xs font-bold bg-{$color}-100 text-{$color}-800 dark:bg-{$color}-900/30 dark:text-{$color}-300\">{$label}</span>";
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match($this->status) {
+            'pending' => 'Menunggu Persetujuan',
+            'approved' => 'Disetujui',
+            'rejected' => 'Ditolak',
+            'borrowed' => 'Dipinjam',
+            'returned' => 'Dikembalikan',
+            default => ucfirst($this->status),
+        };
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        return match($this->status) {
+            'pending' => 'warning',
+            'approved' => 'success',
+            'rejected' => 'danger',
+            'borrowed' => 'primary',
+            'returned' => 'secondary',
+            default => 'secondary',
+        };
+    }
+    
+    // ==========================================
+    // Scopes
+    // ==========================================
+    
+    /**
+     * Scope: Get overdue borrowings
+     */
+    public function scopeOverdue($query)
+    {
+        return $query->where('status', self::STATUS_BORROWED)
+            ->whereDate('return_date', '<', now());
+    }
+    
+    /**
+     * Scope: Get active borrowings (borrowed status)
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', self::STATUS_BORROWED);
+    }
+    
+    /**
+     * Scope: Get pending approval
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', self::STATUS_PENDING);
+    }
+    
+    /**
+     * Scope: Need reminder (H-1)
+     */
+    public function scopeNeedReminder($query)
+    {
+        return $query->where('status', self::STATUS_BORROWED)
+            ->whereNull('reminder_sent_at')
+            ->whereDate('return_date', now()->addDay()->toDateString());
+    }
+}
+
+===== app\Http\Controllers\TeacherApprovalController.php =====
+
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\BorrowingRequest;
+use App\Services\BorrowingApprovalService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class TeacherApprovalController extends Controller
+{
+    public function __construct(
+        private BorrowingApprovalService $approvalService
+    ) {}
+    
+    /**
+     * Display pending borrowing requests for the logged-in teacher
+     */
+    public function index()
+    {
+        $pendingRequests = BorrowingRequest::where('teacher_id', Auth::id())
+            ->where('status', BorrowingRequest::STATUS_PENDING)
+            ->with(['user', 'item'])
+            ->latest()
+            ->get();
+        
+        return view('pages.guru.requests', [
+            'pendingRequests' => $pendingRequests
+        ]);
+    }
+    
+    /**
+     * Approve a borrowing request
+     */
+    public function approve(Request $request, int $id)
+    {
+        try {
+            $borrowingRequest = BorrowingRequest::findOrFail($id);
+            
+            // Authorization check
+            if ($borrowingRequest->teacher_id !== Auth::id()) {
+                return back()->with('error', 'Anda tidak memiliki akses untuk menyetujui permintaan ini');
+            }
+            
+            // Check current status
+            if ($borrowingRequest->status !== BorrowingRequest::STATUS_PENDING) {
+                return back()->with('error', 'Permintaan ini tidak dalam status menunggu persetujuan');
+            }
+            
+            // Approve via service
+            $this->approvalService->approve($borrowingRequest, Auth::id());
+            
+            return back()->with('success', 'Permintaan peminjaman berhasil disetujui. QR Code telah dikirim ke siswa via WhatsApp.');
+            
+        } catch (\App\Exceptions\InsufficientStockException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error('Error approving borrowing request', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->with('error', 'Terjadi kesalahan saat menyetujui permintaan: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Reject a borrowing request
+     */
+    public function reject(Request $request, int $id)
+    {
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|min:10|max:500',
+        ], [
+            'rejection_reason.required' => 'Alasan penolakan harus diisi',
+            'rejection_reason.min' => 'Alasan penolakan minimal 10 karakter',
+            'rejection_reason.max' => 'Alasan penolakan maksimal 500 karakter',
+        ]);
+        
+        try {
+            $borrowingRequest = BorrowingRequest::findOrFail($id);
+            
+            // Authorization check
+            if ($borrowingRequest->teacher_id !== Auth::id()) {
+                return back()->with('error', 'Anda tidak memiliki akses untuk menolak permintaan ini');
+            }
+            
+            // Check current status
+            if ($borrowingRequest->status !== BorrowingRequest::STATUS_PENDING) {
+                return back()->with('error', 'Permintaan ini tidak dalam status menunggu persetujuan');
+            }
+            
+            // Reject via service
+            $this->approvalService->reject(
+                $borrowingRequest,
+                $validated['rejection_reason'],
+                Auth::id()
+            );
+            
+            return back()->with('success', 'Permintaan peminjaman berhasil ditolak. Notifikasi telah dikirim ke siswa.');
+            
+        } catch (\Exception $e) {
+            \Log::error('Error rejecting borrowing request', [
+                'id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return back()->with('error', 'Terjadi kesalahan saat menolak permintaan: ' . $e->getMessage());
+        }
+    }
+}
+
