@@ -28,28 +28,28 @@ Route::prefix('v1')->group(function () {
 
 // Protected API - Requires Authentication
 Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
-    
+
     // Borrowing Endpoints
     Route::prefix('borrowings')->group(function () {
         // Student endpoints
         Route::get('my-history', [BorrowingApiController::class, 'myHistory'])
             ->name('api.borrowings.my-history');
-        
+
         Route::get('{id}/qr-code', [BorrowingApiController::class, 'getQRCode'])
             ->name('api.borrowings.qr-code');
-        
+
         // Teacher/Admin endpoints
         Route::get('statistics', [BorrowingApiController::class, 'statistics'])
             ->middleware('role:guru|admin')
             ->name('api.borrowings.statistics');
     });
-    
+
     // QR Scanner Endpoints
     Route::prefix('qr')->middleware('role:guru|admin')->group(function () {
         Route::post('validate', [BorrowingApiController::class, 'validateQR'])
             ->name('api.qr.validate');
     });
-    
+
     // User Info
     Route::get('me', function () {
         $user = auth()->user();
@@ -79,4 +79,13 @@ Route::prefix('v1/bot')->middleware('bot.auth')->group(function () {
 
     Route::get('riwayat/{phone}', [BotApiController::class, 'riwayat'])
         ->name('api.bot.riwayat');
+
+    Route::get('permohonan/{phone}', [BotApiController::class, 'permohonanPending'])
+        ->name('api.bot.permohonan');
+
+    Route::post('approve/{id}', [BotApiController::class, 'approveViaBot'])
+        ->name('api.bot.approve');
+
+    Route::post('reject/{id}', [BotApiController::class, 'rejectViaBot'])
+        ->name('api.bot.reject');
 });
