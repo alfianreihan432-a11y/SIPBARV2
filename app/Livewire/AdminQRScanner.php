@@ -62,27 +62,27 @@ class AdminQRScanner extends Component
 
         $request = $this->scannedRequest;
 
-        if ($request->status !== 'qr_ready') {
+        if (! in_array($request->status, ['approved', 'qr_ready'])) {
             session()->flash('error', 'Status peminjaman tidak valid untuk persetujuan.');
             return;
         }
 
         // Check stock availability
         $item = $request->item;
-        if ($item->stock < $request->quantity) {
-            session()->flash('error', 'Stok barang tidak mencukupi.');
-            return;
+        if ($item) {
+            if ($item->stock < $request->quantity) {
+                session()->flash('error', 'Stok barang tidak mencukupi.');
+                return;
+            }
+            // Reduce stock
+            $item->decrement('stock', $request->quantity);
         }
 
         // Update request status
         $request->update([
             'status' => 'borrowed',
             'borrowed_at' => now(),
-        ]);
-
-        // Reduce stock
-        $item->update([
-            'stock' => $item->stock - $request->quantity,
+            'checkout_by' => Auth::id(),
         ]);
 
         // Mark QR as scanned
