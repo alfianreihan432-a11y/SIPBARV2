@@ -65,7 +65,8 @@ html.dark{
 }
 
 /* ─── NAVBAR ─── */
-.nav{position:sticky;top:0;z-index:100;background:var(--nav-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--nav-border);transition:background .3s}
+header{position:sticky;top:0;z-index:100;background:var(--nav-bg)}
+.nav{position:relative;background:var(--nav-bg);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--nav-border);transition:background .3s}
 .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;gap:40px}
 .nav-logo{display:flex;align-items:center;gap:0;text-decoration:none;flex-shrink:0}
 .nav-logo-box{width:36px;height:36px;background:#1d4ed8;border-radius:10px;display:flex;align-items:center;justify-content:center}
@@ -398,7 +399,6 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
     </a>
     <div class="nav-links">
       <a href="#beranda" class="active">Beranda</a>
-      <a href="#kategori">Kategori</a>
       <a href="#fitur">Fitur</a>
       <a href="#tentang">Tentang</a>
       <a href="#kontak">Kontak</a>
@@ -430,7 +430,6 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
   </div>
   <div id="navMob" class="nav-mobile">
     <a href="#beranda">Beranda</a>
-    <a href="#kategori">Kategori</a>
     <a href="#fitur">Fitur</a>
     <a href="#tentang">Tentang</a>
     <a href="#kontak">Kontak</a>
@@ -448,52 +447,6 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
       <div class="hero-badge"><span class="hero-badge-pulse"></span>Sistem Inventaris Modern</div>
       <h1 class="hero-h1">Kelola Inventaris<br><em>Lebih Mudah</em> & Efisien</h1>
       <p class="hero-p">Platform web modern untuk mengelola inventaris sekolah secara digital, transparan, dan terintegrasi.</p>
-      <div class="hero-btns">
-        @auth
-          <a href="{{ route('dashboard') }}" class="hero-btn-main">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-            Dashboard
-          </a>
-        @else
-          <a href="{{ route('login') }}" class="hero-btn-main">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-            Masuk
-          </a>
-        @endauth
-      </div>
-    </div>
-  </div>
-</section>
-
-{{-- ═══════════════ KATEGORI ═══════════════ --}}
-<section class="section" id="kategori">
-  <div class="section-inner">
-    <div class="section-head">
-      <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>Kategori Inventaris</div>
-      <h2 class="section-h2">Kelompok <em>Barang Inventaris</em></h2>
-      <p class="section-lead">Inventaris dikelompokkan dalam kategori untuk memudahkan pengelolaan dan pencarian barang.</p>
-    </div>
-    <div class="cat-grid">
-      @php
-      $cats=[
-        ['Elektronik','Komputer, proyektor, printer, dan perangkat elektronik lainnya.','M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
-        ['Furnitur','Meja, kursi, lemari, rak, dan perabot sekolah lainnya.','M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'],
-        ['Buku & Referensi','Buku pelajaran, referensi, modul, dan bahan bacaan.','M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13'],
-        ['Laboratorium','Alat dan bahan praktikum IPA, Kimia, Biologi, dll.','M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z'],
-        ['Olahraga','Peralatan olahraga dan perlengkapan ekstrakurikuler.','M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07'],
-        ['Lainnya','Kategori inventaris lainnya yang tidak termasuk di atas.','M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z'],
-      ];
-      @endphp
-      @foreach($cats as $c)
-      <div class="cat-card">
-        <div class="cat-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#2563eb" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $c[2] }}"/></svg>
-        </div>
-        <div class="cat-name">{{ $c[0] }}</div>
-        <div class="cat-desc">{{ $c[1] }}</div>
-        <a href="{{ route('login') }}" class="cat-link">Lihat Barang <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>
-      </div>
-      @endforeach
     </div>
   </div>
 </section>
@@ -677,10 +630,6 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           </li>
           @endforeach
         </ul>
-        <a href="{{ route('register') }}" class="btn-primary" style="display:inline-flex;padding:13px 28px;font-size:14px">
-          Mulai Sekarang
-          <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-        </a>
       </div>
       <div class="about-visual">
         <div class="about-img-wrap">
@@ -735,7 +684,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
       </div>
       <div>
         <div class="footer-heading">Menu</div>
-        <ul class="footer-list">@foreach(['Beranda','Kategori','Fitur','Tentang','Kontak'] as $m)<li><a href="#">{{ $m }}</a></li>@endforeach</ul>
+        <ul class="footer-list">@foreach(['Beranda','Fitur','Tentang','Kontak'] as $m)<li><a href="#">{{ $m }}</a></li>@endforeach</ul>
       </div>
       <div>
         <div class="footer-heading">Fitur</div>

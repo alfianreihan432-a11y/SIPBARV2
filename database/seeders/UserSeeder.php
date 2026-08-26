@@ -32,10 +32,11 @@ class UserSeeder extends Seeder
 
         // Guru
         $guru = User::updateOrCreate(
-            ['email' => 'guru@sipbar.sch.id'],
+            ['email' => '198505@sipbar.sch.id'],
             [
                 'name'               => 'Budi Santoso',
                 'password'           => bcrypt('guru123'),
+                'nip'                => '198505',
                 'email_verified_at'  => now(),
             ]
         );
@@ -43,10 +44,11 @@ class UserSeeder extends Seeder
 
         // Siswa
         $siswa = User::updateOrCreate(
-            ['email' => 'siswa@sipbar.sch.id'],
+            ['email' => '4692@sipbar.sch.id'],
             [
                 'name'               => 'Ahmad Fauzi',
                 'password'           => bcrypt('siswa123'),
+                'nis'                => '4692',
                 'email_verified_at'  => now(),
             ]
         );
