@@ -331,5 +331,6 @@
         hamburgerBtn.addEventListener('click', toggleSidebar);
         sidebarOverlay.addEventListener('click', toggleSidebar);
     </script>
+    @stack('scripts')
 </body>
 </html>

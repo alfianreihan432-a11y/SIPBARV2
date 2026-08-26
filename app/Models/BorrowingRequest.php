@@ -56,6 +56,16 @@ class BorrowingRequest extends Model
         return $this->belongsTo(Item::class);
     }
 
+    /**
+     * Relasi item termasuk yang sudah di-soft delete.
+     * Dipakai di halaman pengumuman/history agar nama barang tetap tampil
+     * meski barang sudah dihapus dari inventaris.
+     */
+    public function itemWithTrashed(): BelongsTo
+    {
+        return $this->belongsTo(Item::class, 'item_id')->withoutGlobalScope(\Illuminate\Database\Eloquent\SoftDeletingScope::class);
+    }
+
     public function teacher(): BelongsTo
     {
         return $this->belongsTo(User::class, 'teacher_id');

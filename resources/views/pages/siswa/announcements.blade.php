@@ -72,6 +72,88 @@
     }
     .ann-btn:hover { background: var(--primary-dark); }
 
+    /* ── QR Code Modal ── */
+    .qr-modal-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+        z-index: 1000;
+        display: flex; align-items: center; justify-content: center;
+        padding: 20px;
+        opacity: 0; pointer-events: none;
+        transition: opacity .25s ease;
+    }
+    .qr-modal-overlay.is-open {
+        opacity: 1; pointer-events: all;
+    }
+    .qr-modal {
+        background: var(--card); border: 1px solid var(--border2);
+        border-radius: 18px;
+        padding: 28px 24px;
+        max-width: 360px; width: 100%;
+        text-align: center;
+        transform: scale(.94) translateY(12px);
+        transition: transform .28s cubic-bezier(.34,1.56,.64,1), opacity .25s;
+        opacity: 0;
+        position: relative;
+    }
+    .qr-modal-overlay.is-open .qr-modal {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+    .qr-modal-close {
+        position: absolute; top: 14px; right: 14px;
+        background: var(--bg3); border: 1px solid var(--border2);
+        border-radius: 8px; width: 30px; height: 30px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; color: var(--muted);
+        transition: background .15s;
+    }
+    .qr-modal-close:hover { background: var(--bg2); }
+    .qr-modal-heading {
+        font-size: 16px; font-weight: 800; color: var(--text);
+        margin: 0 0 4px;
+    }
+    .qr-modal-sub {
+        font-size: 12px; color: var(--muted); margin-bottom: 20px;
+    }
+    .qr-img-wrap {
+        width: 260px; height: 260px;
+        margin: 0 auto 16px;
+        border-radius: 12px;
+        border: 2px solid var(--border2);
+        overflow: hidden;
+        display: flex; align-items: center; justify-content: center;
+        background: #fff;
+    }
+    .qr-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
+    .qr-item-name {
+        font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px;
+    }
+    .qr-token {
+        font-size: 11px; color: var(--muted); font-family: monospace;
+        background: var(--bg3); border-radius: 6px; padding: 4px 8px;
+        display: inline-block; margin-bottom: 16px; letter-spacing: .04em;
+    }
+    .qr-instruction {
+        font-size: 12px; color: var(--muted); line-height: 1.6;
+        background: var(--bg3); border-radius: 8px;
+        padding: 10px 12px; margin-bottom: 16px;
+        border: 1px solid var(--border2);
+    }
+    .qr-expires {
+        font-size: 11px; color: var(--subtle);
+    }
+    /* spinner */
+    .qr-spinner {
+        width: 40px; height: 40px;
+        border: 3px solid var(--border2);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin .7s linear infinite;
+        margin: 60px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     .ann-empty {
         padding: 48px 20px; text-align: center;
     }
@@ -81,6 +163,42 @@
 </style>
 
 <div>
+    {{-- ── QR Code Modal ── --}}
+    <div id="qr-modal-overlay" class="qr-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="qr-modal-heading">
+        <div class="qr-modal">
+            <button class="qr-modal-close" onclick="closeQRModal()" aria-label="Tutup modal">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <p class="qr-modal-heading" id="qr-modal-heading">QR Code Peminjaman</p>
+            <p class="qr-modal-sub">Tunjukkan ke petugas ruang inventaris saat mengambil barang</p>
+
+            {{-- Spinner (loading state) --}}
+            <div id="qr-spinner" class="qr-spinner"></div>
+
+            {{-- Error state --}}
+            <div id="qr-error" style="display:none;color:#dc2626;font-size:13px;padding:16px;"></div>
+
+            {{-- QR Image --}}
+            <div id="qr-img-wrap" class="qr-img-wrap" style="display:none;">
+                <img id="qr-img" src="" alt="QR Code peminjaman" />
+            </div>
+
+            {{-- Info barang --}}
+            <div id="qr-item-name" class="qr-item-name"></div>
+            <div id="qr-token" class="qr-token"></div>
+
+            {{-- Instruksi --}}
+            <div class="qr-instruction">
+                📋 Tunjukkan QR Code ini ke petugas ruang inventaris saat mengambil barang. Petugas akan men-scan untuk konfirmasi pengambilan.
+            </div>
+
+            <div id="qr-expires" class="qr-expires"></div>
+        </div>
+    </div>
+
     {{-- Page Header --}}
     <div class="ann-header">
         <div class="ann-header-content">
@@ -97,27 +215,27 @@
     </div>
 
     @php
-        $overdueBorrowings = \App\Models\BorrowingRequest::with('item')
+        $overdueBorrowings = \App\Models\BorrowingRequest::with('itemWithTrashed')
             ->where('user_id', auth()->id())
             ->where('status', 'borrowed')
             ->whereDate('return_date', '<', now())
             ->get();
 
-        $dueSoonBorrowings = \App\Models\BorrowingRequest::with('item')
+        $dueSoonBorrowings = \App\Models\BorrowingRequest::with('itemWithTrashed')
             ->where('user_id', auth()->id())
             ->where('status', 'borrowed')
             ->whereDate('return_date', '>=', now())
             ->whereDate('return_date', '<=', now()->addDays(2))
             ->get();
 
-        $recentApprovals = \App\Models\BorrowingRequest::with('item')
+        $recentApprovals = \App\Models\BorrowingRequest::with('itemWithTrashed')
             ->where('user_id', auth()->id())
             ->where('status', 'approved')
             ->latest('approved_at')
             ->take(3)
             ->get();
 
-        $recentRejections = \App\Models\BorrowingRequest::with('item')
+        $recentRejections = \App\Models\BorrowingRequest::with('itemWithTrashed')
             ->where('user_id', auth()->id())
             ->where('status', 'rejected')
             ->latest('updated_at')
@@ -154,7 +272,7 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="ann-item-name">{{ $overdue->item?->name ?? 'Barang tidak tersedia' }}</div>
+                        <div class="ann-item-name">{{ $overdue->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
                         <div class="ann-item-meta">
                             Seharusnya dikembalikan: {{ \Carbon\Carbon::parse($overdue->return_date)->format('d M Y') }}
                         </div>
@@ -196,7 +314,7 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="ann-item-name">{{ $dueSoon->item?->name ?? 'Barang tidak tersedia' }}</div>
+                        <div class="ann-item-name">{{ $dueSoon->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
                         <div class="ann-item-meta">
                             Harus dikembalikan: {{ \Carbon\Carbon::parse($dueSoon->return_date)->format('d M Y') }}
                         </div>
@@ -221,13 +339,21 @@
             <div class="ann-item">
                 <div class="ann-item-left">
                     <div>
-                        <div class="ann-item-name">{{ $approval->item?->name ?? 'Barang tidak tersedia' }}</div>
+                        <div class="ann-item-name">{{ $approval->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
                         <div class="ann-item-meta">
                             Disetujui {{ $approval->approved_at ? $approval->approved_at->diffForHumans() : 'baru saja' }}
                         </div>
                     </div>
                 </div>
-                <a href="{{ route('student.loans') }}" class="ann-btn">Lihat QR Code</a>
+                <button
+                    class="ann-btn"
+                    onclick="openQRModal({{ $approval->id }}, '{{ addslashes($approval->itemWithTrashed?->name ?? 'Barang tidak tersedia') }}')"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h2M4 12h2m-2-4h2M7 20h2M4 4h4v4H4V4zm12 0h4v4h-4V4zM4 16h4v4H4v-4z" />
+                    </svg>
+                    Lihat QR Code
+                </button>
             </div>
             @endforeach
         </div>
@@ -244,7 +370,7 @@
         <div class="ann-panel-body">
             @foreach($recentRejections as $rejection)
             <div class="ann-card">
-                <div class="ann-card-title">{{ $rejection->item?->name ?? 'Barang tidak tersedia' }}</div>
+                <div class="ann-card-title">{{ $rejection->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
                 <div class="ann-card-meta" style="font-size:13px;color:var(--muted);margin-bottom:8px">
                     Ditolak {{ $rejection->updated_at->diffForHumans() }}
                 </div>
@@ -310,3 +436,72 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+// ── QR Code Modal Logic ──
+const qrOverlay  = document.getElementById('qr-modal-overlay');
+const qrImgWrap  = document.getElementById('qr-img-wrap');
+const qrImgEl    = document.getElementById('qr-img');
+const qrItemName = document.getElementById('qr-item-name');
+const qrToken    = document.getElementById('qr-token');
+const qrExpires  = document.getElementById('qr-expires');
+const qrSpinner  = document.getElementById('qr-spinner');
+const qrError    = document.getElementById('qr-error');
+
+function openQRModal(borrowingId, itemName) {
+    // Reset state
+    qrImgWrap.style.display  = 'none';
+    qrSpinner.style.display  = 'block';
+    qrError.style.display    = 'none';
+    qrItemName.textContent   = itemName;
+    qrToken.textContent      = '';
+    qrExpires.textContent    = '';
+
+    // Tampilkan modal
+    qrOverlay.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+
+    // Fetch QR Code dari backend
+    fetch(`/siswa/peminjaman/${borrowingId}/qrcode`, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        qrSpinner.style.display = 'none';
+        if (data.success) {
+            qrImgEl.src          = data.qr_image;
+            qrImgWrap.style.display = 'flex';
+            qrToken.textContent  = '#' + data.borrowing_id + ' · ' + data.token.substring(0, 8).toUpperCase() + '...';
+            qrExpires.textContent = data.expires_at ? 'Berlaku hingga: ' + data.expires_at : '';
+        } else {
+            qrError.style.display = 'block';
+            qrError.textContent   = data.message || 'Gagal memuat QR Code.';
+        }
+    })
+    .catch(() => {
+        qrSpinner.style.display = 'none';
+        qrError.style.display   = 'block';
+        qrError.textContent     = 'Koneksi gagal. Coba lagi beberapa saat.';
+    });
+}
+
+function closeQRModal() {
+    qrOverlay.classList.remove('is-open');
+    document.body.style.overflow = '';
+}
+
+// Tutup modal saat klik overlay
+qrOverlay.addEventListener('click', function(e) {
+    if (e.target === qrOverlay) closeQRModal();
+});
+
+// Tutup modal saat tekan Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeQRModal();
+});
+</script>
+@endpush

@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminQRVerificationController;
 use App\Http\Controllers\Admin\AdminReturnController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SipintuAuthController;
 use App\Http\Controllers\SipintuStatusController;
+use App\Http\Controllers\Student\StudentQRCodeController;
 use App\Http\Controllers\Student\StudentReturnController;
 use App\Http\Controllers\TeacherApprovalController;
 use App\Http\Controllers\TransactionHistoryController;
@@ -66,6 +68,17 @@ Route::middleware(['auth'])->group(function () {
     Route::view('siswa/riwayat', 'pages.siswa.history')->name('student.history');
     Route::view('siswa/pengumuman', 'pages.siswa.announcements')->name('student.announcements');
     Route::view('siswa/profil', 'pages.siswa.profile')->name('student.profile');
+
+    // Student QR Code — generate/tampilkan QR untuk peminjaman yang disetujui
+    Route::get('siswa/peminjaman/{id}/qrcode', [StudentQRCodeController::class, 'show'])
+        ->name('student.qrcode.show');
+
+    // Admin QR Verification — verifikasi token QR saat scan & konfirmasi pengambilan
+    Route::middleware('role:admin')->group(function () {
+        Route::get('admin/qr/verify/{token}', [AdminQRVerificationController::class, 'verify'])->name('admin.qr.verify');
+        Route::get('admin/verifikasi-pengambilan/{token}', [AdminQRVerificationController::class, 'verify'])->name('admin.qr.verify.alias');
+        Route::post('admin/qr/confirm-checkout/{id}', [AdminQRVerificationController::class, 'confirmCheckout'])->name('admin.qr.confirm-checkout');
+    });
 
     // Teacher pages
     Route::get('guru/dashboard', function() {
