@@ -152,9 +152,9 @@ class UserManager extends Component
         // Auto-generate email & password if creating new
         if (! $this->editingId) {
             $slug  = Str::slug($this->name, '.');
-            $base  = strtolower($role === 'siswa' ? ($this->nis ?: $slug) : ($this->nip ?: $slug));
+            $base  = strtolower($role === 'siswa' ? trim($this->nis ?: $slug) : trim($this->nip ?: $slug));
             $this->email    = $base . '@sipbar.sch.id';
-            $this->password = $role === 'siswa' ? 'siswa' . $this->nis : 'guru' . $this->nip;
+            $this->password = $role === 'siswa' ? 'siswa123' : 'guru123';
 
             // Check if email already exists
             if (User::where('email', $this->email)->exists()) {

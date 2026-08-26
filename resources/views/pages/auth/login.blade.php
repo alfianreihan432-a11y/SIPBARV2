@@ -389,87 +389,26 @@
                 @csrf
 
                 {{-- Role Dropdown (Admin-style with icons) --}}
-                <div class="form-group">
-                    <label class="form-label">Login sebagai</label>
-                    <input type="hidden" name="role" id="role" value="{{ old('role', 'admin') }}">
-                    
-                    <div class="admin-select-wrap">
-                        <button type="button" class="admin-select-trigger" id="roleSelectTrigger" onclick="toggleRoleDropdown(event)">
-                            <span id="roleSelectedLabel">
-                                @if(old('role') === 'guru')
-                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px;vertical-align:middle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Guru
-                                @elseif(old('role') === 'siswa')
-                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px;vertical-align:middle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg> Siswa
-                                @else
-                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px;vertical-align:middle" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> Admin
-                                @endif
-                            </span>
-                        </button>
-                        <div class="admin-select-dropdown" id="roleSelectDropdown">
-                            <div class="admin-select-option {{ old('role', 'admin') === 'admin' ? 'selected' : '' }}" data-value="admin" data-label="Admin" onclick="selectRole('admin', 'Admin', this)">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                <span>Admin</span>
-                            </div>
-                            <div class="admin-select-option {{ old('role') === 'guru' ? 'selected' : '' }}" data-value="guru" data-label="Guru" onclick="selectRole('guru', 'Guru', this)">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                <span>Guru</span>
-                            </div>
-                            <div class="admin-select-option {{ old('role') === 'siswa' ? 'selected' : '' }}" data-value="siswa" data-label="Siswa" onclick="selectRole('siswa', 'Siswa', this)">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
-                                <span>Siswa</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                            {{-- Removed Role Dropdown --}}
 
-                {{-- Dynamic Identifier Field --}}
+                {{-- Email --}}
                 <div class="form-group" id="identifierGroup">
-
-                    {{-- ADMIN: Email --}}
-                    <div id="field-admin" style="{{ old('role','admin') !== 'admin' ? 'display:none' : '' }}">
-                        <label class="form-label" for="email">Email</label>
-                        <div class="password-wrap">
-                            <input type="email" id="email" name="email"
-                                class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-                                placeholder="admin@sipbar.sch.id"
-                                value="{{ old('email') }}"
-                                autocomplete="email">
-                        </div>
-                        @error('email')<div class="error-msg">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            {{ $message }}
-                        </div>@enderror
+                    <label class="form-label" for="email">Email</label>
+                    <div class="password-wrap">
+                        <input type="email" id="email" name="email"
+                            class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
+                            placeholder="nama@sipbar.sch.id"
+                            value="{{ old('email') }}"
+                            autocomplete="email">
                     </div>
-
-                    {{-- GURU: NIP --}}
-                    <div id="field-guru" style="{{ old('role','admin') !== 'guru' ? 'display:none' : '' }}">
-                        <label class="form-label" for="nip">NIP (Nomor Induk Pegawai)</label>
-                        <div class="password-wrap">
-                            <input type="text" id="nip" name="nip"
-                                class="form-control {{ $errors->has('nip') ? 'is-invalid' : '' }}"
-                                placeholder="Contoh: 198505152010011001"
-                                value="{{ old('nip') }}"
-                                autocomplete="off">
-                        </div>
-                        @error('nip')<div class="error-msg">{{ $message }}</div>@enderror
-                    </div>
-
-                    {{-- SISWA: NIS --}}
-                    <div id="field-siswa" style="{{ old('role','admin') !== 'siswa' ? 'display:none' : '' }}">
-                        <label class="form-label" for="nis">NIS (Nomor Induk Siswa)</label>
-                        <div class="password-wrap">
-                            <input type="text" id="nis" name="nis"
-                                class="form-control {{ $errors->has('nis') ? 'is-invalid' : '' }}"
-                                placeholder="Contoh: 2024001"
-                                value="{{ old('nis') }}"
-                                autocomplete="off">
-                        </div>
-                        @error('nis')<div class="error-msg">{{ $message }}</div>@enderror
-                    </div>
+                    @error('email')<div class="error-msg">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ $message }}
+                    </div>@enderror
                 </div>
 
-                {{-- Password (admin only) --}}
-                <div class="form-group" id="password-group" style="{{ old('role','admin') !== 'admin' ? 'display:none' : '' }}">
+                {{-- Password --}}
+                <div class="form-group" id="password-group">
                     <label class="form-label" for="password">Password</label>
                     <div class="password-wrap">
                         <input type="password" id="password" name="password"
@@ -484,19 +423,6 @@
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         {{ $message }}
                     </div>@enderror
-                </div>
-
-                {{-- Tanggal Lahir (guru & siswa only) --}}
-                <div class="form-group" id="tgl-lahir-group" style="{{ old('role','admin') === 'admin' ? 'display:none' : '' }}">
-                    <label class="form-label" for="tanggal_lahir">Tanggal Lahir</label>
-                    <div class="password-wrap">
-                        <input type="date" id="tanggal_lahir" name="tanggal_lahir"
-                            class="form-control {{ $errors->has('tanggal_lahir') ? 'is-invalid' : '' }}"
-                            value="{{ old('tanggal_lahir') }}"
-                            autocomplete="off">
-                    </div>
-                    @error('tanggal_lahir')<div class="error-msg">{{ $message }}</div>@enderror
-                    <div style="font-size:11px;color:#94a3b8;margin-top:4px">Gunakan tanggal lahir sesuai data di sistem</div>
                 </div>
 
                 {{-- Remember + Forgot --}}
@@ -551,61 +477,6 @@
 </div>
 
 <script>
-    // ── Admin Select Dropdown Handlers ──
-    function toggleRoleDropdown(e) {
-        e.stopPropagation();
-        const wrap = document.getElementById('roleSelectTrigger').parentElement;
-        wrap.classList.toggle('open');
-    }
-
-    function selectRole(val, label, el) {
-        document.getElementById('role').value = val;
-
-        // Get the icon from the selected item
-        const iconHtml = el.querySelector('svg').outerHTML;
-        document.getElementById('roleSelectedLabel').innerHTML = iconHtml + ' ' + label;
-
-        // Update selected class
-        const items = document.querySelectorAll('.admin-select-option');
-        items.forEach(item => item.classList.remove('selected'));
-        el.classList.add('selected');
-
-        // Close dropdown
-        document.getElementById('roleSelectTrigger').parentElement.classList.remove('open');
-
-        // Trigger dynamic form fields update
-        handleRoleChange(val);
-    }
-
-    // Close on click outside
-    document.addEventListener('click', function (e) {
-        const wrap = document.getElementById('roleSelectTrigger').parentElement;
-        if (wrap && !wrap.contains(e.target)) {
-            wrap.classList.remove('open');
-        }
-    });
-
-    // ── Role switcher ──
-    function handleRoleChange(role) {
-        // Reset semua field visibility
-        document.getElementById('field-admin').style.display    = 'none';
-        document.getElementById('field-guru').style.display     = 'none';
-        document.getElementById('field-siswa').style.display    = 'none';
-        document.getElementById('password-group').style.display = 'none';
-        document.getElementById('tgl-lahir-group').style.display= 'none';
-
-        if (role === 'admin') {
-            document.getElementById('field-admin').style.display    = '';
-            document.getElementById('password-group').style.display = '';
-        } else if (role === 'guru') {
-            document.getElementById('field-guru').style.display      = '';
-            document.getElementById('tgl-lahir-group').style.display = '';
-        } else if (role === 'siswa') {
-            document.getElementById('field-siswa').style.display     = '';
-            document.getElementById('tgl-lahir-group').style.display = '';
-        }
-    }
-
     function togglePassword() {
         const pw = document.getElementById('password');
         const icon = document.getElementById('eyeIcon');
@@ -616,11 +487,6 @@
             : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
     }
 
-    // Init on page load
-    document.addEventListener('DOMContentLoaded', function () {
-        const role = document.getElementById('role').value || 'admin';
-        handleRoleChange(role);
-    });
 </script>
 </body>
 </html>
