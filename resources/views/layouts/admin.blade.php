@@ -484,9 +484,15 @@
                 @endif
             </a>
 
-            <a href="{{ route('returns.index') }}" class="nav-item {{ request()->routeIs('returns.index') ? 'active' : '' }}">
+            @php
+                $pendingReturnCount = \App\Models\ItemReturn::where('status', 'menunggu')->count();
+            @endphp
+            <a href="{{ route('returns.index') }}" class="nav-item {{ request()->routeIs('returns.index', 'admin.returns.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
                 Pengembalian
+                @if($pendingReturnCount > 0)
+                <span class="nav-badge" style="background:#f59e0b;color:#0f172a;">{{ $pendingReturnCount }}</span>
+                @endif
             </a>
 
             <div class="nav-group-label">Laporan</div>

@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminReturnController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SipintuAuthController;
 use App\Http\Controllers\SipintuStatusController;
+use App\Http\Controllers\Student\StudentReturnController;
 use App\Http\Controllers\TeacherApprovalController;
 use App\Http\Controllers\TransactionHistoryController;
 use Illuminate\Support\Facades\Route;
@@ -22,7 +24,13 @@ Route::middleware(['auth'])->group(function () {
     Route::view('kelola-barang', 'pages.admin.kelola-barang')->name('kelola-barang.index');
     Route::view('categories', 'pages.admin.categories')->name('categories.index');
     Route::view('loans', 'pages.admin.loans')->name('loans.index');
-    Route::view('returns', 'pages.admin.returns')->name('returns.index');
+    
+    // Admin Return Verification routes
+    Route::get('returns', [AdminReturnController::class, 'index'])->name('returns.index');
+    Route::get('returns/{id}', [AdminReturnController::class, 'show'])->name('admin.returns.show');
+    Route::post('returns/{id}/approve', [AdminReturnController::class, 'approve'])->name('admin.returns.approve');
+    Route::post('returns/{id}/reject', [AdminReturnController::class, 'reject'])->name('admin.returns.reject');
+
     Route::view('reports', 'pages.admin.reports')->name('reports.index');
     Route::view('statistics', 'pages.admin.statistics')->name('statistics.index');
     Route::view('users', 'pages.admin.users')->name('users.index');
@@ -48,6 +56,13 @@ Route::middleware(['auth'])->group(function () {
     })->name('student.catalog');
 
     Route::view('siswa/peminjaman', 'pages.siswa.loans')->name('student.loans');
+    
+    // Student Return System routes
+    Route::get('siswa/pengembalian', [StudentReturnController::class, 'index'])->name('student.returns.index');
+    Route::get('siswa/pengembalian/ajukan/{id}', [StudentReturnController::class, 'create'])->name('student.returns.create');
+    Route::post('siswa/pengembalian/ajukan', [StudentReturnController::class, 'store'])->name('student.returns.store');
+    Route::get('siswa/pengembalian/riwayat', [StudentReturnController::class, 'history'])->name('student.returns.history');
+
     Route::view('siswa/riwayat', 'pages.siswa.history')->name('student.history');
     Route::view('siswa/pengumuman', 'pages.siswa.announcements')->name('student.announcements');
     Route::view('siswa/profil', 'pages.siswa.profile')->name('student.profile');
