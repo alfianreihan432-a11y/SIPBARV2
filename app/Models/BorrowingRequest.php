@@ -81,6 +81,16 @@ class BorrowingRequest extends Model
         return $this->hasMany(WhatsAppNotificationLog::class);
     }
 
+    public function itemReturns()
+    {
+        return $this->hasMany(ItemReturn::class, 'borrowing_request_id');
+    }
+
+    public function latestReturn()
+    {
+        return $this->hasOne(ItemReturn::class, 'borrowing_request_id')->latestOfMany();
+    }
+
     // ==========================================
     // Helper Methods
     // ==========================================

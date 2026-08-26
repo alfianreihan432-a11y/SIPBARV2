@@ -17,15 +17,15 @@
         </div>
         <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0">
             <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);border-radius:12px;padding:12px 16px;text-align:center">
-                <div style="font-size:18px;font-weight:800;color:#10b981">{{ \App\Models\Borrowing::where('status','pending')->count() }}</div>
+                <div style="font-size:18px;font-weight:800;color:#10b981">{{ \App\Models\BorrowingRequest::where('status','pending')->count() }}</div>
                 <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Menunggu</div>
             </div>
             <div style="background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:12px 16px;text-align:center">
-                <div style="font-size:18px;font-weight:800;color:var(--blue)">{{ \App\Models\Borrowing::whereIn('status',['approved','borrowed'])->count() }}</div>
+                <div style="font-size:18px;font-weight:800;color:var(--blue)">{{ \App\Models\BorrowingRequest::whereIn('status',['approved','borrowed'])->count() }}</div>
                 <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Aktif</div>
             </div>
             <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:12px 16px;text-align:center">
-                <div style="font-size:18px;font-weight:800;color:#f87171">{{ \App\Models\Borrowing::where('status','overdue')->count() }}</div>
+                <div style="font-size:18px;font-weight:800;color:#f87171">{{ \App\Models\BorrowingRequest::where('status','overdue')->count() }}</div>
                 <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Terlambat</div>
             </div>
         </div>

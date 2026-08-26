@@ -2,9 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\Borrowing;
-use App\Models\Item;
-use App\Models\User;
+use App\Models\BorrowingRequest;
 use Livewire\Component;
 
 class LoanManager extends Component
@@ -29,7 +27,7 @@ class LoanManager extends Component
 
     public function loadBorrowings(): void
     {
-        $query = Borrowing::with(['user', 'details.item'])->latest();
+        $query = BorrowingRequest::with(['user', 'item'])->latest();
 
         if ($this->filterStatus !== 'semua') {
             $query->where('status', $this->filterStatus);
@@ -43,32 +41,60 @@ class LoanManager extends Component
      */
     public function approve(int $id): void
     {
-        $borrowing = Borrowing::findOrFail($id);
-        $borrowing->update(['status' => 'borrowed']);
+        $borrowing = BorrowingRequest::findOrFail($id);
+        $borrowing->update([
+            'status'      => 'approved',
+            'approved_at' => now(),
+        ]);
 
         $this->loadBorrowings();
-        session()->flash('message', 'Peminjaman #' . $borrowing->number . ' telah disetujui.');
+        session()->flash('message', 'Peminjaman #BR-' . str_pad($borrowing->id, 4, '0', STR_PAD_LEFT) . ' telah disetujui.');
     }
 
     /**
-     * Tandai dikembalikan (approved/borrowed → returned)
+     * Tandai dipinjam (approved → borrowed)
+     */
+    public function markBorrowed(int $id): void
+    {
+        $borrowing = BorrowingRequest::findOrFail($id);
+        $borrowing->update([
+            'status'      => 'borrowed',
+            'borrowed_at' => now(),
+        ]);
+
+        $this->loadBorrowings();
+        session()->flash('message', 'Peminjaman #BR-' . str_pad($borrowing->id, 4, '0', STR_PAD_LEFT) . ' ditandai dipinjam.');
+    }
+
+    /**
+     * Tandai dikembalikan (borrowed → returned)
      */
     public function markReturned(int $id): void
     {
-        $borrowing = Borrowing::with('details.item')->findOrFail($id);
+        $borrowing = BorrowingRequest::with('item')->findOrFail($id);
         $borrowing->update([
             'status'      => 'returned',
             'returned_at' => now(),
         ]);
 
-        // Kembalikan stok
-        foreach ($borrowing->details as $detail) {
-            if ($detail->item) {
-                $detail->item->increment('stock', $detail->quantity);
-            }
+        // Kembalikan stok barang
+        if ($borrowing->item) {
+            $borrowing->item->increment('stock', $borrowing->quantity ?? 1);
         }
 
         $this->loadBorrowings();
-        session()->flash('message', 'Peminjaman #' . $borrowing->number . ' berhasil dikembalikan.');
+        session()->flash('message', 'Peminjaman #BR-' . str_pad($borrowing->id, 4, '0', STR_PAD_LEFT) . ' berhasil dikembalikan.');
+    }
+
+    /**
+     * Tolak peminjaman (pending → rejected)
+     */
+    public function reject(int $id): void
+    {
+        $borrowing = BorrowingRequest::findOrFail($id);
+        $borrowing->update(['status' => 'rejected']);
+
+        $this->loadBorrowings();
+        session()->flash('message', 'Peminjaman #BR-' . str_pad($borrowing->id, 4, '0', STR_PAD_LEFT) . ' telah ditolak.');
     }
 }

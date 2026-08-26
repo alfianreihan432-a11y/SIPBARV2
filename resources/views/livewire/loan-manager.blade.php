@@ -39,8 +39,12 @@ table.lmt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
 .lm-act-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
 .btn-approve{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.2)}
 .btn-approve:hover{background:#10b981;color:#fff}
+.btn-borrowed{background:rgba(234,179,8,.12);color:#eab308;border:1px solid rgba(234,179,8,.2)}
+.btn-borrowed:hover{background:#eab308;color:#fff}
 .btn-return{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
 .btn-return:hover{background:var(--blue);color:#fff}
+.btn-reject{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.btn-reject:hover{background:#f87171;color:#fff}
 .lm-empty{padding:56px;text-align:center;color:var(--text-muted)}
 .lm-alert{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:11px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#10b981;font-size:13px;font-weight:600;margin-bottom:16px;animation:lmIn .3s ease}
 @keyframes lmIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
@@ -133,16 +137,18 @@ table.lmt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                 @endphp
                 @foreach($borrowings as $b)
                 @php
-                    $dueDate   = $b->due_at ? \Carbon\Carbon::parse($b->due_at) : null;
-                    $dueClass  = 'ok';
-                    $dueText   = $dueDate ? $dueDate->format('d M Y') : '—';
+                    $nomorPinjam = 'BR-' . str_pad($b->id, 4, '0', STR_PAD_LEFT);
+                    $dueDate  = $b->return_date ? \Carbon\Carbon::parse($b->return_date) : null;
+                    $dueClass = 'ok';
+                    $dueText  = $dueDate ? $dueDate->format('d M Y') : '—';
                     if ($dueDate) {
                         if ($dueDate->isPast() && $b->status !== 'returned') $dueClass = 'over';
                         elseif ($dueDate->diffInDays(now()) <= 2 && $b->status !== 'returned') $dueClass = 'warn';
                     }
+                    $borrowedAt = $b->borrowed_at ?? $b->borrow_date;
                 @endphp
                 <tr wire:key="b-{{ $b->id }}">
-                    <td><span class="lmt-num">{{ $b->number }}</span></td>
+                    <td><span class="lmt-num">{{ $nomorPinjam }}</span></td>
                     <td>
                         <div class="lmt-student">
                             <div class="lmt-avatar">{{ strtoupper(substr($b->user?->name??'?',0,2)) }}</div>
@@ -153,17 +159,16 @@ table.lmt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                         </div>
                     </td>
                     <td>
-                        @foreach($b->details as $d)
-                        <div class="lmt-item">{{ $d->item?->name ?? '—' }}</div>
-                        @endforeach
+                        <div class="lmt-item">{{ $b->item?->name ?? '—' }}</div>
+                        @if($b->purpose)
+                        <div style="font-size:11px;color:var(--text-subtle);margin-top:2px">{{ Str::limit($b->purpose, 40) }}</div>
+                        @endif
                     </td>
                     <td>
-                        @foreach($b->details as $d)
-                        <span class="lmt-qty">{{ $d->quantity }}</span>
-                        @endforeach
+                        <span class="lmt-qty">{{ $b->quantity ?? 1 }}</span>
                     </td>
                     <td>
-                        <div class="lmt-date">{{ $b->borrowed_at ? \Carbon\Carbon::parse($b->borrowed_at)->format('d M Y') : '—' }}</div>
+                        <div class="lmt-date">{{ $borrowedAt ? \Carbon\Carbon::parse($borrowedAt)->format('d M Y') : '—' }}</div>
                     </td>
                     <td><div class="lmt-due {{ $dueClass }}">{{ $dueText }}</div></td>
                     <td>
@@ -179,8 +184,18 @@ table.lmt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                 Setujui
                             </button>
+                            <button wire:click="reject({{ $b->id }})" class="lm-act-btn btn-reject">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                Tolak
+                            </button>
                             @endif
-                            @if(in_array($b->status, ['approved','borrowed']))
+                            @if($b->status === 'approved')
+                            <button wire:click="markBorrowed({{ $b->id }})" class="lm-act-btn btn-borrowed">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4"/></svg>
+                                Dipinjam
+                            </button>
+                            @endif
+                            @if(in_array($b->status, ['borrowed','overdue']))
                             <button wire:click="markReturned({{ $b->id }})" class="lm-act-btn btn-return">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
                                 Kembalikan
