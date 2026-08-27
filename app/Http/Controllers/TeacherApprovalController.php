@@ -50,8 +50,7 @@ class TeacherApprovalController extends Controller
             // Approve via service
             $this->approvalService->approve($borrowingRequest, Auth::id());
             
-            return back()->with('success', 'Permintaan peminjaman berhasil disetujui. QR Code telah dikirim ke siswa via WhatsApp.');
-            
+return back()->with('success', 'Permintaan peminjaman berhasil disetujui. QR Code sudah tersedia untuk siswa.');            
         } catch (\App\Exceptions\InsufficientStockException $e) {
             return back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
