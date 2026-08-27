@@ -12,8 +12,9 @@ class BorrowingApprovalService
 {
     public function __construct(
         private QRCodeService $qrCodeService,
-        private WhatsAppNotificationService $whatsAppService,
-        private BorrowingStateMachine $stateMachine
+        private WhatsAppNotificationService $whatsAppService, // Kept for easy re-activation
+        private BorrowingStateMachine $stateMachine,
+        private EmailNotificationService $emailService
     ) {}
     
     /**
@@ -37,14 +38,20 @@ class BorrowingApprovalService
             
             // 3. Generate QR code
             $qrCode = $this->qrCodeService->generateForRequest($request);
-            
-            // 4. Send WhatsApp notification (non-blocking - errors only logged)
+
+            // 4. Send notification (non-blocking - errors only logged)
             try {
                 $qrBase64 = $this->qrCodeService->getImageBase64($qrCode);
-                $this->whatsAppService->notifyApproved($request, $qrBase64);
+
+                // -- WhatsApp (dinonaktifkan sementara karena bot diblokir) --
+                // $this->whatsAppService->notifyApproved($request, $qrBase64);
+
+                // -- Email (aktif) --
+                $this->emailService->notifyApproved($request, $qrBase64);
+
             } catch (\Exception $e) {
                 // Log but don't fail transaction
-                Log::error('WhatsApp notification failed during approval', [
+                Log::error('Email notification failed during approval', [
                     'request_id' => $request->id,
                     'error' => $e->getMessage(),
                     'trace' => $e->getTraceAsString(),
@@ -71,11 +78,16 @@ class BorrowingApprovalService
                 $teacherId
             );
             
-            // 3. Send WhatsApp notification (non-blocking)
+            // 3. Send notification (non-blocking)
             try {
-                $this->whatsAppService->notifyRejected($request);
+                // -- WhatsApp (dinonaktifkan sementara karena bot diblokir) --
+                // $this->whatsAppService->notifyRejected($request);
+
+                // -- Email (aktif) --
+                $this->emailService->notifyRejected($request);
+
             } catch (\Exception $e) {
-                Log::error('WhatsApp notification failed during rejection', [
+                Log::error('Email notification failed during rejection', [
                     'request_id' => $request->id,
                     'error' => $e->getMessage(),
                 ]);

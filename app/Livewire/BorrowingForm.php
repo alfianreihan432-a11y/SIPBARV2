@@ -6,6 +6,7 @@ use App\Models\BorrowingRequest;
 use App\Models\Item;
 use App\Models\User;
 use App\Models\QRCode;
+use App\Services\EmailNotificationService;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Auth;
@@ -62,27 +63,39 @@ class BorrowingForm extends Component
             'status' => 'pending',
         ]);
 
-        // Send WhatsApp notification to teacher
-        $this->sendWhatsAppNotification($request);
+        // Send email notification to teacher
+        $this->sendEmailNotification($request);
 
         session()->flash('success', 'Pengajuan peminjaman berhasil dikirim. Menunggu persetujuan guru.');
         
         return redirect()->route('student.dashboard');
     }
 
-    protected function sendWhatsAppNotification($request)
+    protected function sendEmailNotification(BorrowingRequest $request): void
     {
         try {
-            $whatsappService = app(\App\Services\WhatsAppNotificationService::class);
-            $whatsappService->notifyNewRequest($request);
+            app(EmailNotificationService::class)->notifyNewRequest($request);
         } catch (\Exception $e) {
-            // Log error but don't stop the process
-            \Log::error('WhatsApp notification failed for new request', [
+            \Log::error('Email notification failed for new request', [
                 'borrowing_request_id' => $request->id,
                 'error' => $e->getMessage()
             ]);
         }
     }
+
+    // Metode lama WhatsApp — dinonaktifkan sementara (bot diblokir)
+    // protected function sendWhatsAppNotification($request)
+    // {
+    //     try {
+    //         $whatsappService = app(\App\Services\WhatsAppNotificationService::class);
+    //         $whatsappService->notifyNewRequest($request);
+    //     } catch (\Exception $e) {
+    //         \Log::error('WhatsApp notification failed for new request', [
+    //             'borrowing_request_id' => $request->id,
+    //             'error' => $e->getMessage()
+    //         ]);
+    //     }
+    // }
 
     public function render()
     {
