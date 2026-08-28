@@ -33,6 +33,10 @@
 
 /* Form Grid */
 .cm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 640px) {
+    .cm-grid { grid-template-columns: 1fr; }
+    .cm-form-card { padding: 18px 16px; }
+}
 .cm-field { display: flex; flex-direction: column; gap: 6px; }
 .cm-field.full { grid-column: 1 / -1; }
 .cm-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: .05em; text-transform: uppercase; }
@@ -64,7 +68,7 @@
 .cm-error { font-size: 11px; color: #f87171; margin-top: 2px; }
 
 /* Buttons */
-.cm-actions { display: flex; align-items: center; gap: 10px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border-subtle); }
+.cm-actions { display: flex; align-items: center; gap: 10px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border-subtle); flex-wrap: wrap; }
 .cm-btn {
     display: inline-flex; align-items: center; gap: 7px;
     padding: 9px 20px; border-radius: 10px; font-size: 13px; font-weight: 700;
@@ -84,12 +88,15 @@
 .cm-table-card {
     background: var(--bg-card);
     border: 1px solid var(--border-alt);
-    border-radius: 18px; overflow: hidden;
+    border-radius: 18px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     box-shadow: var(--card-shadow);
 }
 .cm-table-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 16px 22px; border-bottom: 1px solid var(--border-subtle);
+    flex-wrap: wrap; gap: 10px;
 }
 .cm-table-title { font-size: 16px; font-weight: 800; color: var(--text-primary); }
 .cm-count { font-size: 11px; background: rgba(37,99,235,.12); color: var(--blue); border: 1px solid rgba(37,99,235,.2); padding: 3px 10px; border-radius: 999px; font-weight: 700; }

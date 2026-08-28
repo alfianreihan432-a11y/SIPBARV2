@@ -102,24 +102,28 @@
         .sidebar-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 20px 20px 16px;
+            gap: 14px;
+            padding: 20px 18px 16px;
             border-bottom: 1px solid var(--border-main);
             text-decoration: none;
             color: var(--text-primary);
         }
-        .brand-icon {
-            width: 34px;
-            height: 34px;
-            background: var(--blue-dark);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+        .sidebar-logo-wrap {
+            width: 46px; height: 46px; border-radius: 50%;
+            background: rgba(255,255,255,.92);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; overflow: hidden; padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.35), 0 0 0 1.5px rgba(255,255,255,.12);
+            transition: transform .2s ease, box-shadow .2s ease;
         }
-        .brand-name { font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
-        .brand-sub { font-size: 10px; color: var(--text-muted); line-height: 1.2; }
+        html.light .sidebar-logo-wrap {
+            background: rgba(255,255,255,.98);
+            box-shadow: 0 2px 8px rgba(0,0,0,.12), 0 0 0 1.5px rgba(0,0,0,.07);
+        }
+        .sidebar-brand:hover .sidebar-logo-wrap { transform: scale(1.05); box-shadow: 0 4px 14px rgba(0,0,0,.4); }
+        .sidebar-brand-img { width: 100%; height: 100%; object-fit: contain; }
+        .brand-name { font-size: 16px; font-weight: 800; color: var(--text-primary); line-height: 1.15; }
+        .brand-sub { font-size: 10px; font-weight: 700; color: var(--text-muted); line-height: 1.2; letter-spacing: .08em; text-transform: uppercase; }
         .sidebar-search {
             margin: 14px 14px 8px;
             display: flex; align-items: center; gap: 8px;
@@ -311,17 +315,64 @@
         .panel-text { color: var(--text-muted); line-height: 1.7; font-size: 13px; }
         .action-link { display: inline-flex; align-items: center; gap: 8px; color: var(--blue); font-weight: 700; text-decoration: none; margin-top: 16px; font-size: 13px; }
 
+        /* ── Universal Table Responsive Helper ── */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ── Hamburger & Mobile Overlay ── */
+        .admin-hamburger-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            min-height: 44px;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-alt);
+            color: var(--text-primary);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all .15s;
+        }
+        .admin-hamburger-btn:hover { background: var(--bg-hover); }
+
+        .sidebar-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,.55);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            z-index: 45; display: none; opacity: 0;
+            transition: opacity .25s ease;
+        }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+
         @media(max-width: 960px) {
             .sidebar { 
                 position: fixed; 
+                left: 0; top: 0;
                 transform: translateX(-100%);
                 width: 220px;
+                z-index: 50;
+                box-shadow: 4px 0 30px rgba(0,0,0,.35);
+                transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
             }
             .sidebar.open { transform: translateX(0); }
             .sidebar.collapsed { width: 220px; }
             .main { margin-left: 0; }
             .main.expanded { margin-left: 0; }
-            .topbar { padding: 0 18px; }
+            .admin-hamburger-btn { display: flex !important; }
+            .topbar { padding: 0 16px; gap: 8px; }
+            .content { padding: 16px 14px; }
+        }
+
+        @media(max-width: 480px) {
+            .breadcrumb { display: none; }
+            .topbar-right { gap: 6px; }
+            .topbar-icon-btn { width: 38px; height: 38px; }
+            .content { padding: 14px 12px; }
         }
 
         /* ══════════════════════════════════════════════════════════════
@@ -435,16 +486,15 @@
     </style>
 </head>
 <body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <aside class="sidebar" id="sidebar">
         <a href="{{ route('dashboard') }}" class="sidebar-brand">
-            <div class="brand-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 42" style="width:18px;height:18px;fill:#fff">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M17.2 5.633 8.6.855 0 5.633v26.51l16.2 9 16.2-9v-8.442l7.6-4.223V9.856l-8.6-4.777-8.6 4.777V18.3l-5.6 3.111V5.633Z"/>
-                </svg>
+            <div class="sidebar-logo-wrap">
+                <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
             </div>
             <div>
                 <div class="brand-name">SIPBAR</div>
-                <div class="brand-sub">Sistem Inventaris</div>
+                <div class="brand-sub">SMKN 1 BANGSRI</div>
             </div>
         </a>
 
@@ -547,8 +597,8 @@
 
     <div class="main">
         <div class="topbar">
-            <button class="topbar-icon-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none" id="hamburgerBtn">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <button type="button" class="admin-hamburger-btn" id="hamburgerBtn" title="Buka Menu" aria-label="Toggle Menu">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
             <div class="breadcrumb">
                 <span>Home</span>
@@ -585,29 +635,44 @@
         @livewireScripts
     @endif
     <script>
-        // Responsive hamburger
-        function checkWidth() {
-            const btn = document.getElementById('hamburgerBtn');
-            if (window.innerWidth <= 960) {
-                btn.style.display = 'flex';
-            } else {
-                btn.style.display = 'none';
-                document.getElementById('sidebar').classList.remove('open');
-            }
-        }
-        checkWidth();
-        window.addEventListener('resize', checkWidth);
+        // Responsive sidebar drawer toggle
+        (function(){
+            var hamburger = document.getElementById('hamburgerBtn');
+            var sidebar   = document.getElementById('sidebar');
+            var overlay   = document.getElementById('sidebarOverlay');
 
-        // Close sidebar on outside click (mobile)
-        document.addEventListener('click', function(e) {
-            const sidebar = document.getElementById('sidebar');
-            const btn = document.getElementById('hamburgerBtn');
-            if (window.innerWidth <= 960 && sidebar.classList.contains('open')) {
-                if (!sidebar.contains(e.target) && !btn.contains(e.target)) {
-                    sidebar.classList.remove('open');
-                }
+            function toggleSidebar(e) {
+                if (e) e.stopPropagation();
+                if (sidebar) sidebar.classList.toggle('open');
+                if (overlay) overlay.classList.toggle('active');
             }
-        });
+
+            function closeSidebar() {
+                if (sidebar) sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('active');
+            }
+
+            if (hamburger) hamburger.addEventListener('click', toggleSidebar);
+            if (overlay)   overlay.addEventListener('click', closeSidebar);
+
+            // Close on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
+                    closeSidebar();
+                }
+            });
+
+            // Auto-close when clicking links inside sidebar on mobile
+            if (sidebar) {
+                sidebar.querySelectorAll('a.nav-item, a.sidebar-cta-btn').forEach(function(link){
+                    link.addEventListener('click', function(){
+                        if (window.innerWidth <= 960) {
+                            closeSidebar();
+                        }
+                    });
+                });
+            }
+        })();
 
         // ── THEME TOGGLE ──
         (function(){

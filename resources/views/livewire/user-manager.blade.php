@@ -46,7 +46,7 @@
 .um-btn-secondary:hover{background:var(--bg-hover);color:var(--text-primary)}
 .um-edit-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#f59e0b;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;margin-left:auto}
 /* ── TABLE ── */
-.um-table-card{background:var(--bg-card);border:1px solid var(--border-alt);border-radius:18px;overflow:hidden;box-shadow:var(--card-shadow)}
+.um-table-card{background:var(--bg-card);border:1px solid var(--border-alt);border-radius:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;box-shadow:var(--card-shadow)}
 .um-table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border-subtle);flex-wrap:wrap;gap:10px}
 .um-table-title{font-size:15px;font-weight:800;color:var(--text-primary)}
 .um-count{font-size:11px;background:rgba(29,78,216,.14);color:var(--blue);border:1px solid rgba(29,78,216,.2);padding:3px 10px;border-radius:999px;font-weight:700}
@@ -54,7 +54,7 @@
 .um-search-wrap input{background:none;border:none;outline:none;font-size:13px;color:var(--text-primary);width:200px}
 .um-search-wrap input::placeholder{color:var(--text-subtle)}
 table.umt{width:100%;border-collapse:collapse}
-table.umt thead th{padding:11px 18px;font-size:10px;font-weight:700;color:var(--text-subtle);letter-spacing:.08em;text-transform:uppercase;background:var(--table-head-bg);text-align:left;border-bottom:1px solid var(--border-subtle)}
+table.umt thead th{padding:11px 18px;font-size:10px;font-weight:700;color:var(--text-subtle);letter-spacing:.08em;text-transform:uppercase;background:var(--table-head-bg);text-align:left;border-bottom:1px solid var(--border-subtle);white-space:nowrap}
 table.umt tbody tr{border-bottom:1px solid var(--border-subtle);transition:background .15s}
 table.umt tbody tr:last-child{border-bottom:none}
 table.umt tbody tr:hover{background:var(--table-hover)}
@@ -73,7 +73,15 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
 .umt-btn-del{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.15)}
 .umt-btn-del:hover{background:#ef4444;color:#fff;border-color:#ef4444}
 .um-empty{padding:56px;text-align:center;color:var(--text-muted);font-size:13px}
-@media(max-width:800px){.um-grid-2,.um-grid-3{grid-template-columns:1fr}.um-tabs{width:100%}.um-tab{flex:1;justify-content:center}}
+@media(max-width:800px){
+    .um-grid-2,.um-grid-3{grid-template-columns:1fr}
+    .um-tabs{width:100%}
+    .um-tab{flex:1;justify-content:center;padding:8px 12px;font-size:12px}
+    .um-card-body{padding:16px 14px}
+    .um-actions{padding:14px 16px;flex-wrap:wrap}
+    .um-search-wrap{width:100%}
+    .um-search-wrap input{width:100%}
+}
 </style>
 
 <div class="um">

@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SIPBAR – Sistem Informasi Pengelolaan Barang</title>
-{{-- Anti-flash: apply theme class BEFORE any CSS renders --}}
+
 <script>
   (function(){
     var t = localStorage.getItem('sipbar-theme');
@@ -13,7 +13,7 @@
     if(t === 'dark' || (!t && d)) document.documentElement.classList.add('dark');
   })();
 </script>
-@vite(['resources/css/app.css','resources/js/app.js'])
+<?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css','resources/js/app.js']); ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -871,12 +871,12 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
 </head>
 <body>
 
-{{-- ═══════════════ NAVBAR ═══════════════ --}}
+
 <header class="site-header">
 <nav class="nav">
   <div class="nav-inner">
-    {{-- Brand Logo & Text --}}
-    <a href="{{ route('home') }}" class="nav-brand" aria-label="SIPBAR Homepage">
+    
+    <a href="<?php echo e(route('home')); ?>" class="nav-brand" aria-label="SIPBAR Homepage">
       <div class="nav-logo-wrap">
         <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="nav-brand-img">
       </div>
@@ -886,7 +886,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
       </div>
     </a>
 
-    {{-- Center Navigation Links --}}
+    
     <div class="nav-links">
       <a href="#beranda" class="active">Beranda</a>
       <a href="#fitur">Fitur</a>
@@ -895,36 +895,36 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
       <a href="#kontak">Bantuan</a>
     </div>
 
-    {{-- Right Actions: Desktop Theme Toggle & Login CTA --}}
+    
     <div class="nav-actions">
-      {{-- Dark Mode Toggle Button (Desktop) --}}
+      
       <button type="button" class="theme-toggle theme-toggle-btn" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
-        {{-- Sun icon (visible in dark mode) --}}
+        
         <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/>
         </svg>
-        {{-- Moon icon (visible in light mode) --}}
+        
         <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
         </svg>
       </button>
 
-      @auth
-        <a href="{{ route('dashboard') }}" class="btn-nav-cta">
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+        <a href="<?php echo e(route('dashboard')); ?>" class="btn-nav-cta">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
           <span>Dashboard</span>
         </a>
-      @else
-        <a href="{{ route('login') }}" class="btn-nav-cta">
+      <?php else: ?>
+        <a href="<?php echo e(route('login')); ?>" class="btn-nav-cta">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
           <span>Masuk</span>
         </a>
-      @endauth
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </div>
 
-    {{-- Mobile Controls: Theme Toggle & Hamburger Button --}}
+    
     <div class="nav-mobile-ctrls">
-      {{-- Dark Mode Toggle Button (Mobile Topbar) --}}
+      
       <button type="button" class="theme-toggle theme-toggle-btn" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
         <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/>
@@ -934,7 +934,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
         </svg>
       </button>
 
-      {{-- Mobile Hamburger Button --}}
+      
       <button type="button" class="nav-ham" id="navHamBtn" aria-label="Buka Menu Navigasi" aria-expanded="false" title="Menu Navigasi">
         <span class="ham-line"></span>
         <span class="ham-line"></span>
@@ -943,7 +943,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
     </div>
   </div>
 
-  {{-- Mobile Nav Drawer --}}
+  
   <div id="navMob" class="nav-mobile">
     <div class="nav-mobile-links">
       <a href="#beranda" onclick="closeNavMob()">
@@ -970,7 +970,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
 
     <div class="nav-mob-divider"></div>
 
-    {{-- Mobile Drawer Theme Switcher Row --}}
+    
     <div class="nav-mob-theme-row">
       <div class="nav-mob-theme-info">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
@@ -989,23 +989,23 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
     </div>
 
     <div class="nav-mobile-footer">
-      @auth
-        <a href="{{ route('dashboard') }}" class="nav-mob-login">
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+        <a href="<?php echo e(route('dashboard')); ?>" class="nav-mob-login">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
           <span>Masuk Dashboard</span>
         </a>
-      @else
-        <a href="{{ route('login') }}" class="nav-mob-login">
+      <?php else: ?>
+        <a href="<?php echo e(route('login')); ?>" class="nav-mob-login">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
           <span>Masuk ke SIPBAR</span>
         </a>
-      @endauth
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </div>
   </div>
 </nav>
 </header>
 
-{{-- ═══════════════ HERO ═══════════════ --}}
+
 <section class="hero" id="beranda">
   <div class="hero-inner">
     <div>
@@ -1016,7 +1016,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
   </div>
 </section>
 
-{{-- ═══════════════ FITUR UNGGULAN ═══════════════ --}}
+
 <section class="section feat-bg" id="fitur">
   <div class="section-inner">
     <div class="section-head">
@@ -1026,12 +1026,12 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
     </div>
 
     <div class="feat-bento">
-      {{-- HERO BENTO CARD: Peminjaman & Validasi QR --}}
-      @auth
-      <a href="{{ route('loans.index') }}" class="feat-bento-card feat-card-hero">
-      @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-hero">
-      @endauth
+      
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+      <a href="<?php echo e(route('loans.index')); ?>" class="feat-bento-card feat-card-hero">
+      <?php else: ?>
+      <a href="<?php echo e(route('login')); ?>" class="feat-bento-card feat-card-hero">
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         <div>
           <div class="feat-top-meta">
             <span class="feat-index">01 / WORKFLOW UTAMA</span>
@@ -1040,7 +1040,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
           <div class="feat-title">Sirkulasi Peminjaman Digital & Validasi QR Code</div>
           <p class="feat-summary">Siswa dapat mengajukan peminjaman secara mandiri melalui web. Guru pembimbing memberikan persetujuan seketika lewat tautan resmi, dan pengambilan barang divalidasi dengan pemindaian QR Code di ruang sarpras tanpa formulir kertas.</p>
           
-          {{-- Mini interactive workflow preview --}}
+          
           <div class="feat-workflow-flow">
             <div class="feat-flow-step">
               <span class="feat-flow-dot">1</span>
@@ -1064,12 +1064,12 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
         </div>
       </a>
 
-      {{-- BENTO CARD 2: Manajemen Stok & Aset --}}
-      @auth
-      <a href="{{ route('inventory.index') }}" class="feat-bento-card feat-card-side">
-      @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-side">
-      @endauth
+      
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+      <a href="<?php echo e(route('inventory.index')); ?>" class="feat-bento-card feat-card-side">
+      <?php else: ?>
+      <a href="<?php echo e(route('login')); ?>" class="feat-bento-card feat-card-side">
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         <div>
           <div class="feat-top-meta">
             <span class="feat-index">02</span>
@@ -1086,12 +1086,12 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
         </div>
       </a>
 
-      {{-- BENTO CARD 3: Pengembalian & Kondisi --}}
-      @auth
-      <a href="{{ route('returns.index') }}" class="feat-bento-card feat-card-sub">
-      @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-sub">
-      @endauth
+      
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+      <a href="<?php echo e(route('returns.index')); ?>" class="feat-bento-card feat-card-sub">
+      <?php else: ?>
+      <a href="<?php echo e(route('login')); ?>" class="feat-bento-card feat-card-sub">
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         <div>
           <div class="feat-top-meta">
             <span class="feat-index">03</span>
@@ -1108,12 +1108,12 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
         </div>
       </a>
 
-      {{-- BENTO CARD 4: Laporan & Audit --}}
-      @auth
-      <a href="{{ route('reports.index') }}" class="feat-bento-card feat-card-sub">
-      @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-sub">
-      @endauth
+      
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+      <a href="<?php echo e(route('reports.index')); ?>" class="feat-bento-card feat-card-sub">
+      <?php else: ?>
+      <a href="<?php echo e(route('login')); ?>" class="feat-bento-card feat-card-sub">
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         <div>
           <div class="feat-top-meta">
             <span class="feat-index">04</span>
@@ -1130,12 +1130,12 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
         </div>
       </a>
 
-      {{-- BENTO CARD 5: Manajemen Pengguna RBAC --}}
-      @auth
-      <a href="{{ route('users.index') }}" class="feat-bento-card feat-card-sub">
-      @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-sub">
-      @endauth
+      
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+      <a href="<?php echo e(route('users.index')); ?>" class="feat-bento-card feat-card-sub">
+      <?php else: ?>
+      <a href="<?php echo e(route('login')); ?>" class="feat-bento-card feat-card-sub">
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         <div>
           <div class="feat-top-meta">
             <span class="feat-index">05</span>
@@ -1155,8 +1155,8 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
   </div>
 </section>
 
-{{-- ═══════════════ DATA INVENTARIS STATS ═══════════════ --}}
-@php
+
+<?php
 use Illuminate\Support\Facades\Cache;
 use App\Models\Item;
 use App\Models\Category;
@@ -1202,7 +1202,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
         'completion_rate' => $completionRate,
     ];
 });
-@endphp
+?>
 
 <section class="section stats-bg" id="data-inventaris">
   <div class="stats-inner">
@@ -1213,20 +1213,20 @@ $stats = Cache::remember('homepage_stats', 900, function () {
       </div>
       <h2 class="stats-h2">Inventaris Sekolah<br><em>dalam Real-Time Data</em></h2>
       <p class="stats-p">Kelola dan pantau seluruh aset fisik sekolah secara terintegrasi, transparan, dan dapat diakses dari mana saja dengan sistem inventaris modern.</p>
-      @auth
-      <a href="{{ route('inventory.index') }}" class="stats-cta-btn">
+      <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->guard()->check()): ?>
+      <a href="<?php echo e(route('inventory.index')); ?>" class="stats-cta-btn">
         <span>Jelajahi Data Inventaris</span>
         <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
       </a>
-      @else
-      <a href="{{ route('login') }}" class="stats-cta-btn">
+      <?php else: ?>
+      <a href="<?php echo e(route('login')); ?>" class="stats-cta-btn">
         <span>Jelajahi Data Inventaris</span>
         <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
       </a>
-      @endauth
+      <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
     </div>
     <div class="stats-grid">
-      {{-- Total Items --}}
+      
       <div class="stat-block">
         <div class="stat-header">
           <div class="stat-icon-b" style="background:#1d4ed8">
@@ -1234,12 +1234,12 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           </div>
           <span class="stat-trend" style="background:#dbeafe;color:#1e40af">Real-time</span>
         </div>
-        <div class="stat-num-b">{{ number_format($stats['total_items'], 0, ',', '.') }}</div>
+        <div class="stat-num-b"><?php echo e(number_format($stats['total_items'], 0, ',', '.')); ?></div>
         <div class="stat-lbl-b">Total Barang Terdata</div>
         <div class="stat-sub-b">Terintegrasi seluruh unit</div>
       </div>
 
-      {{-- Total Categories --}}
+      
       <div class="stat-block">
         <div class="stat-header">
           <div class="stat-icon-b" style="background:#0891b2">
@@ -1247,12 +1247,12 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           </div>
           <span class="stat-trend" style="background:#e0f2fe;color:#0369a1">Terstruktur</span>
         </div>
-        <div class="stat-num-b">{{ number_format($stats['total_categories'], 0, ',', '.') }}</div>
+        <div class="stat-num-b"><?php echo e(number_format($stats['total_categories'], 0, ',', '.')); ?></div>
         <div class="stat-lbl-b">Kategori Aset</div>
-        <div class="stat-sub-b">{{ $stats['top_category'] }} terbanyak</div>
+        <div class="stat-sub-b"><?php echo e($stats['top_category']); ?> terbanyak</div>
       </div>
 
-      {{-- Total Users --}}
+      
       <div class="stat-block">
         <div class="stat-header">
           <div class="stat-icon-b" style="background:#7c3aed">
@@ -1260,20 +1260,20 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           </div>
           <span class="stat-trend" style="background:#f3e8ff;color:#6b21a8">Tersinkron</span>
         </div>
-        <div class="stat-num-b">{{ number_format($stats['total_users'], 0, ',', '.') }}</div>
+        <div class="stat-num-b"><?php echo e(number_format($stats['total_users'], 0, ',', '.')); ?></div>
         <div class="stat-lbl-b">Pengguna Aktif</div>
-        <div class="stat-sub-b">{{ $stats['user_breakdown'] }}</div>
+        <div class="stat-sub-b"><?php echo e($stats['user_breakdown']); ?></div>
       </div>
 
-      {{-- Total Borrowings --}}
+      
       <div class="stat-block">
         <div class="stat-header">
           <div class="stat-icon-b" style="background:#059669">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#ffffff" fill="none" viewBox="0 0 24 24" stroke="#ffffff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
           </div>
-          <span class="stat-trend" style="background:#d1fae5;color:#065f46">{{ $stats['completion_rate'] }}% Selesai</span>
+          <span class="stat-trend" style="background:#d1fae5;color:#065f46"><?php echo e($stats['completion_rate']); ?>% Selesai</span>
         </div>
-        <div class="stat-num-b">{{ number_format($stats['total_borrowings'], 0, ',', '.') }}</div>
+        <div class="stat-num-b"><?php echo e(number_format($stats['total_borrowings'], 0, ',', '.')); ?></div>
         <div class="stat-lbl-b">Sirkulasi Peminjaman</div>
         <div class="stat-sub-b">Proses approval cepat</div>
       </div>
@@ -1281,11 +1281,11 @@ $stats = Cache::remember('homepage_stats', 900, function () {
   </div>
 </section>
 
-{{-- ═══════════════ TENTANG KAMI ═══════════════ --}}
+
 <section class="section" id="tentang">
   <div class="section-inner">
     <div class="about-grid-modern">
-      {{-- Left column: Intro & Structured Value Pillars --}}
+      
       <div class="about-content">
         <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>Tentang Platform SIPBAR</div>
         <h2 class="section-h2" style="text-align:left;max-width:none">Membangun Ekosistem Sarpras <em>Tertib & Akuntabel</em></h2>
@@ -1318,7 +1318,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
         </div>
       </div>
 
-      {{-- Right column: Interactive UI Showcase & Quote --}}
+      
       <div class="about-showcase">
         <div class="showcase-glass-card">
           <div class="showcase-header">
@@ -1330,7 +1330,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
             <span class="showcase-tag">Sistem Verifikasi Sarpras</span>
           </div>
 
-          {{-- Sample Borrowing Ticket Mockup --}}
+          
           <div class="showcase-ticket">
             <div class="showcase-ticket-top">
               <span class="showcase-ticket-id">TIKET #TRX-2026-089</span>
@@ -1343,7 +1343,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
             <div class="showcase-item-sub">Peminjam: Moch. Alfian Reihan (XII RPL 1) • Lokasi: Lab RPL 2</div>
           </div>
 
-          {{-- QR Code Verification row --}}
+          
           <div class="showcase-qr-row">
             <div class="showcase-qr-box">
               <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
@@ -1354,7 +1354,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
             </div>
           </div>
 
-          {{-- Elegant Quote Card --}}
+          
           <div class="quote-elegant">
             <div class="quote-mark">“</div>
             <p class="quote-phrase">Digitalisasi yang baik bukan sekadar mengganti kertas, melainkan membangun budaya tanggung jawab dan keterbukaan bersama.</p>
@@ -1366,7 +1366,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
   </div>
 </section>
 
-{{-- ═══════════════ FOOTER ═══════════════ --}}
+
 <footer class="footer" id="kontak">
   <div class="footer-inner">
     <div class="footer-grid">
@@ -1377,26 +1377,26 @@ $stats = Cache::remember('homepage_stats', 900, function () {
         </div>
         <p class="footer-desc">Sistem inventaris berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.</p>
         <div class="social-row">
-          @foreach(['M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z','M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5','M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z'] as $i)
-          <a href="#" class="social-btn"><svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $i }}"/></svg></a>
-          @endforeach
+          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = ['M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z','M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5','M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+          <a href="#" class="social-btn"><svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="<?php echo e($i); ?>"/></svg></a>
+          <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         </div>
       </div>
       <div>
         <div class="footer-heading">Menu</div>
-        <ul class="footer-list">@foreach(['Beranda','Fitur','Tentang'] as $m)<li><a href="#">{{ $m }}</a></li>@endforeach</ul>
+        <ul class="footer-list"><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = ['Beranda','Fitur','Tentang']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?><li><a href="#"><?php echo e($m); ?></a></li><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?></ul>
       </div>
       <div>
         <div class="footer-heading">Fitur</div>
-        <ul class="footer-list">@foreach(['Manajemen Barang','Peminjaman','Pengembalian','Laporan','Pengguna'] as $f)<li><a href="#">{{ $f }}</a></li>@endforeach</ul>
+        <ul class="footer-list"><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = ['Manajemen Barang','Peminjaman','Pengembalian','Laporan','Pengguna']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $f): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?><li><a href="#"><?php echo e($f); ?></a></li><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?></ul>
       </div>
       <div>
         <div class="footer-heading">Bantuan</div>
-        <ul class="footer-list">@foreach(['Panduan Penggunaan','FAQ','Kebijakan Privasi','Syarat & Ketentuan'] as $b)<li><a href="#">{{ $b }}</a></li>@endforeach</ul>
+        <ul class="footer-list"><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = ['Panduan Penggunaan','FAQ','Kebijakan Privasi','Syarat & Ketentuan']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $b): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?><li><a href="#"><?php echo e($b); ?></a></li><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?></ul>
       </div>
     </div>
     <hr class="footer-divider">
-    <p class="footer-copy">&copy; {{ date('Y') }} SIPBAR – Sistem Informasi Pengelolaan Barang. All rights reserved.</p>
+    <p class="footer-copy">&copy; <?php echo e(date('Y')); ?> SIPBAR – Sistem Informasi Pengelolaan Barang. All rights reserved.</p>
   </div>
 </footer>
 <script>
@@ -1505,3 +1505,4 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 </body>
 </html>
+<?php /**PATH C:\Users\Dell\SIPBARV2\resources\views/welcome.blade.php ENDPATH**/ ?>
