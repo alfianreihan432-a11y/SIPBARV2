@@ -142,7 +142,7 @@
         align-items: center;
         gap: 6px;
         background: #f59e0b;
-        color: #0f172a;
+        color: #ffffff;
         font-size: 13px;
         font-weight: 800;
         padding: 10px 18px;

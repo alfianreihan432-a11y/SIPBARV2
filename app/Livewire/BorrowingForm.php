@@ -5,12 +5,8 @@ namespace App\Livewire;
 use App\Models\BorrowingRequest;
 use App\Models\Item;
 use App\Models\User;
-use App\Models\QRCode;
 use App\Services\EmailNotificationService;
-use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 class BorrowingForm extends Component
@@ -20,6 +16,7 @@ class BorrowingForm extends Component
     public $purpose = '';
     public $borrow_date;
     public $return_date;
+    public $return_time;
     public $teacher_id;
     public $notes = '';
 
@@ -28,14 +25,14 @@ class BorrowingForm extends Component
         $this->item = Item::findOrFail($itemId);
         $this->borrow_date = now()->toDateString();
         $this->return_date = now()->addDays(7)->toDateString();
-        
-        // Auto-select teacher if item has assigned teacher
+        $this->return_time = '14:00';
+
         if ($this->item->teacher_id) {
             $this->teacher_id = $this->item->teacher_id;
         }
     }
 
-    public function close(): void
+    public function close()
     {
         $this->dispatch('close-borrow-modal');
     }
@@ -46,10 +43,19 @@ class BorrowingForm extends Component
             'quantity' => 'required|integer|min:1|max:' . $this->item->stock,
             'purpose' => 'required|string|min:5',
             'borrow_date' => 'required|date|after_or_equal:today',
-            'return_date' => 'required|date|after:borrow_date',
+            'return_date' => 'required|date|after_or_equal:borrow_date',
+            'return_time' => 'required|date_format:H:i',
             'teacher_id' => 'required|exists:users,id',
             'notes' => 'nullable|string|max:500',
         ]);
+
+        if ($this->return_date === $this->borrow_date && $this->return_date === now()->toDateString()) {
+            $currentHour = now()->format('H:i');
+            if ($this->return_time <= $currentHour) {
+                $this->addError('return_time', 'Jam kembali harus lebih besar dari waktu saat ini untuk pengembalian di hari yang sama.');
+                return;
+            }
+        }
 
         $request = BorrowingRequest::create([
             'user_id' => Auth::id(),
@@ -59,15 +65,15 @@ class BorrowingForm extends Component
             'purpose' => $this->purpose,
             'borrow_date' => $this->borrow_date,
             'return_date' => $this->return_date,
+            'return_time' => $this->return_time,
             'notes' => $this->notes,
             'status' => 'pending',
         ]);
 
-        // Send email notification to teacher
         $this->sendEmailNotification($request);
 
         session()->flash('success', 'Pengajuan peminjaman berhasil dikirim. Menunggu persetujuan guru.');
-        
+
         return redirect()->route('student.dashboard');
     }
 
@@ -83,24 +89,10 @@ class BorrowingForm extends Component
         }
     }
 
-    // Metode lama WhatsApp — dinonaktifkan sementara (bot diblokir)
-    // protected function sendWhatsAppNotification($request)
-    // {
-    //     try {
-    //         $whatsappService = app(\App\Services\WhatsAppNotificationService::class);
-    //         $whatsappService->notifyNewRequest($request);
-    //     } catch (\Exception $e) {
-    //         \Log::error('WhatsApp notification failed for new request', [
-    //             'borrowing_request_id' => $request->id,
-    //             'error' => $e->getMessage()
-    //         ]);
-    //     }
-    // }
-
     public function render()
     {
         $teachers = User::role('guru')->get();
-        
+
         return view('livewire.borrowing-form', [
             'teachers' => $teachers,
         ]);

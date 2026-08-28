@@ -132,7 +132,7 @@
                                     </svg>
                                     Tgl. Pengembalian
                                 </span>
-                                <span class="ta-field-value">{{ \Carbon\Carbon::parse($request->return_date)->format('d M Y') }}</span>
+                                <span class="ta-field-value">{{ \Carbon\Carbon::parse($request->return_date)->format('d M Y') }} @if($request->return_time) · {{ $request->return_time }}@endif</span>
                             </div>
                             <div class="ta-detail-item">
                                 <span class="ta-field-label">

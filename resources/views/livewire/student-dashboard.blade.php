@@ -9,16 +9,16 @@
         @media (max-width: 640px)  { .db-stat-grid { grid-template-columns: 1fr; } }
 
         .db-stat-card {
-            background: var(--card); border: 1px solid var(--border2);
+            background: #1d4ed8; border: 1px solid #1d4ed8;
             border-radius: 14px; padding: 18px 20px;
             display: flex; align-items: center; gap: 14px;
             transition: border-color .2s, transform .2s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.15);
         }
-        .db-stat-card:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .db-stat-icon-box { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .db-stat-num   { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 3px; }
-        .db-stat-label { font-size: 12px; color: var(--muted); }
+        .db-stat-card:hover { border-color: #2563eb; transform: translateY(-2px); }
+        .db-stat-icon-box { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: rgba(255,255,255,0.2); }
+        .db-stat-num   { font-size: 22px; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 3px; }
+        .db-stat-label { font-size: 12px; color: rgba(255,255,255,0.85); }
         .db-stat-change { font-size: 11px; font-weight: 600; margin-top: 3px; }
 
         .db-panel { background: var(--card); border: 1px solid var(--border2); border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; }
@@ -84,8 +84,8 @@
     {{-- Stat Cards --}}
     <div class="db-stat-grid">
         <div class="db-stat-card">
-            <div class="db-stat-icon-box" style="background:rgba(100,116,139,.12)">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#64748b" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="db-stat-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                 </svg>
             </div>
@@ -96,8 +96,8 @@
         </div>
         
         <div class="db-stat-card">
-            <div class="db-stat-icon-box" style="background:rgba(100,116,139,.12)">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#64748b" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="db-stat-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
@@ -108,8 +108,8 @@
         </div>
         
         <div class="db-stat-card">
-            <div class="db-stat-icon-box" style="background:rgba(100,116,139,.12)">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#64748b" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="db-stat-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
@@ -120,8 +120,8 @@
         </div>
         
         <div class="db-stat-card">
-            <div class="db-stat-icon-box" style="background:rgba(37,99,235,.1)">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#2563eb" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="db-stat-icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                 </svg>
             </div>
@@ -165,7 +165,7 @@
                         {{ $request->created_at->diffForHumans() }}
                     </div>
                     <div style="font-size:11px;color:var(--text-subtle)">
-                        Qty: {{ $request->quantity }} | {{ $request->borrow_date->format('d M Y') }} - {{ $request->return_date->format('d M Y') }}
+                        Qty: {{ $request->quantity }} | {{ $request->borrow_date->format('d M Y') }} - {{ $request->return_date->format('d M Y') }} @if($request->return_time) · {{ $request->return_time }}@endif
                     </div>
                 </div>
                 @if($request->status === 'qr_ready' && $request->qrCode)

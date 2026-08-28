@@ -174,29 +174,40 @@ html.dark .icon-moon{display:none}
 .cat-link{font-size:12px;font-weight:700;color:#1d4ed8;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:gap .15s}
 .cat-link:hover{gap:8px}
 /* ─── FEATURES ─── */
-.feat-bg{background:var(--surface)}
-.feat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
-.feat-card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:24px 20px;text-align:center;transition:all .2s}
-.feat-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(29,78,216,.08);border-color:#1d4ed8}
-.feat-icon-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
-.feat-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;letter-spacing:-.01em}
-.feat-desc{font-size:13px;color:var(--muted);line-height:1.6;font-weight:400}
+.feat-bg{background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);position:relative}
+.feat-bg::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#e2e8f0 50%,transparent)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{background:#ffffff;border:1.5px solid #e5e7eb;border-radius:20px;padding:32px 24px;text-align:left;transition:all .3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;display:block}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--feat-color),var(--feat-color-light));transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
+.feat-card:hover::before{transform:scaleX(1)}
+.feat-card:hover{transform:translateY(-6px);box-shadow:0 12px 32px rgba(0,0,0,.08);border-color:var(--feat-color)}
+.feat-icon-wrap{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;position:relative;background:var(--feat-bg);transition:all .3s ease}
+.feat-card:hover .feat-icon-wrap{transform:scale(1.05);background:var(--feat-color)}
+.feat-icon-wrap svg{transition:all .3s ease}
+.feat-card:hover .feat-icon-wrap svg{color:#ffffff !important;transform:rotate(5deg)}
+.feat-name{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:10px;letter-spacing:-.02em;line-height:1.3;transition:color .3s ease}
+.feat-card:hover .feat-name{color:var(--feat-color)}
+.feat-desc{font-size:14px;color:#64748b;line-height:1.65;font-weight:400;margin-bottom:16px}
+.feat-arrow{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--feat-color);opacity:0;transform:translateX(-10px);transition:all .3s ease}
+.feat-card:hover .feat-arrow{opacity:1;transform:translateX(0)}
+.feat-arrow svg{width:14px;height:14px;transition:transform .3s ease}
+.feat-card:hover .feat-arrow svg{transform:translateX(4px)}
 /* ─── STATS / DATA INVENTARIS ─── */
-.stats-bg{background:#1d4ed8;position:relative;overflow:hidden;padding:70px 24px}
+.stats-bg{background:#ffffff;position:relative;overflow:hidden;padding:70px 24px}
 .stats-bg::before{content:'';position:absolute;top:0;left:0;width:6px;height:100%;background:#f59e0b}
 .stats-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1;display:grid;grid-template-columns:1fr 1.1fr;gap:50px;align-items:center}
-.stats-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#ffffff;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;background:rgba(255,255,255,.15);padding:6px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.2)}
+.stats-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#1d4ed8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;background:rgba(29,78,216,.08);padding:6px 16px;border-radius:999px;border:1px solid rgba(29,78,216,.15)}
 .stats-eyebrow-pulse{width:6px;height:6px;border-radius:50%;background:#f59e0b}
-.stats-h2{font-size:34px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:14px;letter-spacing:-.01em}
+.stats-h2{font-size:34px;font-weight:800;color:#0f172a;line-height:1.2;margin-bottom:14px;letter-spacing:-.01em}
 .stats-h2 em{font-style:normal;color:#f59e0b}
-.stats-p{font-size:16px;color:rgba(255,255,255,.9);line-height:1.65;margin-bottom:24px;font-weight:400}
-.stats-cta-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;background:#ffffff;color:#1d4ed8;font-size:14px;font-weight:700;text-decoration:none;transition:all .2s}
-.stats-cta-btn:hover{transform:translateY(-2px);background:#f8fafc}
+.stats-p{font-size:16px;color:#4b5563;line-height:1.65;margin-bottom:24px;font-weight:400}
+.stats-cta-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;transition:all .2s;box-shadow:0 4px 12px rgba(29,78,216,.25)}
+.stats-cta-btn:hover{transform:translateY(-2px);background:#1e40af;box-shadow:0 6px 16px rgba(29,78,216,.35)}
 .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 
 /* Solid Rectangle Cards */
-.stat-block{background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,.1);transition:all .2s ease;position:relative;overflow:hidden}
-.stat-block:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.15)}
+.stat-block{background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .2s ease;position:relative;overflow:hidden}
+.stat-block:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.08);border-color:#cbd5e1}
 .stat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .stat-icon-b{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .stat-trend{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px}
@@ -250,8 +261,8 @@ html.dark .icon-moon{display:none}
 .footer-divider{border:none;border-top:1px solid #1e293b;margin-bottom:20px}
 .footer-copy{text-align:center;font-size:12px;color:#64748b;font-weight:400}
 /* ─── RESPONSIVE ─── */
-@media(max-width:1024px){.hero-inner,.stats-inner,.about-grid{grid-template-columns:1fr}.hero{padding-bottom:50px}.hero-trust{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(3,1fr)}.feat-grid{grid-template-columns:repeat(3,1fr)}.footer-grid{grid-template-columns:repeat(2,1fr)}.section{padding:60px 24px}}
-@media(max-width:768px){.nav-links,.nav-actions{display:none}.nav-ham{display:block}.hero-h1{font-size:36px}.section-h2{font-size:28px}.stats-h2{font-size:28px}.cat-grid{grid-template-columns:repeat(2,1fr)}.feat-grid{grid-template-columns:repeat(2,1fr)}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1024px){.hero-inner,.stats-inner,.about-grid{grid-template-columns:1fr}.hero{padding-bottom:50px}.hero-trust{grid-template-columns:repeat(2,1fr)}.cat-grid{grid-template-columns:repeat(3,1fr)}.feat-grid{grid-template-columns:repeat(2,1fr)}.footer-grid{grid-template-columns:repeat(2,1fr)}.section{padding:60px 24px}}
+@media(max-width:768px){.nav-links,.nav-actions{display:none}.nav-ham{display:block}.hero-h1{font-size:36px}.section-h2{font-size:28px}.stats-h2{font-size:28px}.cat-grid{grid-template-columns:repeat(2,1fr)}.feat-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.cat-grid,.feat-grid{grid-template-columns:1fr}.hero-h1{font-size:32px}.section-h2{font-size:24px}.stats-h2{font-size:24px}.footer-grid{grid-template-columns:1fr}.section{padding:50px 20px}}
 /* ════════════════════════════════════════
    DARK MODE OVERRIDES — SEMUA ELEMEN
@@ -306,43 +317,47 @@ html.dark .cat-desc { color:#94a3b8 !important }
 html.dark .cat-link { color:#60a5fa !important }
 
 /* ── FITUR ── */
-html.dark .feat-bg { background:#141c2b !important }
+html.dark .feat-bg { background:linear-gradient(180deg,#141c2b 0%,#0f1117 100%) !important }
+html.dark .feat-bg::before { background:linear-gradient(90deg,transparent,#2a3f6f 50%,transparent) !important }
 html.dark .feat-card {
   background:#16203a !important;
-  border-color:#243050 !important;
-  box-shadow:0 2px 12px rgba(0,0,0,.25) !important;
+  border-color:#2a3f6f !important;
+  box-shadow:0 2px 12px rgba(0,0,0,.3) !important;
 }
 html.dark .feat-card:hover {
-  border-color:#60a5fa !important;
-  box-shadow:0 8px 24px rgba(96,165,250,.15) !important;
+  border-color:var(--feat-color) !important;
+  box-shadow:0 12px 32px rgba(0,0,0,.4) !important;
 }
-html.dark .feat-icon-wrap { filter:brightness(0.85) saturate(1.2) }
+html.dark .feat-icon-wrap { background:rgba(59,130,246,.1) !important }
+html.dark .feat-card:hover .feat-icon-wrap { background:var(--feat-color) !important }
 html.dark .feat-name { color:#f0f6ff !important }
+html.dark .feat-card:hover .feat-name { color:var(--feat-color) !important }
 html.dark .feat-desc { color:#94a3b8 !important }
 
 /* ── STATS SECTION ── */
-html.dark .stats-bg { background:#1e40af !important }
+html.dark .stats-bg { background:#141c2b !important }
+html.dark .stats-eyebrow { background:rgba(59,130,246,.15) !important; color:#60a5fa !important; border-color:rgba(59,130,246,.25) !important }
+html.dark .stats-eyebrow-pulse { background:#fb923c !important }
+html.dark .stats-h2 { color:#f0f6ff !important }
+html.dark .stats-h2 em { color:#fb923c !important }
+html.dark .stats-p { color:#94a3b8 !important }
+html.dark .stats-cta-btn { background:#3b82f6 !important; color:#ffffff !important }
+html.dark .stats-cta-btn:hover { background:#60a5fa !important }
 html.dark .stat-block {
-  background:rgba(255,255,255,.09) !important;
-  border-color:rgba(255,255,255,.15) !important;
+  background:#16203a !important;
+  border-color:#2a3f6f !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.3) !important;
 }
 html.dark .stat-block:hover { 
-  background:rgba(255,255,255,.12) !important;
-  box-shadow:0 12px 28px rgba(0,0,0,.3) !important;
+  border-color:#3b82f6 !important;
+  box-shadow:0 8px 20px rgba(59,130,246,.2) !important;
 }
 html.dark .stat-icon-b {
   filter:brightness(1.1) !important;
 }
-html.dark .stat-num-b { color:#fff !important }
-html.dark .stat-lbl-b { color:rgba(255,255,255,.85) !important }
-html.dark .stat-sub-b { color:rgba(255,255,255,.65) !important }
-html.dark .stats-eyebrow { color:#bfdbfe !important; border-color:rgba(255,255,255,.25) !important }
-html.dark .stats-eyebrow-pulse { background:#fb923c !important }
-html.dark .stats-h2 { color:#fff !important }
-html.dark .stats-h2 em { color:#fb923c !important }
-html.dark .stats-p { color:rgba(255,255,255,.85) !important }
-html.dark .stats-cta-btn { background:#f0f9ff !important; color:#1e40af !important }
-html.dark .stats-cta-btn:hover { background:#fff !important }
+html.dark .stat-num-b { color:#f0f6ff !important }
+html.dark .stat-lbl-b { color:#dce9ff !important }
+html.dark .stat-sub-b { color:#94a3b8 !important }
 
 /* ── TENTANG ── */
 html.dark .about-grid > div > p { color:#94a3b8 !important }
@@ -462,24 +477,28 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
     <div class="feat-grid">
       @php
       $feats=[
-        ['Manajemen Barang','Kelola data barang dengan mudah — tambah, ubah, hapus, dan lacak stok secara real-time.','M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4','#eff6ff','#2563eb','inventory'],
-        ['Peminjaman Barang','Catat dan pantau peminjaman barang secara sistematis dengan notifikasi jatuh tempo.','M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4','#ecfdf5','#059669','loans'],
-        ['Pengembalian','Proses pengembalian lebih cepat dengan verifikasi kondisi barang yang terstruktur.','M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6','#fffbeb','#d97706','returns'],
-        ['Laporan & Statistik','Laporan inventaris lengkap dengan grafik dan statistik penggunaan barang.','M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z','#fdf4ff','#9333ea','reports'],
-        ['Manajemen Pengguna','Atur hak akses pengguna (Admin, Guru, Siswa) sesuai peran dan tanggung jawab.','M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z','#fff1f2','#e11d48','users'],
+        ['Manajemen Barang','Kelola data barang dengan mudah — tambah, ubah, hapus, dan lacak stok secara real-time dengan sistem yang intuitif.','M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4','#eff6ff','#2563eb','#3b82f6','inventory'],
+        ['Peminjaman Barang','Catat dan pantau peminjaman barang secara sistematis dengan notifikasi otomatis dan approval cepat.','M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4','#ecfdf5','#059669','#10b981','loans'],
+        ['Pengembalian','Proses pengembalian lebih cepat dengan verifikasi kondisi barang yang terstruktur dan terintegrasi.','M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6','#fffbeb','#d97706','#f59e0b','returns'],
+        ['Laporan & Statistik','Laporan inventaris lengkap dengan visualisasi grafik dan statistik penggunaan barang yang komprehensif.','M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z','#fdf4ff','#9333ea','#a855f7','reports'],
+        ['Manajemen Pengguna','Atur hak akses pengguna berdasarkan role (Admin, Guru, Siswa) dengan kontrol permission yang fleksibel.','M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z','#fff1f2','#e11d48','#f43f5e','users'],
       ];
       @endphp
       @foreach($feats as $f)
       @auth
-      <a href="{{ route($f[5] . '.index') }}" class="feat-card" style="text-decoration:none">
+      <a href="{{ route($f[6] . '.index') }}" class="feat-card" style="--feat-bg:{{ $f[3] }};--feat-color:{{ $f[4] }};--feat-color-light:{{ $f[5] }}">
       @else
-      <a href="{{ route('login') }}" class="feat-card" style="text-decoration:none">
+      <a href="{{ route('login') }}" class="feat-card" style="--feat-bg:{{ $f[3] }};--feat-color:{{ $f[4] }};--feat-color-light:{{ $f[5] }}">
       @endauth
-        <div class="feat-icon-wrap" style="background:{{ $f[3] }}">
-          <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:{{ $f[4] }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $f[2] }}"/></svg>
+        <div class="feat-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" style="width:26px;height:26px;color:{{ $f[4] }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $f[2] }}"/></svg>
         </div>
         <div class="feat-name">{{ $f[0] }}</div>
         <div class="feat-desc">{{ $f[1] }}</div>
+        <span class="feat-arrow">
+          Lihat Detail
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </span>
       </a>
       @endforeach
     </div>
