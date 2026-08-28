@@ -11,7 +11,7 @@
     if(s==='dark'||(s===null&&d)) document.documentElement.classList.add('dark');
 })();
 </script>
-@vite(['resources/css/app.css','resources/js/app.js'])
+<?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css','resources/js/app.js']); ?>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Instrument Sans',ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
@@ -161,9 +161,9 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-{{-- ===== SIDEBAR ===== --}}
+
 <aside class="sidebar" id="sidebar">
-    <a href="{{ route('teacher.dashboard') }}" class="sidebar-brand">
+    <a href="<?php echo e(route('teacher.dashboard')); ?>" class="sidebar-brand">
         <div class="sidebar-logo-wrap">
             <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
         </div>
@@ -173,7 +173,7 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
         </div>
     </a>
     <nav class="sidebar-nav">
-        @php
+        <?php
         $menus = [
             ['Dashboard',        'teacher.dashboard', 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', null],
             ['Permohonan',       'teacher.requests', 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', '5'],
@@ -183,25 +183,26 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
             ['Laporan',          'teacher.reports',  'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', null],
             ['Profil',           'teacher.profile',  'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', null],
         ];
-        @endphp
-        @foreach($menus as $m)
-        <a href="{{ route($m[1]) }}" class="nav-item {{ request()->routeIs($m[1]) ? 'active' : '' }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $m[2] }}"/></svg>
-            {{ $m[0] }}
-            @if($m[3]) <span class="nav-badge">{{ $m[3] }}</span> @endif
+        ?>
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $menus; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+        <a href="<?php echo e(route($m[1])); ?>" class="nav-item <?php echo e(request()->routeIs($m[1]) ? 'active' : ''); ?>">
+            <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo e($m[2]); ?>"/></svg>
+            <?php echo e($m[0]); ?>
+
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($m[3]): ?> <span class="nav-badge"><?php echo e($m[3]); ?></span> <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
         </a>
-        @endforeach
+        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
     </nav>
     <div class="sidebar-footer">
-        <a href="{{ route('teacher.profile') }}" class="user-card">
-            <div class="user-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
+        <a href="<?php echo e(route('teacher.profile')); ?>" class="user-card">
+            <div class="user-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR'); ?></div>
             <div>
-                <div class="user-name">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
+                <div class="user-name"><?php echo e(auth()->check() ? auth()->user()->name : 'Budi Santoso'); ?></div>
                 <div class="user-role">Guru Pembimbing</div>
             </div>
         </a>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
+        <form method="POST" action="<?php echo e(route('logout')); ?>">
+            <?php echo csrf_field(); ?>
             <button type="submit" class="logout-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                 Log Out
@@ -210,9 +211,9 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
     </div>
 </aside>
 
-{{-- ===== MAIN ===== --}}
+
 <div class="main">
-    {{-- TOPBAR --}}
+    
     <div class="topbar">
         <button type="button" id="hamburgerBtn" class="hamburger-btn" title="Buka Menu" aria-label="Toggle Menu" style="display:none;align-items:center;justify-content:center;width:44px;height:44px;min-width:44px;min-height:44px;border-radius:10px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);cursor:pointer;flex-shrink:0;">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -222,7 +223,7 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
             <input type="text" placeholder="Cari siswa atau permohonan...">
         </div>
         <div class="topbar-right">
-            {{-- Theme toggle --}}
+            
             <button class="topbar-icon" id="themeBtn" title="Ganti Mode (Alt+D)">
                 <svg class="t-moon" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                 <svg class="t-sun" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/></svg>
@@ -230,7 +231,7 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
             <div class="topbar-icon" id="mailBtn" title="Pesan" style="cursor:pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </div>
-            {{-- Notification Dropdown Wrap --}}
+            
             <div class="topbar-icon-wrap">
                 <button type="button" class="topbar-icon" id="notifBtn" title="Notifikasi">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -242,14 +243,14 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
                         <span class="ndm-badge">2 Menunggu</span>
                     </div>
                     <div class="ndm-list">
-                        <a href="{{ route('teacher.requests') }}" class="ndm-item">
+                        <a href="<?php echo e(route('teacher.requests')); ?>" class="ndm-item">
                             <div class="ndm-dot"></div>
                             <div>
                                 <div class="ndm-text">Permohonan peminjaman siswa perlu approval</div>
                                 <div class="ndm-time">Baru saja</div>
                             </div>
                         </a>
-                        <a href="{{ route('teacher.loans') }}" class="ndm-item">
+                        <a href="<?php echo e(route('teacher.loans')); ?>" class="ndm-item">
                             <div class="ndm-dot blue"></div>
                             <div>
                                 <div class="ndm-text">Jadwal pengembalian barang aktif hari ini</div>
@@ -259,35 +260,35 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
                     </div>
                 </div>
             </div>
-            {{-- User Profile Dropdown Wrap --}}
+            
             <div class="topbar-user-wrap">
                 <button type="button" id="profileBtn" class="topbar-user">
-                    <div class="topbar-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
-                    <div class="topbar-uname">{{ auth()->check() ? explode(' ',auth()->user()->name)[0] : 'Guru' }}</div>
+                    <div class="topbar-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR'); ?></div>
+                    <div class="topbar-uname"><?php echo e(auth()->check() ? explode(' ',auth()->user()->name)[0] : 'Guru'); ?></div>
                     <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;color:var(--subtle);margin-left:2px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div id="profileDropdown" class="profile-dropdown-menu">
                     <div class="pdm-header">
-                        <div class="pdm-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
+                        <div class="pdm-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR'); ?></div>
                         <div class="pdm-info">
-                            <div class="pdm-name">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
+                            <div class="pdm-name"><?php echo e(auth()->check() ? auth()->user()->name : 'Budi Santoso'); ?></div>
                             <div class="pdm-role">Guru Pembimbing</div>
                         </div>
                     </div>
                     <div class="pdm-divider"></div>
                     <div class="pdm-links">
-                        <a href="{{ route('teacher.profile') }}" class="pdm-link">
+                        <a href="<?php echo e(route('teacher.profile')); ?>" class="pdm-link">
                             <svg xmlns="http://www.w3.org/2000/svg" class="pdm-link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             <span>Profil Guru</span>
                         </a>
-                        <a href="{{ route('teacher.requests') }}" class="pdm-link">
+                        <a href="<?php echo e(route('teacher.requests')); ?>" class="pdm-link">
                             <svg xmlns="http://www.w3.org/2000/svg" class="pdm-link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             <span>Kelola Permohonan</span>
                         </a>
                     </div>
                     <div class="pdm-divider"></div>
-                    <form method="POST" action="{{ route('logout') }}" class="pdm-logout-form">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('logout')); ?>" class="pdm-logout-form">
+                        <?php echo csrf_field(); ?>
                         <button type="submit" class="pdm-logout-btn">
                             <svg xmlns="http://www.w3.org/2000/svg" class="pdm-link-icon" style="color:#ef4444" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                             <span>Log Out</span>
@@ -298,11 +299,36 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
         </div>
     </div>
 
-    {{-- CONTENT --}}
+    
     <div class="content">
-        <livewire:teacher-dashboard />
-    </div>{{-- /content --}}
-</div>{{-- /main --}}
+        <?php
+$__split = function ($name, $params = []) {
+    return [$name, $params];
+};
+[$__name, $__params] = $__split('teacher-dashboard', []);
+
+$__keyOuter = $__key ?? null;
+
+$__key = null;
+$__componentSlots = [];
+
+$__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-2701590359-0', $__key);
+
+$__html = app('livewire')->mount($__name, $__params, $__key, $__componentSlots);
+
+echo $__html;
+
+unset($__html);
+unset($__key);
+$__key = $__keyOuter;
+unset($__keyOuter);
+unset($__name);
+unset($__params);
+unset($__componentSlots);
+unset($__split);
+?>
+    </div>
+</div>
 
 <script>
 // Theme toggle
@@ -404,3 +430,4 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
 </script>
 </body>
 </html>
+<?php /**PATH C:\Users\Dell\SIPBARV2\resources\views/dashboard-guru.blade.php ENDPATH**/ ?>

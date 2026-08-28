@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'SIPBAR Guru')</title>
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <title><?php echo $__env->yieldContent('title', 'SIPBAR Guru'); ?></title>
     <script>
     (function(){
         var s=localStorage.getItem('sipbar-guru-theme');
@@ -12,7 +12,7 @@
         if(s==='dark'||(s===null&&d)) document.documentElement.classList.add('dark');
     })();
     </script>
-    @vite(['resources/css/app.css','resources/js/app.js'])
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css','resources/js/app.js']); ?>
     <style>
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
         html,body{height:100%;font-family:'Instrument Sans',ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
@@ -167,7 +167,7 @@
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <aside class="sidebar" id="sidebar">
-        <a href="{{ route('teacher.dashboard') }}" class="sidebar-brand">
+        <a href="<?php echo e(route('teacher.dashboard')); ?>" class="sidebar-brand">
             <div class="sidebar-logo-wrap">
                 <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
             </div>
@@ -177,7 +177,7 @@
             </div>
         </a>
         <nav class="sidebar-nav">
-            @php
+            <?php
             $menus = [
                 ['Dashboard',        'teacher.dashboard', 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', null],
                 ['Permohonan',       'teacher.requests', 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', '5'],
@@ -187,25 +187,26 @@
                 ['Laporan',          'teacher.reports',  'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', null],
                 ['Profil',           'teacher.profile',  'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', null],
             ];
-            @endphp
-            @foreach($menus as $m)
-            <a href="{{ route($m[1]) }}" class="nav-item {{ request()->routeIs($m[1]) ? 'active' : '' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $m[2] }}"/></svg>
-                {{ $m[0] }}
-                @if($m[3]) <span class="nav-badge">{{ $m[3] }}</span> @endif
+            ?>
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $menus; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
+            <a href="<?php echo e(route($m[1])); ?>" class="nav-item <?php echo e(request()->routeIs($m[1]) ? 'active' : ''); ?>">
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo e($m[2]); ?>"/></svg>
+                <?php echo e($m[0]); ?>
+
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($m[3]): ?> <span class="nav-badge"><?php echo e($m[3]); ?></span> <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
-            @endforeach
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         </nav>
         <div class="sidebar-footer">
-            <a href="{{ route('teacher.profile') }}" class="user-card">
-                <div class="user-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
+            <a href="<?php echo e(route('teacher.profile')); ?>" class="user-card">
+                <div class="user-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR'); ?></div>
                 <div>
-                    <div class="user-name">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
+                    <div class="user-name"><?php echo e(auth()->check() ? auth()->user()->name : 'Budi Santoso'); ?></div>
                     <div class="user-role">Guru Pembimbing</div>
                 </div>
             </a>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
+            <form method="POST" action="<?php echo e(route('logout')); ?>">
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="logout-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                     Log Out
@@ -224,43 +225,43 @@
                 <input type="text" placeholder="Cari siswa atau permohonan...">
             </div>
             <div class="topbar-right">
-                <a href="{{ route('home') }}" class="topbar-icon" title="Beranda" style="text-decoration:none">
+                <a href="<?php echo e(route('home')); ?>" class="topbar-icon" title="Beranda" style="text-decoration:none">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                 </a>
                 <button class="topbar-icon" id="themeBtn" title="Ganti Mode (Alt+D)">
                     <svg class="t-moon" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                     <svg class="t-sun" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/></svg>
                 </button>
-                @include('partials.notif-widget', ['iconClass' => 'topbar-icon'])
-                {{-- User Profile Dropdown Wrap --}}
+                <?php echo $__env->make('partials.notif-widget', ['iconClass' => 'topbar-icon'], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                
                 <div class="topbar-user-wrap">
                     <button type="button" id="profileBtn" class="topbar-user">
-                        <div class="topbar-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
-                        <div class="topbar-uname">{{ auth()->check() ? explode(' ',auth()->user()->name)[0] : 'Guru' }}</div>
+                        <div class="topbar-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR'); ?></div>
+                        <div class="topbar-uname"><?php echo e(auth()->check() ? explode(' ',auth()->user()->name)[0] : 'Guru'); ?></div>
                         <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;color:var(--subtle);margin-left:2px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
                     <div id="profileDropdown" class="profile-dropdown-menu">
                         <div class="pdm-header">
-                            <div class="pdm-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
+                            <div class="pdm-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR'); ?></div>
                             <div class="pdm-info">
-                                <div class="pdm-name">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
+                                <div class="pdm-name"><?php echo e(auth()->check() ? auth()->user()->name : 'Budi Santoso'); ?></div>
                                 <div class="pdm-role">Guru Pembimbing</div>
                             </div>
                         </div>
                         <div class="pdm-divider"></div>
                         <div class="pdm-links">
-                            <a href="{{ route('teacher.profile') }}" class="pdm-link">
+                            <a href="<?php echo e(route('teacher.profile')); ?>" class="pdm-link">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="pdm-link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                 <span>Profil Guru</span>
                             </a>
-                            <a href="{{ route('teacher.requests') }}" class="pdm-link">
+                            <a href="<?php echo e(route('teacher.requests')); ?>" class="pdm-link">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="pdm-link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 <span>Kelola Permohonan</span>
                             </a>
                         </div>
                         <div class="pdm-divider"></div>
-                        <form method="POST" action="{{ route('logout') }}" class="pdm-logout-form">
-                            @csrf
+                        <form method="POST" action="<?php echo e(route('logout')); ?>" class="pdm-logout-form">
+                            <?php echo csrf_field(); ?>
                             <button type="submit" class="pdm-logout-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="pdm-link-icon" style="color:#ef4444" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                                 <span>Log Out</span>
@@ -271,7 +272,7 @@
             </div>
         </div>
         <div class="content">
-            @yield('content')
+            <?php echo $__env->yieldContent('content'); ?>
         </div>
     </div>
 
@@ -332,3 +333,4 @@
     </script>
 </body>
 </html>
+<?php /**PATH C:\Users\Dell\SIPBARV2\resources\views/layouts/guru.blade.php ENDPATH**/ ?>

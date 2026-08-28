@@ -1,13 +1,11 @@
 <aside class="sidebar" id="sidebar">
     <a href="{{ route('dashboard') }}" class="sidebar-brand">
-        <div class="brand-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 42" style="width:18px;height:18px;fill:#fff">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M17.2 5.633 8.6.855 0 5.633v26.51l16.2 9 16.2-9v-8.442l7.6-4.223V9.856l-8.6-4.777-8.6 4.777V18.3l-5.6 3.111V5.633Z"/>
-            </svg>
+        <div class="sidebar-logo-wrap">
+            <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
         </div>
         <div>
             <div class="brand-name">SIPBAR</div>
-            <div class="brand-sub">Sistem Inventaris</div>
+            <div class="brand-sub">SMKN 1 BANGSRI</div>
         </div>
     </a>
 

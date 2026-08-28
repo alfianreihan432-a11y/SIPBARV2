@@ -1,89 +1,179 @@
 /* ══════════════════════════════════════════════════════════════
    GLOBAL THEME VARIABLES - SIPBAR
-   Digunakan oleh semua komponen untuk konsistensi theme
+   Single Source of Truth for Light & Dark Mode
+   Compatible with all alias variable names across components
    ══════════════════════════════════════════════════════════════ */
 
-:root {
-    /* Dark Mode (Default) */
-    --bg-main: #0f172a;
-    --bg-alt: #1e293b;
-    --bg-hover: #334155;
-    --bg-card: #1e293b;
+:root,
+html.light {
+    /* Surfaces */
+    --bg-main:         #f0f4f8;
+    --bg:              #f0f4f8;
+    --bg-alt:          #ffffff;
+    --bg2:             #ffffff;
+    --bg3:             #e8edf2;
+    --bg-hover:        #e2e8f0;
+    --bg-card:         #ffffff;
+    --card:            #ffffff;
+    --card2:           #f8fafc;
+    --panel-bg:        #ffffff;
+    --content-bg:      #f0f4f8;
+    --input-bg:        #ffffff;
     
-    --border-main: #1e293b;
-    --border-alt: #334155;
-    --border-subtle: rgba(148,163,184,.14);
+    /* Borders */
+    --border-main:     #dde3ea;
+    --border:          #dde3ea;
+    --border-alt:      #e4e9ef;
+    --border2:         #e4e9ef;
+    --border-subtle:   #e2e8f0;
     
-    --text-primary: #f1f5f9;
-    --text-secondary: #e2e8f0;
-    --text-muted: #94a3b8;
-    --text-subtle: #64748b;
-    --text-dim: #475569;
+    /* Text - High Contrast WCAG AA */
+    --text-primary:    #0f172a;
+    --text:            #0f172a;
+    --text-secondary:  #334155;
+    --text2:           #334155;
+    --text-muted:      #64748b;
+    --muted:           #64748b;
+    --text-subtle:     #8898aa;
+    --subtle:          #8898aa;
+    --text-dim:        #94a3b8;
     
-    --blue: #2563eb;
-    --blue-dark: #1d4ed8;
-    --blue-light: #3b82f6;
-    --cyan: #0891b2;
-    --green: #059669;
-    --red: #ef4444;
-    --orange: #f97316;
-    --yellow: #fbbf24;
-    --purple: #7c3aed;
+    /* Primary / Blue Accent */
+    --primary:         #2563eb;
+    --primary-dark:    #1d4ed8;
+    --primary-light:   #eff6ff;
+    --primary-muted:   #bfdbfe;
+    --blue:            #2563eb;
+    --blue-dark:       #1d4ed8;
+    --blue-light:      #3b82f6;
     
-    --sidebar-bg: #0f172a;
-    --topbar-bg: #0f172a;
-    --content-bg: #0a1020;
-    --scrollbar: #334155;
-    --notif-border: #0f172a;
+    /* Semantic Colors */
+    --cyan:            #0891b2;
+    --green:           #059669;
+    --red:             #dc2626;
+    --orange:          #f97316;
+    --yellow:          #d97706;
+    --purple:          #7c3aed;
     
-    --shadow-sm: 0 1px 2px rgba(0,0,0,.25);
-    --shadow-md: 0 4px 12px rgba(0,0,0,.3);
-    --shadow-lg: 0 12px 32px rgba(0,0,0,.4);
-    --shadow-blue: 0 4px 12px rgba(29,78,216,.4);
+    /* Semantic Status - Light */
+    --s-pending:       #d97706;
+    --s-pending-bg:    #fffbeb;
+    --s-pending-bdr:   #fde68a;
+    --s-approved:      #2563eb;
+    --s-approved-bg:   #eff6ff;
+    --s-approved-bdr:  #bfdbfe;
+    --s-borrowed:      #0891b2;
+    --s-borrowed-bg:   #ecfeff;
+    --s-borrowed-bdr:  #a5f3fc;
+    --s-returned:      #059669;
+    --s-returned-bg:   #ecfdf5;
+    --s-returned-bdr:  #a7f3d0;
+    --s-rejected:      #dc2626;
+    --s-rejected-bg:   #fef2f2;
+    --s-rejected-bdr:  #fecaca;
+
+    /* Layout Specific */
+    --sidebar-bg:      #1e3a8a;
+    --sidebar-dark:    #162d6e;
+    --sidebar-accent:  #3b82f6;
+    --topbar-bg:       #ffffff;
+    --topbar-bdr:      #e4e9ef;
+    --scrollbar:       #c8d3e0;
+    --notif-border:    #ffffff;
+    
+    /* Shadows */
+    --shadow-sm:       0 1px 3px rgba(0,0,0,.06);
+    --shadow-md:       0 4px 12px rgba(0,0,0,.08);
+    --shadow-lg:       0 12px 32px rgba(0,0,0,.12);
+    --shadow-blue:     0 4px 14px rgba(37,99,235,.2);
 }
 
-/* Light Mode */
-html.light {
-    --bg-main: #f0f7ff;
-    --bg-alt: #ffffff;
-    --bg-hover: #e8f1fe;
-    --bg-card: #ffffff;
+/* ══ DARK MODE ══ */
+html.dark {
+    /* Surfaces */
+    --bg-main:         #0c1220;
+    --bg:              #0c1220;
+    --bg-alt:          #131e2e;
+    --bg2:             #111827;
+    --bg3:             #1a2436;
+    --bg-hover:        #243349;
+    --bg-card:         #131e2e;
+    --card:            #131e2e;
+    --card2:           #0f1a28;
+    --panel-bg:        #131e2e;
+    --content-bg:      #0a1020;
+    --input-bg:        #111827;
     
-    --border-main: #dbeafe;
-    --border-alt: #e2e8f0;
-    --border-subtle: rgba(148,163,184,.25);
+    /* Borders */
+    --border-main:     #1e2d45;
+    --border:          #1e2d45;
+    --border-alt:      #243349;
+    --border2:         #243349;
+    --border-subtle:   #1e2d45;
     
-    --text-primary: #0f172a;
-    --text-secondary: #1e293b;
-    --text-muted: #64748b;
-    --text-subtle: #94a3b8;
-    --text-dim: #cbd5e1;
+    /* Text - High Contrast WCAG AA */
+    --text-primary:    #f0f6ff;
+    --text:            #f0f6ff;
+    --text-secondary:  #c9d8ef;
+    --text2:           #c9d8ef;
+    --text-muted:      #94a3b8;
+    --muted:           #94a3b8;
+    --text-subtle:     #64748b;
+    --subtle:          #64748b;
+    --text-dim:        #475569;
     
-    --blue: #2563eb;
-    --blue-dark: #1d4ed8;
-    --blue-light: #3b82f6;
-    --cyan: #0891b2;
-    --green: #059669;
-    --red: #ef4444;
-    --orange: #f97316;
-    --yellow: #fbbf24;
-    --purple: #7c3aed;
+    /* Primary / Blue Accent */
+    --primary:         #3b82f6;
+    --primary-dark:    #2563eb;
+    --primary-light:   rgba(59,130,246,.15);
+    --primary-muted:   rgba(59,130,246,.3);
+    --blue:            #3b82f6;
+    --blue-dark:       #2563eb;
+    --blue-light:      #60a5fa;
     
-    --topbar-bg: #ffffff;
-    --sidebar-bg: #0f172a;  /* Sidebar tetap dark di light mode */
-    --content-bg: #f0f7ff;
-    --scrollbar: #cbd5e1;
-    --notif-border: #ffffff;
+    /* Semantic Colors */
+    --cyan:            #22d3ee;
+    --green:           #34d399;
+    --red:             #f87171;
+    --orange:          #fb923c;
+    --yellow:          #f59e0b;
+    --purple:          #a78bfa;
     
-    --shadow-sm: 0 1px 2px rgba(0,0,0,.1);
-    --shadow-md: 0 4px 12px rgba(0,0,0,.15);
-    --shadow-lg: 0 12px 32px rgba(0,0,0,.2);
-    --shadow-blue: 0 4px 12px rgba(29,78,216,.3);
+    /* Semantic Status - Dark */
+    --s-pending:       #f59e0b;
+    --s-pending-bg:    rgba(245,158,11,.12);
+    --s-pending-bdr:   rgba(245,158,11,.25);
+    --s-approved:      #60a5fa;
+    --s-approved-bg:   rgba(96,165,250,.12);
+    --s-approved-bdr:  rgba(96,165,250,.25);
+    --s-borrowed:      #22d3ee;
+    --s-borrowed-bg:   rgba(34,211,238,.10);
+    --s-borrowed-bdr:  rgba(34,211,238,.22);
+    --s-returned:      #34d399;
+    --s-returned-bg:   rgba(52,211,153,.10);
+    --s-returned-bdr:  rgba(52,211,153,.22);
+    --s-rejected:      #f87171;
+    --s-rejected-bg:   rgba(248,113,113,.10);
+    --s-rejected-bdr:  rgba(248,113,113,.22);
+
+    /* Layout Specific */
+    --sidebar-bg:      #0f1e3c;
+    --sidebar-dark:    #091530;
+    --sidebar-accent:  #60a5fa;
+    --topbar-bg:       #0c1220;
+    --topbar-bdr:      #1e2d45;
+    --scrollbar:       #243349;
+    --notif-border:    #0c1220;
+    
+    /* Shadows */
+    --shadow-sm:       0 1px 3px rgba(0,0,0,.3);
+    --shadow-md:       0 4px 12px rgba(0,0,0,.4);
+    --shadow-lg:       0 12px 32px rgba(0,0,0,.5);
+    --shadow-blue:     0 4px 14px rgba(59,130,246,.25);
 }
 
 /* ══════════════════════════════════════════════════════════════
-   UPGRADED RADIX / SHADCN STYLE DROPDOWNS & SELECT CONTROLS
-   Theme: Main Website Blue (#2563eb / #3b82f6)
+   UPGRADED SELECT CONTROLS & DROPDOWNS
    ══════════════════════════════════════════════════════════════ */
 
 select,
@@ -103,9 +193,9 @@ select.form-control {
     background-size: 16px 16px !important;
     padding: 9px 36px 9px 13px !important;
     border-radius: 10px !important;
-    border: 1.5px solid var(--border-alt, #e2e8f0) !important;
-    background-color: var(--input-bg, var(--bg-card, #ffffff)) !important;
-    color: var(--text-primary, #0f172a) !important;
+    border: 1.5px solid var(--border2) !important;
+    background-color: var(--input-bg) !important;
+    color: var(--text) !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     font-family: inherit !important;
@@ -121,7 +211,7 @@ select:hover,
 .cm-select:hover,
 .form-select:hover,
 select.form-control:hover {
-    border-color: var(--blue, #2563eb) !important;
+    border-color: var(--primary) !important;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12) !important;
 }
 
@@ -131,8 +221,8 @@ select:focus,
 .cm-select:focus,
 .form-select:focus,
 select.form-control:focus {
-    border-color: var(--blue, #2563eb) !important;
-    box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.18) !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3.5px var(--primary-light) !important;
 }
 
 html.dark select,
@@ -148,8 +238,8 @@ select option,
 .im-select option,
 .im-select-field option,
 .cm-select option {
-    background-color: var(--bg-card, #ffffff) !important;
-    color: var(--text-primary, #0f172a) !important;
+    background-color: var(--card) !important;
+    color: var(--text) !important;
     padding: 10px 14px !important;
     font-size: 13px !important;
     font-weight: 500 !important;
@@ -159,12 +249,12 @@ select option,
 [data-flux-menu],
 ui-menu,
 .dropdown-menu-content {
-    background-color: var(--bg-card, #ffffff) !important;
-    border: 1.5px solid var(--border-alt, #e2e8f0) !important;
+    background-color: var(--card) !important;
+    border: 1.5px solid var(--border2) !important;
     border-radius: 12px !important;
     padding: 6px !important;
-    color: var(--text-primary, #0f172a) !important;
-    box-shadow: 0 12px 36px -4px rgba(37, 99, 235, 0.18), 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    color: var(--text) !important;
+    box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0, 0, 0, 0.08) !important;
     animation: dropdownFadeIn 0.15s ease-out !important;
 }
 
@@ -180,7 +270,7 @@ ui-menu-item,
     padding: 8px 12px !important;
     font-size: 13px !important;
     font-weight: 600 !important;
-    color: var(--text-primary, #0f172a) !important;
+    color: var(--text) !important;
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
@@ -194,13 +284,12 @@ ui-menu-item:hover,
 [data-flux-menu-item]:focus,
 ui-menu-item:focus,
 .dropdown-menu-item:focus {
-    background-color: rgba(37, 99, 235, 0.12) !important;
-    color: var(--blue, #2563eb) !important;
+    background-color: var(--primary-light) !important;
+    color: var(--primary) !important;
 }
 
 /* ══════════════════════════════════════════════════════════════
    RADIX / SHADCN CUSTOM DROPDOWN COMPONENT (HTML/JS/BLADE)
-   Matches @radix-ui/react-dropdown-menu React Component
    ══════════════════════════════════════════════════════════════ */
 .radix-menu {
     position: relative;
@@ -212,31 +301,25 @@ ui-menu-item:focus,
     justify-content: space-between;
     width: 100%;
     padding: 11px 14px;
-    background: #ffffff;
-    border: 1.5px solid #e2e8f0;
+    background: var(--input-bg);
+    border: 1.5px solid var(--border2);
     border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text);
     cursor: pointer;
     outline: none;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
-.dark .radix-menu-trigger,
-html.dark .radix-menu-trigger {
-    background: #1e293b;
-    border-color: #334155;
-    color: #f1f5f9;
-}
 .radix-menu-trigger:hover {
-    border-color: #2563eb;
+    border-color: var(--primary);
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
 }
 .radix-menu-trigger:focus,
 .radix-menu.open .radix-menu-trigger {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.18);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3.5px var(--primary-light);
 }
 .radix-chevron,
 svg.radix-chevron {
@@ -244,15 +327,9 @@ svg.radix-chevron {
     height: 16px !important;
     max-width: 16px !important;
     max-height: 16px !important;
-    color: #2563eb;
+    color: var(--primary);
     transition: transform 0.2s ease;
     flex-shrink: 0 !important;
-}
-.dark .radix-chevron,
-html.dark .radix-chevron,
-.dark svg.radix-chevron,
-html.dark svg.radix-chevron {
-    color: #60a5fa;
 }
 .radix-menu.open .radix-chevron {
     transform: rotate(180deg);
@@ -263,21 +340,15 @@ html.dark svg.radix-chevron {
     left: 0;
     right: 0;
     z-index: 9999;
-    background: #ffffff;
-    border: 1.5px solid #e2e8f0;
+    background: var(--card);
+    border: 1.5px solid var(--border2);
     border-radius: 12px;
     padding: 6px;
-    box-shadow: 0 12px 36px -4px rgba(37, 99, 235, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-6px) scale(0.97);
     transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.dark .radix-menu-content,
-html.dark .radix-menu-content {
-    background: #1e293b;
-    border-color: #334155;
-    box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.5);
 }
 .radix-menu.open .radix-menu-content {
     opacity: 1;
@@ -293,31 +364,17 @@ html.dark .radix-menu-content {
     border-radius: 8px;
     font-size: 13.5px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text);
     cursor: pointer;
     transition: all 0.15s ease-in-out;
 }
-.dark .radix-menu-item,
-html.dark .radix-menu-item {
-    color: #f1f5f9;
-}
 .radix-menu-item:hover {
-    background-color: rgba(37, 99, 235, 0.1);
-    color: #2563eb;
-}
-.dark .radix-menu-item:hover,
-html.dark .radix-menu-item:hover {
-    background-color: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
+    background-color: var(--primary-light);
+    color: var(--primary);
 }
 .radix-menu-item.active {
-    background-color: rgba(37, 99, 235, 0.15);
-    color: #2563eb;
-}
-.dark .radix-menu-item.active,
-html.dark .radix-menu-item.active {
-    background-color: rgba(59, 130, 246, 0.25);
-    color: #60a5fa;
+    background-color: var(--primary-light);
+    color: var(--primary);
 }
 .radix-check,
 svg.radix-check {
@@ -329,18 +386,11 @@ svg.radix-check {
     height: 14px !important;
     max-width: 14px !important;
     max-height: 14px !important;
-    color: #2563eb;
+    color: var(--primary);
     opacity: 0;
     transition: opacity 0.15s ease;
     flex-shrink: 0 !important;
 }
-
-.dark .radix-check,
-html.dark .radix-check {
-    color: #60a5fa;
-}
 .radix-menu-item.active .radix-check {
     opacity: 1;
 }
-
-

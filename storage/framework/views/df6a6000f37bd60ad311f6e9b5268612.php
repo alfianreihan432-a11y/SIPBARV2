@@ -190,21 +190,21 @@
         @media (max-width: 900px) { .db-grid-2 { grid-template-columns: 1fr; } }
     </style>
 
-    {{-- Greeting --}}
+    
     <div class="db-greeting-row">
         <div>
             <div class="db-greeting-title">
-                @php
+                <?php
                     $hour = now()->hour;
                     $greet = $hour < 12 ? 'Selamat Pagi' : ($hour < 17 ? 'Selamat Siang' : 'Selamat Malam');
-                @endphp
-                {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Guru' }} 👋
+                ?>
+                <?php echo e($greet); ?>, <?php echo e(auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Guru'); ?> 👋
             </div>
-            <div class="db-greeting-sub">{{ now()->translatedFormat('l, d F Y') }} • Portal Pengelolaan Inventaris Guru Pembimbing</div>
+            <div class="db-greeting-sub"><?php echo e(now()->translatedFormat('l, d F Y')); ?> • Portal Pengelolaan Inventaris Guru Pembimbing</div>
         </div>
     </div>
 
-    {{-- 1. Quick Action Menu Cards --}}
+    
     <div style="margin-bottom:28px">
         <div class="db-section-head">
             <div class="db-section-title-wrap">
@@ -214,28 +214,28 @@
             <span class="db-section-tag">Akses Utama</span>
         </div>
         <div class="db-menu-grid">
-            {{-- Permohonan Peminjaman (PRIORITY HIGHLIGHT) --}}
-            <a href="{{ route('teacher.requests') }}" class="db-menu-card card-priority">
+            
+            <a href="<?php echo e(route('teacher.requests')); ?>" class="db-menu-card card-priority">
                 <div class="db-menu-icon" style="background:rgba(16,185,129,.14);color:#059669">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </div>
                 <div class="db-menu-title">Permohonan Peminjaman</div>
                 <div class="db-menu-desc">Kelola dan setujui pengajuan peminjaman siswa bimbingan</div>
-                @if(isset($pendingRequests) && $pendingRequests > 0)
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($pendingRequests) && $pendingRequests > 0): ?>
                 <div class="db-menu-badge" style="background:#fef3c7;color:#b45309;border:1px solid #fde68a">
                     <span class="db-badge-dot"></span>
-                    <span>{{ $pendingRequests }} Menunggu Approval</span>
+                    <span><?php echo e($pendingRequests); ?> Menunggu Approval</span>
                 </div>
-                @else
+                <?php else: ?>
                 <div class="db-menu-badge" style="background:#ecfdf5;color:#059669;border:1px solid #a7f3d0">
                     <span class="db-badge-dot"></span>
                     <span>Semua Terproses</span>
                 </div>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
 
-            {{-- Siswa Bimbingan --}}
-            <a href="{{ route('teacher.students') }}" class="db-menu-card">
+            
+            <a href="<?php echo e(route('teacher.students')); ?>" class="db-menu-card">
                 <div class="db-menu-icon" style="background:rgba(37,99,235,.12);color:#2563eb">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
@@ -243,23 +243,23 @@
                 <div class="db-menu-desc">Pantau profil dan aktivitas siswa bimbingan Anda</div>
             </a>
 
-            {{-- Peminjaman Aktif --}}
-            <a href="{{ route('teacher.loans') }}" class="db-menu-card">
+            
+            <a href="<?php echo e(route('teacher.loans')); ?>" class="db-menu-card">
                 <div class="db-menu-icon" style="background:rgba(2,132,199,.12);color:#0284c7">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
                 </div>
                 <div class="db-menu-title">Peminjaman Aktif</div>
                 <div class="db-menu-desc">Monitor aset sarpras yang sedang berstatus dipinjam</div>
-                @if($totalBorrowed > 0)
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($totalBorrowed > 0): ?>
                 <div class="db-menu-badge" style="background:rgba(2,132,199,.12);color:#0284c7;border:1px solid rgba(2,132,199,.25)">
                     <span class="db-badge-dot"></span>
-                    <span>{{ $totalBorrowed }} Sedang Dipinjam</span>
+                    <span><?php echo e($totalBorrowed); ?> Sedang Dipinjam</span>
                 </div>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
 
-            {{-- Pengembalian --}}
-            <a href="{{ route('teacher.returns') }}" class="db-menu-card">
+            
+            <a href="<?php echo e(route('teacher.returns')); ?>" class="db-menu-card">
                 <div class="db-menu-icon" style="background:rgba(16,185,129,.12);color:#10b981">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
@@ -267,8 +267,8 @@
                 <div class="db-menu-desc">Verifikasi pengembalian barang dan kondisi aset</div>
             </a>
 
-            {{-- Laporan --}}
-            <a href="{{ route('teacher.reports') }}" class="db-menu-card">
+            
+            <a href="<?php echo e(route('teacher.reports')); ?>" class="db-menu-card">
                 <div class="db-menu-icon" style="background:rgba(147,51,234,.12);color:#9333ea">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </div>
@@ -276,8 +276,8 @@
                 <div class="db-menu-desc">Rekapitulasi sirkulasi dan catatan log peminjaman</div>
             </a>
 
-            {{-- Kelola Inventaris --}}
-            <a href="{{ route('inventory.index') }}" class="db-menu-card">
+            
+            <a href="<?php echo e(route('inventory.index')); ?>" class="db-menu-card">
                 <div class="db-menu-icon" style="background:rgba(14,116,144,.12);color:#0e7490">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
@@ -288,7 +288,7 @@
     </div>
 
 
-    {{-- 2. Stat Cards --}}
+    
     <div style="margin-bottom:28px">
         <div class="db-section-head">
             <div class="db-section-title-wrap">
@@ -308,7 +308,7 @@
                     <span class="db-stat-pill" style="background:#eff6ff;color:#1d4ed8">Total Unit</span>
                 </div>
                 <div>
-                    <div class="db-stat-num">{{ $departmentItems }}</div>
+                    <div class="db-stat-num"><?php echo e($departmentItems); ?></div>
                     <div class="db-stat-label">Total Barang Terdata</div>
                 </div>
             </div>
@@ -323,7 +323,7 @@
                     <span class="db-stat-pill" style="background:#f0f9ff;color:#0284c7">Sirkulasi Guru</span>
                 </div>
                 <div>
-                    <div class="db-stat-num">{{ $totalBorrowed }}</div>
+                    <div class="db-stat-num"><?php echo e($totalBorrowed); ?></div>
                     <div class="db-stat-label">Peminjaman Saya</div>
                 </div>
             </div>
@@ -338,7 +338,7 @@
                     <span class="db-stat-pill" style="background:#ecfdf5;color:#059669">Selesai</span>
                 </div>
                 <div>
-                    <div class="db-stat-num">{{ $totalReturned }}</div>
+                    <div class="db-stat-num"><?php echo e($totalReturned); ?></div>
                     <div class="db-stat-label">Barang Dikembalikan</div>
                 </div>
             </div>
@@ -353,14 +353,14 @@
                     <span class="db-stat-pill" style="background:#faf5ff;color:#7e22ce">Siap Dipinjam</span>
                 </div>
                 <div>
-                    <div class="db-stat-num">{{ $availableItems }}</div>
+                    <div class="db-stat-num"><?php echo e($availableItems); ?></div>
                     <div class="db-stat-label">Barang Tersedia</div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 3. Grid 2 Kolom untuk Peminjaman Saya & Peminjaman Sekolah --}}
+    
     <div style="margin-bottom:16px">
         <div class="db-section-head">
             <div class="db-section-title-wrap">
@@ -370,7 +370,7 @@
             <span class="db-section-tag">Log Transaksi</span>
         </div>
         <div class="db-grid-2">
-            {{-- Peminjaman Saya --}}
+            
             <div class="db-panel">
                 <div class="db-panel-header">
                     <div>
@@ -379,32 +379,34 @@
                     </div>
                 </div>
 
-                @if($myBorrowings->count() > 0)
-                    @foreach($myBorrowings as $borrowing)
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($myBorrowings->count() > 0): ?>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $myBorrowings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $borrowing): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                     <div class="db-txn-item">
                         <div class="db-txn-top">
                             <div>
-                                <div class="db-txn-name">{{ $borrowing->details->first()?->item->name ?? 'Barang Inventaris' }}</div>
-                                <div class="db-txn-type">Kode Peminjaman #{{ $borrowing->number ?? $borrowing->id }}</div>
+                                <div class="db-txn-name"><?php echo e($borrowing->details->first()?->item->name ?? 'Barang Inventaris'); ?></div>
+                                <div class="db-txn-type">Kode Peminjaman #<?php echo e($borrowing->number ?? $borrowing->id); ?></div>
                             </div>
-                            <span class="db-badge {{ $borrowing->status === 'borrowed' ? 'db-badge-borrowed' : ($borrowing->status === 'returned' ? 'db-badge-returned' : 'db-badge-pending') }}">
-                                {{ $borrowing->status === 'borrowed' ? 'DIPINJAM' : ($borrowing->status === 'returned' ? 'KEMBALI' : strtoupper($borrowing->status)) }}
+                            <span class="db-badge <?php echo e($borrowing->status === 'borrowed' ? 'db-badge-borrowed' : ($borrowing->status === 'returned' ? 'db-badge-returned' : 'db-badge-pending')); ?>">
+                                <?php echo e($borrowing->status === 'borrowed' ? 'DIPINJAM' : ($borrowing->status === 'returned' ? 'KEMBALI' : strtoupper($borrowing->status))); ?>
+
                             </span>
                         </div>
                         <div class="db-txn-meta">
                             <div style="display:flex;align-items:center;gap:5px;color:var(--text-muted)">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                {{ $borrowing->borrowed_at?->diffForHumans() ?? 'Baru saja' }}
+                                <?php echo e($borrowing->borrowed_at?->diffForHumans() ?? 'Baru saja'); ?>
+
                             </div>
                             <div style="font-size:11.5px;color:var(--text-subtle)">
-                                @if($borrowing->return_date)
-                                    Batas: {{ $borrowing->return_date->format('d M Y') }} @if($borrowing->return_time) · {{ $borrowing->return_time }}@endif
-                                @endif
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($borrowing->return_date): ?>
+                                    Batas: <?php echo e($borrowing->return_date->format('d M Y')); ?> <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($borrowing->return_time): ?> · <?php echo e($borrowing->return_time); ?><?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             </div>
                         </div>
                     </div>
-                    @endforeach
-                @else
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                <?php else: ?>
                     <div class="db-empty">
                         <svg xmlns="http://www.w3.org/2000/svg" class="db-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -412,10 +414,10 @@
                         <div class="db-empty-title">Belum ada peminjaman aktif</div>
                         <div class="db-empty-sub">Riwayat pengajuan Anda akan muncul di sini</div>
                     </div>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
 
-            {{-- Peminjaman Sekolah / Siswa Bimbingan --}}
+            
             <div class="db-panel">
                 <div class="db-panel-header">
                     <div>
@@ -424,32 +426,35 @@
                     </div>
                 </div>
 
-                @if($recentDepartmentBorrowings->count() > 0)
-                    @foreach($recentDepartmentBorrowings as $borrowing)
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($recentDepartmentBorrowings->count() > 0): ?>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $recentDepartmentBorrowings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $borrowing): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
                     <div class="db-txn-item">
                         <div class="db-txn-top">
                             <div>
-                                <div class="db-txn-name">{{ $borrowing->details->first()?->item->name ?? 'Barang Inventaris' }}</div>
-                                <div class="db-txn-type">Diajukan oleh {{ $borrowing->user->name ?? 'Siswa' }}</div>
+                                <div class="db-txn-name"><?php echo e($borrowing->details->first()?->item->name ?? 'Barang Inventaris'); ?></div>
+                                <div class="db-txn-type">Diajukan oleh <?php echo e($borrowing->user->name ?? 'Siswa'); ?></div>
                             </div>
-                            <span class="db-badge {{ $borrowing->status === 'borrowed' ? 'db-badge-borrowed' : ($borrowing->status === 'returned' ? 'db-badge-returned' : 'db-badge-pending') }}">
-                                {{ $borrowing->status === 'borrowed' ? 'DIPINJAM' : ($borrowing->status === 'returned' ? 'KEMBALI' : strtoupper($borrowing->status)) }}
+                            <span class="db-badge <?php echo e($borrowing->status === 'borrowed' ? 'db-badge-borrowed' : ($borrowing->status === 'returned' ? 'db-badge-returned' : 'db-badge-pending')); ?>">
+                                <?php echo e($borrowing->status === 'borrowed' ? 'DIPINJAM' : ($borrowing->status === 'returned' ? 'KEMBALI' : strtoupper($borrowing->status))); ?>
+
                             </span>
                         </div>
                         <div class="db-txn-meta">
                             <div style="display:flex;align-items:center;gap:5px;color:var(--text-muted)">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                {{ $borrowing->borrowed_at?->diffForHumans() ?? 'Baru saja' }}
+                                <?php echo e($borrowing->borrowed_at?->diffForHumans() ?? 'Baru saja'); ?>
+
                             </div>
                             <div style="font-size:11.5px;color:var(--text-subtle)">
-                                @if($borrowing->return_date)
-                                    Batas: {{ $borrowing->return_date->format('d M Y') }}
-                                @endif
+                                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($borrowing->return_date): ?>
+                                    Batas: <?php echo e($borrowing->return_date->format('d M Y')); ?>
+
+                                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             </div>
                         </div>
                     </div>
-                    @endforeach
-                @else
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
+                <?php else: ?>
                     <div class="db-empty">
                         <svg xmlns="http://www.w3.org/2000/svg" class="db-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -457,8 +462,9 @@
                         <div class="db-empty-title">Belum ada aktivitas baru</div>
                         <div class="db-empty-sub">Menunggu transaksi peminjaman siswa</div>
                     </div>
-                @endif
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </div>
         </div>
     </div>
 </div>
+<?php /**PATH C:\Users\Dell\SIPBARV2\resources\views/livewire/teacher-dashboard.blade.php ENDPATH**/ ?>
