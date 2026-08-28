@@ -88,7 +88,7 @@
     @if($showBorrowModal && $selectedItem)
         <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px;">
             <div style="background: var(--card); border-radius: 16px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;">
-                <livewire:borrowing-form :itemId="$selectedItem->id" :key="$selectedItem->id" />
+                <livewire:borrowing-form :itemId="$selectedItem->id" :key="'borrowing-form-'.$selectedItem->id" />
             </div>
         </div>
     @endif

@@ -36,7 +36,7 @@
             --panel-bg:    #ffffff;
             --input-bg:    #ffffff;
             --scrollbar:   #cbd5e1;
-            --sidebar-bg:  #0a192f;
+            --sidebar-bg:  #1d4ed8;
         }
 
         html.dark {
@@ -58,7 +58,7 @@
             --panel-bg:    #1e293b;
             --input-bg:    #1e293b;
             --scrollbar:   #475569;
-            --sidebar-bg:  #0a192f;
+            --sidebar-bg:  #1d4ed8;
         }
 
         body { display: flex; background: var(--content-bg); color: var(--text); overflow: hidden; transition: background .25s, color .25s; }
@@ -95,12 +95,12 @@
         .nav-item {
             display: flex; align-items: center; gap: 10px;
             padding: 9px 12px; border-radius: 10px;
-            font-size: 13px; font-weight: 500; color: rgba(255,255,255,.65);
+            font-size: 13px; font-weight: 500; color: rgba(255,255,255,.9);
             text-decoration: none; margin-bottom: 3px;
             transition: all .15s;
         }
-        .nav-item:hover { background: rgba(255,255,255,.12); color: #fff; }
-        .nav-item.active { background: var(--primary-dark); color: #fff; font-weight: 700; }
+        .nav-item:hover { background: rgba(0,0,0,.15); color: #fff; }
+        .nav-item.active { background: rgba(0,0,0,.25); color: #fff; font-weight: 700; }
         .nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
         .nav-badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 10px; font-weight: 800; padding: 1px 7px; border-radius: 999px; }
 
@@ -233,6 +233,18 @@
                 @endif
             </a>
             @endforeach
+
+            {{-- CTA Pinjam Barang --}}
+            <a href="{{ route('student.catalog') }}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;margin-top:8px;margin-bottom:3px;background:rgba(0,0,0,.2);border-radius:10px;text-decoration:none;transition:all .15s;border:1px solid rgba(255,255,255,.3);">
+                <div style="width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                </div>
+                <div style="flex:1">
+                    <div style="font-size:13px;font-weight:700;color:#fff">Pinjam Barang</div>
+                    <div style="font-size:10px;color:rgba(255,255,255,.8);margin-top:1px">Akses katalog sekarang</div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:rgba(255,255,255,.8);flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
         </nav>
         <div class="sidebar-footer">
             <div class="user-card">

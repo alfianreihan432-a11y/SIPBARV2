@@ -297,7 +297,7 @@
                             </div>
                             <div style="font-size:11px;color:var(--text-subtle)">
                                 @if($borrowing->return_date)
-                                    Deadline: {{ $borrowing->return_date->format('d M Y') }}
+                                    Deadline: {{ $borrowing->return_date->format('d M Y') }} @if($borrowing->return_time) · {{ $borrowing->return_time }}@endif
                                 @endif
                             </div>
                         </div>

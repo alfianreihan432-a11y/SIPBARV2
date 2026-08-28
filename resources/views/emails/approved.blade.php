@@ -208,7 +208,7 @@
                 </div>
                 <div class="info-row">
                     <span class="info-label">Tanggal Kembali</span>
-                    <span class="info-value">{{ $borrowingRequest->return_date?->format('d M Y') ?? '-' }}</span>
+                    <span class="info-value">{{ $borrowingRequest->return_date?->format('d M Y') ?? '-' }} @if($borrowingRequest->return_time) · {{ $borrowingRequest->return_time }}@endif</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Disetujui oleh</span>

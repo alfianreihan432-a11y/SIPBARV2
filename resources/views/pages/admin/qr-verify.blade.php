@@ -121,7 +121,7 @@
                 </tr>
                 <tr>
                     <td>Tgl Kembali</td>
-                    <td>{{ \Carbon\Carbon::parse($br->return_date)->format('d M Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($br->return_date)->format('d M Y') }} @if($br->return_time) · {{ $br->return_time }}@endif</td>
                 </tr>
                 <tr>
                     <td>Status</td>
