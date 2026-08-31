@@ -87,12 +87,13 @@
             @foreach($myRequests as $request)
             @php
                 $statusMap = [
-                    'pending'  => ['label'=>'Menunggu',    'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
-                    'approved' => ['label'=>'Disetujui',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-                    'qr_ready' => ['label'=>'Siap Ambil',  'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-                    'borrowed' => ['label'=>'Dipinjam',    'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
-                    'returned' => ['label'=>'Dikembalikan','cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
-                    'rejected' => ['label'=>'Ditolak',     'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
+                    'pending'   => ['label'=>'Menunggu',    'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
+                    'cancelled' => ['label'=>'Dibatalkan',  'cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
+                    'approved'  => ['label'=>'Disetujui',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
+                    'qr_ready'  => ['label'=>'Siap Ambil',  'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
+                    'borrowed'  => ['label'=>'Dipinjam',    'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
+                    'returned'  => ['label'=>'Dikembalikan','cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
+                    'rejected'  => ['label'=>'Ditolak',     'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
                 ];
                 $st = $statusMap[$request->status] ?? $statusMap['pending'];
             @endphp
@@ -110,12 +111,38 @@
                         </div>
                     </div>
                     @if($request->status === 'qr_ready' && $request->qrCode)
-                    <div style="margin-top:10px">
-                        <button wire:click="showQRCode({{ $request->id }})" class="s-btn s-btn--sm s-btn--ghost">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-                            Tampilkan QR Code
-                        </button>
-                    </div>
+                        <div style="margin-top:10px">
+                            <a href="{{ route('student.loans.qr', $request->id) }}" class="s-btn s-btn--sm s-btn--primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-5v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V8a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1zm12 0h2a1 1 0 001-1V8a1 1 0 00-1-1h-2a1 1 0 00-1 1v1a1 1 0 001 1zM5 20h2a1 1 0 001-1v-1a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1z"/></svg>
+                                Lihat QR Code
+                            </a>
+                        </div>
+                    @elseif($request->status === 'pending')
+                        @php
+                            $shareLink = $request->teacher && $request->teacher->phone
+                                ? app(\App\Services\WhatsAppNotificationService::class)->getDirectWaLink($request)
+                                : null;
+                        @endphp
+                        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                            <a href="{{ route('student.loans.edit', $request->id) }}" class="s-btn s-btn--sm s-btn--ghost">
+                                Edit
+                            </a>
+                            @if($shareLink)
+                                <a href="{{ $shareLink }}" target="_blank" rel="noopener" class="s-btn s-btn--sm s-btn--primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l.7-3.305A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                    Kirim ke WA Guru
+                                </a>
+                                <button type="button" onclick="navigator.clipboard.writeText('{{ $shareLink }}'); this.textContent='Tersalin';" class="s-btn s-btn--sm s-btn--ghost">
+                                    Salin Link
+                                </button>
+                            @endif
+                            <form method="POST" action="{{ route('student.loans.cancel', $request->id) }}" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="s-btn s-btn--sm s-btn--danger">
+                                    Batalkan
+                                </button>
+                            </form>
+                        </div>
                     @endif
                 </div>
                 <div class="s-loan-right">

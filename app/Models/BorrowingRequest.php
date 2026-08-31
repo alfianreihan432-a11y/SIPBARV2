@@ -40,6 +40,7 @@ class BorrowingRequest extends Model
     
     // Status constants
     public const STATUS_PENDING = 'pending';
+    public const STATUS_CANCELLED = 'cancelled';
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
     public const STATUS_BORROWED = 'borrowed';
@@ -143,7 +144,8 @@ class BorrowingRequest extends Model
     {
         return in_array($this->status, [
             self::STATUS_RETURNED,
-            self::STATUS_REJECTED
+            self::STATUS_REJECTED,
+            self::STATUS_CANCELLED,
         ]);
     }
     
@@ -165,6 +167,7 @@ class BorrowingRequest extends Model
     {
         $colors = [
             self::STATUS_PENDING => 'amber',
+            self::STATUS_CANCELLED => 'slate',
             self::STATUS_APPROVED => 'emerald',
             self::STATUS_REJECTED => 'red',
             self::STATUS_BORROWED => 'blue',
@@ -181,6 +184,7 @@ class BorrowingRequest extends Model
     {
         return match($this->status) {
             'pending' => 'Menunggu Persetujuan',
+            'cancelled' => 'Dibatalkan',
             'approved' => 'Disetujui',
             'rejected' => 'Ditolak',
             'borrowed' => 'Dipinjam',
@@ -193,6 +197,7 @@ class BorrowingRequest extends Model
     {
         return match($this->status) {
             'pending' => 'warning',
+            'cancelled' => 'secondary',
             'approved' => 'success',
             'rejected' => 'danger',
             'borrowed' => 'primary',

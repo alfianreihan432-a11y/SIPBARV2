@@ -6,18 +6,21 @@
 @php
     $requests = \App\Models\BorrowingRequest::where('user_id', auth()->id())->latest()->get();
     $counts = [
-        'pending'  => $requests->whereIn('status', ['pending'])->count(),
-        'borrowed' => $requests->whereIn('status', ['approved','qr_ready','borrowed'])->count(),
-        'returned' => $requests->where('status', 'returned')->count(),
-        'rejected' => $requests->where('status', 'rejected')->count(),
+        'pending'   => $requests->whereIn('status', ['pending'])->count(),
+        'cancelled' => $requests->whereIn('status', ['cancelled'])->count(),
+        'borrowed'  => $requests->whereIn('status', ['approved','qr_ready','borrowed'])->count(),
+        'returned'  => $requests->where('status', 'returned')->count(),
+        'rejected'  => $requests->where('status', 'rejected')->count(),
     ];
     $statusMap = [
-        'pending'  => ['label'=>'Menunggu',    'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
-        'approved' => ['label'=>'Disetujui',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-        'qr_ready' => ['label'=>'Siap Ambil',  'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-        'borrowed' => ['label'=>'Dipinjam',    'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
-        'returned' => ['label'=>'Dikembalikan','cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
-        'rejected' => ['label'=>'Ditolak',     'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
+        'pending'   => ['label'=>'Menunggu',    'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
+        'cancelled' => ['label'=>'Dibatalkan',  'cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
+        'approved'  => ['label'=>'Disetujui',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
+        'qr_ready'  => ['label'=>'Siap Ambil',  'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
+        'borrowed'  => ['label'=>'Dipinjam',    'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
+        'returned'  => ['label'=>'Dikembalikan','cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
+        'rejected'  => ['label'=>'Ditolak',     'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
+>>>>>>> origin/frondtend
     ];
 @endphp
 
@@ -113,7 +116,36 @@
                     </div>
                     @endif
                 </div>
+<<<<<<< HEAD
                 @if($req->status === 'rejected' && $req->rejection_reason)
+=======
+                @if($req->status === 'pending')
+                    @php
+                        $shareLink = $req->teacher && $req->teacher->phone
+                            ? app(\App\Services\WhatsAppNotificationService::class)->getDirectWaLink($req)
+                            : null;
+                    @endphp
+                    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                        <a href="{{ route('student.loans.edit', $req->id) }}" class="s-btn s-btn--sm s-btn--ghost">
+                            Edit
+                        </a>
+                        @if($shareLink)
+                            <a href="{{ $shareLink }}" target="_blank" rel="noopener" class="s-btn s-btn--sm s-btn--primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l.7-3.305A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                Kirim ke WA Guru
+                            </a>
+                            <button type="button" onclick="navigator.clipboard.writeText('{{ $shareLink }}'); this.textContent='Tersalin';" class="s-btn s-btn--sm s-btn--ghost">
+                                Salin Link
+                            </button>
+                        @endif
+                        <form method="POST" action="{{ route('student.loans.cancel', $req->id) }}" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="s-btn s-btn--sm s-btn--danger">
+                                Batalkan
+                            </button>
+                        </form>
+                    </div>
+                @elseif($req->status === 'rejected' && $req->rejection_reason)
                 <div style="margin-top:8px;padding:8px 12px;background:var(--s-rejected-bg);border:1px solid var(--s-rejected-bdr);border-radius:8px;font-size:12px;color:var(--s-rejected)">
                     <strong>Alasan ditolak:</strong> {{ $req->rejection_reason }}
                 </div>

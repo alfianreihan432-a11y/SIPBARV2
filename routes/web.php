@@ -83,7 +83,13 @@ Route::middleware(['auth'])->group(function () {
     })->name('student.catalog');
 
     Route::view('siswa/peminjaman', 'pages.siswa.loans')->name('student.loans');
-    
+    Route::get('siswa/peminjaman/{id}/edit', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'edit'])
+        ->name('student.loans.edit');
+    Route::put('siswa/peminjaman/{id}/update', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'update'])
+        ->name('student.loans.update');
+    Route::post('siswa/peminjaman/{id}/cancel', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'cancel'])
+        ->name('student.loans.cancel');
+
     // Student Return System routes
     Route::get('siswa/pengembalian', [StudentReturnController::class, 'index'])->name('student.returns.index');
     Route::get('siswa/pengembalian/ajukan/{id}', [StudentReturnController::class, 'create'])->name('student.returns.create');
@@ -116,6 +122,23 @@ Route::middleware(['auth'])->group(function () {
 
     // Teacher approval routes
     Route::middleware('role:guru')->prefix('guru')->name('teacher.')->group(function () {
+        Route::get('sidebar-counts', function () {
+            $teacherId = auth()->id();
+
+            return response()->json([
+                'pending_requests' => \App\Models\BorrowingRequest::where('teacher_id', $teacherId)
+                    ->where('status', \App\Models\BorrowingRequest::STATUS_PENDING)
+                    ->count(),
+                'active_loans' => \App\Models\BorrowingRequest::where('teacher_id', $teacherId)
+                    ->whereIn('status', [
+                        \App\Models\BorrowingRequest::STATUS_APPROVED,
+                        \App\Models\BorrowingRequest::STATUS_BORROWED,
+                        \App\Models\BorrowingRequest::STATUS_OVERDUE,
+                    ])
+                    ->count(),
+            ]);
+        })->name('sidebar.counts');
+
         Route::get('permohonan', [TeacherApprovalController::class, 'index'])->name('requests');
         Route::post('permohonan/{id}/approve', [TeacherApprovalController::class, 'approve'])->name('requests.approve');
         Route::post('permohonan/{id}/reject', [TeacherApprovalController::class, 'reject'])->name('requests.reject');
@@ -143,6 +166,11 @@ Route::middleware(['auth'])->group(function () {
     // Teacher profile photo routes
     Route::post('guru/profil/foto', [SettingsController::class, 'updateProfilePhoto'])->name('teacher.profile.photo.update');
     Route::delete('guru/profil/foto', [SettingsController::class, 'deleteProfilePhoto'])->name('teacher.profile.photo.delete');
+
+    // ─── Notification & Message APIs ───
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
 
     // ─── Notification & Message APIs ───
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');

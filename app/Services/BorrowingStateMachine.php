@@ -16,6 +16,7 @@ class BorrowingStateMachine
             BorrowingRequest::STATUS_PENDING => [
                 BorrowingRequest::STATUS_APPROVED,
                 BorrowingRequest::STATUS_REJECTED,
+                BorrowingRequest::STATUS_CANCELLED,
             ],
             BorrowingRequest::STATUS_APPROVED => [
                 BorrowingRequest::STATUS_BORROWED,
@@ -24,7 +25,7 @@ class BorrowingStateMachine
                 BorrowingRequest::STATUS_RETURNED,
                 BorrowingRequest::STATUS_OVERDUE,
             ],
-            // Terminal states (rejected, returned) have no transitions
+            // Terminal states (cancelled, rejected, returned) have no transitions
         ];
 
         $currentStatus = $request->status;
@@ -77,6 +78,7 @@ class BorrowingStateMachine
             BorrowingRequest::STATUS_PENDING => [
                 BorrowingRequest::STATUS_APPROVED => 'Setujui',
                 BorrowingRequest::STATUS_REJECTED => 'Tolak',
+                BorrowingRequest::STATUS_CANCELLED => 'Batalkan',
             ],
             BorrowingRequest::STATUS_APPROVED => [
                 BorrowingRequest::STATUS_BORROWED => 'Checkout (Scan QR)',
@@ -95,6 +97,7 @@ class BorrowingStateMachine
     public function isTerminalStatus(string $status): bool
     {
         return in_array($status, [
+            BorrowingRequest::STATUS_CANCELLED,
             BorrowingRequest::STATUS_REJECTED,
             BorrowingRequest::STATUS_RETURNED,
         ]);
