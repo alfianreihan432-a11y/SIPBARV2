@@ -6,18 +6,20 @@
 @php
     $requests = \App\Models\BorrowingRequest::where('user_id', auth()->id())->latest()->get();
     $counts = [
-        'pending'  => $requests->whereIn('status', ['pending'])->count(),
-        'borrowed' => $requests->whereIn('status', ['approved','qr_ready','borrowed'])->count(),
-        'returned' => $requests->where('status', 'returned')->count(),
-        'rejected' => $requests->where('status', 'rejected')->count(),
+        'pending'   => $requests->whereIn('status', ['pending'])->count(),
+        'cancelled' => $requests->whereIn('status', ['cancelled'])->count(),
+        'borrowed'  => $requests->whereIn('status', ['approved','qr_ready','borrowed'])->count(),
+        'returned'  => $requests->where('status', 'returned')->count(),
+        'rejected'  => $requests->where('status', 'rejected')->count(),
     ];
     $statusMap = [
-        'pending'  => ['label'=>'Menunggu',    'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
-        'approved' => ['label'=>'Disetujui',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-        'qr_ready' => ['label'=>'Siap Ambil',  'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-        'borrowed' => ['label'=>'Dipinjam',    'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
-        'returned' => ['label'=>'Dikembalikan','cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
-        'rejected' => ['label'=>'Ditolak',     'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
+        'pending'   => ['label'=>'Menunggu',    'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
+        'cancelled' => ['label'=>'Dibatalkan',  'cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
+        'approved'  => ['label'=>'Disetujui',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
+        'qr_ready'  => ['label'=>'Siap Ambil',  'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
+        'borrowed'  => ['label'=>'Dipinjam',    'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
+        'returned'  => ['label'=>'Dikembalikan','cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
+        'rejected'  => ['label'=>'Ditolak',     'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
     ];
 @endphp
 
@@ -128,6 +130,21 @@
                             <button type="button" onclick="navigator.clipboard.writeText('{{ $shareLink }}'); this.textContent='Tersalin';" class="s-btn s-btn--sm s-btn--ghost">
                                 Salin Link
                             </button>
+                            <form method="POST" action="{{ route('student.loans.cancel', $req->id) }}" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="s-btn s-btn--sm s-btn--danger">
+                                    Batalkan
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                            <form method="POST" action="{{ route('student.loans.cancel', $req->id) }}" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="s-btn s-btn--sm s-btn--danger">
+                                    Batalkan
+                                </button>
+                            </form>
                         </div>
                     @endif
                 @elseif($req->status === 'rejected' && $req->rejection_reason)

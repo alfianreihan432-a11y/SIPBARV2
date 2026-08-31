@@ -178,22 +178,39 @@
         </a>
         <nav class="sidebar-nav">
             <?php
+            $teacherId = auth()->id();
+            $pendingRequestsCount = $teacherId
+                ? \App\Models\BorrowingRequest::where('teacher_id', $teacherId)
+                    ->where('status', \App\Models\BorrowingRequest::STATUS_PENDING)
+                    ->count()
+                : 0;
+            $activeLoansCount = $teacherId
+                ? \App\Models\BorrowingRequest::where('teacher_id', $teacherId)
+                    ->whereIn('status', [
+                        \App\Models\BorrowingRequest::STATUS_APPROVED,
+                        \App\Models\BorrowingRequest::STATUS_BORROWED,
+                        \App\Models\BorrowingRequest::STATUS_OVERDUE,
+                    ])
+                    ->count()
+                : 0;
             $menus = [
-                ['Dashboard',        'teacher.dashboard', 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', null],
-                ['Permohonan',       'teacher.requests', 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', '5'],
-                ['Siswa Bimbingan',  'teacher.students', 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', null],
-                ['Peminjaman Aktif', 'teacher.loans',    'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4', '3'],
-                ['Pengembalian',     'teacher.returns',  'M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6', null],
-                ['Laporan',          'teacher.reports',  'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', null],
-                ['Profil',           'teacher.profile',  'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', null],
+                ['Dashboard',        'teacher.dashboard', 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', null, null],
+                ['Permohonan',       'teacher.requests', 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'pending_requests', $pendingRequestsCount],
+                ['Siswa Bimbingan',  'teacher.students', 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', null, null],
+                ['Peminjaman Aktif', 'teacher.loans',    'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4', 'active_loans', $activeLoansCount],
+                ['Pengembalian',     'teacher.returns',  'M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6', null, null],
+                ['Laporan',          'teacher.reports',  'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', null, null],
+                ['Profil',           'teacher.profile',  'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', null, null],
             ];
             ?>
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $menus; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
-            <a href="<?php echo e(route($m[1])); ?>" class="nav-item <?php echo e(request()->routeIs($m[1]) ? 'active' : ''); ?>">
+            <a href="<?php echo e(route($m[1])); ?>" class="nav-item <?php echo e(request()->routeIs($m[1]) ? 'active' : ''); ?>" data-menu="<?php echo e($m[3] ?? ''); ?>">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<?php echo e($m[2]); ?>"/></svg>
                 <?php echo e($m[0]); ?>
 
-                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($m[3]): ?> <span class="nav-badge"><?php echo e($m[3]); ?></span> <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($m[3]): ?>
+                    <span class="nav-badge" data-badge="<?php echo e($m[3]); ?>" style="display: <?php echo e($m[4] > 0 ? 'inline-flex' : 'none'); ?>"><?php echo e($m[4]); ?></span>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             </a>
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::endLoop(); ?><?php endif; ?><?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::closeLoop(); ?><?php endif; ?>
         </nav>
@@ -329,6 +346,36 @@
                 e.stopPropagation();
             });
         }
+
+        function refreshTeacherSidebarCounts() {
+            fetch('<?php echo e(route('teacher.sidebar.counts')); ?>', {
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            })
+            .then(function(response) {
+                if (!response.ok) throw new Error('Failed');
+                return response.json();
+            })
+            .then(function(data) {
+                var pendingBadge = document.querySelector('[data-badge="pending_requests"]');
+                var activeBadge = document.querySelector('[data-badge="active_loans"]');
+
+                if (pendingBadge) {
+                    var pendingCount = Number(data.pending_requests || 0);
+                    pendingBadge.textContent = pendingCount;
+                    pendingBadge.style.display = pendingCount > 0 ? 'inline-flex' : 'none';
+                }
+
+                if (activeBadge) {
+                    var activeCount = Number(data.active_loans || 0);
+                    activeBadge.textContent = activeCount;
+                    activeBadge.style.display = activeCount > 0 ? 'inline-flex' : 'none';
+                }
+            })
+            .catch(function() {});
+        }
+
+        refreshTeacherSidebarCounts();
+        setInterval(refreshTeacherSidebarCounts, 15000);
     })();
     </script>
 </body>

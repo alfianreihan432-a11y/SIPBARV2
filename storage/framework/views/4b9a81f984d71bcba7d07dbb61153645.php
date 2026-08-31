@@ -88,12 +88,13 @@
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::openLoop(); ?><?php endif; ?><?php $__currentLoopData = $myRequests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::startLoopIteration(); ?><?php endif; ?>
             <?php
                 $statusMap = [
-                    'pending'  => ['label'=>'Menunggu',    'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
-                    'approved' => ['label'=>'Disetujui',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-                    'qr_ready' => ['label'=>'Siap Ambil',  'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-                    'borrowed' => ['label'=>'Dipinjam',    'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
-                    'returned' => ['label'=>'Dikembalikan','cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
-                    'rejected' => ['label'=>'Ditolak',     'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
+                    'pending'   => ['label'=>'Menunggu',    'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
+                    'cancelled' => ['label'=>'Dibatalkan',  'cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
+                    'approved'  => ['label'=>'Disetujui',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
+                    'qr_ready'  => ['label'=>'Siap Ambil',  'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
+                    'borrowed'  => ['label'=>'Dipinjam',    'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
+                    'returned'  => ['label'=>'Dikembalikan','cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
+                    'rejected'  => ['label'=>'Ditolak',     'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
                 ];
                 $st = $statusMap[$request->status] ?? $statusMap['pending'];
             ?>
@@ -126,6 +127,21 @@
                                 <button type="button" onclick="navigator.clipboard.writeText('<?php echo e($shareLink); ?>'); this.textContent='Tersalin';" class="s-btn s-btn--sm s-btn--ghost">
                                     Salin Link
                                 </button>
+                                <form method="POST" action="<?php echo e(route('student.loans.cancel', $request->id)); ?>" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
+                                    <?php echo csrf_field(); ?>
+                                    <button type="submit" class="s-btn s-btn--sm s-btn--danger">
+                                        Batalkan
+                                    </button>
+                                </form>
+                            </div>
+                        <?php else: ?>
+                            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                                <form method="POST" action="<?php echo e(route('student.loans.cancel', $request->id)); ?>" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
+                                    <?php echo csrf_field(); ?>
+                                    <button type="submit" class="s-btn s-btn--sm s-btn--danger">
+                                        Batalkan
+                                    </button>
+                                </form>
                             </div>
                         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     <?php elseif($request->status === 'qr_ready' && $request->qrCode): ?>
