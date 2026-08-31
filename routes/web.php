@@ -144,6 +144,9 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('api/internal/sipintu')->name('sipintu.')->group(function () {
         Route::get('status',   [SipintuStatusController::class, 'status'])->name('status');
         Route::post('validate', [SipintuStatusController::class, 'validate'])->name('validate');
+        Route::get('students', [SipintuStatusController::class, 'students'])->name('students');
+        Route::get('teachers', [SipintuStatusController::class, 'teachers'])->name('teachers');
+        Route::post('sync',     [SipintuStatusController::class, 'sync'])->name('sync');
     });
 });
 
