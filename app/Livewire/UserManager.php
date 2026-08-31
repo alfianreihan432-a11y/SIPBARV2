@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Classroom;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -14,6 +15,8 @@ class UserManager extends Component
 
     public $users;
     public $roles;
+    public $classrooms;
+    public $filterClassroom = '';
 
     // Active tab: 'siswa' | 'guru'
     public $activeTab = 'siswa';
@@ -29,6 +32,7 @@ class UserManager extends Component
     public $nis   = '';
     public $kelas = '';
     public $jurusan = '';
+    public $classroom_id = '';
 
     // ── Guru only ──
     public $nip = '';
@@ -43,6 +47,12 @@ class UserManager extends Component
     public $sijunaLoading = false;
     public $sijunaMessage = '';
     public $sijunaSuccess = false;
+
+    // ── SiPintu Sync Status ──
+    public $syncStatus = null;
+    public $syncMessage = '';
+    public $syncStats = null;
+    public $isSyncRunning = false;
 
     public function fetchSijunaData(): void
     {
@@ -104,6 +114,8 @@ class UserManager extends Component
     {
         $this->loadUsers();
         $this->loadRoles();
+        $this->loadClassrooms();
+        $this->loadSyncStatus();
     }
 
     public function render()
@@ -113,12 +125,28 @@ class UserManager extends Component
 
     public function loadUsers(): void
     {
-        $this->users = User::with('roles')->latest()->get();
+        $query = User::with('roles', 'classroom')->latest();
+
+        if ($this->filterClassroom) {
+            $query->where('classroom_id', $this->filterClassroom);
+        }
+
+        $this->users = $query->get();
+    }
+
+    public function updatedFilterClassroom(): void
+    {
+        $this->loadUsers();
     }
 
     public function loadRoles(): void
     {
         $this->roles = Role::orderBy('name')->pluck('name');
+    }
+
+    public function loadClassrooms(): void
+    {
+        $this->classrooms = Classroom::orderBy('name')->pluck('name', 'id');
     }
 
     public function setTab(string $tab): void
@@ -184,6 +212,7 @@ class UserManager extends Component
             $data['nis']     = $this->nis;
             $data['kelas']   = $this->kelas;
             $data['jurusan'] = $this->jurusan;
+            $data['classroom_id'] = $this->classroom_id ?: null;
         } elseif ($role === 'guru') {
             $data['nip']     = $this->nip;
             $data['jabatan'] = $this->jabatan;
@@ -224,6 +253,7 @@ class UserManager extends Component
         $this->nis            = $user->nis   ?? '';
         $this->kelas          = $user->kelas ?? '';
         $this->jurusan        = $user->jurusan ?? '';
+        $this->classroom_id   = $user->classroom_id ?? '';
         $this->nip            = $user->nip   ?? '';
         $this->jabatan        = $user->jabatan ?? '';
         $this->email          = $user->email;
@@ -248,6 +278,7 @@ class UserManager extends Component
         $this->nis           = '';
         $this->kelas         = '';
         $this->jurusan       = '';
+        $this->classroom_id  = '';
         $this->nip           = '';
         $this->jabatan       = '';
         $this->email         = '';
@@ -255,5 +286,40 @@ class UserManager extends Component
         $this->sijunaMessage = '';
         $this->sijunaSuccess = false;
         $this->sijunaLoading = false;
+    }
+
+    public function syncFromSipintu(): void
+    {
+        // Dispatch job to background queue
+        \App\Jobs\SyncSipintuUsersJob::dispatch(forceRefresh: true, batchSize: 100, chunkSize: 200);
+
+        // Update status immediately
+        $this->syncStatus = 'running';
+        $this->syncMessage = 'Sinkronisasi dimulai di background...';
+        $this->isSyncRunning = true;
+
+        session()->flash('message', 'Sinkronisasi dimulai di background. Proses akan berjalan beberapa menit.');
+    }
+
+    public function loadSyncStatus(): void
+    {
+        $status = \Illuminate\Support\Facades\Cache::get('sipintu_sync_status');
+
+        if ($status) {
+            $this->syncStatus = $status['status'];
+            $this->syncMessage = $status['message'];
+            $this->syncStats = $status['stats'] ?? null;
+            $this->isSyncRunning = $status['status'] === 'running';
+
+            // If sync is completed, reload users
+            if ($this->syncStatus === 'completed') {
+                $this->loadUsers();
+            }
+        } else {
+            $this->syncStatus = null;
+            $this->syncMessage = '';
+            $this->syncStats = null;
+            $this->isSyncRunning = false;
+        }
     }
 }

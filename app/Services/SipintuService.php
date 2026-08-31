@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -42,6 +43,8 @@ class SipintuService
     private function gatewayClient(): \Illuminate\Http\Client\PendingRequest
     {
         return Http::timeout($this->timeout)
+            ->connectTimeout(5) // 5 seconds connection timeout
+            ->withoutVerifying() // Bypass SSL verification for testing
             ->withHeaders([
                 'X-Client-ID'     => $this->clientId,
                 'X-Client-Secret' => $this->clientSecret,
@@ -70,8 +73,7 @@ class SipintuService
     public function ping(): array
     {
         try {
-            $response = Http::timeout($this->timeout)
-                ->withHeaders(['Accept' => 'application/json'])
+            $response = $this->gatewayClient()
                 ->get($this->url('ping'), ['client_id' => $this->clientId]);
 
             if ($response->successful()) {
@@ -136,14 +138,15 @@ class SipintuService
     // ═══════════════════════════════════════════════════════════
 
     /**
-     * Ambil data siswa dari SIJUNA via SiPintu Gateway.
+     * Ambil data siswa dari SIJUNA via SiPintu Gateway dengan caching.
      * GET /api/v1/sijuna/students
      *
      * @param  string|null  $nis     Filter berdasarkan NIS siswa
      * @param  string|null  $search  Pencarian berdasarkan nama
-     * @return array{success: bool, data: array, total: int, error: string|null}
+     * @param  bool         $forceRefresh  Skip cache dan ambil data fresh dari API
+     * @return array{success: bool, data: array, total: int, error: string|null, cached: bool}
      */
-    public function getStudents(?string $nis = null, ?string $search = null): array
+    public function getStudents(?string $nis = null, ?string $search = null, bool $forceRefresh = false): array
     {
         try {
             $params = array_filter([
@@ -151,16 +154,35 @@ class SipintuService
                 'search' => $search,
             ]);
 
+            // Generate cache key
+            $cacheKey = 'sipintu:students:' . md5(json_encode($params));
+
+            // Return cached data if available and not forcing refresh
+            if (!$forceRefresh && Cache::has($cacheKey)) {
+                return [
+                    'success' => true,
+                    'data'    => Cache::get($cacheKey),
+                    'total'   => count(Cache::get($cacheKey)),
+                    'error'   => null,
+                    'cached'  => true,
+                ];
+            }
+
             $response = $this->gatewayClient()->get($this->url('students'), $params);
 
             if ($response->successful()) {
                 $body = $response->json();
                 $data = $body['data'] ?? $body;
+
+                // Cache result for 10 minutes
+                Cache::put($cacheKey, is_array($data) ? $data : [], now()->addMinutes(10));
+
                 return [
                     'success' => true,
                     'data'    => is_array($data) ? $data : [],
                     'total'   => $body['total'] ?? count($data),
                     'error'   => null,
+                    'cached'  => false,
                 ];
             }
 
@@ -169,24 +191,26 @@ class SipintuService
                 'data'    => [],
                 'total'   => 0,
                 'error'   => "HTTP {$response->status()}: " . ($response->json('message') ?? 'Gagal mengambil data siswa'),
+                'cached'  => false,
             ];
         } catch (ConnectionException $e) {
-            return ['success' => false, 'data' => [], 'total' => 0, 'error' => 'Tidak dapat terhubung ke SiPintu — server mungkin offline.'];
+            return ['success' => false, 'data' => [], 'total' => 0, 'error' => 'Tidak dapat terhubung ke SiPintu — server mungkin offline.', 'cached' => false];
         } catch (\Exception $e) {
             Log::error('SiPintu getStudents error: ' . $e->getMessage());
-            return ['success' => false, 'data' => [], 'total' => 0, 'error' => $e->getMessage()];
+            return ['success' => false, 'data' => [], 'total' => 0, 'error' => $e->getMessage(), 'cached' => false];
         }
     }
 
     /**
-     * Ambil data guru dari SIJUNA via SiPintu Gateway.
+     * Ambil data guru dari SIJUNA via SiPintu Gateway dengan caching.
      * GET /api/v1/sijuna/teachers
      *
      * @param  string|null  $nip     Filter berdasarkan NIP guru
      * @param  string|null  $search  Pencarian berdasarkan nama guru
-     * @return array{success: bool, data: array, total: int, error: string|null}
+     * @param  bool         $forceRefresh  Skip cache dan ambil data fresh dari API
+     * @return array{success: bool, data: array, total: int, error: string|null, cached: bool}
      */
-    public function getTeachers(?string $nip = null, ?string $search = null): array
+    public function getTeachers(?string $nip = null, ?string $search = null, bool $forceRefresh = false): array
     {
         try {
             $params = array_filter([
@@ -194,16 +218,35 @@ class SipintuService
                 'search' => $search,
             ]);
 
+            // Generate cache key
+            $cacheKey = 'sipintu:teachers:' . md5(json_encode($params));
+
+            // Return cached data if available and not forcing refresh
+            if (!$forceRefresh && Cache::has($cacheKey)) {
+                return [
+                    'success' => true,
+                    'data'    => Cache::get($cacheKey),
+                    'total'   => count(Cache::get($cacheKey)),
+                    'error'   => null,
+                    'cached'  => true,
+                ];
+            }
+
             $response = $this->gatewayClient()->get($this->url('teachers'), $params);
 
             if ($response->successful()) {
                 $body = $response->json();
                 $data = $body['data'] ?? $body;
+
+                // Cache result for 10 minutes
+                Cache::put($cacheKey, is_array($data) ? $data : [], now()->addMinutes(10));
+
                 return [
                     'success' => true,
                     'data'    => is_array($data) ? $data : [],
                     'total'   => $body['total'] ?? count($data),
                     'error'   => null,
+                    'cached'  => false,
                 ];
             }
 
@@ -212,12 +255,13 @@ class SipintuService
                 'data'    => [],
                 'total'   => 0,
                 'error'   => "HTTP {$response->status()}: " . ($response->json('message') ?? 'Gagal mengambil data guru'),
+                'cached'  => false,
             ];
         } catch (ConnectionException $e) {
-            return ['success' => false, 'data' => [], 'total' => 0, 'error' => 'Tidak dapat terhubung ke SiPintu — server mungkin offline.'];
+            return ['success' => false, 'data' => [], 'total' => 0, 'error' => 'Tidak dapat terhubung ke SiPintu — server mungkin offline.', 'cached' => false];
         } catch (\Exception $e) {
             Log::error('SiPintu getTeachers error: ' . $e->getMessage());
-            return ['success' => false, 'data' => [], 'total' => 0, 'error' => $e->getMessage()];
+            return ['success' => false, 'data' => [], 'total' => 0, 'error' => $e->getMessage(), 'cached' => false];
         }
     }
 

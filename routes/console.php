@@ -15,3 +15,11 @@ Schedule::command('borrowing:send-reminders')
     ->withoutOverlapping()
     ->onOneServer();
 
+// Schedule SiPintu user sync to run daily at 01:00 AM
+Schedule::command('sipintu:sync-users')
+    ->dailyAt('01:00')
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping()
+    ->onOneServer()
+    ->runInBackground();
+
