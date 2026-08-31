@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class SettingsController extends Controller
@@ -59,5 +60,48 @@ class SettingsController extends Controller
     public function appearance()
     {
         return view('pages.admin.settings-appearance');
+    }
+
+    /** Update profile photo */
+    public function updateProfilePhoto(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'foto_profil' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+        ]);
+
+        // Delete old photo if exists
+        if ($user->foto_profil && Storage::exists($user->foto_profil)) {
+            Storage::delete($user->foto_profil);
+        }
+
+        // Store new photo
+        $path = $validated['foto_profil']->store('profile-photos', 'public');
+
+        $user->update(['foto_profil' => $path]);
+
+        // Refresh user model to get updated data
+        $user->refresh();
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Foto profil berhasil diperbarui']);
+        }
+
+        return back()->with('success', 'Foto profil berhasil diperbarui');
+    }
+
+    /** Delete profile photo */
+    public function deleteProfilePhoto(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->foto_profil && Storage::exists($user->foto_profil)) {
+            Storage::delete($user->foto_profil);
+        }
+
+        $user->update(['foto_profil' => null]);
+
+        return back()->with('success', 'Foto profil berhasil dihapus');
     }
 }

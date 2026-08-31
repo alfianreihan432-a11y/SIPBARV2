@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\MagicApprovalController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SipintuAuthController;
 use App\Http\Controllers\SipintuStatusController;
 use App\Http\Controllers\Student\StudentQRCodeController;
@@ -92,6 +93,10 @@ Route::middleware(['auth'])->group(function () {
     Route::view('siswa/riwayat', 'pages.siswa.history')->name('student.history');
     Route::view('siswa/pengumuman', 'pages.siswa.announcements')->name('student.announcements');
     Route::view('siswa/profil', 'pages.siswa.profile')->name('student.profile');
+    
+    // Student profile photo routes
+    Route::post('siswa/profil/foto', [SettingsController::class, 'updateProfilePhoto'])->name('student.profile.photo.update');
+    Route::delete('siswa/profil/foto', [SettingsController::class, 'deleteProfilePhoto'])->name('student.profile.photo.delete');
 
     // Student QR Code — generate/tampilkan QR untuk peminjaman yang disetujui
     Route::get('siswa/peminjaman/{id}/qrcode', [StudentQRCodeController::class, 'show'])
@@ -134,6 +139,10 @@ Route::middleware(['auth'])->group(function () {
     Route::view('guru/pengembalian', 'pages.guru.returns')->name('teacher.returns');
     Route::view('guru/laporan', 'pages.guru.reports')->name('teacher.reports');
     Route::view('guru/profil', 'pages.guru.profile')->name('teacher.profile');
+    
+    // Teacher profile photo routes
+    Route::post('guru/profil/foto', [SettingsController::class, 'updateProfilePhoto'])->name('teacher.profile.photo.update');
+    Route::delete('guru/profil/foto', [SettingsController::class, 'deleteProfilePhoto'])->name('teacher.profile.photo.delete');
 
     // ─── Notification & Message APIs ───
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');

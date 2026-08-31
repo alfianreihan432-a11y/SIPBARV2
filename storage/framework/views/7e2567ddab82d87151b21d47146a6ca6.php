@@ -1,16 +1,14 @@
-@extends('layouts.siswa')
+<?php $__env->startSection('title', 'Profil Saya – SIPBAR'); ?>
 
-@section('title', 'Profil Saya – SIPBAR')
-
-@section('content')
-@php
+<?php $__env->startSection('content'); ?>
+<?php
     $user = auth()->user();
     $totalLoans    = \App\Models\BorrowingRequest::where('user_id', auth()->id())->count();
     $activeLoans   = \App\Models\BorrowingRequest::where('user_id', auth()->id())->whereIn('status', ['borrowed', 'approved'])->count();
     $returnedLoans = \App\Models\BorrowingRequest::where('user_id', auth()->id())->where('status', 'returned')->count();
-@endphp
+?>
 
-{{-- Page Header --}}
+
 <div class="page-header">
     <div class="page-header-left">
         <div class="page-title">Profil Saya</div>
@@ -18,17 +16,18 @@
     </div>
 </div>
 
-{{-- Profile Card Banner --}}
+
 <div class="s-card" style="margin-bottom:20px;padding:24px 28px">
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
         <div style="position:relative;flex-shrink:0">
-            @if($user && $user->hasProfilePhoto())
-                <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" style="width:72px;height:72px;border-radius:50%;border:3px solid var(--border2);object-fit:cover;box-shadow:0 4px 12px rgba(37,99,235,.2)">
-            @else
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($user && $user->hasProfilePhoto()): ?>
+                <img src="<?php echo e($user->profile_photo_url); ?>" alt="<?php echo e($user->name); ?>" style="width:72px;height:72px;border-radius:50%;border:3px solid var(--border2);object-fit:cover;box-shadow:0 4px 12px rgba(37,99,235,.2)">
+            <?php else: ?>
                 <div style="width:72px;height:72px;border-radius:50%;background:var(--primary-dark);border:3px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:24px;font-weight:800;color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.2)">
-                    {{ $user ? strtoupper(substr($user->name, 0, 2)) : 'SI' }}
+                    <?php echo e($user ? strtoupper(substr($user->name, 0, 2)) : 'SI'); ?>
+
                 </div>
-            @endif
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             <label for="foto_profil" style="position:absolute;bottom:0;right:0;width:28px;height:28px;background:var(--primary);border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:all .2s" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </label>
@@ -36,10 +35,12 @@
         </div>
         <div style="flex:1;min-width:200px">
             <div style="font-family:var(--font-head);font-size:20px;font-weight:800;color:var(--text);line-height:1.2">
-                {{ $user ? $user->name : 'Siswa' }}
+                <?php echo e($user ? $user->name : 'Siswa'); ?>
+
             </div>
             <div style="font-size:13px;color:var(--muted);margin-top:4px">
-                {{ $user ? $user->email : '-' }}
+                <?php echo e($user ? $user->email : '-'); ?>
+
             </div>
             <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
                 <span class="s-badge s-badge--approved">
@@ -54,14 +55,14 @@
     </div>
 </div>
 
-{{-- Statistics Row --}}
+
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px" class="profile-stat-grid">
     <div class="s-stat">
         <div class="s-stat-icon" style="background:rgba(37,99,235,.1)">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--primary)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
         </div>
         <div class="s-stat-body">
-            <div class="s-stat-num">{{ $totalLoans }}</div>
+            <div class="s-stat-num"><?php echo e($totalLoans); ?></div>
             <div class="s-stat-label">Total Pengajuan</div>
         </div>
     </div>
@@ -70,7 +71,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#0891b2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
         </div>
         <div class="s-stat-body">
-            <div class="s-stat-num">{{ $activeLoans }}</div>
+            <div class="s-stat-num"><?php echo e($activeLoans); ?></div>
             <div class="s-stat-label">Sedang Dipinjam</div>
         </div>
     </div>
@@ -79,7 +80,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#059669" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <div class="s-stat-body">
-            <div class="s-stat-num">{{ $returnedLoans }}</div>
+            <div class="s-stat-num"><?php echo e($returnedLoans); ?></div>
             <div class="s-stat-label">Selesai Dikembalikan</div>
         </div>
     </div>
@@ -88,7 +89,7 @@
     @media(max-width:768px){.profile-stat-grid{grid-template-columns:1fr!important}}
 </style>
 
-{{-- Info Grid --}}
+
 <div class="s-card" style="margin-bottom:20px">
     <div class="s-card-header">
         <div>
@@ -99,11 +100,11 @@
     <div class="s-info-grid">
         <div class="s-info-item">
             <div class="s-info-label">Nama Lengkap</div>
-            <div class="s-info-value">{{ $user ? $user->name : '-' }}</div>
+            <div class="s-info-value"><?php echo e($user ? $user->name : '-'); ?></div>
         </div>
         <div class="s-info-item">
             <div class="s-info-label">Alamat Email</div>
-            <div class="s-info-value">{{ $user ? $user->email : '-' }}</div>
+            <div class="s-info-value"><?php echo e($user ? $user->email : '-'); ?></div>
         </div>
         <div class="s-info-item">
             <div class="s-info-label">Hak Akses</div>
@@ -112,13 +113,14 @@
         <div class="s-info-item">
             <div class="s-info-label">Terdaftar Sejak</div>
             <div class="s-info-value">
-                {{ $user && $user->created_at ? \Carbon\Carbon::parse($user->created_at)->translatedFormat('d F Y') : '-' }}
+                <?php echo e($user && $user->created_at ? \Carbon\Carbon::parse($user->created_at)->translatedFormat('d F Y') : '-'); ?>
+
             </div>
         </div>
     </div>
 </div>
 
-{{-- Quick Actions --}}
+
 <div class="s-card">
     <div class="s-card-header">
         <div>
@@ -127,19 +129,19 @@
         </div>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <a href="{{ route('student.catalog') }}" class="s-btn s-btn--primary">
+        <a href="<?php echo e(route('student.catalog')); ?>" class="s-btn s-btn--primary">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             Katalog Barang
         </a>
-        <a href="{{ route('student.loans') }}" class="s-btn s-btn--secondary">
+        <a href="<?php echo e(route('student.loans')); ?>" class="s-btn s-btn--secondary">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             Peminjaman Saya
         </a>
-        <a href="{{ route('student.history') }}" class="s-btn s-btn--secondary">
+        <a href="<?php echo e(route('student.history')); ?>" class="s-btn s-btn--secondary">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             Riwayat Transaksi
         </a>
-        <a href="{{ route('student.announcements') }}" class="s-btn s-btn--secondary">
+        <a href="<?php echo e(route('student.announcements')); ?>" class="s-btn s-btn--secondary">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
             Pengumuman
         </a>
@@ -179,7 +181,7 @@ function previewAndUpload(input) {
         formData.append('_token', csrfToken);
         
         // Upload via AJAX
-        fetch('{{ route("student.profile.photo.update") }}', {
+        fetch('<?php echo e(route("student.profile.photo.update")); ?>', {
             method: 'POST',
             body: formData,
             headers: {
@@ -213,4 +215,6 @@ function previewAndUpload(input) {
     }
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.siswa', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\Dell\SIPBARV2\resources\views/pages/siswa/profile.blade.php ENDPATH**/ ?>

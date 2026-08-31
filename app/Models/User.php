@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
@@ -30,7 +31,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'nis', 'kelas', 'alamat', 'tanggal_lahir', 'nip', 'phone', 'jurusan', 'jabatan', 'sipintu_synced_at', 'data_source', 'classroom_id'])]
+#[Fillable(['name', 'email', 'password', 'nis', 'kelas', 'alamat', 'tanggal_lahir', 'nip', 'phone', 'jurusan', 'jabatan', 'sipintu_synced_at', 'data_source', 'classroom_id', 'foto_profil'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
@@ -81,5 +82,25 @@ class User extends Authenticatable implements PasskeyUser
         return Str::length($initials) > 1
             ? Str::substr($initials, 0, 1).Str::substr($initials, -1)
             : $initials;
+    }
+
+    /**
+     * Get the user's profile photo URL
+     */
+    public function getProfilePhotoUrlAttribute(): string
+    {
+        if ($this->foto_profil) {
+            return Storage::url($this->foto_profil);
+        }
+
+        return '';
+    }
+
+    /**
+     * Check if user has a profile photo
+     */
+    public function hasProfilePhoto(): bool
+    {
+        return !empty($this->foto_profil) && Storage::exists($this->foto_profil);
     }
 }
