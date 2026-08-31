@@ -78,7 +78,7 @@
             </div>
             <div>
                 <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tanggal Kembali</label>
-                <p class="mt-1 font-semibold text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($transaction->return_date)->format('d M Y') }}</p>
+                <p class="mt-1 font-semibold text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($transaction->return_date)->format('d M Y') }} @if($transaction->return_time) · {{ $transaction->return_time }}@endif</p>
             </div>
         </div>
 

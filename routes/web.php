@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\AdminQRVerificationController;
 use App\Http\Controllers\Admin\AdminReturnController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\MagicApprovalController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SipintuAuthController;
 use App\Http\Controllers\SipintuStatusController;
 use App\Http\Controllers\Student\StudentQRCodeController;
@@ -13,6 +15,28 @@ use App\Http\Controllers\TransactionHistoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+
+// ─── MAGIC LINK APPROVAL (Signed URL — tidak perlu login) ───────────────────
+// Guru mengklik link dari email, tanpa harus punya akun / login ke SIPBAR.
+// Middleware 'signed' memvalidasi signature dari URL::temporarySignedRoute().
+// PENTING: GET show() tidak boleh ada side effect (aman dari prefetcher email).
+Route::middleware('signed')->group(function () {
+    Route::get(
+        '/approval/{borrowingRequest}',
+        [MagicApprovalController::class, 'show']
+    )->name('approval.show');
+
+    Route::post(
+        '/approval/{borrowingRequest}/approve',
+        [MagicApprovalController::class, 'approve']
+    )->name('approval.approve');
+
+    Route::post(
+        '/approval/{borrowingRequest}/reject',
+        [MagicApprovalController::class, 'reject']
+    )->name('approval.reject');
+});
+// ────────────────────────────────────────────────────────────────────────────
 
 // ─── SIPINTU OAUTH 2.0 SSO (public — sebelum middleware auth) ───
 Route::get('/oauth/sipintu', [SipintuAuthController::class, 'redirect'])->name('sipintu.oauth.redirect');
@@ -110,6 +134,11 @@ Route::middleware(['auth'])->group(function () {
     Route::view('guru/pengembalian', 'pages.guru.returns')->name('teacher.returns');
     Route::view('guru/laporan', 'pages.guru.reports')->name('teacher.reports');
     Route::view('guru/profil', 'pages.guru.profile')->name('teacher.profile');
+
+    // ─── Notification & Message APIs ───
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
 
     // ─── SIPINTU Internal API (AJAX dari admin panel) ───
     Route::prefix('api/internal/sipintu')->name('sipintu.')->group(function () {

@@ -62,7 +62,7 @@
                     </div>
                     <div>
                         <label class="text-xs text-gray-500">Tanggal Kembali</label>
-                        <p class="font-medium">{{ $scannedRequest->return_date }}</p>
+                        <p class="font-medium">{{ $scannedRequest->return_date }} @if($scannedRequest->return_time) · {{ $scannedRequest->return_time }}@endif</p>
                     </div>
                 </div>
             </div>

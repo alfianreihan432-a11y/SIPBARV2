@@ -141,6 +141,9 @@ table.lmt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                     $dueDate  = $b->return_date ? \Carbon\Carbon::parse($b->return_date) : null;
                     $dueClass = 'ok';
                     $dueText  = $dueDate ? $dueDate->format('d M Y') : '—';
+                    if ($b->return_time) {
+                        $dueText .= ' · ' . $b->return_time;
+                    }
                     if ($dueDate) {
                         if ($dueDate->isPast() && $b->status !== 'returned') $dueClass = 'over';
                         elseif ($dueDate->diffInDays(now()) <= 2 && $b->status !== 'returned') $dueClass = 'warn';
