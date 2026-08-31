@@ -198,7 +198,11 @@
         </nav>
         <div class="sidebar-footer">
             <a href="{{ route('teacher.profile') }}" class="user-card">
-                <div class="user-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
+                @if(auth()->check() && auth()->user()->hasProfilePhoto())
+                    <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="user-avatar" style="object-fit:cover">
+                @else
+                    <div class="user-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
+                @endif
                 <div>
                     <div class="user-name">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
                     <div class="user-role">Guru Pembimbing</div>
@@ -235,13 +239,21 @@
                 {{-- User Profile Dropdown Wrap --}}
                 <div class="topbar-user-wrap">
                     <button type="button" id="profileBtn" class="topbar-user">
-                        <div class="topbar-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
+                        @if(auth()->check() && auth()->user()->hasProfilePhoto())
+                            <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="topbar-avatar" style="object-fit:cover">
+                        @else
+                            <div class="topbar-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
+                        @endif
                         <div class="topbar-uname">{{ auth()->check() ? explode(' ',auth()->user()->name)[0] : 'Guru' }}</div>
                         <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;color:var(--subtle);margin-left:2px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
                     <div id="profileDropdown" class="profile-dropdown-menu">
                         <div class="pdm-header">
-                            <div class="pdm-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
+                            @if(auth()->check() && auth()->user()->hasProfilePhoto())
+                                <img src="{{ auth()->user()->profile_photo_url }}" alt="{{ auth()->user()->name }}" class="pdm-avatar" style="object-fit:cover">
+                            @else
+                                <div class="pdm-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
+                            @endif
                             <div class="pdm-info">
                                 <div class="pdm-name">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
                                 <div class="pdm-role">Guru Pembimbing</div>

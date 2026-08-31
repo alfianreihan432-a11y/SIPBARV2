@@ -646,7 +646,11 @@
 
         <div class="sidebar-footer">
             <a href="<?php echo e(route('student.profile')); ?>" class="user-card">
-                <div class="user-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'SI'); ?></div>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->check() && auth()->user()->hasProfilePhoto()): ?>
+                    <img src="<?php echo e(auth()->user()->profile_photo_url); ?>" alt="<?php echo e(auth()->user()->name); ?>" class="user-avatar" style="object-fit:cover">
+                <?php else: ?>
+                    <div class="user-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'SI'); ?></div>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 <div>
                     <div class="user-name"><?php echo e(auth()->check() ? auth()->user()->name : 'Siswa'); ?></div>
                     <div class="user-role">Peminjam Barang</div>
@@ -686,13 +690,21 @@
                 
                 <div class="topbar-user-wrap">
                     <button type="button" id="profileBtn" class="topbar-user">
-                        <div class="topbar-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'SI'); ?></div>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->check() && auth()->user()->hasProfilePhoto()): ?>
+                            <img src="<?php echo e(auth()->user()->profile_photo_url); ?>" alt="<?php echo e(auth()->user()->name); ?>" class="topbar-avatar" style="object-fit:cover">
+                        <?php else: ?>
+                            <div class="topbar-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'SI'); ?></div>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         <div class="topbar-uname"><?php echo e(auth()->check() ? explode(' ',auth()->user()->name)[0] : 'Siswa'); ?></div>
                         <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;color:var(--subtle);margin-left:2px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
                     <div id="profileDropdown" class="profile-dropdown-menu">
                         <div class="pdm-header">
-                            <div class="pdm-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'SI'); ?></div>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(auth()->check() && auth()->user()->hasProfilePhoto()): ?>
+                                <img src="<?php echo e(auth()->user()->profile_photo_url); ?>" alt="<?php echo e(auth()->user()->name); ?>" class="pdm-avatar" style="object-fit:cover">
+                            <?php else: ?>
+                                <div class="pdm-avatar"><?php echo e(auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'SI'); ?></div>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                             <div class="pdm-info">
                                 <div class="pdm-name"><?php echo e(auth()->check() ? auth()->user()->name : 'Siswa'); ?></div>
                                 <div class="pdm-role">Peminjam Barang</div>
