@@ -82,6 +82,10 @@ Route::middleware(['auth'])->group(function () {
     })->name('student.catalog');
 
     Route::view('siswa/peminjaman', 'pages.siswa.loans')->name('student.loans');
+    Route::get('siswa/peminjaman/{id}/edit', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'edit'])
+        ->name('student.loans.edit');
+    Route::put('siswa/peminjaman/{id}/update', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'update'])
+        ->name('student.loans.update');
     Route::post('siswa/peminjaman/{id}/cancel', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'cancel'])
         ->name('student.loans.cancel');
 
