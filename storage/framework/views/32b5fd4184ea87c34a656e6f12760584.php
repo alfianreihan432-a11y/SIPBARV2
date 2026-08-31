@@ -104,6 +104,20 @@
     </div>
 
     <form wire:submit.prevent="submit">
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px;">
+                Nomor HP Siswa *
+            </label>
+            <input type="text" wire:model="student_phone" class="s-filter-input" placeholder="Contoh: 08123456789" autocomplete="off">
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['student_phone'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> <span style="color: var(--s-rejected); font-size: 12px; display: block; margin-top: 4px;"><?php echo e($message); ?></span> <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+        </div>
         
         <div style="margin-bottom: 16px;">
             <label style="display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px;">

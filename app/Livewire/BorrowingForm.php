@@ -20,6 +20,7 @@ class BorrowingForm extends Component
     public $return_time;
     public $teacher_id;
     public $notes = '';
+    public $student_phone = '';
 
     public function mount($itemId)
     {
@@ -27,6 +28,7 @@ class BorrowingForm extends Component
         $this->borrow_date = now()->toDateString();
         $this->return_date = now()->addDays(7)->toDateString();
         $this->return_time = '14:00';
+        $this->student_phone = Auth::user()->phone ?? '';
 
         if ($this->item->teacher_id) {
             $this->teacher_id = $this->item->teacher_id;
@@ -43,12 +45,17 @@ class BorrowingForm extends Component
         $this->validate([
             'quantity' => 'required|integer|min:1|max:' . $this->item->stock,
             'purpose' => 'required|string|min:5',
+            'student_phone' => 'required|string|min:9|max:20',
             'borrow_date' => 'required|date|after_or_equal:today',
             'return_date' => 'required|date|after_or_equal:borrow_date',
             'return_time' => 'required|date_format:H:i',
             'teacher_id' => 'required|exists:users,id',
             'notes' => 'nullable|string|max:500',
         ]);
+
+        $user = Auth::user();
+        $user->phone = $this->student_phone;
+        $user->save();
 
         if ($this->return_date === $this->borrow_date && $this->return_date === now()->toDateString()) {
             $currentHour = now()->format('H:i');
