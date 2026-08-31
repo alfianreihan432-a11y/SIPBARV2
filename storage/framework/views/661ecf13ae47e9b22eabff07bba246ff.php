@@ -121,8 +121,11 @@
                             ? app(\App\Services\WhatsAppNotificationService::class)->getDirectWaLink($req)
                             : null;
                     ?>
-                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($shareLink): ?>
-                        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+                        <a href="<?php echo e(route('student.loans.edit', $req->id)); ?>" class="s-btn s-btn--sm s-btn--ghost">
+                            Edit
+                        </a>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($shareLink): ?>
                             <a href="<?php echo e($shareLink); ?>" target="_blank" rel="noopener" class="s-btn s-btn--sm s-btn--primary">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l.7-3.305A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                                 Kirim ke WA Guru
@@ -130,23 +133,14 @@
                             <button type="button" onclick="navigator.clipboard.writeText('<?php echo e($shareLink); ?>'); this.textContent='Tersalin';" class="s-btn s-btn--sm s-btn--ghost">
                                 Salin Link
                             </button>
-                            <form method="POST" action="<?php echo e(route('student.loans.cancel', $req->id)); ?>" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
-                                <?php echo csrf_field(); ?>
-                                <button type="submit" class="s-btn s-btn--sm s-btn--danger">
-                                    Batalkan
-                                </button>
-                            </form>
-                        </div>
-                    <?php else: ?>
-                        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-                            <form method="POST" action="<?php echo e(route('student.loans.cancel', $req->id)); ?>" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
-                                <?php echo csrf_field(); ?>
-                                <button type="submit" class="s-btn s-btn--sm s-btn--danger">
-                                    Batalkan
-                                </button>
-                            </form>
-                        </div>
-                    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        <form method="POST" action="<?php echo e(route('student.loans.cancel', $req->id)); ?>" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
+                            <?php echo csrf_field(); ?>
+                            <button type="submit" class="s-btn s-btn--sm s-btn--danger">
+                                Batalkan
+                            </button>
+                        </form>
+                    </div>
                 <?php elseif($req->status === 'rejected' && $req->rejection_reason): ?>
                 <div style="margin-top:8px;padding:8px 12px;background:var(--s-rejected-bg);border:1px solid var(--s-rejected-bdr);border-radius:8px;font-size:12px;color:var(--s-rejected)">
                     <strong>Alasan ditolak:</strong> <?php echo e($req->rejection_reason); ?>
