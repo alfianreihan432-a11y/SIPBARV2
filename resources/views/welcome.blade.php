@@ -512,41 +512,75 @@ html.dark .mob-t-moon{display:none}
 .stat-sub-b{font-size:12px;font-weight:500;color:#64748b;margin-top:3px}
 </style>
 <style>
-/* ─── ABOUT (MODERN SHOWCASE) ─── */
-.about-grid-modern{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
-.about-content{display:flex;flex-direction:column}
-.about-pillars{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:32px}
-.about-pillar-card{background:#ffffff;border:1.5px solid #e5e7eb;border-radius:16px;padding:18px;transition:all .25s ease;display:flex;flex-direction:column;gap:6px}
-.about-pillar-card:hover{transform:translateY(-3px);border-color:#2563eb;box-shadow:0 8px 24px rgba(37,99,235,.08)}
-.about-pillar-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;color:#2563eb;letter-spacing:.05em}
-.about-pillar-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#0f172a;line-height:1.35}
-.about-pillar-desc{font-size:12.5px;color:#64748b;line-height:1.55;font-weight:400}
+/* ─── ABOUT SECTION REDESIGNED ─── */
+.about-grid-redesigned{display:grid;grid-template-columns:1fr 1px 1.05fr;gap:0;align-items:stretch;position:relative}
+.about-content-redesigned{position:relative;padding-right:48px;display:flex;flex-direction:column}
 
-/* Showcase visual container */
-.about-showcase{position:relative}
-.showcase-glass-card{background:linear-gradient(145deg,#ffffff 0%,#f8fafc 100%);border:1.5px solid #e2e8f0;border-radius:24px;padding:24px;box-shadow:0 24px 64px rgba(29,78,216,.1);position:relative;overflow:hidden}
-.showcase-header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:14px;margin-bottom:18px}
-.showcase-dots{display:flex;gap:6px}
-.showcase-dot{width:10px;height:10px;border-radius:50%}
-.showcase-tag{font-size:11px;font-weight:700;color:#1d4ed8;background:#eff6ff;padding:4px 10px;border-radius:999px;border:1px solid #dbeafe}
+/* Decorative large number */
+.decorative-number{position:absolute;top:-60px;left:-20px;font-family:'Plus Jakarta Sans',sans-serif;font-size:180px;font-weight:900;color:rgba(29,78,216,.04);line-height:1;z-index:0;pointer-events:none}
 
-.showcase-ticket{background:#ffffff;border:1.5px solid #e5e7eb;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 4px 12px rgba(0,0,0,.03)}
-.showcase-ticket-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.showcase-ticket-id{font-size:11px;font-weight:800;color:#64748b;font-family:'Plus Jakarta Sans',sans-serif}
-.showcase-ticket-status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#059669;background:#ecfdf5;padding:3px 8px;border-radius:999px}
-.showcase-ticket-pulse{width:6px;height:6px;border-radius:50%;background:#10b981}
-.showcase-item-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#0f172a;margin-bottom:4px}
-.showcase-item-sub{font-size:12px;color:#64748b}
+/* Eyebrow label */
+.about-eyebrow-redesigned{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#1d4ed8;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;position:relative;z-index:1}
+.eyebrow-dot{width:6px;height:6px;background:#1d4ed8;border-radius:50%}
 
-.showcase-qr-row{display:flex;align-items:center;gap:14px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:12px}
-.showcase-qr-box{width:46px;height:46px;background:#1d4ed8;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
-.showcase-qr-text{font-size:12px;font-weight:700;color:#1e293b}
-.showcase-qr-sub{font-size:11px;color:#64748b}
+/* Headline with hierarchy */
+.about-headline-redesigned{font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:800;line-height:1.2;color:#0f172a;margin-bottom:16px;position:relative;z-index:1;letter-spacing:-.01em}
+.headline-accent{color:#1d4ed8;font-style:normal}
 
-.quote-elegant{margin-top:18px;background:rgba(255,255,255,.9);border:1px solid #e2e8f0;border-radius:16px;padding:16px 20px;position:relative;backdrop-filter:blur(8px)}
-.quote-mark{font-size:32px;font-family:Georgia,serif;line-height:1;color:#2563eb;margin-bottom:2px}
-.quote-phrase{font-size:13px;font-style:italic;color:#334155;line-height:1.55;font-weight:500}
-.quote-sign{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;color:#1d4ed8;margin-top:8px;letter-spacing:.02em}
+/* Description */
+.about-desc-redesigned{font-size:16px;color:#64748b;line-height:1.75;margin-bottom:40px;position:relative;z-index:1;max-width:520px}
+
+/* Feature Cards Grid */
+.feature-cards-redesigned{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;position:relative;z-index:1}
+
+/* Feature Card */
+.feature-card{background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;transition:all .3s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.feature-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:#e5e7eb;transition:background .3s}
+.feature-card:hover{transform:translateY(-4px);border-color:#1d4ed8;box-shadow:0 12px 32px rgba(29,78,216,.12)}
+.feature-card:hover::before{background:#1d4ed8}
+
+/* Primary Card (highlighted) */
+.feature-card-primary{background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%);border-color:#1d4ed8}
+.feature-card-primary::before{background:rgba(255,255,255,.3)}
+.feature-card-primary:hover{box-shadow:0 16px 40px rgba(29,78,216,.25)}
+.feature-card-primary .card-num{color:#fff}
+.feature-card-primary .card-title{color:#fff}
+.feature-card-primary .card-desc{color:rgba(255,255,255,.9)}
+.feature-card-primary .card-icon{background:rgba(255,255,255,.2);color:#fff}
+
+/* Card Header with icon and number */
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.card-icon{width:36px;height:36px;background:#eff6ff;border:1px solid #dbeafe;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#1d4ed8;flex-shrink:0;transition:all .3s}
+.feature-card:hover .card-icon{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+.card-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;color:#1d4ed8;letter-spacing:.05em}
+
+/* Card Content */
+.card-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:#0f172a;line-height:1.3;margin:0}
+.card-desc{font-size:13px;color:#64748b;line-height:1.55;margin:0;font-weight:400}
+
+/* Vertical Divider */
+.vertical-divider{width:1px;background:linear-gradient(to bottom,transparent,#e2e8f0 20%,#e2e8f0 80%,transparent);position:relative}
+
+/* Visual Column */
+.about-visual-redesigned{padding-left:48px;display:flex;align-items:center}
+.school-photo-frame-redesigned{background:linear-gradient(145deg,#ffffff 0%,#f8fafc 100%);border:1.5px solid #e2e8f0;border-radius:24px;padding:20px;box-shadow:0 24px 64px rgba(29,78,216,.1);position:relative;overflow:hidden;width:100%}
+.photo-wrapper{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:4/3}
+.school-photo{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(0.4,0,0.2,1)}
+.photo-wrapper:hover .school-photo{transform:scale(1.05)}
+.photo-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.95) 0%,rgba(15,23,42,.5) 35%,transparent 65%);pointer-events:none}
+
+/* Glassmorphism Badge */
+.glass-badge{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:14px;padding:10px 16px;border:1px solid rgba(255,255,255,.4);box-shadow:0 8px 24px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;transition:all .3s ease}
+.photo-wrapper:hover .glass-badge{background:rgba(255,255,255,.95);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.badge-icon{width:28px;height:28px;background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(29,78,216,.3)}
+.badge-content{display:flex;flex-direction:column;gap:2px}
+.badge-year{font-size:10px;font-weight:800;color:#1d4ed8;letter-spacing:.08em;text-transform:uppercase}
+.badge-name{font-size:12px;font-weight:700;color:#0f172a;line-height:1.2}
+
+/* Caption */
+.photo-caption{position:absolute;bottom:0;left:0;right:0;padding:20px 24px;color:#fff;z-index:1}
+.caption-label{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;line-height:1.3}
+.caption-sub{font-size:13px;color:rgba(255,255,255,.9);line-height:1.5;max-width:90%}
 /* ─── FOOTER ─── */
 .footer{background:#ffffff;color:#475569;padding:60px 24px 28px;border-top:1px solid #e2e8f0}
 .footer-inner{max-width:1200px;margin:0 auto}
@@ -595,7 +629,19 @@ html.dark .mob-t-moon{display:none}
   .feat-bento{grid-template-columns:1fr}
   .feat-card-hero,.feat-card-side,.feat-card-sub{grid-column:span 1}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .about-pillars{grid-template-columns:1fr}
+  
+  /* About section responsive */
+  .about-grid-redesigned{grid-template-columns:1fr;gap:40px}
+  .vertical-divider{display:none}
+  .about-content-redesigned{padding-right:0}
+  .about-visual-redesigned{padding-left:0}
+  .decorative-number{font-size:120px;top:-40px;left:-10px}
+  .about-headline-redesigned{font-size:28px}
+  .feature-cards-redesigned{grid-template-columns:1fr;gap:12px}
+  .glass-badge{top:12px;right:12px;padding:8px 12px}
+  .badge-icon{width:24px;height:24px}
+  .caption-label{font-size:14px}
+  .caption-sub{font-size:12px}
 }
 @media(max-width:480px){
   .nav-inner{height:64px;padding:0 14px}
@@ -609,6 +655,17 @@ html.dark .mob-t-moon{display:none}
   .footer-grid{grid-template-columns:1fr}
   .section{padding:48px 16px}
   .feat-workflow-flow{flex-direction:column;align-items:flex-start}
+  
+  /* About section mobile */
+  .decorative-number{font-size:100px;top:-30px;left:-5px}
+  .about-headline-redesigned{font-size:24px}
+  .card-icon{width:32px;height:32px}
+  .glass-badge{top:10px;right:10px;padding:6px 10px}
+  .badge-icon{width:22px;height:22px}
+  .badge-year{font-size:9px}
+  .badge-name{font-size:11px}
+  .caption-label{font-size:13px}
+  .caption-sub{font-size:11px}
 }
 /* ════════════════════════════════════════
    DARK MODE OVERRIDES — SEMUA ELEMEN
@@ -792,54 +849,51 @@ html.dark .stat-block:nth-child(3) .stat-trend { background: rgba(168, 85, 247, 
 html.dark .stat-block:nth-child(4) .stat-trend { background: rgba(16, 185, 129, 0.2) !important; color: #6ee7b7 !important }
 
 /* ── TENTANG (DARK MODE) ── */
-html.dark .about-pillar-card{
-  background: var(--dark-card-bg) !important;
-  border-color: var(--dark-card-border) !important;
-  backdrop-filter: blur(10px) !important;
-}
-html.dark .about-pillar-card:hover{
-  border-color: #60a5fa !important;
-  box-shadow: 0 10px 24px rgba(0,0,0,.4) !important;
-}
-html.dark .about-pillar-num{ color: #60a5fa !important }
-html.dark .about-pillar-title{ color: #f0f6ff !important }
-html.dark .about-pillar-desc{ color: #94a3b8 !important }
+/* ── ABOUT SECTION (DARK MODE) ── */
+html.dark .decorative-number{color:rgba(96,165,250,.06)}
+html.dark .about-eyebrow-redesigned{color:#60a5fa}
+html.dark .eyebrow-dot{background:#60a5fa}
+html.dark .about-headline-redesigned{color:#f0f6ff}
+html.dark .headline-accent{color:#60a5fa}
+html.dark .about-desc-redesigned{color:#94a3b8}
 
-html.dark .showcase-glass-card{
-  background: linear-gradient(145deg, rgba(20, 32, 60, 0.9) 0%, rgba(13, 22, 42, 0.95) 100%) !important;
-  border-color: rgba(59, 130, 246, 0.25) !important;
-  box-shadow: 0 24px 64px rgba(0,0,0,.6) !important;
+html.dark .feature-card{
+  background:var(--dark-card-bg);
+  border-color:var(--dark-card-border);
+  backdrop-filter:blur(10px)
 }
-html.dark .showcase-header{ border-bottom-color: rgba(59, 130, 246, 0.2) !important }
-html.dark .showcase-tag{
-  background: rgba(59, 130, 246, 0.15) !important;
-  color: #93c5fd !important;
-  border-color: rgba(59, 130, 246, 0.3) !important;
+html.dark .feature-card::before{background:rgba(59,130,246,.2)}
+html.dark .feature-card:hover{border-color:#60a5fa;box-shadow:0 12px 32px rgba(59,130,250,.2)}
+html.dark .feature-card:hover::before{background:#60a5fa}
+html.dark .card-icon{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25);color:#60a5fa}
+html.dark .feature-card:hover .card-icon{background:#3b82f6;color:#fff;border-color:#3b82f6}
+html.dark .card-num{color:#60a5fa}
+html.dark .card-title{color:#f0f6ff}
+html.dark .card-desc{color:#94a3b8}
+
+html.dark .feature-card-primary{background:linear-gradient(135deg,#2563eb 0%,#3b82f6 100%);border-color:#3b82f6}
+html.dark .feature-card-primary::before{background:rgba(255,255,255,.25)}
+html.dark .feature-card-primary:hover{box-shadow:0 16px 40px rgba(59,130,250,.35)}
+
+html.dark .vertical-divider{background:linear-gradient(to bottom,transparent,rgba(59,130,246,.2) 20%,rgba(59,130,246,.2) 80%,transparent)}
+
+html.dark .school-photo-frame-redesigned{
+  background:linear-gradient(145deg,rgba(20,32,60,.9) 0%,rgba(13,22,42,.95) 100%);
+  border-color:rgba(59,130,246,.25);
+  box-shadow:0 24px 64px rgba(0,0,0,.6)
 }
-html.dark .showcase-ticket{
-  background: rgba(15, 25, 48, 0.9) !important;
-  border-color: rgba(59, 130, 246, 0.2) !important;
+html.dark .glass-badge{
+  background:rgba(18,29,54,.9);
+  border-color:rgba(59,130,246,.3);
+  box-shadow:0 8px 24px rgba(0,0,0,.4)
 }
-html.dark .showcase-ticket-id{ color: #94a3b8 !important }
-html.dark .showcase-ticket-status{
-  background: rgba(16, 185, 129, 0.15) !important;
-  color: #6ee7b7 !important;
+html.dark .glass-badge:hover{background:rgba(18,29,54,.95)}
+html.dark .badge-icon{
+  background:linear-gradient(135deg,#3b82f6 0%,#60a5fa 100%);
+  box-shadow:0 4px 12px rgba(59,130,246,.4)
 }
-html.dark .showcase-item-title{ color: #f0f6ff !important }
-html.dark .showcase-item-sub{ color: #94a3b8 !important }
-html.dark .showcase-qr-row{
-  background: rgba(11, 19, 36, 0.7) !important;
-  border-color: rgba(59, 130, 246, 0.25) !important;
-}
-html.dark .showcase-qr-text{ color: #f0f6ff !important }
-html.dark .showcase-qr-sub{ color: #94a3b8 !important }
-html.dark .quote-elegant{
-  background: rgba(15, 25, 48, 0.85) !important;
-  border-color: rgba(59, 130, 246, 0.2) !important;
-}
-html.dark .quote-mark{ color: #60a5fa !important }
-html.dark .quote-phrase{ color: #cbd5e1 !important }
-html.dark .quote-sign{ color: #60a5fa !important }
+html.dark .badge-year{color:#60a5fa}
+html.dark .badge-name{color:#f0f6ff}
 html.dark .about-badge-lbl { color: #94a3b8 !important }
 html.dark .about-badge-icon { background: linear-gradient(135deg, #3b82f6, #60a5fa) !important }
 
@@ -1284,81 +1338,115 @@ $stats = Cache::remember('homepage_stats', 900, function () {
 {{-- ═══════════════ TENTANG KAMI ═══════════════ --}}
 <section class="section" id="tentang">
   <div class="section-inner">
-    <div class="about-grid-modern">
-      {{-- Left column: Intro & Structured Value Pillars --}}
-      <div class="about-content">
-        <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>Tentang Platform SIPBAR</div>
-        <h2 class="section-h2" style="text-align:left;max-width:none">Membangun Ekosistem Sarpras <em>Tertib & Akuntabel</em></h2>
-        <p style="font-size:16px;color:var(--muted);line-height:1.75;margin-top:12px">SIPBAR mentransformasi pencatatan inventaris sekolah konvensional menjadi ekosistem digital yang terintegrasi, transparan, dan dapat diakses dari mana saja.</p>
+    <div class="about-grid-redesigned">
+      {{-- Left column: Content with decorative numbers --}}
+      <div class="about-content-redesigned">
+        {{-- Decorative large number in background --}}
+        <div class="decorative-number">04</div>
         
-        <div class="about-pillars">
-          <div class="about-pillar-card">
-            <span class="about-pillar-num">01 / INTEGRASI</span>
-            <div class="about-pillar-title">Persetujuan Cepat Tanpa Kertas</div>
-            <p class="about-pillar-desc">Guru pembimbing dapat menyetujui peminjaman langsung dari smartphone tanpa perlu menandatangani formulir fisik.</p>
+        <div class="about-eyebrow-redesigned">
+          <span class="eyebrow-dot"></span>
+          Tentang Platform SIPBAR
+        </div>
+        
+        <h2 class="about-headline-redesigned">
+          Membangun Sistem Peminjaman Barang yang <span class="headline-accent">Terintegrasi</span>
+        </h2>
+        
+        <p class="about-desc-redesigned">
+          SIPBAR mentransformasi pencatatan inventaris sekolah konvensional menjadi ekosistem digital yang terintegrasi, transparan, dan dapat diakses dari mana saja.
+        </p>
+        
+        {{-- Feature Cards with hierarchy and icons --}}
+        <div class="feature-cards-redesigned">
+          {{-- Card 01 - Highlighted as primary feature --}}
+          <div class="feature-card feature-card-primary">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <span class="card-num">01</span>
+            </div>
+            <h3 class="card-title">Integrasi</h3>
+            <p class="card-desc">Persetujuan cepat tanpa kertas — guru dapat menyetujui peminjaman langsung dari smartphone.</p>
           </div>
 
-          <div class="about-pillar-card">
-            <span class="about-pillar-num">02 / AKURASI</span>
-            <div class="about-pillar-title">Inventaris Real-Time</div>
-            <p class="about-pillar-desc">Stok aset bertambah dan berkurang otomatis secara instan setiap transaksi peminjaman terverifikasi.</p>
+          {{-- Card 02 --}}
+          <div class="feature-card">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </div>
+              <span class="card-num">02</span>
+            </div>
+            <h3 class="card-title">Akurasi</h3>
+            <p class="card-desc">Inventaris real-time — stok aset bertambah/berkurang otomatis setiap transaksi terverifikasi.</p>
           </div>
 
-          <div class="about-pillar-card">
-            <span class="about-pillar-num">03 / AKUNTABILITAS</span>
-            <div class="about-pillar-title">Riwayat & Log Transparan</div>
-            <p class="about-pillar-desc">Setiap pergerakan barang memiliki jejak audit lengkap: waktu, nama peminjam, guru penyetuju, dan kondisi fisik barang.</p>
+          {{-- Card 03 --}}
+          <div class="feature-card">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+              </div>
+              <span class="card-num">03</span>
+            </div>
+            <h3 class="card-title">Akuntabilitas</h3>
+            <p class="card-desc">Riwayat & log transparan — setiap pergerakan barang memiliki jejak audit lengkap.</p>
           </div>
 
-          <div class="about-pillar-card">
-            <span class="about-pillar-num">04 / AKSESIBILITAS</span>
-            <div class="about-pillar-title">Akses Fleksibel Multi-Perangkat</div>
-            <p class="about-pillar-desc">Responsif dan ringan dijalankan pada PC ruang sarpras, tablet laboratorium, maupun ponsel pribadi pengguna.</p>
+          {{-- Card 04 --}}
+          <div class="feature-card">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <span class="card-num">04</span>
+            </div>
+            <h3 class="card-title">Aksesibilitas</h3>
+            <p class="card-desc">Akses fleksibel multi-perangkat — responsif di PC, tablet, maupun ponsel.</p>
           </div>
         </div>
       </div>
 
-      {{-- Right column: Interactive UI Showcase & Quote --}}
-      <div class="about-showcase">
-        <div class="showcase-glass-card">
-          <div class="showcase-header">
-            <div class="showcase-dots">
-              <span class="showcase-dot" style="background:#ef4444"></span>
-              <span class="showcase-dot" style="background:#f59e0b"></span>
-              <span class="showcase-dot" style="background:#10b981"></span>
-            </div>
-            <span class="showcase-tag">Sistem Verifikasi Sarpras</span>
-          </div>
+      {{-- Vertical divider line --}}
+      <div class="vertical-divider"></div>
 
-          {{-- Sample Borrowing Ticket Mockup --}}
-          <div class="showcase-ticket">
-            <div class="showcase-ticket-top">
-              <span class="showcase-ticket-id">TIKET #TRX-2026-089</span>
-              <span class="showcase-ticket-status">
-                <span class="showcase-ticket-pulse"></span>
-                Disetujui Guru
-              </span>
+      {{-- Right column: Photo frame with connection to headline --}}
+      <div class="about-visual-redesigned">
+        <div class="school-photo-frame-redesigned">
+          <div class="photo-wrapper">
+            <img 
+              src="/build/assets/smkTop.png" 
+              alt="Gedung SMKN 1 Bangsri" 
+              class="school-photo"
+            />
+            <div class="photo-gradient"></div>
+            
+            <div class="glass-badge">
+              <div class="badge-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+              </div>
+              <div class="badge-content">
+                <span class="badge-year">2026</span>
+                <span class="badge-name">SMKN 1 BANGSRI</span>
+              </div>
             </div>
-            <div class="showcase-item-title">Laptop Asus ExpertBook B1400 (Core i5)</div>
-            <div class="showcase-item-sub">Peminjam: Moch. Alfian Reihan (XII RPL 1) • Lokasi: Lab RPL 2</div>
-          </div>
-
-          {{-- QR Code Verification row --}}
-          <div class="showcase-qr-row">
-            <div class="showcase-qr-box">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            
+            <div class="photo-caption">
+              <div class="caption-label">Gedung Utama Sekolah</div>
+              <div class="caption-sub">Pusat kegiatan belajar mengajar dan inovasi digital</div>
             </div>
-            <div>
-              <div class="showcase-qr-text">QR Code Siap Dipindai</div>
-              <div class="showcase-qr-sub">Tunjukkan ke petugas sarpras saat serah-terima unit</div>
-            </div>
-          </div>
-
-          {{-- Elegant Quote Card --}}
-          <div class="quote-elegant">
-            <div class="quote-mark">“</div>
-            <p class="quote-phrase">Digitalisasi yang baik bukan sekadar mengganti kertas, melainkan membangun budaya tanggung jawab dan keterbukaan bersama.</p>
-            <div class="quote-sign">SIPBAR — SMKN 1 BANGSRI</div>
           </div>
         </div>
       </div>
