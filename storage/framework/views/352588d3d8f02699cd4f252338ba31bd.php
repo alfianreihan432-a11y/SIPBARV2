@@ -41,6 +41,11 @@
         display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
         box-shadow: var(--card-shadow);
     }
+    @media (max-width: 640px) {
+        .im-toolbar { padding: 12px; }
+        .im-search-wrap { min-width: 100% !important; }
+        .im-form-panel { padding: 16px 14px !important; }
+    }
     .im-search-wrap {
         flex: 1; min-width: 200px;
         position: relative;
@@ -384,7 +389,9 @@
     .im-table-wrap {
         background: var(--bg-card);
         border: 1px solid var(--border-alt);
-        border-radius: 16px; overflow: hidden;
+        border-radius: 16px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         box-shadow: var(--card-shadow);
     }
     .im-table { width: 100%; border-collapse: collapse; font-size: 12px; }

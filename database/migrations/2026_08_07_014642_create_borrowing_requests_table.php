@@ -23,6 +23,7 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->enum('status', [
                 'pending',           // Menunggu Persetujuan Guru
+                'cancelled',         // Dibatalkan oleh siswa
                 'approved',          // Disetujui Guru
                 'rejected',          // Ditolak Guru
                 'qr_ready',          // QR Code Siap Digunakan
