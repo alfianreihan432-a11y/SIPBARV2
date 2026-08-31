@@ -146,7 +146,6 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
             </div>
             <div>
                 <div class="um-card-title">{{ $editingId ? 'Edit Data Siswa' : 'Form Tambah Siswa' }}</div>
-                <div class="um-card-sub">Nama lengkap, NIS, kelas, dan tanggal lahir wajib diisi</div>
             </div>
         </div>
         @else
@@ -156,7 +155,6 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
             </div>
             <div>
                 <div class="um-card-title">{{ $editingId ? 'Edit Data Guru' : 'Form Tambah Guru' }}</div>
-                <div class="um-card-sub">Nama lengkap, NIP, dan tanggal lahir wajib diisi</div>
             </div>
         </div>
         @endif
@@ -234,32 +232,6 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                     @error('jurusan')<div class="um-error">{{ $message }}</div>@enderror
                 </div>
 
-                {{-- Tanggal Lahir --}}
-                <div class="um-field">
-                    <label class="um-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Tanggal Lahir <span class="um-req">*</span>
-                    </label>
-                    <div class="um-input-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <input wire:model="tanggal_lahir" type="date" class="um-input" autocomplete="off" name="siswa_tanggal_lahir">
-                    </div>
-                    @error('tanggal_lahir')<div class="um-error">{{ $message }}</div>@enderror
-                </div>
-
-                {{-- Nomor HP --}}
-                <div class="um-field">
-                    <label class="um-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                        Nomor HP <span class="um-req">*</span>
-                    </label>
-                    <div class="um-input-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-                        <input wire:model="phone" type="text" class="um-input" placeholder="Contoh: 08123456789" autocomplete="off" name="siswa_phone" id="siswa_phone">
-                    </div>
-                    @error('phone')<div class="um-error">{{ $message }}</div>@enderror
-                    <div class="um-hint">Format: 08xxx, 628xxx, atau +628xxx</div>
-                </div>
             </div>
 
             {{-- Info auto-gen --}}
@@ -317,19 +289,6 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                         <input wire:model="jabatan" type="text" class="um-input" placeholder="Contoh: Guru Matematika / Kepala Sekolah" name="guru_jabatan" autocomplete="off">
                     </div>
                     @error('jabatan')<div class="um-error">{{ $message }}</div>@enderror
-                </div>
-
-                {{-- Tanggal Lahir --}}
-                <div class="um-field">
-                    <label class="um-label">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Tanggal Lahir <span class="um-req">*</span>
-                    </label>
-                    <div class="um-input-wrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        <input wire:model="tanggal_lahir" type="date" class="um-input" autocomplete="off" name="guru_tanggal_lahir">
-                    </div>
-                    @error('tanggal_lahir')<div class="um-error">{{ $message }}</div>@enderror
                 </div>
 
                 {{-- Nomor HP --}}
@@ -403,7 +362,6 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                     <th>Peran</th>
                     <th>ID Khusus</th>
                     <th>Kelas / Jabatan</th>
-                    <th>Tgl. Lahir</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -448,9 +406,6 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                     </td>
                     <td style="font-size:13px;color:#475569">
                         {{ $uRole === 'siswa' ? ($u->kelas ?? '—') : '—' }}
-                    </td>
-                    <td style="font-size:12px;color:#475569">
-                        {{ $u->tanggal_lahir ? \Carbon\Carbon::parse($u->tanggal_lahir)->format('d M Y') : '—' }}
                     </td>
                     <td>
                         <div style="display:flex;gap:7px">
