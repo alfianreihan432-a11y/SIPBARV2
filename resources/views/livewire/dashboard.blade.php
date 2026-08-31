@@ -120,9 +120,15 @@
             text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
         }
         @media (max-width: 768px) {
-            .hero-title { font-size: 28px; }
-            .hero-subtitle { font-size: 14px; }
-            .hero-greeting { font-size: 18px; }
+            .hero-section { padding: 24px 16px; margin-bottom: 16px; border-radius: 14px; }
+            .hero-title { font-size: 22px; }
+            .hero-subtitle { font-size: 13px; margin-bottom: 14px; }
+            .hero-greeting { font-size: 16px; }
+            .hero-date { font-size: 12px; }
+            .db-status-grid { gap: 6px; }
+            .db-bar { width: 24px; }
+            .db-panel { padding: 14px 16px; }
+            .db-stat-card { padding: 14px 16px; }
         }
     </style>
 

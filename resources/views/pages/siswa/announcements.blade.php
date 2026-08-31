@@ -1,507 +1,326 @@
 @extends('layouts.siswa')
 
-@section('title', 'Pengumuman')
-@section('page-heading', 'Pengumuman')
+@section('title', 'QR Barang – SIPBAR')
 
 @section('content')
-<style>
-    .ann-header {
-        background: var(--card); border: 1px solid var(--border2);
-        border-radius: 14px; padding: 24px; margin-bottom: 20px;
-    }
-    .ann-header-content { display: flex; justify-content: space-between; align-items: center; }
-    .ann-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .ann-sub { font-size: 13px; color: var(--muted); }
-    .ann-icon {
-        width: 40px; height: 40px; background: var(--bg3);
-        border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    }
+@php
+    $overdueBorrowings = \App\Models\BorrowingRequest::with('itemWithTrashed')
+        ->where('user_id', auth()->id())
+        ->where('status', 'borrowed')
+        ->whereDate('return_date', '<', now())
+        ->get();
 
-    .ann-panel {
-        background: var(--card); border: 1px solid var(--border2);
-        border-radius: 14px; overflow: hidden; margin-bottom: 20px;
-    }
-    .ann-panel-header {
-        padding: 20px; border-bottom: 1px solid var(--border2);
-    }
-    .ann-panel-header-content { display: flex; align-items: center; gap: 12px; }
-    .ann-panel-title { font-size: 16px; font-weight: 700; color: var(--text); }
-    .ann-panel-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    $dueSoonBorrowings = \App\Models\BorrowingRequest::with('itemWithTrashed')
+        ->where('user_id', auth()->id())
+        ->where('status', 'borrowed')
+        ->whereDate('return_date', '>=', now())
+        ->whereDate('return_date', '<=', now()->addDays(2))
+        ->get();
 
-    .ann-panel-body { padding: 20px; }
-    .ann-item {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 16px; background: var(--bg3); border: 1px solid var(--border2);
-        border-radius: 10px; margin-bottom: 12px;
-    }
-    .ann-item:last-child { margin-bottom: 0; }
-    .ann-item-left { display: flex; align-items: center; gap: 12px; }
-    .ann-item-icon {
-        width: 36px; height: 36px; background: var(--bg2);
-        border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    }
-    .ann-item-name { font-size: 14px; font-weight: 700; color: var(--text); }
-    .ann-item-meta { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    $recentApprovals = \App\Models\BorrowingRequest::with('itemWithTrashed')
+        ->where('user_id', auth()->id())
+        ->where('status', 'approved')
+        ->latest('approved_at')
+        ->take(3)->get();
 
-    .ann-badge {
-        padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 600;
-    }
-    .ann-badge-danger { background: #dc2626; color: #fff; }
-    .ann-badge-warning { background: var(--bg2); color: var(--text); border: 1px solid var(--border2); }
-    .ann-badge-primary { background: var(--primary); color: #fff; }
+    $recentRejections = \App\Models\BorrowingRequest::with('itemWithTrashed')
+        ->where('user_id', auth()->id())
+        ->where('status', 'rejected')
+        ->latest('updated_at')
+        ->take(3)->get();
 
-    .ann-card {
-        padding: 16px; background: var(--bg3); border: 1px solid var(--border2);
-        border-radius: 10px; margin-bottom: 12px;
-    }
-    .ann-card:last-child { margin-bottom: 0; }
-    .ann-card-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
-    .ann-card-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
-    .ann-card-date { font-size: 12px; color: var(--subtle); margin-top: 8px; }
+    $totalAlerts = $overdueBorrowings->count() + $dueSoonBorrowings->count() + $recentApprovals->count() + $recentRejections->count();
+@endphp
 
-    .ann-rejection {
-        background: var(--card); padding: 12px; border-radius: 8px;
-        border: 1px solid var(--border2); margin-top: 8px;
-    }
-    .ann-rejection-text { font-size: 13px; color: var(--text); }
+{{-- QR Code Modal --}}
+<div id="qr-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s ease">
+    <div id="qr-modal" style="background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center;transform:scale(.94) translateY(12px);transition:transform .28s cubic-bezier(.34,1.56,.64,1),opacity .25s;opacity:0;position:relative">
+        <button onclick="closeQRModal()" style="position:absolute;top:14px;right:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted)">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <div style="font-family:var(--font-head);font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px">QR Code Peminjaman</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Tunjukkan kepada petugas saat mengambil barang</div>
+        <div id="qr-spinner" style="width:40px;height:40px;border:3px solid var(--border2);border-top-color:var(--primary);border-radius:50%;animation:qr-spin .7s linear infinite;margin:40px auto"></div>
+        <div id="qr-error" style="display:none;color:var(--s-rejected);font-size:13px;padding:16px;background:var(--s-rejected-bg);border-radius:10px;margin-bottom:12px"></div>
+        <div id="qr-img-wrap" style="display:none;width:260px;height:260px;margin:0 auto 16px;border-radius:14px;border:2px solid var(--border2);overflow:hidden;background:#fff">
+            <img id="qr-img" src="" alt="QR Code" style="width:100%;height:100%;object-fit:contain">
+        </div>
+        <div id="qr-item-name" style="font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px"></div>
+        <div id="qr-token" style="font-size:11px;color:var(--muted);font-family:monospace;background:var(--bg3);border-radius:6px;padding:4px 10px;display:inline-block;margin-bottom:14px;letter-spacing:.04em"></div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6;background:var(--primary-light);border:1px solid var(--primary-muted);border-radius:10px;padding:10px 14px;margin-bottom:12px;text-align:left">
+            Petugas inventaris akan men-scan QR Code ini untuk konfirmasi pengambilan barang.
+        </div>
+        <div id="qr-expires" style="font-size:11px;color:var(--subtle)"></div>
+    </div>
+</div>
+<style>@keyframes qr-spin{to{transform:rotate(360deg)}}</style>
 
-    .ann-btn {
-        padding: 8px 16px; background: var(--primary); color: #fff;
-        border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
-        cursor: pointer; text-decoration: none; display: inline-block;
-    }
-    .ann-btn:hover { background: var(--primary-dark); }
+{{-- Page Header --}}
+<div class="page-header">
+    <div class="page-header-left">
+        <div class="page-title">
+            QR Barang
+            @if($totalAlerts > 0)
+            <span class="page-title-count" style="background:var(--s-rejected-bg);color:var(--s-rejected);border-color:var(--s-rejected-bdr)">{{ $totalAlerts }} status</span>
+            @else
+            <span class="page-title-count">Siap dipakai</span>
+            @endif
+        </div>
+        <div class="page-subtitle">Status peminjaman, QR Code, dan informasi pengambilan barang</div>
+    </div>
+</div>
 
-    /* ── QR Code Modal ── */
-    .qr-modal-overlay {
-        position: fixed; inset: 0;
-        background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
-        z-index: 1000;
-        display: flex; align-items: center; justify-content: center;
-        padding: 20px;
-        opacity: 0; pointer-events: none;
-        transition: opacity .25s ease;
-    }
-    .qr-modal-overlay.is-open {
-        opacity: 1; pointer-events: all;
-    }
-    .qr-modal {
-        background: var(--card); border: 1px solid var(--border2);
-        border-radius: 18px;
-        padding: 28px 24px;
-        max-width: 360px; width: 100%;
-        text-align: center;
-        transform: scale(.94) translateY(12px);
-        transition: transform .28s cubic-bezier(.34,1.56,.64,1), opacity .25s;
-        opacity: 0;
-        position: relative;
-    }
-    .qr-modal-overlay.is-open .qr-modal {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-    }
-    .qr-modal-close {
-        position: absolute; top: 14px; right: 14px;
-        background: var(--bg3); border: 1px solid var(--border2);
-        border-radius: 8px; width: 30px; height: 30px;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; color: var(--muted);
-        transition: background .15s;
-    }
-    .qr-modal-close:hover { background: var(--bg2); }
-    .qr-modal-heading {
-        font-size: 16px; font-weight: 800; color: var(--text);
-        margin: 0 0 4px;
-    }
-    .qr-modal-sub {
-        font-size: 12px; color: var(--muted); margin-bottom: 20px;
-    }
-    .qr-img-wrap {
-        width: 260px; height: 260px;
-        margin: 0 auto 16px;
-        border-radius: 12px;
-        border: 2px solid var(--border2);
-        overflow: hidden;
-        display: flex; align-items: center; justify-content: center;
-        background: #fff;
-    }
-    .qr-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
-    .qr-item-name {
-        font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px;
-    }
-    .qr-token {
-        font-size: 11px; color: var(--muted); font-family: monospace;
-        background: var(--bg3); border-radius: 6px; padding: 4px 8px;
-        display: inline-block; margin-bottom: 16px; letter-spacing: .04em;
-    }
-    .qr-instruction {
-        font-size: 12px; color: var(--muted); line-height: 1.6;
-        background: var(--bg3); border-radius: 8px;
-        padding: 10px 12px; margin-bottom: 16px;
-        border: 1px solid var(--border2);
-    }
-    .qr-expires {
-        font-size: 11px; color: var(--subtle);
-    }
-    /* spinner */
-    .qr-spinner {
-        width: 40px; height: 40px;
-        border: 3px solid var(--border2);
-        border-top-color: var(--primary);
-        border-radius: 50%;
-        animation: spin .7s linear infinite;
-        margin: 60px auto;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .ann-empty {
-        padding: 48px 20px; text-align: center;
-    }
-    .ann-empty-icon { width: 80px; height: 80px; margin: 0 auto 16px; color: var(--subtle); }
-    .ann-empty-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-    .ann-empty-sub { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
-</style>
-
-<div>
-    {{-- ── QR Code Modal ── --}}
-    <div id="qr-modal-overlay" class="qr-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="qr-modal-heading">
-        <div class="qr-modal">
-            <button class="qr-modal-close" onclick="closeQRModal()" aria-label="Tutup modal">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-
-            <p class="qr-modal-heading" id="qr-modal-heading">QR Code Peminjaman</p>
-            <p class="qr-modal-sub">Tunjukkan ke petugas ruang inventaris saat mengambil barang</p>
-
-            {{-- Spinner (loading state) --}}
-            <div id="qr-spinner" class="qr-spinner"></div>
-
-            {{-- Error state --}}
-            <div id="qr-error" style="display:none;color:#dc2626;font-size:13px;padding:16px;"></div>
-
-            {{-- QR Image --}}
-            <div id="qr-img-wrap" class="qr-img-wrap" style="display:none;">
-                <img id="qr-img" src="" alt="QR Code peminjaman" />
+{{-- Critical: Overdue --}}
+@if($overdueBorrowings->isNotEmpty())
+<div class="s-card" style="border-color:var(--s-rejected-bdr);margin-bottom:16px">
+    <div class="s-card-header" style="padding-bottom:14px;border-bottom:1px solid var(--s-rejected-bdr);margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:10px;background:#dc2626;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             </div>
-
-            {{-- Info barang --}}
-            <div id="qr-item-name" class="qr-item-name"></div>
-            <div id="qr-token" class="qr-token"></div>
-
-            {{-- Instruksi --}}
-            <div class="qr-instruction">
-                📋 Tunjukkan QR Code ini ke petugas ruang inventaris saat mengambil barang. Petugas akan men-scan untuk konfirmasi pengambilan.
+            <div>
+                <div class="s-card-title" style="color:var(--s-rejected)">Terlambat Dikembalikan</div>
+                <div class="s-card-sub">Segera kembalikan barang untuk menghindari sanksi</div>
             </div>
-
-            <div id="qr-expires" class="qr-expires"></div>
         </div>
     </div>
+    @foreach($overdueBorrowings as $overdue)
+    @php $daysOverdue = now()->diffInDays(\Carbon\Carbon::parse($overdue->return_date)); @endphp
+    <div class="s-loan-row s-loan-row--rejected">
+        <div class="s-loan-icon" style="background:var(--s-rejected-bg)">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--s-rejected)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        </div>
+        <div class="s-loan-content">
+            <div class="s-loan-name">{{ $overdue->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
+            <div class="s-loan-meta">
+                <span>Seharusnya kembali: {{ \Carbon\Carbon::parse($overdue->return_date)->format('d M Y') }}</span>
+            </div>
+        </div>
+        <div class="s-loan-right">
+            <span class="s-badge s-badge--rejected">Terlambat {{ $daysOverdue }} hari</span>
+            <a href="{{ route('student.returns.index') }}" class="s-btn s-btn--danger s-btn--sm">Kembalikan</a>
+        </div>
+    </div>
+    @endforeach
+</div>
+@endif
 
-    {{-- Page Header --}}
-    <div class="ann-header">
-        <div class="ann-header-content">
+{{-- Warning: Due Soon --}}
+@if($dueSoonBorrowings->isNotEmpty())
+<div class="s-card" style="border-color:var(--s-pending-bdr);margin-bottom:16px">
+    <div class="s-card-header" style="padding-bottom:14px;border-bottom:1px solid var(--s-pending-bdr);margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:10px;background:#d97706;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
             <div>
-                <div class="ann-title">Pengumuman & Notifikasi</div>
-                <div class="ann-sub">Informasi penting terkait peminjaman Anda</div>
+                <div class="s-card-title" style="color:var(--s-pending)">Segera Kembalikan</div>
+                <div class="s-card-sub">Barang ini harus dikembalikan dalam waktu dekat</div>
             </div>
-            <div class="ann-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
+        </div>
+    </div>
+    @foreach($dueSoonBorrowings as $dueSoon)
+    @php $daysLeft = \Carbon\Carbon::parse($dueSoon->return_date)->diffInDays(now()); @endphp
+    <div class="s-loan-row s-loan-row--pending">
+        <div class="s-loan-icon" style="background:var(--s-pending-bg)">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--s-pending)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        </div>
+        <div class="s-loan-content">
+            <div class="s-loan-name">{{ $dueSoon->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
+            <div class="s-loan-meta">
+                <span>Harus kembali: {{ \Carbon\Carbon::parse($dueSoon->return_date)->format('d M Y') }}</span>
             </div>
+        </div>
+        <div class="s-loan-right">
+            <span class="s-badge s-badge--pending">{{ $daysLeft }} hari lagi</span>
+        </div>
+    </div>
+    @endforeach
+</div>
+@endif
+
+{{-- Approvals with QR --}}
+@if($recentApprovals->isNotEmpty())
+<div class="s-card" style="margin-bottom:16px">
+    <div class="s-card-header">
+        <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--s-returned-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--s-returned)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+                <div class="s-card-title">Peminjaman Disetujui</div>
+                <div class="s-card-sub">Ambil barang dari ruang inventaris dengan QR Code</div>
+            </div>
+        </div>
+    </div>
+    @foreach($recentApprovals as $approval)
+    <div class="s-loan-row s-loan-row--approved">
+        <div class="s-loan-icon" style="background:var(--s-approved-bg)">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--s-approved)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="s-loan-content">
+            <div class="s-loan-name">{{ $approval->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
+            <div class="s-loan-meta">
+                <span>Disetujui {{ $approval->approved_at ? $approval->approved_at->diffForHumans() : 'baru saja' }}</span>
+            </div>
+        </div>
+        <div class="s-loan-right">
+            <span class="s-badge s-badge--approved">Disetujui</span>
+            <button onclick="openQRModal({{ $approval->id }}, '{{ addslashes($approval->itemWithTrashed?->name ?? 'Barang') }}')" class="s-btn s-btn--sm s-btn--primary">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+                QR Code
+            </button>
+        </div>
+    </div>
+    @endforeach
+</div>
+@endif
+
+{{-- Recent Rejections --}}
+@if($recentRejections->isNotEmpty())
+<div class="s-card" style="margin-bottom:16px">
+    <div class="s-card-header">
+        <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:10px;background:var(--s-rejected-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--s-rejected)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+                <div class="s-card-title">Peminjaman Ditolak</div>
+                <div class="s-card-sub">Pengajuan yang tidak dapat disetujui</div>
+            </div>
+        </div>
+    </div>
+    @foreach($recentRejections as $rejection)
+    <div class="s-loan-row s-loan-row--rejected">
+        <div class="s-loan-icon" style="background:var(--s-rejected-bg)">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--s-rejected)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        </div>
+        <div class="s-loan-content">
+            <div class="s-loan-name">{{ $rejection->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
+            @if($rejection->rejection_reason)
+            <div style="margin-top:8px;padding:8px 12px;background:var(--s-rejected-bg);border:1px solid var(--s-rejected-bdr);border-radius:8px;font-size:12px;color:var(--s-rejected)">
+                <strong>Alasan:</strong> {{ $rejection->rejection_reason }}
+            </div>
+            @endif
+        </div>
+        <div class="s-loan-right">
+            <span class="s-badge s-badge--rejected">Ditolak</span>
+            <span class="s-loan-time">{{ $rejection->updated_at->diffForHumans() }}</span>
+        </div>
+    </div>
+    @endforeach
+</div>
+@endif
+
+{{-- System Announcements --}}
+<div class="s-card" style="margin-bottom:16px">
+    <div class="s-card-header">
+        <div>
+            <div class="s-card-title">Panduan QR Barang</div>
+            <div class="s-card-sub">Cara menampilkan dan menggunakan QR Code peminjaman</div>
         </div>
     </div>
 
     @php
-        $overdueBorrowings = \App\Models\BorrowingRequest::with('itemWithTrashed')
-            ->where('user_id', auth()->id())
-            ->where('status', 'borrowed')
-            ->whereDate('return_date', '<', now())
-            ->get();
-
-        $dueSoonBorrowings = \App\Models\BorrowingRequest::with('itemWithTrashed')
-            ->where('user_id', auth()->id())
-            ->where('status', 'borrowed')
-            ->whereDate('return_date', '>=', now())
-            ->whereDate('return_date', '<=', now()->addDays(2))
-            ->get();
-
-        $recentApprovals = \App\Models\BorrowingRequest::with('itemWithTrashed')
-            ->where('user_id', auth()->id())
-            ->where('status', 'approved')
-            ->latest('approved_at')
-            ->take(3)
-            ->get();
-
-        $recentRejections = \App\Models\BorrowingRequest::with('itemWithTrashed')
-            ->where('user_id', auth()->id())
-            ->where('status', 'rejected')
-            ->latest('updated_at')
-            ->take(3)
-            ->get();
+    $sysAnn = [
+        ['icon'=>'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z', 'color'=>'var(--primary)', 'bg'=>'var(--primary-light)', 'title'=>'Cara Menggunakan QR Barang', 'body'=>'Setelah peminjaman disetujui, QR Code barang akan muncul di halaman ini. Tunjukkan QR Code kepada admin untuk konfirmasi pengambilan barang dari ruang inventaris.', 'date'=>'Hari ini'],
+        ['icon'=>'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'color'=>'#d97706', 'bg'=>'rgba(217,119,6,.1)', 'title'=>'Tanggal Kembali Barang', 'body'=>'Pastikan barang dikembalikan sesuai tanggal yang tertera. Jika mendekati tenggat, cek kembali status peminjaman di halaman QR Barang.', 'date'=>'2 hari lalu'],
+        ['icon'=>'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', 'color'=>'#059669', 'bg'=>'rgba(5,150,105,.1)', 'title'=>'Kondisi Barang Saat Pinjam', 'body'=>'Jaga barang tetap baik selama masa peminjaman. Jika ada kerusakan atau perubahan kondisi, segera laporkan agar proses pengembalian mudah dipantau.', 'date'=>'1 minggu lalu'],
+    ];
     @endphp
-
-    {{-- Critical: Overdue Items --}}
-    @if($overdueBorrowings->isNotEmpty())
-    <div class="ann-panel" style="border-color:rgba(239,68,68,.3)">
-        <div class="ann-panel-header" style="border-color:rgba(239,68,68,.3)">
-            <div class="ann-panel-header-content">
-                <div style="width:36px;height:36px;background:#dc2626;border-radius:8px;display:flex;align-items:center;justify-content:center">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </div>
-                <div>
-                    <div class="ann-panel-title">Peminjaman Terlambat</div>
-                    <div class="ann-panel-sub">Segera kembalikan barang berikut untuk menghindari sanksi</div>
-                </div>
-            </div>
+    @foreach($sysAnn as $ann)
+    <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border2)">
+        <div style="width:40px;height:40px;border-radius:10px;background:{{ $ann['bg'] }};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:{{ $ann['color'] }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $ann['icon'] }}"/></svg>
         </div>
-        <div class="ann-panel-body">
-            @foreach($overdueBorrowings as $overdue)
-            @php
-                $daysOverdue = now()->diffInDays(\Carbon\Carbon::parse($overdue->return_date));
-            @endphp
-            <div class="ann-item">
-                <div class="ann-item-left">
-                    <div class="ann-item-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="ann-item-name">{{ $overdue->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
-                        <div class="ann-item-meta">
-                            Seharusnya dikembalikan: {{ \Carbon\Carbon::parse($overdue->return_date)->format('d M Y') }}
-                        </div>
-                    </div>
-                </div>
-                <span class="ann-badge ann-badge-danger">Terlambat {{ $daysOverdue }} hari</span>
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    {{-- Warning: Due Soon --}}
-    @if($dueSoonBorrowings->isNotEmpty())
-    <div class="ann-panel">
-        <div class="ann-panel-header">
-            <div class="ann-panel-header-content">
-                <div class="ann-item-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <div>
-                    <div class="ann-panel-title">Pengingat Pengembalian</div>
-                    <div class="ann-panel-sub">Barang berikut harus segera dikembalikan</div>
-                </div>
-            </div>
-        </div>
-        <div class="ann-panel-body">
-            @foreach($dueSoonBorrowings as $dueSoon)
-            @php
-                $daysLeft = \Carbon\Carbon::parse($dueSoon->return_date)->diffInDays(now());
-            @endphp
-            <div class="ann-item">
-                <div class="ann-item-left">
-                    <div class="ann-item-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="ann-item-name">{{ $dueSoon->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
-                        <div class="ann-item-meta">
-                            Harus dikembalikan: {{ \Carbon\Carbon::parse($dueSoon->return_date)->format('d M Y') }}
-                        </div>
-                    </div>
-                </div>
-                <span class="ann-badge ann-badge-warning">{{ $daysLeft }} hari lagi</span>
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    {{-- Recent Approvals --}}
-    @if($recentApprovals->isNotEmpty())
-    <div class="ann-panel">
-        <div class="ann-panel-header">
-            <div class="ann-panel-title">Peminjaman Disetujui</div>
-            <div class="ann-panel-sub">Barang siap diambil dari ruang inventaris</div>
-        </div>
-        <div class="ann-panel-body">
-            @foreach($recentApprovals as $approval)
-            <div class="ann-item">
-                <div class="ann-item-left">
-                    <div>
-                        <div class="ann-item-name">{{ $approval->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
-                        <div class="ann-item-meta">
-                            Disetujui {{ $approval->approved_at ? $approval->approved_at->diffForHumans() : 'baru saja' }}
-                        </div>
-                    </div>
-                </div>
-                <button
-                    class="ann-btn"
-                    onclick="openQRModal({{ $approval->id }}, '{{ addslashes($approval->itemWithTrashed?->name ?? 'Barang tidak tersedia') }}')"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h2M4 12h2m-2-4h2M7 20h2M4 4h4v4H4V4zm12 0h4v4h-4V4zM4 16h4v4H4v-4z" />
-                    </svg>
-                    Lihat QR Code
-                </button>
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    {{-- Recent Rejections --}}
-    @if($recentRejections->isNotEmpty())
-    <div class="ann-panel">
-        <div class="ann-panel-header">
-            <div class="ann-panel-title">Peminjaman Ditolak</div>
-            <div class="ann-panel-sub">Informasi pengajuan yang tidak disetujui</div>
-        </div>
-        <div class="ann-panel-body">
-            @foreach($recentRejections as $rejection)
-            <div class="ann-card">
-                <div class="ann-card-title">{{ $rejection->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
-                <div class="ann-card-meta" style="font-size:13px;color:var(--muted);margin-bottom:8px">
-                    Ditolak {{ $rejection->updated_at->diffForHumans() }}
-                </div>
-                @if($rejection->rejection_reason)
-                <div class="ann-rejection">
-                    <div class="ann-rejection-text"><strong>Alasan:</strong> {{ $rejection->rejection_reason }}</div>
-                </div>
-                @endif
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    {{-- System Announcements --}}
-    <div class="ann-panel">
-        <div class="ann-panel-header">
-            <div class="ann-panel-title">Pengumuman Sistem</div>
-            <div class="ann-panel-sub">Informasi penting tentang sistem SIPBAR</div>
-        </div>
-        <div class="ann-panel-body">
-            <div class="ann-card">
-                <div class="ann-card-title">Cara Menggunakan QR Code</div>
-                <div class="ann-card-text">
-                    Setelah peminjaman disetujui, QR Code akan muncul di halaman "Peminjaman". Tunjukkan QR Code kepada admin untuk mengambil dan mengembalikan barang.
-                </div>
-                <div class="ann-card-date">Dipublikasikan: Hari ini</div>
-            </div>
-
-            <div class="ann-card">
-                <div class="ann-card-title">Kebijakan Peminjaman</div>
-                <div class="ann-card-text">
-                    Pastikan mengembalikan barang tepat waktu. Keterlambatan akan mempengaruhi riwayat peminjaman Anda dan dapat berakibat pada sanksi.
-                </div>
-                <div class="ann-card-date">Dipublikasikan: 2 hari lalu</div>
-            </div>
-
-            <div class="ann-card">
-                <div class="ann-card-title">Perawatan Barang</div>
-                <div class="ann-card-text">
-                    Jaga kondisi barang yang dipinjam. Laporkan segera jika terjadi kerusakan. Pengembalian dalam kondisi baik adalah tanggung jawab peminjam.
-                </div>
-                <div class="ann-card-date">Dipublikasikan: 1 minggu lalu</div>
+        <div style="flex:1">
+            <div style="font-family:var(--font-head);font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px">{{ $ann['title'] }}</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.6">{{ $ann['body'] }}</div>
+            <div style="display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:11px;color:var(--subtle);background:var(--bg3);border:1px solid var(--border2);padding:3px 10px;border-radius:6px">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                {{ $ann['date'] }}
             </div>
         </div>
     </div>
-
-    {{-- Empty State --}}
-    @if($overdueBorrowings->isEmpty() && $dueSoonBorrowings->isEmpty() && $recentApprovals->isEmpty() && $recentRejections->isEmpty())
-    <div class="ann-empty">
-        <svg xmlns="http://www.w3.org/2000/svg" class="ann-empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <div class="ann-empty-title">Semua Lancar!</div>
-        <div class="ann-empty-sub">Tidak ada pengumuman penting saat ini. Peminjaman Anda dalam kondisi baik.</div>
-        <a href="{{ route('student.catalog') }}" class="ann-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;margin-right:8px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Lihat Katalog Barang
-        </a>
-    </div>
-    @endif
+    @endforeach
+    <div style="padding-top:4px"></div>
 </div>
+
+{{-- Empty State --}}
+@if($overdueBorrowings->isEmpty() && $dueSoonBorrowings->isEmpty() && $recentApprovals->isEmpty() && $recentRejections->isEmpty())
+<div class="s-empty" style="margin-top:-10px">
+    <div class="s-empty-icon-wrap" style="background:var(--s-returned-bg);border-color:var(--s-returned-bdr)">
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;color:var(--s-returned)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    </div>
+    <div class="s-empty-title">Semua Lancar!</div>
+    <div class="s-empty-sub">Tidak ada peringatan atau notifikasi penting saat ini. Peminjaman kamu dalam status yang baik.</div>
+    <a href="{{ route('student.catalog') }}" class="s-btn s-btn--primary">Lihat Katalog Barang</a>
+</div>
+@endif
 @endsection
 
 @push('scripts')
 <script>
-// ── QR Code Modal Logic ──
-const qrOverlay  = document.getElementById('qr-modal-overlay');
-const qrImgWrap  = document.getElementById('qr-img-wrap');
-const qrImgEl    = document.getElementById('qr-img');
-const qrItemName = document.getElementById('qr-item-name');
-const qrToken    = document.getElementById('qr-token');
-const qrExpires  = document.getElementById('qr-expires');
-const qrSpinner  = document.getElementById('qr-spinner');
-const qrError    = document.getElementById('qr-error');
+var qrOverlay  = document.getElementById('qr-modal-overlay');
+var qrModal    = document.getElementById('qr-modal');
+var qrImgWrap  = document.getElementById('qr-img-wrap');
+var qrImgEl    = document.getElementById('qr-img');
+var qrItemName = document.getElementById('qr-item-name');
+var qrToken    = document.getElementById('qr-token');
+var qrExpires  = document.getElementById('qr-expires');
+var qrSpinner  = document.getElementById('qr-spinner');
+var qrError    = document.getElementById('qr-error');
 
 function openQRModal(borrowingId, itemName) {
-    // Reset state
-    qrImgWrap.style.display  = 'none';
-    qrSpinner.style.display  = 'block';
-    qrError.style.display    = 'none';
-    qrItemName.textContent   = itemName;
-    qrToken.textContent      = '';
-    qrExpires.textContent    = '';
+    qrImgWrap.style.display = 'none';
+    qrSpinner.style.display = 'block';
+    qrError.style.display   = 'none';
+    qrItemName.textContent  = itemName;
+    qrToken.textContent     = '';
+    qrExpires.textContent   = '';
 
-    // Tampilkan modal
-    qrOverlay.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
+    qrOverlay.style.opacity        = '1';
+    qrOverlay.style.pointerEvents  = 'all';
+    qrModal.style.opacity           = '1';
+    qrModal.style.transform         = 'scale(1) translateY(0)';
+    document.body.style.overflow    = 'hidden';
 
-    // Fetch QR Code dari backend
-    fetch(`/siswa/peminjaman/${borrowingId}/qrcode`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json',
-        }
+    fetch('/siswa/peminjaman/' + borrowingId + '/qrcode', {
+        headers: {'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(function(r){return r.json();})
+    .then(function(data) {
         qrSpinner.style.display = 'none';
-        if (data.success) {
-            qrImgEl.src          = data.qr_image;
+        if(data.success) {
+            qrImgEl.src = data.qr_image;
             qrImgWrap.style.display = 'flex';
-            qrToken.textContent  = '#' + data.borrowing_id + ' · ' + data.token.substring(0, 8).toUpperCase() + '...';
+            qrToken.textContent = '#' + data.borrowing_id + ' · ' + data.token.substring(0,8).toUpperCase() + '...';
             qrExpires.textContent = data.expires_at ? 'Berlaku hingga: ' + data.expires_at : '';
         } else {
             qrError.style.display = 'block';
-            qrError.textContent   = data.message || 'Gagal memuat QR Code.';
+            qrError.textContent = data.message || 'Gagal memuat QR Code.';
         }
     })
-    .catch(() => {
+    .catch(function() {
         qrSpinner.style.display = 'none';
-        qrError.style.display   = 'block';
-        qrError.textContent     = 'Koneksi gagal. Coba lagi beberapa saat.';
+        qrError.style.display = 'block';
+        qrError.textContent = 'Koneksi gagal. Coba lagi beberapa saat.';
     });
 }
 
 function closeQRModal() {
-    qrOverlay.classList.remove('is-open');
-    document.body.style.overflow = '';
+    qrOverlay.style.opacity       = '0';
+    qrOverlay.style.pointerEvents = 'none';
+    qrModal.style.opacity          = '0';
+    qrModal.style.transform        = 'scale(.94) translateY(12px)';
+    document.body.style.overflow   = '';
 }
 
-// Tutup modal saat klik overlay
 qrOverlay.addEventListener('click', function(e) {
-    if (e.target === qrOverlay) closeQRModal();
+    if(e.target === qrOverlay) closeQRModal();
 });
-
-// Tutup modal saat tekan Escape
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeQRModal();
+    if(e.key === 'Escape') closeQRModal();
 });
 </script>
 @endpush

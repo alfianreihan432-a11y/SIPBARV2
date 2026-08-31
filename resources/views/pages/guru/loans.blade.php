@@ -283,7 +283,7 @@
                         </td>
                         <td>
                             <p class="date-text {{ $loan->return_date < now() ? 'overdue' : '' }}">
-                                {{ \Carbon\Carbon::parse($loan->return_date)->format('d M Y') }}
+                                {{ \Carbon\Carbon::parse($loan->return_date)->format('d M Y') }} @if($loan->return_time) · {{ $loan->return_time }}@endif
                             </p>
                         </td>
                         <td>

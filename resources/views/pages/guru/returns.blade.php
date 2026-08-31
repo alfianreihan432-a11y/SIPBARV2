@@ -285,7 +285,7 @@
                         </td>
                         <td>
                             <p class="date-text {{ $item->return_date < now() ? 'overdue' : '' }}">
-                                {{ \Carbon\Carbon::parse($item->return_date)->format('d M Y') }}
+                                {{ \Carbon\Carbon::parse($item->return_date)->format('d M Y') }} @if($item->return_time) · {{ $item->return_time }}@endif
                             </p>
                         </td>
                         <td>

@@ -6,6 +6,7 @@ use App\Models\BorrowingRequest;
 use App\Models\WhatsAppNotificationLog;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 
 class WhatsAppNotificationService
 {
@@ -20,12 +21,24 @@ class WhatsAppNotificationService
     }
     
     /**
-     * Notify teacher about new borrowing request
+     * Notify teacher about new borrowing request using a direct WhatsApp link,
+     * without requiring a WhatsApp bot service.
      */
     public function notifyNewRequest(BorrowingRequest $request): void
     {
+        $teacherPhone = (string) ($request->teacher->phone ?? '');
+
+        if ($teacherPhone === '') {
+            Log::warning('WhatsApp notification new request skipped: teacher phone is empty', [
+                'borrowing_request_id' => $request->id,
+                'teacher_id' => $request->teacher_id,
+            ]);
+
+            return;
+        }
+
         $payload = [
-            'nomorGuru' => $request->teacher->phone ?? '',
+            'nomorGuru' => $teacherPhone,
             'namaSiswa' => $request->user->name,
             'kelas' => $request->user->kelas ?? '',
             'barang' => $request->item->name,
@@ -33,15 +46,41 @@ class WhatsAppNotificationService
             'tglPinjam' => $request->borrow_date->format('d-m-Y'),
             'tglKembali' => $request->return_date->format('d-m-Y'),
             'keperluan' => $request->purpose,
-            'linkKeputusan' => route('teacher.requests'),
+            'linkKeputusan' => $this->getDirectWaLink($request),
         ];
-        
-        $this->sendNotification(
-            $request->id,
-            'pengajuan_baru',
-            $request->teacher->phone ?? '',
-            $payload
+
+        Log::info('WA direct link generated for teacher approval', [
+            'borrowing_request_id' => $request->id,
+            'teacher_phone' => $teacherPhone,
+            'wa_link' => $payload['linkKeputusan'],
+        ]);
+    }
+
+    public function getDirectWaLink(BorrowingRequest $request): string
+    {
+        $teacherPhone = (string) ($request->teacher->phone ?? '');
+
+        if ($teacherPhone === '') {
+            return '';
+        }
+
+        $approvalUrl = URL::temporarySignedRoute(
+            'approval.show',
+            now()->addDays(3),
+            ['borrowingRequest' => $request->id]
         );
+
+        $waPhone = $this->normalizePhone($teacherPhone);
+        $message = urlencode(
+            "Halo, ada pengajuan peminjaman baru.\n" .
+            "Siswa: {$request->user->name}\n" .
+            "Barang: {$request->item->name}\n" .
+            "Jumlah: {$request->quantity}\n" .
+            "Keperluan: {$request->purpose}\n\n" .
+            "Klik link berikut untuk meninjau dan memutuskan: {$approvalUrl}"
+        );
+
+        return "https://wa.me/{$waPhone}?text={$message}";
     }
     
     /**
@@ -147,13 +186,32 @@ class WhatsAppNotificationService
     }
     
     /**
+     * Normalisasi nomor WA untuk format wa.me/62xxx.
+     */
+    private function normalizePhone(string $phone): string
+    {
+        $digits = preg_replace('/[^0-9]/', '', $phone ?? '');
+
+        if ($digits === '') {
+            return '';
+        }
+
+        if (str_starts_with($digits, '62')) {
+            return $digits;
+        }
+
+        if (str_starts_with($digits, '0')) {
+            return '62' . substr($digits, 1);
+        }
+
+        return '62' . $digits;
+    }
+
+    /**
      * Send notification to WhatsApp bot
-     * 
-     * @param int $borrowingRequestId
-     * @param string $type
-     * @param string $recipientPhone
-     * @param array $payload
-     * @return void
+     *
+     * Dihentikan untuk flow baru karena user meminta memakai link WA saja,
+     * bukan bot WhatsApp.
      */
     private function sendNotification(
         int $borrowingRequestId,
@@ -161,49 +219,12 @@ class WhatsAppNotificationService
         string $recipientPhone,
         array $payload
     ): void {
-        // Create log entry
-        $log = WhatsAppNotificationLog::create([
+        Log::info('WhatsApp bot integration skipped; using direct wa.me link flow instead.', [
             'borrowing_request_id' => $borrowingRequestId,
             'notification_type' => $type,
             'recipient_phone' => $recipientPhone,
             'payload' => $payload,
-            'status' => 'pending',
         ]);
-        
-        try {
-            $response = Http::timeout($this->timeout)
-                ->withHeaders(['X-API-Key' => $this->apiKey])
-                ->post("{$this->baseUrl}/notify/{$type}", $payload);
-            
-            $log->update([
-                'status' => $response->successful() ? 'success' : 'failed',
-                'http_status_code' => $response->status(),
-                'error_message' => $response->successful() ? null : $response->body(),
-                'sent_at' => now(),
-            ]);
-            
-            if (!$response->successful()) {
-                Log::error("WhatsApp notification failed: {$type}", [
-                    'log_id' => $log->id,
-                    'borrowing_request_id' => $borrowingRequestId,
-                    'status_code' => $response->status(),
-                    'response' => $response->body(),
-                ]);
-            }
-            
-        } catch (\Exception $e) {
-            $log->update([
-                'status' => 'failed',
-                'error_message' => $e->getMessage(),
-            ]);
-            
-            Log::error("WhatsApp notification exception: {$type}", [
-                'log_id' => $log->id,
-                'borrowing_request_id' => $borrowingRequestId,
-                'exception' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-        }
     }
     
     /**

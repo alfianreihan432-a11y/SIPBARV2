@@ -135,7 +135,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ $transaction->quantity }} unit</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 dark:text-white">{{ \Carbon\Carbon::parse($transaction->borrow_date)->format('d M Y') }}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">s/d {{ \Carbon\Carbon::parse($transaction->return_date)->format('d M Y') }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">s/d {{ \Carbon\Carbon::parse($transaction->return_date)->format('d M Y') }} @if($transaction->return_time) · {{ $transaction->return_time }}@endif</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 rounded text-xs font-bold
