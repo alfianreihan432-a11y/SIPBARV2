@@ -213,4 +213,6 @@ function previewAndUpload(input) {
     }
 }
 </script>
+=======
+>>>>>>> origin/frondtend
 @endsection

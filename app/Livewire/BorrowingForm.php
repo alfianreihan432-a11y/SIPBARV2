@@ -6,6 +6,7 @@ use App\Models\BorrowingRequest;
 use App\Models\Item;
 use App\Models\User;
 use App\Services\EmailNotificationService;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -81,8 +82,9 @@ class BorrowingForm extends Component
     {
         try {
             app(EmailNotificationService::class)->notifyNewRequest($request);
+            app(WhatsAppNotificationService::class)->notifyNewRequest($request);
         } catch (\Exception $e) {
-            \Log::error('Email notification failed for new request', [
+            \Log::error('New request notification failed', [
                 'borrowing_request_id' => $request->id,
                 'error' => $e->getMessage()
             ]);
