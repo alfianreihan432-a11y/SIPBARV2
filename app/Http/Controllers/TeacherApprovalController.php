@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\BorrowingRequest;
 use App\Services\BorrowingApprovalService;
+use App\Services\WhatsAppNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TeacherApprovalController extends Controller
 {
     public function __construct(
-        private BorrowingApprovalService $approvalService
+        private BorrowingApprovalService $approvalService,
+        private WhatsAppNotificationService $whatsAppService
     ) {}
     
     /**
@@ -49,8 +51,14 @@ class TeacherApprovalController extends Controller
             
             // Approve via service
             $this->approvalService->approve($borrowingRequest, Auth::id());
-            
-return back()->with('success', 'Permintaan peminjaman berhasil disetujui. QR Code sudah tersedia untuk siswa.');            
+
+            $waLink = $this->whatsAppService->getApprovedStudentWaLink($borrowingRequest);
+
+            if ($waLink !== '') {
+                return redirect()->away($waLink);
+            }
+
+            return back()->with('success', 'Permintaan peminjaman berhasil disetujui. QR Code sudah tersedia untuk siswa.');
         } catch (\App\Exceptions\InsufficientStockException $e) {
             return back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
@@ -96,7 +104,13 @@ return back()->with('success', 'Permintaan peminjaman berhasil disetujui. QR Cod
                 $validated['rejection_reason'],
                 Auth::id()
             );
-            
+
+            $waLink = $this->whatsAppService->getRejectedStudentWaLink($borrowingRequest);
+
+            if ($waLink !== '') {
+                return redirect()->away($waLink);
+            }
+
             return back()->with('success', 'Permintaan peminjaman berhasil ditolak. Notifikasi telah dikirim ke siswa.');
             
         } catch (\Exception $e) {
