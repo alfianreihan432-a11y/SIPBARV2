@@ -45,11 +45,7 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation, SkipsEmptyR
             return null;
         }
 
-        // 2. Generate Email Otomatis: {nip/nis}@sipbar.sch.id
-        $identifier = $nip ?: $nis;
-        $email = "{$identifier}@sipbar.sch.id";
-
-        // 3. Parsing format tanggal lahir (mendukung serial Excel & format string tanggal)
+        // 2. Parsing format tanggal lahir (mendukung serial Excel & format string tanggal)
         $tanggalLahir = null;
         if (!empty($row['tanggal_lahir'])) {
             try {
@@ -61,6 +57,13 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation, SkipsEmptyR
             } catch (\Exception $e) {
                 $tanggalLahir = null;
             }
+        }
+
+        // 3. Generate Email Otomatis: Guru (DDMMYYYY@sipbar.sch.id), Siswa ({nis}@sipbar.sch.id)
+        if ($nip) {
+            $email = User::generateTeacherEmail($nip, $tanggalLahir);
+        } else {
+            $email = "{$nis}@sipbar.sch.id";
         }
 
         // 4. Instansiasi Model User

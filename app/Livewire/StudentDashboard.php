@@ -29,7 +29,7 @@ class StudentDashboard extends Component
     {
         $userId = Auth::id();
         
-        $this->myRequests = BorrowingRequest::with(['item', 'teacher', 'qrCode'])
+        $this->myRequests = BorrowingRequest::with(['item', 'itemWithTrashed', 'teacher', 'qrCode'])
             ->where('user_id', $userId)
             ->latest()
             ->take(5)
@@ -37,7 +37,7 @@ class StudentDashboard extends Component
             
         $this->availableItems = Item::where('status', 'Tersedia')
             ->where('condition', 'Baik')
-            ->where('stock', '>', 0)
+            ->hasAvailableStock()
             ->count();
             
         $this->totalBorrowed = BorrowingRequest::where('user_id', $userId)
@@ -79,6 +79,16 @@ class StudentDashboard extends Component
     
     public function render()
     {
-        return view('livewire.student-dashboard');
+        $this->loadStats();
+
+        return view('livewire.student-dashboard', [
+            'myRequests'      => $this->myRequests,
+            'availableItems'  => $this->availableItems,
+            'totalBorrowed'   => $this->totalBorrowed,
+            'totalReturned'   => $this->totalReturned,
+            'pendingRequests' => $this->pendingRequests,
+            'showQRModal'     => $this->showQRModal,
+            'selectedQR'      => $this->selectedQR,
+        ]);
     }
 }

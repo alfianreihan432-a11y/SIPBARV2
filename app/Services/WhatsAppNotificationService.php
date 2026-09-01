@@ -45,14 +45,17 @@ class WhatsAppNotificationService
             return;
         }
 
+        $studentName = $request->user?->name ?? 'Siswa';
+        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+
         $payload = [
             'nomorGuru' => $teacherPhone,
-            'namaSiswa' => $request->user->name,
-            'kelas' => $request->user->kelas ?? '',
-            'barang' => $request->item->name,
+            'namaSiswa' => $studentName,
+            'kelas' => $request->user?->kelas ?? '',
+            'barang' => $itemName,
             'jumlah' => $request->quantity,
-            'tglPinjam' => $request->borrow_date->format('d-m-Y'),
-            'tglKembali' => $request->return_date->format('d-m-Y'),
+            'tglPinjam' => $request->borrow_date ? $request->borrow_date->format('d-m-Y') : '-',
+            'tglKembali' => $request->return_date ? $request->return_date->format('d-m-Y') : '-',
             'keperluan' => $request->purpose,
             'linkKeputusan' => $this->getDirectWaLink($request),
         ];
@@ -64,31 +67,39 @@ class WhatsAppNotificationService
         ]);
     }
 
-    public function getDirectWaLink(BorrowingRequest $request): string
+    public function getApprovalUrl(BorrowingRequest $request): string
     {
-        $teacherPhone = (string) ($request->teacher->phone ?? '');
-
-        if ($teacherPhone === '') {
-            return '';
-        }
-
-        $approvalUrl = URL::temporarySignedRoute(
+        return URL::temporarySignedRoute(
             'approval.show',
-            now()->addDays(3),
+            now()->addDays(7),
             ['borrowingRequest' => $request->id]
         );
+    }
 
-        $waPhone = $this->normalizePhone($teacherPhone);
+    public function getDirectWaLink(BorrowingRequest $request): string
+    {
+        $teacherPhone = trim((string) ($request->teacher?->phone ?? ''));
+        $approvalUrl = $this->getApprovalUrl($request);
+
+        $studentName = $request->user?->name ?? 'Siswa';
+        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+
         $message = urlencode(
             "Halo, ada pengajuan peminjaman baru.\n" .
-            "Siswa: {$request->user->name}\n" .
-            "Barang: {$request->item->name}\n" .
+            "Siswa: {$studentName}\n" .
+            "Barang: {$itemName}\n" .
             "Jumlah: {$request->quantity}\n" .
             "Keperluan: {$request->purpose}\n\n" .
-            "Klik link berikut untuk meninjau dan memutuskan: {$approvalUrl}"
+            "Klik link berikut untuk meninjau dan memutuskan:\n{$approvalUrl}"
         );
 
-        return "https://api.whatsapp.com/send?phone={$waPhone}&text={$message}";
+        if ($teacherPhone !== '') {
+            $waPhone = $this->normalizePhone($teacherPhone);
+            return "https://api.whatsapp.com/send?phone={$waPhone}&text={$message}";
+        }
+
+        // Jika nomor guru belum diisi, buat link share WA umum (user dapat memilih kontak di WhatsApp)
+        return "https://api.whatsapp.com/send?text={$message}";
     }
     
     /**
@@ -96,15 +107,18 @@ class WhatsAppNotificationService
      */
     public function getRejectedStudentWaLink(BorrowingRequest $request): string
     {
-        $studentPhone = (string) ($request->user->phone ?? '');
+        $studentPhone = (string) ($request->user?->phone ?? '');
 
         if ($studentPhone === '') {
             return '';
         }
 
-        $message = "Halo {$request->user->name},\n" .
+        $studentName = $request->user?->name ?? 'Siswa';
+        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+
+        $message = "Halo {$studentName},\n" .
             "Pengajuan peminjaman barang Anda ditolak.\n\n" .
-            "Barang: {$request->item->name}\n" .
+            "Barang: {$itemName}\n" .
             "Alasan: " . ($request->rejection_reason ?: 'Tidak ada alasan yang diberikan') . "\n\n" .
             "Silakan ajukan ulang atau hubungi guru pembimbing untuk informasi lebih lanjut.";
 
@@ -113,7 +127,7 @@ class WhatsAppNotificationService
 
     public function notifyRejected(BorrowingRequest $request): void
     {
-        $studentPhone = (string) ($request->user->phone ?? '');
+        $studentPhone = (string) ($request->user?->phone ?? '');
 
         if ($studentPhone === '') {
             Log::warning('WhatsApp notification rejected skipped: student phone is empty', [
@@ -124,9 +138,12 @@ class WhatsAppNotificationService
             return;
         }
 
-        $message = "Halo {$request->user->name},\n" .
+        $studentName = $request->user?->name ?? 'Siswa';
+        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+
+        $message = "Halo {$studentName},\n" .
             "Pengajuan peminjaman barang Anda ditolak.\n\n" .
-            "Barang: {$request->item->name}\n" .
+            "Barang: {$itemName}\n" .
             "Alasan: " . ($request->rejection_reason ?: 'Tidak ada alasan yang diberikan') . "\n\n" .
             "Silakan ajukan ulang atau hubungi guru pembimbing untuk informasi lebih lanjut.";
 
@@ -146,17 +163,21 @@ class WhatsAppNotificationService
      */
     public function getApprovedStudentWaLink(BorrowingRequest $request): string
     {
-        $studentPhone = (string) ($request->user->phone ?? '');
+        $studentPhone = (string) ($request->user?->phone ?? '');
 
         if ($studentPhone === '') {
             return '';
         }
 
+        $studentName = $request->user?->name ?? 'Siswa';
+        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+        $returnDate = $request->return_date ? $request->return_date->format('d-m-Y') : '-';
+
         $qrUrl = route('student.qrcode.show', ['id' => $request->id]);
-        $message = "Halo {$request->user->name},\n" .
+        $message = "Halo {$studentName},\n" .
             "Pengajuan peminjaman Anda telah disetujui.\n\n" .
-            "Barang: {$request->item->name}\n" .
-            "Tanggal kembali: {$request->return_date->format('d-m-Y')}\n\n" .
+            "Barang: {$itemName}\n" .
+            "Tanggal kembali: {$returnDate}\n\n" .
             "Klik link berikut untuk melihat QR Code pengambilan barang:\n{$qrUrl}\n\n" .
             "Tunjukkan QR Code ini kepada petugas saat mengambil barang.";
 
@@ -165,7 +186,7 @@ class WhatsAppNotificationService
 
     public function notifyApproved(BorrowingRequest $request, string $qrBase64): void
     {
-        $studentPhone = (string) ($request->user->phone ?? '');
+        $studentPhone = (string) ($request->user?->phone ?? '');
 
         if ($studentPhone === '') {
             Log::warning('WhatsApp notification approved skipped: student phone is empty', [
@@ -176,11 +197,15 @@ class WhatsAppNotificationService
             return;
         }
 
+        $studentName = $request->user?->name ?? 'Siswa';
+        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+        $returnDate = $request->return_date ? $request->return_date->format('d-m-Y') : '-';
+
         $qrUrl = route('student.qrcode.show', ['id' => $request->id]);
-        $message = "Halo {$request->user->name},\n" .
+        $message = "Halo {$studentName},\n" .
             "Pengajuan peminjaman Anda telah disetujui.\n\n" .
-            "Barang: {$request->item->name}\n" .
-            "Tanggal kembali: {$request->return_date->format('d-m-Y')}\n\n" .
+            "Barang: {$itemName}\n" .
+            "Tanggal kembali: {$returnDate}\n\n" .
             "Klik link berikut untuk melihat QR Code pengambilan barang:\n{$qrUrl}\n\n" .
             "Tunjukkan QR Code ini kepada petugas saat mengambil barang.";
 
@@ -200,17 +225,21 @@ class WhatsAppNotificationService
      */
     public function notifyReminder(BorrowingRequest $request): void
     {
+        $studentName = $request->user?->name ?? 'Siswa';
+        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+        $returnDate = $request->return_date ? $request->return_date->format('d-m-Y') : '-';
+
         $payload = [
-            'nomorSiswa' => $request->user->phone ?? '',
-            'namaSiswa' => $request->user->name,
-            'barang' => $request->item->name,
-            'tglKembali' => $request->return_date->format('d-m-Y'),
+            'nomorSiswa' => $request->user?->phone ?? '',
+            'namaSiswa' => $studentName,
+            'barang' => $itemName,
+            'tglKembali' => $returnDate,
         ];
         
         $this->sendNotification(
             $request->id,
             'reminder_h1',
-            $request->user->phone ?? '',
+            $request->user?->phone ?? '',
             $payload
         );
     }
@@ -220,18 +249,22 @@ class WhatsAppNotificationService
      */
     public function notifyCheckout(BorrowingRequest $request): void
     {
+        $studentName = $request->user?->name ?? 'Siswa';
+        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+        $returnDate = $request->return_date ? $request->return_date->format('d-m-Y') : '-';
+
         $payload = [
-            'nomorSiswa' => $request->user->phone ?? '',
-            'namaSiswa' => $request->user->name,
-            'barang' => $request->item->name,
+            'nomorSiswa' => $request->user?->phone ?? '',
+            'namaSiswa' => $studentName,
+            'barang' => $itemName,
             'jumlah' => $request->quantity,
-            'tglKembali' => $request->return_date->format('d-m-Y'),
+            'tglKembali' => $returnDate,
         ];
         
         $this->sendNotification(
             $request->id,
             'checkout',
-            $request->user->phone ?? '',
+            $request->user?->phone ?? '',
             $payload
         );
     }
@@ -241,17 +274,20 @@ class WhatsAppNotificationService
      */
     public function notifyReturned(BorrowingRequest $request): void
     {
+        $studentName = $request->user?->name ?? 'Siswa';
+        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+
         $payload = [
-            'nomorSiswa' => $request->user->phone ?? '',
-            'namaSiswa' => $request->user->name,
-            'barang' => $request->item->name,
+            'nomorSiswa' => $request->user?->phone ?? '',
+            'namaSiswa' => $studentName,
+            'barang' => $itemName,
             'waktuKembali' => $request->returned_at ? $request->returned_at->format('d-m-Y H:i') : now()->format('d-m-Y H:i'),
         ];
         
         $this->sendNotification(
             $request->id,
             'dikembalikan',
-            $request->user->phone ?? '',
+            $request->user?->phone ?? '',
             $payload
         );
     }

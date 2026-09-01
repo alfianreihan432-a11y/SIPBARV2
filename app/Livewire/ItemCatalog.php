@@ -52,7 +52,7 @@ class ItemCatalog extends Component
         $query = Item::with('category', 'teacher')
             ->where('status', 'Tersedia')
             ->where('condition', 'Baik')
-            ->where('stock', '>', 0);
+            ->hasAvailableStock();
 
         if ($this->search) {
             $query->where(function($q) {

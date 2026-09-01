@@ -174,14 +174,19 @@ class UserManager extends Component
 
         // Auto-generate email & password if creating new
         if (! $this->editingId) {
-            $slug  = Str::slug($this->name, '.');
-            $base  = strtolower($role === 'siswa' ? trim($this->nis ?: $slug) : trim($this->nip ?: $slug));
-            $this->email    = $base . '@sipbar.sch.id';
-            $this->password = $role === 'siswa' ? 'siswa123' : 'guru123';
+            if ($role === 'siswa') {
+                $slug  = Str::slug($this->name, '.');
+                $base  = strtolower(trim($this->nis ?: $slug));
+                $this->email    = $base . '@sipbar.sch.id';
+                $this->password = 'siswa123';
+            } else {
+                $this->email    = User::generateTeacherEmail($this->nip, $this->tanggal_lahir);
+                $this->password = 'guru123';
+            }
 
             // Check if email already exists
             if (User::where('email', $this->email)->exists()) {
-                session()->flash('error', 'Email ' . $this->email . ' sudah terdaftar. Pengguna dengan ' . ($role === 'siswa' ? 'NIS' : 'NIP') . ' ini mungkin sudah ada di sistem.');
+                session()->flash('error', 'Email ' . $this->email . ' sudah terdaftar.');
                 return;
             }
 

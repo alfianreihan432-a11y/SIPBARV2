@@ -236,7 +236,7 @@ class SipintuSyncUsers extends Command
                         }
                     } else {
                         // Create new user with default password
-                        $userData['password'] = Hash::make('siswa' . $nis);
+                        $userData['password'] = Hash::make('siswa123');
                         $userData['nis'] = $nis;
 
                         $newUser = User::create($userData);
@@ -329,7 +329,8 @@ class SipintuSyncUsers extends Command
                     $existingUser = User::where('nip', $nip)->first();
 
                     if ($existingUser) {
-                        // Update existing user (don't change password)
+                        // Update existing user (don't overwrite password or email)
+                        unset($userData['email']);
                         $existingUser->update($userData);
                         $stats['teachers']['updated']++;
 
@@ -338,8 +339,9 @@ class SipintuSyncUsers extends Command
                             $existingUser->assignRole('Guru');
                         }
                     } else {
-                        // Create new user with default password
-                        $userData['password'] = Hash::make('guru' . $nip);
+                        // Create new user with DDMMYYYY birthdate email and default password
+                        $userData['email'] = User::generateTeacherEmail($nip, $userData['tanggal_lahir'] ?? null);
+                        $userData['password'] = Hash::make('guru123');
                         $userData['nip'] = $nip;
 
                         $newUser = User::create($userData);

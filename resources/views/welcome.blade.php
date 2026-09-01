@@ -582,23 +582,24 @@ html.dark .mob-t-moon{display:none}
 .caption-label{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;line-height:1.3}
 .caption-sub{font-size:13px;color:rgba(255,255,255,.9);line-height:1.5;max-width:90%}
 /* ─── FOOTER ─── */
-.footer{background:#ffffff;color:#475569;padding:60px 24px 28px;border-top:1px solid #e2e8f0}
+.footer{background:#ffffff;color:#475569;padding:72px 24px 32px;border-top:1px solid #e2e8f0;position:relative}
 .footer-inner{max-width:1200px;margin:0 auto}
-.footer-grid{display:grid;grid-template-columns:2fr 1fr 1.2fr 1.2fr;gap:48px;margin-bottom:48px}
-.footer-brand-name{font-size:15px;font-weight:800;color:#0f172a;letter-spacing:-.01em}
-.footer-brand-sub{font-size:11px;color:#64748b;font-weight:500}
-.footer-desc{font-size:13px;line-height:1.65;margin-bottom:18px;color:#475569;max-width:280px;font-weight:400}
-.footer-logo-wrap{display:flex;align-items:center;gap:10px;margin-bottom:14px}
-.footer-logo-box{width:34px;height:34px;background:#1d4ed8;border-radius:10px;display:flex;align-items:center;justify-content:center}
-.social-row{display:flex;gap:8px}
-.social-btn{width:32px;height:32px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:all .2s;color:#475569;border:1px solid #e2e8f0}
-.social-btn:hover{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
-.footer-heading{font-size:13px;font-weight:700;color:#0f172a;margin-bottom:16px;letter-spacing:.01em}
-.footer-list{list-style:none;display:flex;flex-direction:column;gap:10px}
-.footer-list a{font-size:13px;color:#4b5563;text-decoration:none;transition:color .15s;display:flex;align-items:center;gap:6px;font-weight:400}
-.footer-list a:hover{color:#1d4ed8}
-.footer-divider{border:none;border-top:1px solid #e5e7eb;margin-bottom:20px}
-.footer-copy{text-align:center;font-size:12px;color:#6b7280;font-weight:400}
+.footer-grid{display:grid;grid-template-columns:2.2fr 1fr 1.2fr 1.2fr;gap:48px 36px;margin-bottom:48px}
+.footer-brand{display:flex;flex-direction:column;align-items:flex-start}
+.footer-logo-wrap{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.footer-logo-box{width:46px;height:46px;border-radius:50%;background:#ffffff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;box-shadow:0 2px 10px rgba(0,0,0,.08);border:1px solid #e2e8f0;flex-shrink:0}
+.footer-brand-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;color:#0f172a;letter-spacing:-.01em;line-height:1.2}
+.footer-brand-sub{font-size:11px;color:#1d4ed8;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.footer-desc{font-size:13.5px;line-height:1.7;color:#64748b;max-width:320px;font-weight:400;margin:0}
+.footer-col{display:flex;flex-direction:column}
+.footer-heading{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#0f172a;margin-bottom:18px;letter-spacing:.04em;text-transform:uppercase}
+.footer-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin:0;padding:0}
+.footer-list li{margin:0;padding:0}
+.footer-list a{font-size:13.5px;color:#64748b;text-decoration:none;transition:all .2s ease;display:inline-flex;align-items:center;font-weight:500}
+.footer-list a:hover{color:#1d4ed8;transform:translateX(4px)}
+.footer-divider{border:none;border-top:1px solid #e2e8f0;margin-bottom:24px}
+.footer-bottom{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px}
+.footer-copy{text-align:center;font-size:12.5px;color:#64748b;font-weight:400;margin:0}
 /* ─── RESPONSIVE ─── */
 @media(max-width:1024px){
   .hero-inner,.stats-inner{grid-template-columns:1fr}
@@ -610,7 +611,7 @@ html.dark .mob-t-moon{display:none}
   .feat-card-side{grid-column:span 6}
   .feat-card-sub{grid-column:span 3}
   .about-grid-modern{grid-template-columns:1fr;gap:40px}
-  .footer-grid{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:repeat(2,1fr);gap:40px 32px}
   .section{padding:60px 24px}
 }
 @media(max-width:768px){
@@ -652,7 +653,9 @@ html.dark .mob-t-moon{display:none}
   .section-h2{font-size:22px}
   .stats-h2{font-size:22px}
   .stats-grid{grid-template-columns:1fr}
-  .footer-grid{grid-template-columns:1fr}
+  .footer{padding:48px 20px 24px}
+  .footer-grid{grid-template-columns:1fr;gap:32px;margin-bottom:36px}
+  .footer-desc{max-width:100%}
   .section{padding:48px 16px}
   .feat-workflow-flow{flex-direction:column;align-items:flex-start}
   
@@ -899,17 +902,15 @@ html.dark .about-badge-icon { background: linear-gradient(135deg, #3b82f6, #60a5
 
 /* ── FOOTER ── */
 html.dark .footer { background: var(--dark-bg-footer) !important; border-top: 1px solid rgba(59, 130, 246, 0.15) !important }
-html.dark .footer-logo-box { background: #3b82f6 !important }
-html.dark .footer-brand-name { color: #f0f6ff !important }
-html.dark .footer-brand-sub { color: #94a3b8 !important }
+html.dark .footer-logo-box { background: rgba(15, 23, 42, 0.8) !important; border-color: rgba(59, 130, 246, 0.25) !important; box-shadow: 0 4px 14px rgba(0,0,0,.4) !important }
+html.dark .footer-brand-name { color: #f1f5f9 !important }
+html.dark .footer-brand-sub { color: #60a5fa !important }
 html.dark .footer-desc { color: #94a3b8 !important }
-html.dark .footer-heading { color: #dce9ff !important }
+html.dark .footer-heading { color: #f1f5f9 !important }
 html.dark .footer-list a { color: #94a3b8 !important }
 html.dark .footer-list a:hover { color: #60a5fa !important }
 html.dark .footer-divider { border-top-color: rgba(59, 130, 246, 0.15) !important }
 html.dark .footer-copy { color: #64748b !important }
-html.dark .social-btn { background: rgba(22, 36, 65, 0.6) !important; border-color: rgba(59, 130, 246, 0.25) !important; color: #94a3b8 !important }
-html.dark .social-btn:hover { background: #3b82f6 !important; border-color: #3b82f6 !important; color: #fff !important; box-shadow: 0 4px 12px rgba(59,130,246,.3) !important }
 
 /* ── MISC ── */
 html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.5) }
@@ -1458,33 +1459,59 @@ $stats = Cache::remember('homepage_stats', 900, function () {
 <footer class="footer" id="kontak">
   <div class="footer-inner">
     <div class="footer-grid">
-      <div>
+      {{-- Brand Column --}}
+      <div class="footer-brand">
         <div class="footer-logo-wrap">
-          <div class="footer-logo-box" style="width:48px;height:48px;border-radius:50%;background:#ffffff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.15);flex-shrink:0;"><img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" style="width:100%;height:100%;object-fit:contain;"></div>
-          <div><div class="footer-brand-name">SIPBAR</div><div class="footer-brand-sub">SMKN 1 BANGSRI</div></div>
+          <div class="footer-logo-box">
+            <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" style="width:100%;height:100%;object-fit:contain;">
+          </div>
+          <div>
+            <div class="footer-brand-name">SIPBAR</div>
+            <div class="footer-brand-sub">SMKN 1 BANGSRI</div>
+          </div>
         </div>
         <p class="footer-desc">Sistem inventaris berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.</p>
-        <div class="social-row">
-          @foreach(['M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z','M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5','M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z'] as $i)
-          <a href="#" class="social-btn"><svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $i }}"/></svg></a>
-          @endforeach
-        </div>
       </div>
-      <div>
+
+      {{-- Menu Column --}}
+      <div class="footer-col">
         <div class="footer-heading">Menu</div>
-        <ul class="footer-list">@foreach(['Beranda','Fitur','Tentang'] as $m)<li><a href="#">{{ $m }}</a></li>@endforeach</ul>
+        <ul class="footer-list">
+          <li><a href="#beranda">Beranda</a></li>
+          <li><a href="#fitur">Fitur</a></li>
+          <li><a href="#tentang">Tentang</a></li>
+        </ul>
       </div>
-      <div>
+
+      {{-- Fitur Column --}}
+      <div class="footer-col">
         <div class="footer-heading">Fitur</div>
-        <ul class="footer-list">@foreach(['Manajemen Barang','Peminjaman','Pengembalian','Laporan','Pengguna'] as $f)<li><a href="#">{{ $f }}</a></li>@endforeach</ul>
+        <ul class="footer-list">
+          <li><a href="#fitur">Manajemen Barang</a></li>
+          <li><a href="#fitur">Peminjaman</a></li>
+          <li><a href="#fitur">Pengembalian</a></li>
+          <li><a href="#fitur">Laporan</a></li>
+          <li><a href="#fitur">Pengguna</a></li>
+        </ul>
       </div>
-      <div>
+
+      {{-- Bantuan Column --}}
+      <div class="footer-col">
         <div class="footer-heading">Bantuan</div>
-        <ul class="footer-list">@foreach(['Panduan Penggunaan','FAQ','Kebijakan Privasi','Syarat & Ketentuan'] as $b)<li><a href="#">{{ $b }}</a></li>@endforeach</ul>
+        <ul class="footer-list">
+          <li><a href="#">Panduan Penggunaan</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Kebijakan Privasi</a></li>
+          <li><a href="#">Syarat &amp; Ketentuan</a></li>
+        </ul>
       </div>
     </div>
+
     <hr class="footer-divider">
-    <p class="footer-copy">&copy; {{ date('Y') }} SIPBAR – Sistem Informasi Pengelolaan Barang. All rights reserved.</p>
+
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; {{ date('Y') }} SIPBAR – Sistem Informasi Pengelolaan Barang. All rights reserved.</p>
+    </div>
   </div>
 </footer>
 <script>

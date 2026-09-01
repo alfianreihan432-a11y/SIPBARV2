@@ -190,69 +190,6 @@
         }
         .btn-login:active { transform: translateY(0); }
 
-        /* Divider */
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 24px 0;
-        }
-        .divider-line {
-            flex: 1;
-            height: 1px;
-            background: #e2e8f0;
-        }
-        .divider-text {
-            font-size: 12px;
-            color: #94a3b8;
-            white-space: nowrap;
-            font-weight: 500;
-        }
-
-        /* SSO Button */
-        .btn-sso {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 12px 16px;
-            background: #fff;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #374151;
-            text-decoration: none;
-            transition: all .2s;
-            box-shadow: 0 2px 8px rgba(0,0,0,.05);
-        }
-        .btn-sso:hover {
-            border-color: #1d4ed8;
-            color: #1d4ed8;
-            box-shadow: 0 4px 16px rgba(29, 78, 216, .15);
-        }
-        .sso-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(135deg, #1d4ed8, #2563eb);
-            border-radius: 8px;
-            flex-shrink: 0;
-        }
-        .sso-icon svg { width: 14px; height: 14px; color: #fff; }
-
-        /* SSO info text */
-        .sso-info {
-            font-size: 11px;
-            color: #94a3b8;
-            text-align: center;
-            margin-top: 12px;
-            line-height: 1.5;
-        }
-        .sso-info strong { color: #1d4ed8; }
 
         /* Alert boxes */
         .alert-success {
@@ -363,48 +300,17 @@
                 </div>@enderror
             </div>
 
-            {{-- Remember + Forgot --}}
+            {{-- Remember --}}
             <div class="row-between">
                 <label class="remember-label">
                     <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}>
                     Ingat saya
                 </label>
-                @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="forgot-link">Lupa password?</a>
-                @endif
             </div>
 
             <button type="submit" class="btn-login">Masuk</button>
         </form>
 
-        {{-- Divider --}}
-        <div class="divider">
-            <div class="divider-line"></div>
-            <span class="divider-text">atau masuk dengan</span>
-            <div class="divider-line"></div>
-        </div>
-
-        {{-- SSO Error --}}
-        @if(session('sipintu_error'))
-            <div style="display:flex;align-items:flex-start;gap:10px;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:12px 14px;margin-top:12px">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:#ef4444;flex-shrink:0;margin-top:1px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span style="font-size:12px;color:#dc2626;line-height:1.5">{{ session('sipintu_error') }}</span>
-            </div>
-        @endif
-
-        {{-- SSO SiPintu Button --}}
-        <a href="{{ route('sipintu.oauth.redirect') }}" class="btn-sso">
-            <span class="sso-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-                </svg>
-            </span>
-            Login dengan SiPintu
-        </a>
-
-        <p class="sso-info">
-            SSO terpusat via <strong>SiPintu Identity Gateway</strong> — masuk sekali untuk semua sistem sekolah.
-        </p>
     </div>
 </div>
 

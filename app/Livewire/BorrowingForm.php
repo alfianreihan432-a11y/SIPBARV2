@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\BorrowingRequest;
 use App\Models\Item;
 use App\Models\User;
+use App\Services\BorrowingApprovalService;
 use App\Services\EmailNotificationService;
 use App\Services\WhatsAppNotificationService;
 use Illuminate\Support\Facades\Auth;
@@ -42,16 +43,27 @@ class BorrowingForm extends Component
 
     public function submit()
     {
+        // Hitung stok tersedia saat ini (real-time, dikurangi yang sudah approved/borrowed)
+        $availableStock = app(BorrowingApprovalService::class)->getAvailableStock($this->item);
+
         $this->validate([
-            'quantity' => 'required|integer|min:1|max:' . $this->item->stock,
-            'purpose' => 'required|string|min:5',
+            'quantity'     => 'required|integer|min:1|max:' . $availableStock,
+            'purpose'      => 'required|string|min:5',
             'student_phone' => 'required|string|min:9|max:20',
-            'borrow_date' => 'required|date|after_or_equal:today',
-            'return_date' => 'required|date|after_or_equal:borrow_date',
-            'return_time' => 'required|date_format:H:i',
-            'teacher_id' => 'required|exists:users,id',
-            'notes' => 'nullable|string|max:500',
+            'borrow_date'  => 'required|date|after_or_equal:today',
+            'return_date'  => 'required|date|after_or_equal:borrow_date',
+            'return_time'  => 'required|date_format:H:i',
+            'teacher_id'   => 'required|exists:users,id',
+            'notes'        => 'nullable|string|max:500',
+        ], [
+            'quantity.max' => "Jumlah melebihi stok tersedia ({$availableStock} unit).",
         ]);
+
+        // Validasi ulang stok tersedia sebelum simpan (mencegah race condition UI)
+        if ($availableStock <= 0) {
+            $this->addError('quantity', 'Maaf, stok barang ini sudah habis.');
+            return;
+        }
 
         $user = Auth::user();
         $user->phone = $this->student_phone;
@@ -100,7 +112,7 @@ class BorrowingForm extends Component
 
     public function render()
     {
-        $teachers = User::role('guru')->get();
+        $teachers = User::role('guru')->orderBy('name', 'asc')->get();
 
         return view('livewire.borrowing-form', [
             'teachers' => $teachers,

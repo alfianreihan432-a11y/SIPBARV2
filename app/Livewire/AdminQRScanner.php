@@ -67,30 +67,30 @@ class AdminQRScanner extends Component
             return;
         }
 
-        // Check stock availability
-        $item = $request->item;
-        if ($item) {
-            if ($item->stock < $request->quantity) {
-                session()->flash('error', 'Stok barang tidak mencukupi.');
-                return;
-            }
-            // Reduce stock
-            $item->decrement('stock', $request->quantity);
+        // Check stock availability via BorrowingApprovalService
+        $availableStock = app(\App\Services\BorrowingApprovalService::class)->getAvailableStock($request->item);
+        if ($availableStock < $request->quantity && $request->status !== 'approved') {
+            session()->flash('error', 'Stok barang tidak mencukupi.');
+            return;
         }
 
-        // Update request status
-        $request->update([
-            'status' => 'borrowed',
-            'borrowed_at' => now(),
-            'checkout_by' => Auth::id(),
-        ]);
+        // Use BorrowingStateMachine
+        $stateMachine = app(\App\Services\BorrowingStateMachine::class);
+        try {
+            $stateMachine->transitionTo($request, BorrowingRequest::STATUS_BORROWED, Auth::id());
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal memproses peminjaman: ' . $e->getMessage());
+            return;
+        }
 
         // Mark QR as scanned
-        $request->qrCode->update([
-            'scanned_at' => now(),
-        ]);
+        if ($request->qrCode) {
+            $request->qrCode->update([
+                'scanned_at' => now(),
+            ]);
+        }
 
-        session()->flash('success', 'Pengambilan barang berhasil disetujui. Stok telah dikurangi.');
+        session()->flash('success', 'Pengambilan barang berhasil disetujui. Status stok telah diperbarui.');
         $this->scannedRequest = null;
         $this->showDetails = false;
     }
@@ -113,26 +113,29 @@ class AdminQRScanner extends Component
             return;
         }
 
-        // Update request status
+        // Use BorrowingStateMachine to return and recalculate item status
+        $stateMachine = app(\App\Services\BorrowingStateMachine::class);
+        try {
+            $stateMachine->transitionTo($request, BorrowingRequest::STATUS_RETURNED, Auth::id());
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal memproses pengembalian: ' . $e->getMessage());
+            return;
+        }
+
+        // Update return condition and notes
         $request->update([
-            'status' => 'returned',
-            'returned_at' => now(),
             'return_condition' => $this->returnCondition,
             'return_notes' => $this->returnNotes,
         ]);
 
-        // Increase stock
-        $item = $request->item;
-        $item->update([
-            'stock' => $item->stock + $request->quantity,
-        ]);
+        // Deactivate QR code if exists
+        if ($request->qrCode) {
+            $request->qrCode->update([
+                'is_active' => false,
+            ]);
+        }
 
-        // Deactivate QR code
-        $request->qrCode->update([
-            'is_active' => false,
-        ]);
-
-        session()->flash('success', 'Pengembalian barang berhasil diselesaikan. Stok telah dikembalikan.');
+        session()->flash('success', 'Pengembalian barang berhasil diselesaikan. Stok tersedia telah dipulihkan.');
         $this->scannedRequest = null;
         $this->showDetails = false;
         $this->isReturnMode = false;

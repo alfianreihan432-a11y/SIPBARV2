@@ -731,14 +731,6 @@
                         <label class="im-label">Tipe / Model</label>
                         <input wire:model="type" type="text" class="im-input" placeholder="G513, MX Master 3...">
                     </div>
-                    <div>
-                        <label class="im-label">Tahun Pengadaan</label>
-                        <input wire:model="purchase_year" type="number" min="2000" max="{{ date('Y') }}" class="im-input" placeholder="{{ date('Y') }}">
-                    </div>
-                    <div>
-                        <label class="im-label">Harga Per Unit (Rp)</label>
-                        <input wire:model="price" type="number" min="0" class="im-input" placeholder="15000000">
-                    </div>
                 </div>
             </div>
 
@@ -757,15 +749,6 @@
                             <option value="">— Pilih Lokasi —</option>
                             @foreach($locations as $loc)
                             <option value="{{ $loc->id }}">{{ $loc->building }}{{ $loc->floor ? ' Lt.'.$loc->floor : '' }} — {{ $loc->room }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="im-label">Supplier / Vendor</label>
-                        <select wire:model="supplier_id" class="im-select-field">
-                            <option value="">— Pilih Supplier —</option>
-                            @foreach($suppliers as $sup)
-                            <option value="{{ $sup->id }}">{{ $sup->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -910,8 +893,8 @@
                 {{-- Footer --}}
                 <div class="im-card-footer">
                     <div>
-                        <div class="im-stock-num">{{ $item->stock }}</div>
-                        <div class="im-stock-sub">Unit Tersedia</div>
+                        <div class="im-stock-num">{{ $item->available_stock }} <span style="font-size:12px;font-weight:600;color:var(--text-subtle)">/ {{ $item->stock }}</span></div>
+                        <div class="im-stock-sub">Tersedia / Total</div>
                     </div>
                     <div class="im-card-actions">
                         <button type="button" wire:click="edit({{ $item->id }})" class="im-btn-edit">
@@ -937,10 +920,10 @@
                             <th style="width:40px" class="center">#</th>
                             <th>Barang & Kode</th>
                             <th>Kategori</th>
-                            <th>Lokasi & Supplier</th>
+                            <th>Lokasi</th>
                             <th>Kondisi</th>
                             <th>Status</th>
-                            <th class="center">Stok</th>
+                            <th class="center">Tersedia / Total</th>
                             <th class="right">Aksi</th>
                         </tr>
                     </thead>
@@ -979,7 +962,6 @@
                             </td>
                             <td>
                                 <div style="font-weight:600;color:#e2e8f0;font-size:12px">{{ $item->location?->room ?? $item->location?->building ?? '—' }}</div>
-                                <div style="font-size:10px;color:#475569">{{ $item->supplier?->name ?? '' }}</div>
                             </td>
                             <td><span style="font-weight:700;color:{{ $condColor }}">{{ $item->condition }}</span></td>
                             <td>
@@ -988,7 +970,7 @@
                                     {{ $item->status }}
                                 </span>
                             </td>
-                            <td class="center" style="font-weight:900;color:#60a5fa;font-size:15px">{{ $item->stock }}</td>
+                            <td class="center" style="font-weight:900;color:#60a5fa;font-size:14px">{{ $item->available_stock }} <span style="font-size:11px;color:#64748b;font-weight:600">/ {{ $item->stock }}</span></td>
                             <td class="right">
                                 <div class="im-table-actions">
                                     <button type="button" wire:click="edit({{ $item->id }})" class="im-tbl-btn im-tbl-btn-edit" title="Edit Barang">
