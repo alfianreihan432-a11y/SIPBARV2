@@ -25,7 +25,6 @@ class UserManager extends Component
 
     // ── Shared ──
     public $name = '';
-    public $tanggal_lahir = '';
     public $phone = '';
 
     // ── Siswa only ──
@@ -76,9 +75,7 @@ class UserManager extends Component
                 $this->name           = $student['name']          ?? $student['nama']          ?? $this->name;
                 $this->kelas          = $student['kelas']         ?? $student['class']         ?? $this->kelas;
                 $this->jurusan        = $student['jurusan']       ?? $student['major']         ?? $this->jurusan;
-                $this->tanggal_lahir = $student['tanggal_lahir'] ?? $student['birth_date']   ?? $this->tanggal_lahir;
-                $this->phone          = $student['phone']         ?? $student['no_hp']        ?? $this->phone;
-                
+
                 $this->sijunaSuccess = true;
                 $this->sijunaMessage = 'Data siswa "' . $this->name . '" berhasil diimpor dari SIJUNA!';
             } else {
@@ -97,7 +94,6 @@ class UserManager extends Component
                 $teacher = is_array($result['data'][0] ?? null) ? $result['data'][0] : $result['data'];
                 $this->name           = $teacher['name']          ?? $teacher['nama']          ?? $this->name;
                 $this->jabatan        = $teacher['jabatan']       ?? $teacher['position']      ?? $this->jabatan;
-                $this->tanggal_lahir = $teacher['tanggal_lahir'] ?? $teacher['birth_date']   ?? $this->tanggal_lahir;
                 $this->phone          = $teacher['phone']         ?? $teacher['no_hp']        ?? $this->phone;
                 
                 $this->sijunaSuccess = true;
@@ -161,9 +157,7 @@ class UserManager extends Component
 
         // Dynamic validation
         $rules = [
-            'name'          => 'required|string|min:2',
-            'tanggal_lahir' => 'required|date',
-            'phone'         => 'required|string|min:9|max:20',
+            'name' => 'required|string|min:2',
         ];
 
         if ($role === 'siswa') {
@@ -171,6 +165,7 @@ class UserManager extends Component
             $rules['kelas']   = 'required|string|max:50';
             $rules['jurusan'] = 'required|string|max:50';
         } elseif ($role === 'guru') {
+            $rules['phone']   = 'required|string|min:9|max:20';
             $rules['nip']     = 'required|string|max:30';
             $rules['jabatan'] = 'required|string|max:50';
         }
@@ -203,8 +198,6 @@ class UserManager extends Component
 
         $data = [
             'name'              => $this->name,
-            'tanggal_lahir'     => $this->tanggal_lahir,
-            'phone'             => $this->phone,
             'email_verified_at' => now(), // siswa & guru tidak butuh verifikasi email
         ];
 
@@ -214,6 +207,7 @@ class UserManager extends Component
             $data['jurusan'] = $this->jurusan;
             $data['classroom_id'] = $this->classroom_id ?: null;
         } elseif ($role === 'guru') {
+            $data['phone']   = $this->phone;
             $data['nip']     = $this->nip;
             $data['jabatan'] = $this->jabatan;
         }
@@ -248,7 +242,6 @@ class UserManager extends Component
 
         $this->editingId      = $user->id;
         $this->name           = $user->name;
-        $this->tanggal_lahir = $user->tanggal_lahir ?? '';
         $this->phone          = $user->phone ?? '';
         $this->nis            = $user->nis   ?? '';
         $this->kelas          = $user->kelas ?? '';
@@ -273,8 +266,7 @@ class UserManager extends Component
     {
         $this->editingId     = null;
         $this->name          = '';
-        $this->tanggal_lahir = '';
-        $this->phone          = '';
+        $this->phone         = '';
         $this->nis           = '';
         $this->kelas         = '';
         $this->jurusan       = '';

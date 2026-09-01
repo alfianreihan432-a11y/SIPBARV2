@@ -19,6 +19,14 @@ class WhatsAppNotificationService
         $this->baseUrl = config('services.whatsapp.base_url') ?? '';
         $this->apiKey = config('services.whatsapp.api_key') ?? '';
     }
+
+    private function getApiSettings(): array
+    {
+        return [
+            'base_url' => config('services.whatsapp.base_url') ?? $this->baseUrl,
+            'api_key' => config('services.whatsapp.api_key') ?? $this->apiKey,
+        ];
+    }
     
     /**
      * Notify teacher about new borrowing request using a direct WhatsApp link,
@@ -80,48 +88,111 @@ class WhatsAppNotificationService
             "Klik link berikut untuk meninjau dan memutuskan: {$approvalUrl}"
         );
 
-        return "https://wa.me/{$waPhone}?text={$message}";
+        return "https://api.whatsapp.com/send?phone={$waPhone}&text={$message}";
     }
     
     /**
      * Notify student about rejection
      */
+    public function getRejectedStudentWaLink(BorrowingRequest $request): string
+    {
+        $studentPhone = (string) ($request->user->phone ?? '');
+
+        if ($studentPhone === '') {
+            return '';
+        }
+
+        $message = "Halo {$request->user->name},\n" .
+            "Pengajuan peminjaman barang Anda ditolak.\n\n" .
+            "Barang: {$request->item->name}\n" .
+            "Alasan: " . ($request->rejection_reason ?: 'Tidak ada alasan yang diberikan') . "\n\n" .
+            "Silakan ajukan ulang atau hubungi guru pembimbing untuk informasi lebih lanjut.";
+
+        return $this->buildWaLink($studentPhone, $message);
+    }
+
     public function notifyRejected(BorrowingRequest $request): void
     {
-        $payload = [
-            'nomorSiswa' => $request->user->phone ?? '',
-            'namaSiswa' => $request->user->name,
-            'barang' => $request->item->name,
-            'alasan' => $request->rejection_reason,
-        ];
-        
-        $this->sendNotification(
-            $request->id,
-            'ditolak',
-            $request->user->phone ?? '',
-            $payload
-        );
+        $studentPhone = (string) ($request->user->phone ?? '');
+
+        if ($studentPhone === '') {
+            Log::warning('WhatsApp notification rejected skipped: student phone is empty', [
+                'borrowing_request_id' => $request->id,
+                'user_id' => $request->user_id,
+            ]);
+
+            return;
+        }
+
+        $message = "Halo {$request->user->name},\n" .
+            "Pengajuan peminjaman barang Anda ditolak.\n\n" .
+            "Barang: {$request->item->name}\n" .
+            "Alasan: " . ($request->rejection_reason ?: 'Tidak ada alasan yang diberikan') . "\n\n" .
+            "Silakan ajukan ulang atau hubungi guru pembimbing untuk informasi lebih lanjut.";
+
+        $waLink = $this->buildWaLink($studentPhone, $message);
+        $sent = $this->sendThroughConfiguredApi($studentPhone, $message);
+
+        Log::info('WA notification processed for student rejection', [
+            'borrowing_request_id' => $request->id,
+            'student_phone' => $studentPhone,
+            'wa_link' => $waLink,
+            'sent_via_api' => $sent,
+        ]);
     }
     
     /**
      * Notify student about approval with QR code
      */
+    public function getApprovedStudentWaLink(BorrowingRequest $request): string
+    {
+        $studentPhone = (string) ($request->user->phone ?? '');
+
+        if ($studentPhone === '') {
+            return '';
+        }
+
+        $qrUrl = route('student.qrcode.show', ['id' => $request->id]);
+        $message = "Halo {$request->user->name},\n" .
+            "Pengajuan peminjaman Anda telah disetujui.\n\n" .
+            "Barang: {$request->item->name}\n" .
+            "Tanggal kembali: {$request->return_date->format('d-m-Y')}\n\n" .
+            "Klik link berikut untuk melihat QR Code pengambilan barang:\n{$qrUrl}\n\n" .
+            "Tunjukkan QR Code ini kepada petugas saat mengambil barang.";
+
+        return $this->buildWaLink($studentPhone, $message);
+    }
+
     public function notifyApproved(BorrowingRequest $request, string $qrBase64): void
     {
-        $payload = [
-            'nomorSiswa' => $request->user->phone ?? '',
-            'namaSiswa' => $request->user->name,
-            'barang' => $request->item->name,
-            'tglKembali' => $request->return_date->format('d-m-Y'),
-            'qrBase64' => $qrBase64,
-        ];
-        
-        $this->sendNotification(
-            $request->id,
-            'disetujui',
-            $request->user->phone ?? '',
-            $payload
-        );
+        $studentPhone = (string) ($request->user->phone ?? '');
+
+        if ($studentPhone === '') {
+            Log::warning('WhatsApp notification approved skipped: student phone is empty', [
+                'borrowing_request_id' => $request->id,
+                'user_id' => $request->user_id,
+            ]);
+
+            return;
+        }
+
+        $qrUrl = route('student.qrcode.show', ['id' => $request->id]);
+        $message = "Halo {$request->user->name},\n" .
+            "Pengajuan peminjaman Anda telah disetujui.\n\n" .
+            "Barang: {$request->item->name}\n" .
+            "Tanggal kembali: {$request->return_date->format('d-m-Y')}\n\n" .
+            "Klik link berikut untuk melihat QR Code pengambilan barang:\n{$qrUrl}\n\n" .
+            "Tunjukkan QR Code ini kepada petugas saat mengambil barang.";
+
+        $waLink = $this->buildWaLink($studentPhone, $message);
+        $sent = $this->sendThroughConfiguredApi($studentPhone, $message);
+
+        Log::info('WA notification processed for student approval', [
+            'borrowing_request_id' => $request->id,
+            'student_phone' => $studentPhone,
+            'wa_link' => $waLink,
+            'sent_via_api' => $sent,
+        ]);
     }
     
     /**
@@ -207,11 +278,78 @@ class WhatsAppNotificationService
         return '62' . $digits;
     }
 
+    private function buildWaLink(string $phone, string $message): string
+    {
+        $waPhone = $this->normalizePhone($phone);
+
+        if ($waPhone === '') {
+            return '';
+        }
+
+        return 'https://api.whatsapp.com/send?phone=' . $waPhone . '&text=' . urlencode($message);
+    }
+
     /**
-     * Send notification to WhatsApp bot
+     * Send message via configured WhatsApp API when available.
+     * If no provider is configured, keep the direct wa.me link flow as fallback.
+     */
+    private function sendThroughConfiguredApi(string $recipientPhone, string $message): bool
+    {
+        $waPhone = $this->normalizePhone($recipientPhone);
+        $settings = $this->getApiSettings();
+        $baseUrl = $settings['base_url'] ?? '';
+        $apiKey = $settings['api_key'] ?? '';
+
+        if ($waPhone === '' || empty($baseUrl) || empty($apiKey)) {
+            Log::warning('WhatsApp send skipped because provider config is empty', [
+                'base_url_set' => !empty($baseUrl),
+                'api_key_set' => !empty($apiKey),
+                'recipient_phone' => $waPhone,
+            ]);
+
+            return false;
+        }
+
+        $endpoint = rtrim($baseUrl, '/');
+        $payload = [
+            'phone' => $waPhone,
+            'to' => $waPhone,
+            'message' => $message,
+        ];
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Accept' => 'application/json',
+            ])
+                ->timeout($this->timeout)
+                ->post($endpoint, $payload);
+
+            if ($response->successful()) {
+                return true;
+            }
+
+            Log::warning('WhatsApp API delivery failed', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'recipient_phone' => $waPhone,
+            ]);
+
+            return false;
+        } catch (\Exception $e) {
+            Log::error('WhatsApp API delivery exception', [
+                'message' => $e->getMessage(),
+                'recipient_phone' => $waPhone,
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * Send notification to WhatsApp bot.
      *
-     * Dihentikan untuk flow baru karena user meminta memakai link WA saja,
-     * bukan bot WhatsApp.
+     * Deprecated in favor of configured API + direct wa.me link fallback.
      */
     private function sendNotification(
         int $borrowingRequestId,
