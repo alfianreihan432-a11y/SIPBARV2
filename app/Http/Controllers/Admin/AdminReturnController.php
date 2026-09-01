@@ -128,13 +128,12 @@ class AdminReturnController extends Controller
                 // 3. Update status Item di inventaris
                 $item = $borrowing->item;
                 if ($item) {
-                    // Update status barang kembali ke Tersedia bila kondisi masih layak
-                    if (in_array($return->kondisi_barang, ['baik', 'rusak_ringan'])) {
-                        $item->update(['status' => 'Tersedia']);
-                    } else if ($return->kondisi_barang === 'rusak_berat') {
+                    if ($return->kondisi_barang === 'rusak_berat') {
                         $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
                     } else if ($return->kondisi_barang === 'hilang') {
                         $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
+                    } else {
+                        $item->recalculateStatus();
                     }
                 }
 

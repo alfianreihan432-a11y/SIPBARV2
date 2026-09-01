@@ -44,6 +44,7 @@ class TeacherDashboard extends Component
             
         $this->availableItems = Item::where('status', 'Tersedia')
             ->where('condition', 'Baik')
+            ->hasAvailableStock()
             ->count();
             
         $this->totalBorrowed = Borrowing::where('user_id', $userId)

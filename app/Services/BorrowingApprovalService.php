@@ -102,19 +102,21 @@ class BorrowingApprovalService
      */
     private function validateStock(BorrowingRequest $request): void
     {
-        $item = $request->item;
-        
-        // Calculate reserved stock (approved or borrowed)
+        // Lock item row untuk prevent race condition saat ada concurrent approvals
+        $item = Item::lockForUpdate()->findOrFail($request->item_id);
+
+        // Calculate reserved stock (approved or borrowed) — juga di-lock
         $reservedStock = BorrowingRequest::whereIn('status', [
             BorrowingRequest::STATUS_APPROVED,
-            BorrowingRequest::STATUS_BORROWED
+            BorrowingRequest::STATUS_BORROWED,
         ])
         ->where('item_id', $item->id)
         ->where('id', '!=', $request->id) // Exclude current request
+        ->lockForUpdate()
         ->sum('quantity');
-        
+
         $availableStock = $item->stock - $reservedStock;
-        
+
         if ($availableStock < $request->quantity) {
             throw new InsufficientStockException(
                 "Stok tidak mencukupi. Tersedia: {$availableStock}, Diminta: {$request->quantity}"

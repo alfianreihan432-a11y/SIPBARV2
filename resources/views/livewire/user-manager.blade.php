@@ -256,7 +256,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
             @if(!$editingId)
             <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(29,78,216,.07);border:1px solid rgba(29,78,216,.18);border-radius:11px;padding:12px 16px;margin-top:16px;font-size:12px;color:#60a5fa">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0;margin-top:1px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>Email dan password akan dibuat otomatis dari NIS. Format: <strong>2024001@sipbar.sch.id</strong> / password: <strong>siswa2024001</strong></div>
+                <div>Email dan password dibuat otomatis. Format: <strong>{NIS}@sipbar.sch.id</strong> / password: <strong>siswa123</strong></div>
             </div>
             @endif
 
@@ -327,7 +327,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
             @if(!$editingId)
             <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(15,118,110,.07);border:1px solid rgba(15,118,110,.2);border-radius:11px;padding:12px 16px;margin-top:16px;font-size:12px;color:#34d399">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0;margin-top:1px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>Email dan password akan dibuat otomatis dari NIP. Format: <strong>198505152010011001@sipbar.sch.id</strong> / password: <strong>guru198505152010011001</strong></div>
+                <div>Email dan password dibuat otomatis dari 8 digit pertama NIP. Format: <strong>{YYYYMMDD}@sipbar.sch.id</strong> (contoh: 19840514@sipbar.sch.id) / password: <strong>guru123</strong></div>
             </div>
             @endif
             @endif

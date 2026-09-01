@@ -56,8 +56,8 @@
                     @endif
                     {{-- Stock badge --}}
                     <div style="position:absolute;top:10px;right:10px">
-                        <span style="padding:4px 10px;background:{{ $item->stock > 0 ? 'rgba(5,150,105,.85)' : 'rgba(220,38,38,.85)' }};color:#fff;font-size:11px;font-weight:700;border-radius:999px;backdrop-filter:blur(4px)">
-                            {{ $item->stock > 0 ? 'Stok: '.$item->stock : 'Habis' }}
+                        <span style="padding:4px 10px;background:{{ $item->available_stock > 0 ? 'rgba(5,150,105,.85)' : 'rgba(220,38,38,.85)' }};color:#fff;font-size:11px;font-weight:700;border-radius:999px;backdrop-filter:blur(4px)">
+                            {{ $item->available_stock > 0 ? 'Tersedia: '.$item->available_stock : 'Habis' }}
                         </span>
                     </div>
                     {{-- Category badge --}}
@@ -83,7 +83,7 @@
                     </div>
                     @endif
                     <div style="margin-top:auto;padding-top:12px">
-                        @if($item->stock > 0)
+                        @if($item->available_stock > 0)
                         <button wire:click="openBorrowModal({{ $item->id }})"
                                 class="s-btn s-btn--primary" style="width:100%;justify-content:center">
                             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>

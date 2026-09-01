@@ -102,40 +102,38 @@
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
                 <div class="s-loan-content">
-                    <div class="s-loan-name">{{ $request->item?->name ?? 'Barang tidak tersedia' }}</div>
+                    <div class="s-loan-name">{{ $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang tidak tersedia') }}</div>
                     <div class="s-loan-code">Peminjaman #{{ $request->id }} · Qty: {{ $request->quantity }}</div>
                     <div class="s-loan-meta">
                         <div class="s-loan-meta-item">
                             <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            {{ $request->borrow_date->format('d M Y') }} – {{ $request->return_date->format('d M Y') }}
+                            {{ $request->borrow_date ? $request->borrow_date->format('d M Y') : '-' }} – {{ $request->return_date ? $request->return_date->format('d M Y') : '-' }}
                         </div>
                     </div>
-                    @if($request->status === 'qr_ready' && $request->qrCode)
+                    @if(in_array($request->status, ['approved', 'qr_ready']))
                         <div style="margin-top:10px">
-                            <a href="{{ route('student.loans.qr', $request->id) }}" class="s-btn s-btn--sm s-btn--primary">
+                            <a href="{{ route('student.qrcode.show', $request->id) }}" class="s-btn s-btn--sm s-btn--primary" target="_blank">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-5v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V8a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1zm12 0h2a1 1 0 001-1V8a1 1 0 00-1-1h-2a1 1 0 00-1 1v1a1 1 0 001 1zM5 20h2a1 1 0 001-1v-1a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1z"/></svg>
                                 Lihat QR Code
                             </a>
                         </div>
                     @elseif($request->status === 'pending')
                         @php
-                            $shareLink = $request->teacher && $request->teacher->phone
-                                ? app(\App\Services\WhatsAppNotificationService::class)->getDirectWaLink($request)
-                                : null;
+                            $waService = app(\App\Services\WhatsAppNotificationService::class);
+                            $shareLink = $waService->getDirectWaLink($request);
+                            $approvalUrl = $waService->getApprovalUrl($request);
                         @endphp
                         <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
                             <a href="{{ route('student.loans.edit', $request->id) }}" class="s-btn s-btn--sm s-btn--ghost">
                                 Edit
                             </a>
-                            @if($shareLink)
-                                <a href="{{ $shareLink }}" target="_blank" rel="noopener" class="s-btn s-btn--sm s-btn--primary">
-                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l.7-3.305A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                                    Kirim ke WA Guru
-                                </a>
-                                <button type="button" onclick="navigator.clipboard.writeText('{{ $shareLink }}'); this.textContent='Tersalin';" class="s-btn s-btn--sm s-btn--ghost">
-                                    Salin Link
-                                </button>
-                            @endif
+                            <a href="{{ $shareLink }}" target="_blank" rel="noopener" class="s-btn s-btn--sm s-btn--primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l.7-3.305A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                                Kirim ke WA Guru
+                            </a>
+                            <button type="button" onclick="navigator.clipboard.writeText('{{ $approvalUrl }}'); var btn=this; btn.textContent='Tersalin!'; setTimeout(function(){ btn.textContent='Salin Link'; }, 2000);" class="s-btn s-btn--sm s-btn--ghost">
+                                Salin Link
+                            </button>
                             <form method="POST" action="{{ route('student.loans.cancel', $request->id) }}" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
                                 @csrf
                                 <button type="submit" class="s-btn s-btn--sm s-btn--danger">

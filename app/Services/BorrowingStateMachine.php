@@ -67,6 +67,10 @@ class BorrowingStateMachine
         };
 
         $request->save();
+
+        // Sinkronisasi status kolom items setelah setiap transisi.
+        // Memastikan katalog & dashboard yang baca items.status selalu akurat.
+        \App\Models\Item::find($request->item_id)?->recalculateStatus();
     }
     
     /**

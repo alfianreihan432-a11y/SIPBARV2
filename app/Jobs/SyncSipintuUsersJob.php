@@ -156,7 +156,7 @@ class SyncSipintuUsersJob implements ShouldQueue
                         $newUser = User::create([
                             'name' => $student['nama'] ?? $student['name'] ?? 'Siswa',
                             'email' => $nis . '@sipbar.sch.id',
-                            'password' => Hash::make('siswa' . $nis),
+                            'password' => Hash::make('siswa123'),
                             'nis' => $nis,
                             'kelas' => $student['kelas'] ?? $student['rombel'] ?? null,
                             'alamat' => $student['alamat'] ?? null,
@@ -222,11 +222,13 @@ class SyncSipintuUsersJob implements ShouldQueue
                             $existingUser->assignRole('Guru');
                         }
                     } else {
-                        // Create new user
+                        // Create new user with DDMMYYYY birthdate email
+                        $teacherEmail = User::generateTeacherEmail($nip, !empty($teacher['tanggal_lahir']) ? $teacher['tanggal_lahir'] : null);
+
                         $newUser = User::create([
                             'name' => $teacher['nama'] ?? $teacher['name'] ?? 'Guru',
-                            'email' => $nip . '@sipbar.sch.id',
-                            'password' => Hash::make('guru' . $nip),
+                            'email' => $teacherEmail,
+                            'password' => Hash::make('guru123'),
                             'nip' => $nip,
                             'jabatan' => $teacher['jabatan'] ?? $teacher['position'] ?? null,
                             'alamat' => $teacher['alamat'] ?? null,

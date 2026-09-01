@@ -215,12 +215,12 @@
                 </div>
             </div>
 
-            @foreach($recentBorrowings as $borrowing)
+            @forelse($recentBorrowings as $borrowing)
             <div class="db-txn-item">
                 <div class="db-txn-top">
                     <div>
-                        <div class="db-txn-name">{{ $borrowing->details->first()?->item->name ?? 'Unknown Item' }}</div>
-                        <div class="db-txn-type">Peminjaman #{{ $borrowing->number ?? $borrowing->id }}</div>
+                        <div class="db-txn-name">{{ $borrowing->item?->name ?? ($borrowing->itemWithTrashed?->name ?? 'Barang tidak tersedia') }}</div>
+                        <div class="db-txn-type">Peminjaman #{{ $borrowing->id }} · Qty: {{ $borrowing->quantity ?? 1 }}</div>
                     </div>
                     <div class="db-txn-link-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -229,15 +229,19 @@
                 <div class="db-txn-meta">
                     <div style="display:flex;align-items:center;gap:5px;color:var(--text-muted)">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        {{ $borrowing->borrowed_at?->diffForHumans() ?? 'Just now' }}
+                        {{ $borrowing->created_at?->diffForHumans() ?? 'Baru saja' }}
                     </div>
                     <div class="db-txn-user">
-                        <div class="db-txn-avatar">{{ strtoupper(substr($borrowing->user->name ?? 'U', 0, 1)) }}</div>
-                        {{ $borrowing->user->name ?? 'Unknown User' }}
+                        <div class="db-txn-avatar">{{ strtoupper(substr($borrowing->user?->name ?? 'U', 0, 1)) }}</div>
+                        {{ $borrowing->user?->name ?? 'Unknown User' }}
                     </div>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <div style="padding:24px 0;text-align:center;color:var(--text-muted);font-size:13px">
+                Belum ada transaksi peminjaman terbaru.
+            </div>
+            @endforelse
         </div>
 
         {{-- Chart Panel --}}
