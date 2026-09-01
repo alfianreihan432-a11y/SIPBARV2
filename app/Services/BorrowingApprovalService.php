@@ -43,10 +43,10 @@ class BorrowingApprovalService
             try {
                 $qrBase64 = $this->qrCodeService->getImageBase64($qrCode);
 
-                // -- WhatsApp (dinonaktifkan sementara karena bot diblokir) --
-                // $this->whatsAppService->notifyApproved($request, $qrBase64);
+                // WhatsApp langsung ke siswa agar QR/code approval cepat dikirim
+                $this->whatsAppService->notifyApproved($request, $qrBase64);
 
-                // -- Email (aktif) --
+                // Email (aktif) --
                 $this->emailService->notifyApproved($request, $qrBase64);
 
             } catch (\Exception $e) {
@@ -80,10 +80,10 @@ class BorrowingApprovalService
             
             // 3. Send notification (non-blocking)
             try {
-                // -- WhatsApp (dinonaktifkan sementara karena bot diblokir) --
-                // $this->whatsAppService->notifyRejected($request);
+                // WhatsApp langsung ke siswa agar alasan penolakan sampai ke siswa
+                $this->whatsAppService->notifyRejected($request);
 
-                // -- Email (aktif) --
+                // Email (aktif) --
                 $this->emailService->notifyRejected($request);
 
             } catch (\Exception $e) {

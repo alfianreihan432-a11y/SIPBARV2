@@ -104,6 +104,13 @@
     </div>
 
     <form wire:submit.prevent="submit">
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px;">
+                Nomor HP Siswa *
+            </label>
+            <input type="text" wire:model="student_phone" class="s-filter-input" placeholder="Contoh: 08123456789" autocomplete="off">
+            @error('student_phone') <span style="color: var(--s-rejected); font-size: 12px; display: block; margin-top: 4px;">{{ $message }}</span> @enderror
+        </div>
         {{-- Quantity --}}
         <div style="margin-bottom: 16px;">
             <label style="display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px;">
