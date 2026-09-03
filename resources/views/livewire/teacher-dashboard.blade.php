@@ -198,7 +198,7 @@
                     $hour = now()->hour;
                     $greet = $hour < 12 ? 'Selamat Pagi' : ($hour < 17 ? 'Selamat Siang' : 'Selamat Malam');
                 @endphp
-                {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Guru' }} 👋
+                {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Guru' }}
             </div>
             <div class="db-greeting-sub">{{ now()->translatedFormat('l, d F Y') }} • Portal Pengelolaan Inventaris Guru Pembimbing</div>
         </div>
@@ -384,7 +384,7 @@
                     <div class="db-txn-item">
                         <div class="db-txn-top">
                             <div>
-                                <div class="db-txn-name">{{ $borrowing->details->first()?->item->name ?? 'Barang Inventaris' }}</div>
+                                <div class="db-txn-name">{{ $borrowing->details?->first()?->item?->name ?? 'Barang Inventaris' }}</div>
                                 <div class="db-txn-type">Kode Peminjaman #{{ $borrowing->number ?? $borrowing->id }}</div>
                             </div>
                             <span class="db-badge {{ $borrowing->status === 'borrowed' ? 'db-badge-borrowed' : ($borrowing->status === 'returned' ? 'db-badge-returned' : 'db-badge-pending') }}">
@@ -429,7 +429,7 @@
                     <div class="db-txn-item">
                         <div class="db-txn-top">
                             <div>
-                                <div class="db-txn-name">{{ $borrowing->details->first()?->item->name ?? 'Barang Inventaris' }}</div>
+                                <div class="db-txn-name">{{ $borrowing->details?->first()?->item?->name ?? 'Barang Inventaris' }}</div>
                                 <div class="db-txn-type">Diajukan oleh {{ $borrowing->user->name ?? 'Siswa' }}</div>
                             </div>
                             <span class="db-badge {{ $borrowing->status === 'borrowed' ? 'db-badge-borrowed' : ($borrowing->status === 'returned' ? 'db-badge-returned' : 'db-badge-pending') }}">

@@ -165,7 +165,7 @@
     <div class="wrapper">
         <!-- Header -->
         <div class="header">
-            <div class="header-badge">❌ Ditolak</div>
+            <div class="header-badge">Ditolak</div>
             <h1>Pengajuan Peminjaman<br>Tidak Disetujui</h1>
             <p>Jangan menyerah — kamu bisa mengajukan kembali</p>
         </div>
@@ -181,7 +181,7 @@
 
             <!-- Info Card -->
             <div class="info-card">
-                <h3>📦 Detail Pengajuan</h3>
+                <h3>Detail Pengajuan</h3>
                 <div class="info-row">
                     <span class="info-label">Barang</span>
                     <span class="info-value">{{ $borrowingRequest->item?->name ?? '-' }}</span>
@@ -206,13 +206,13 @@
 
             <!-- Rejection Reason -->
             <div class="reason-box">
-                <h3>💬 Alasan Penolakan</h3>
+                <h3>Alasan Penolakan</h3>
                 <p>{{ $borrowingRequest->rejection_reason ?? 'Tidak ada alasan yang diberikan.' }}</p>
             </div>
 
             <!-- Advice -->
             <div class="advice-box">
-                <h3>💡 Langkah Selanjutnya</h3>
+                <h3>Langkah Selanjutnya</h3>
                 <p>
                     Kamu masih dapat mengajukan peminjaman barang yang lain atau mengajukan
                     ulang dengan melengkapi keperluan yang lebih detail. Hubungi guru terkait

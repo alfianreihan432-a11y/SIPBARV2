@@ -177,14 +177,14 @@
     <div class="wrapper">
         <!-- Header -->
         <div class="header">
-            <div class="header-badge">✅ Disetujui</div>
+            <div class="header-badge">Disetujui</div>
             <h1>Pengajuan Peminjaman<br>Kamu Disetujui!</h1>
             <p>Tunjukkan QR Code di bawah saat mengambil barang</p>
         </div>
 
         <!-- Body -->
         <div class="body">
-            <p class="greeting">Halo, {{ $borrowingRequest->user?->name ?? 'Siswa' }}! 🎉</p>
+            <p class="greeting">Halo, {{ $borrowingRequest->user?->name ?? 'Siswa' }}!</p>
             <p class="intro">
                 Kabar baik! Guru telah <strong>menyetujui</strong> pengajuan peminjaman barangmu.
                 Simpan QR Code di bawah ini — kamu wajib menunjukkannya kepada petugas
@@ -193,7 +193,7 @@
 
             <!-- Info Card -->
             <div class="info-card">
-                <h3>📦 Detail Peminjaman</h3>
+                <h3>Detail Peminjaman</h3>
                 <div class="info-row">
                     <span class="info-label">Barang</span>
                     <span class="info-value">{{ $borrowingRequest->item?->name ?? '-' }}</span>
@@ -218,7 +218,7 @@
 
             <!-- QR Code -->
             <div class="qr-section">
-                <h3>📱 QR Code Pengambilan</h3>
+                <h3>QR Code Pengambilan</h3>
                 <p>Screenshot atau cetak QR Code ini.<br>Tunjukkan kepada petugas saat mengambil barang.</p>
                 <img
                     src="data:image/png;base64,{{ $qrBase64 }}"
@@ -228,7 +228,7 @@
 
             <!-- Instructions -->
             <div class="instructions">
-                <h3>📋 Langkah Selanjutnya</h3>
+                <h3>Langkah Selanjutnya</h3>
                 <ol>
                     <li>Simpan atau screenshot QR Code di atas.</li>
                     <li>Datang ke tempat penyimpanan barang pada tanggal <strong>{{ $borrowingRequest->borrow_date?->format('d M Y') ?? '-' }}</strong>.</li>

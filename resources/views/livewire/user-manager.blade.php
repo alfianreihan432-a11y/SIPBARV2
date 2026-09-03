@@ -95,10 +95,19 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
         <div style="margin-top:2px;opacity:.85">{{ session('message') }}</div>
         @if(session('generated_email'))
         <div class="creds-box">
-            📧 Email: {{ session('generated_email') }}<br>
-            🔑 Password: {{ session('generated_password') }}
+            <div style="display:flex;align-items:center;gap:6px">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:currentColor" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <span>Email: {{ session('generated_email') }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:currentColor" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                <span>Password: {{ session('generated_password') }}</span>
+            </div>
         </div>
-        <div style="font-size:11px;opacity:.7;margin-top:6px">⚠️ Catat kredensial ini dan berikan ke pengguna. Password dapat diganti setelah login.</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;opacity:.7;margin-top:6px">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <span>Catat kredensial ini dan berikan ke pengguna. Password dapat diganti setelah login.</span>
+        </div>
         @endif
     </div>
 </div>
@@ -399,7 +408,9 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
 
     @if($users->isEmpty())
     <div class="um-empty">
-        <div style="font-size:40px;margin-bottom:10px">👥</div>
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:40px;height:40px;margin:0 auto 10px;color:var(--text-muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
         <div>Belum ada pengguna. Gunakan form di atas untuk menambahkan.</div>
     </div>
     @else
@@ -430,10 +441,6 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                         'guru'   => 'linear-gradient(135deg,#0f766e,#06b6d4)',
                         default  => 'linear-gradient(135deg,#7c3aed,#06b6d4)',
                     };
-                    $emoji = match($uRole) {
-                        'siswa'  => '🎓','guru' => '👨‍🏫','admin','super-admin' => '👤',
-                        default  => '🔧'
-                    };
                 @endphp
                 <tr wire:key="u-{{ $u->id }}">
                     <td style="color:#334155;font-size:12px">{{ $i+1 }}</td>
@@ -448,7 +455,14 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                     </td>
                     <td>
                         <span class="umt-chip {{ $chipCls }}">
-                            {{ $emoji }} {{ ucfirst($uRole) }}
+                            @if($uRole === 'siswa')
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a23.508 23.508 0 0 1 2.115-.993M4.26 10.147A23.318 23.318 0 0 1 12 8.443c2.74 0 5.37.469 7.74 1.704M4.26 10.147L12 2l7.74 8.147"/></svg>
+                            @elseif($uRole === 'guru')
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
+                            @else
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/></svg>
+                            @endif
+                            {{ ucfirst($uRole) }}
                         </span>
                     </td>
                     <td style="font-family:monospace;font-size:12px;color:#475569">

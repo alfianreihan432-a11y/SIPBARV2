@@ -360,7 +360,9 @@
     <!-- Top bar -->
     <div class="topbar">
         <div class="brand">
-            <div class="brand-icon">📦</div>
+            <div class="brand-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            </div>
             <div>
                 <div class="brand-name">SIPBAR</div>
                 <div class="brand-sub">Sistem Peminjaman Barang Sekolah</div>
@@ -373,7 +375,10 @@
 
         <!-- Header -->
         <div class="card-header">
-            <div class="card-header-badge">📋 Magic Link Approval</div>
+            <div class="card-header-badge" style="display:inline-flex;align-items:center;gap:6px">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                Magic Link Approval
+            </div>
             <h1>Konfirmasi Pengajuan<br>Peminjaman Barang</h1>
             <p>Tinjau detail di bawah lalu ambil keputusan persetujuan</p>
         </div>
@@ -384,16 +389,19 @@
 
         <!-- Status banner if already processed -->
         @if($status === \App\Models\BorrowingRequest::STATUS_APPROVED)
-            <div class="status-banner approved">
-                ✅ Pengajuan ini sudah <strong>disetujui</strong> sebelumnya.
+            <div class="status-banner approved" style="display:flex;align-items:center;justify-content:center;gap:8px">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                <span>Pengajuan ini sudah <strong>disetujui</strong> sebelumnya.</span>
             </div>
         @elseif($status === \App\Models\BorrowingRequest::STATUS_REJECTED)
-            <div class="status-banner rejected">
-                ❌ Pengajuan ini sudah <strong>ditolak</strong> sebelumnya.
+            <div class="status-banner rejected" style="display:flex;align-items:center;justify-content:center;gap:8px">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                <span>Pengajuan ini sudah <strong>ditolak</strong> sebelumnya.</span>
             </div>
         @elseif($status !== \App\Models\BorrowingRequest::STATUS_PENDING)
-            <div class="status-banner pending">
-                ℹ️ Status pengajuan saat ini: <strong>{{ $borrowingRequest->status_label }}</strong>
+            <div class="status-banner pending" style="display:flex;align-items:center;justify-content:center;gap:8px">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Status pengajuan saat ini: <strong>{{ $borrowingRequest->status_label }}</strong></span>
             </div>
         @endif
 
@@ -402,22 +410,35 @@
 
             {{-- Flash messages --}}
             @if(session('success'))
-                <div class="alert alert-success">✅ {{ session('success') }}</div>
+                <div class="alert alert-success" style="display:flex;align-items:center;gap:8px">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    <span>{{ session('success') }}</span>
+                </div>
             @endif
             @if(session('error'))
-                <div class="alert alert-error">❌ {{ session('error') }}</div>
+                <div class="alert alert-error" style="display:flex;align-items:center;gap:8px">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span>{{ session('error') }}</span>
+                </div>
             @endif
             @if(session('info'))
-                <div class="alert alert-info">ℹ️ {{ session('info') }}</div>
+                <div class="alert alert-info" style="display:flex;align-items:center;gap:8px">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>{{ session('info') }}</span>
+                </div>
             @endif
             @if($errors->any())
-                <div class="alert alert-error">
-                    ❌ {{ $errors->first() }}
+                <div class="alert alert-error" style="display:flex;align-items:center;gap:8px">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <span>{{ $errors->first() }}</span>
                 </div>
             @endif
 
             <!-- Detail pengajuan -->
-            <p class="section-title">🎒 Detail Pengajuan</p>
+            <p class="section-title" style="display:flex;align-items:center;gap:6px">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:#2563eb" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Detail Pengajuan
+            </p>
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-item-label">Nama Siswa</div>
@@ -461,7 +482,10 @@
             {{-- Rejection reason (if already rejected) --}}
             @if($borrowingRequest->rejection_reason)
                 <hr class="divider">
-                <p class="section-title">💬 Alasan Penolakan</p>
+                <p class="section-title" style="display:flex;align-items:center;gap:6px">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:#dc2626" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    Alasan Penolakan
+                </p>
                 <div class="info-item full" style="background:#fff5f5;border-color:#fecaca;margin-bottom:0;">
                     <div class="info-item-value" style="font-size:14px;font-weight:500;color:#991b1b;">
                         {{ $borrowingRequest->rejection_reason }}
@@ -474,7 +498,10 @@
                 <hr class="divider">
 
                 <div class="action-section">
-                    <h2>⚖️ Ambil Keputusan</h2>
+                    <h2 style="display:flex;align-items:center;gap:8px">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--primary)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        Ambil Keputusan
+                    </h2>
                     <p>
                         Pilih untuk menyetujui atau menolak pengajuan ini.
                         Notifikasi akan otomatis dikirim ke email siswa.
@@ -488,8 +515,9 @@
                             action="{{ route('approval.approve', array_merge(['borrowingRequest' => $borrowingRequest->id], request()->query())) }}"
                         >
                             @csrf
-                            <button type="submit" class="btn btn-approve" id="btn-approve">
-                                ✅ Setujui Pengajuan
+                            <button type="submit" class="btn btn-approve" id="btn-approve" style="display:inline-flex;align-items:center;justify-content:center;gap:6px">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                Setujui Pengajuan
                             </button>
                         </form>
 
@@ -499,8 +527,10 @@
                             class="btn btn-reject-toggle"
                             id="btn-reject-toggle"
                             onclick="toggleRejectForm()"
+                            style="display:inline-flex;align-items:center;justify-content:center;gap:6px"
                         >
-                            ❌ Tolak Pengajuan
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <span id="reject-btn-text">Tolak Pengajuan</span>
                         </button>
                     </div>
 
@@ -524,8 +554,9 @@
                             <div class="char-count">
                                 <span id="char-count">0</span>/500 karakter
                             </div>
-                            <button type="submit" class="btn btn-reject-confirm">
-                                ❌ Konfirmasi Penolakan
+                            <button type="submit" class="btn btn-reject-confirm" style="display:inline-flex;align-items:center;justify-content:center;gap:6px">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                Konfirmasi Penolakan
                             </button>
                         </form>
                     </div>
@@ -542,10 +573,12 @@
     <script>
         function toggleRejectForm() {
             const form = document.getElementById('reject-form');
-            const toggle = document.getElementById('btn-reject-toggle');
+            const btnText = document.getElementById('reject-btn-text');
             const isOpen = form.classList.contains('show');
             form.classList.toggle('show');
-            toggle.textContent = isOpen ? '❌ Tolak Pengajuan' : '✖ Batal';
+            if (btnText) {
+                btnText.textContent = isOpen ? 'Tolak Pengajuan' : 'Batal';
+            }
             if (!isOpen) {
                 document.getElementById('rejection_reason').focus();
             }

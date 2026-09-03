@@ -185,7 +185,7 @@
     <div class="wrapper">
         <!-- Header -->
         <div class="header">
-            <div class="header-badge">📋 Pengajuan Baru</div>
+            <div class="header-badge">Pengajuan Baru</div>
             <h1>Ada Pengajuan Peminjaman<br>yang Perlu Ditinjau</h1>
             <p>Sistem Peminjaman Barang Sekolah — SIPBAR</p>
         </div>
@@ -200,7 +200,7 @@
 
             <!-- Info Card -->
             <div class="info-card">
-                <h3>🎒 Detail Pengajuan</h3>
+                <h3>Detail Pengajuan</h3>
                 <div class="info-row">
                     <span class="info-label">Nama Siswa</span>
                     <span class="info-value">{{ $borrowingRequest->user?->name ?? '-' }}</span>
@@ -235,7 +235,7 @@
 
             <!-- Purpose -->
             <div class="purpose-box">
-                <h3>📝 Keperluan</h3>
+                <h3>Keperluan</h3>
                 <p>{{ $borrowingRequest->purpose }}</p>
             </div>
 
@@ -247,10 +247,10 @@
                     <strong>menolak</strong> pengajuan ini.
                 </p>
                 <a href="{{ $approvalUrl }}" class="btn-approve">
-                    🔍 Tinjau Pengajuan Ini
+                    Tinjau Pengajuan Ini
                 </a>
                 <div class="deadline-note">
-                    ⏰ Link ini berlaku selama <strong>3 hari</strong> sejak email ini dikirim.
+                    Link ini berlaku selama <strong>3 hari</strong> sejak email ini dikirim.
                     Setelah kedaluwarsa, pengajuan masih dapat diproses melalui dashboard SIPBAR.
                 </div>
             </div>

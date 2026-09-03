@@ -143,7 +143,7 @@
                     $hour = now()->hour;
                     $greet = $hour < 12 ? 'Selamat Pagi' : ($hour < 17 ? 'Selamat Siang' : 'Selamat Malam');
                 @endphp
-                {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Admin' }} 👋
+                {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Admin' }}
             </div>
             <div class="hero-date">{{ now()->translatedFormat('l, d F Y') }}</div>
         </div>
