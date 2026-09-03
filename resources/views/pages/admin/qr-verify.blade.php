@@ -99,7 +99,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
             </div>
-            <div class="qrv-title" style="color:#16a34a">QR Code Valid ✓</div>
+            <div class="qrv-title" style="color:#16a34a">QR Code Valid</div>
             <div class="qrv-sub">Data peminjaman berhasil diverifikasi</div>
 
             <table class="qrv-table">
@@ -137,7 +137,10 @@
                 <form method="POST" action="{{ route('admin.qr.confirm-checkout', $br->id) }}" style="display:inline">
                     @csrf
                     <a href="{{ route('admin.qr-scanner') }}" class="qrv-btn qrv-btn-outline">Batal</a>
-                    <button type="submit" class="qrv-btn">✓ Konfirmasi Pengambilan</button>
+                    <button type="submit" class="qrv-btn" style="display:inline-flex;align-items:center;gap:6px">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        Konfirmasi Pengambilan
+                    </button>
                 </form>
             @else
                 <a href="{{ route('admin.qr-scanner') }}" class="qrv-btn">Kembali ke Scanner</a>

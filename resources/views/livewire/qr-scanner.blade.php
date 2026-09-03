@@ -133,24 +133,24 @@
                 <label class="relative flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all
                     {{ $returnCondition === 'good' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'border-gray-300 dark:border-slate-600 hover:border-emerald-300' }}">
                     <input type="radio" wire:model="returnCondition" value="good" class="sr-only">
-                    <div class="text-center">
-                        <div class="text-2xl mb-1">✅</div>
+                    <div class="text-center flex flex-col items-center">
+                        <svg class="w-6 h-6 mb-1 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <div class="text-sm font-semibold {{ $returnCondition === 'good' ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-700 dark:text-gray-300' }}">Baik</div>
                     </div>
                 </label>
                 <label class="relative flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all
                     {{ $returnCondition === 'damaged' ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'border-gray-300 dark:border-slate-600 hover:border-amber-300' }}">
                     <input type="radio" wire:model="returnCondition" value="damaged" class="sr-only">
-                    <div class="text-center">
-                        <div class="text-2xl mb-1">⚠️</div>
+                    <div class="text-center flex flex-col items-center">
+                        <svg class="w-6 h-6 mb-1 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         <div class="text-sm font-semibold {{ $returnCondition === 'damaged' ? 'text-amber-700 dark:text-amber-300' : 'text-gray-700 dark:text-gray-300' }}">Rusak</div>
                     </div>
                 </label>
                 <label class="relative flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-all
                     {{ $returnCondition === 'lost' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-slate-600 hover:border-red-300' }}">
                     <input type="radio" wire:model="returnCondition" value="lost" class="sr-only">
-                    <div class="text-center">
-                        <div class="text-2xl mb-1">❌</div>
+                    <div class="text-center flex flex-col items-center">
+                        <svg class="w-6 h-6 mb-1 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <div class="text-sm font-semibold {{ $returnCondition === 'lost' ? 'text-red-700 dark:text-red-300' : 'text-gray-700 dark:text-gray-300' }}">Hilang</div>
                     </div>
                 </label>

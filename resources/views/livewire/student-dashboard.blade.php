@@ -7,7 +7,7 @@
                 $greet = $hour < 12 ? 'Selamat Pagi' : ($hour < 17 ? 'Selamat Siang' : 'Selamat Malam');
             @endphp
             <div style="font-family:var(--font-head);font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1.2">
-                {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Siswa' }} 👋
+                {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Siswa' }}
             </div>
             <div style="font-size:13px;color:var(--muted);margin-top:5px">
                 {{ now()->translatedFormat('l, d F Y') }}
@@ -196,13 +196,15 @@
     @endif
 
     @session('success')
-    <div style="margin-top:16px;padding:14px 18px;background:var(--s-returned-bg);border:1px solid var(--s-returned-bdr);color:var(--s-returned);border-radius:12px;font-size:13px;font-weight:600">
-        ✓ {{ session('success') }}
+    <div style="margin-top:16px;padding:14px 18px;background:var(--s-returned-bg);border:1px solid var(--s-returned-bdr);color:var(--s-returned);border-radius:12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        <span>{{ session('success') }}</span>
     </div>
     @endsession
     @session('error')
-    <div style="margin-top:16px;padding:14px 18px;background:var(--s-rejected-bg);border:1px solid var(--s-rejected-bdr);color:var(--s-rejected);border-radius:12px;font-size:13px;font-weight:600">
-        ✕ {{ session('error') }}
+    <div style="margin-top:16px;padding:14px 18px;background:var(--s-rejected-bg);border:1px solid var(--s-rejected-bdr);color:var(--s-rejected);border-radius:12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        <span>{{ session('error') }}</span>
     </div>
     @endsession
 </div>

@@ -59,17 +59,37 @@
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;" class="condition-grid">
                     @php
                         $conditions = [
-                            ['val' => 'baik', 'icon' => '✨', 'title' => 'Baik', 'sub' => 'Normal / Utuh'],
-                            ['val' => 'rusak_ringan', 'icon' => '⚠️', 'title' => 'Rusak Ringan', 'sub' => 'Gores / Lecet'],
-                            ['val' => 'rusak_berat', 'icon' => '❌', 'title' => 'Rusak Berat', 'sub' => 'Patah / Mati Total'],
-                            ['val' => 'hilang', 'icon' => '🔍', 'title' => 'Hilang', 'sub' => 'Tidak Ditemukan'],
+                            [
+                                'val' => 'baik',
+                                'svg' => '<svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#10b981" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                                'title' => 'Baik',
+                                'sub' => 'Normal / Utuh'
+                            ],
+                            [
+                                'val' => 'rusak_ringan',
+                                'svg' => '<svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#f59e0b" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>',
+                                'title' => 'Rusak Ringan',
+                                'sub' => 'Gores / Lecet'
+                            ],
+                            [
+                                'val' => 'rusak_berat',
+                                'svg' => '<svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#ef4444" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+                                'title' => 'Rusak Berat',
+                                'sub' => 'Patah / Mati Total'
+                            ],
+                            [
+                                'val' => 'hilang',
+                                'svg' => '<svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#64748b" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>',
+                                'title' => 'Hilang',
+                                'sub' => 'Tidak Ditemukan'
+                            ],
                         ];
                     @endphp
                     @foreach($conditions as $c)
                     <label style="position: relative; cursor: pointer;">
                         <input type="radio" name="kondisi_barang" value="{{ $c['val'] }}" {{ old('kondisi_barang', 'baik') === $c['val'] ? 'checked' : '' }} style="position: absolute; opacity: 0; width: 0; height: 0;" class="condition-radio">
                         <div class="condition-box" style="border: 1.5px solid var(--border2); border-radius: 10px; padding: 14px 10px; text-align: center; background: var(--bg3); transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                            <span style="font-size: 20px;">{{ $c['icon'] }}</span>
+                            <div style="display:flex;align-items:center;justify-content:center;height:28px;">{!! $c['svg'] !!}</div>
                             <div style="font-size: 13px; font-weight: 700; color: var(--text);">{{ $c['title'] }}</div>
                             <div style="font-size: 10px; color: var(--muted);">{{ $c['sub'] }}</div>
                         </div>
