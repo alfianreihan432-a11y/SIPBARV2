@@ -167,17 +167,17 @@
             text-decoration: none;
         }
         .sidebar-logo-wrap {
-            width: 46px; height: 46px; border-radius: 50%;
+            width: 48px; height: 48px; border-radius: 50%;
             background: rgba(255,255,255,.95);
             display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; overflow: hidden; padding: 4px;
+            flex-shrink: 0; overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,.3), 0 0 0 1.5px rgba(255,255,255,.15);
             transition: transform .2s ease, box-shadow .2s ease;
         }
         .sidebar-brand:hover .sidebar-logo-wrap { transform: scale(1.05); box-shadow: 0 4px 14px rgba(0,0,0,.4); }
         .sidebar-brand-img {
             width: 100%; height: 100%;
-            object-fit: contain;
+            object-fit: cover;
         }
         .brand-name {
             font-family: var(--font-head); font-size: 18px; font-weight: 800;
@@ -577,7 +577,7 @@
     <aside class="sidebar" id="sidebar">
         <a href="{{ route('student.dashboard') }}" class="sidebar-brand">
             <div class="sidebar-logo-wrap">
-                <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+                <img src="/build/assets/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
             </div>
             <div>
                 <div class="brand-name">SIPBAR</div>

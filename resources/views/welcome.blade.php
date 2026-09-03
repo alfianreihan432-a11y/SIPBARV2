@@ -118,12 +118,12 @@ html.dark{
   flex-shrink:0;
   box-shadow:0 2px 10px rgba(0,0,0,.10), 0 0 0 1.5px rgba(0,0,0,.06);
   transition:transform .25s ease, box-shadow .25s ease;
-  overflow:hidden; padding:4px;
+  overflow:hidden;
 }
 .nav-brand:hover .nav-logo-wrap{transform:scale(1.04); box-shadow:0 4px 16px rgba(29,78,216,.18)}
 .nav-brand-img{
   width:100%; height:100%;
-  object-fit:contain;
+  object-fit:cover;
 }
 html.dark .nav-logo-wrap{
   background:rgba(255,255,255,.92);
@@ -385,7 +385,7 @@ html.dark .mob-t-moon{display:none}
 </style>
 <style>
 /* ─── HERO ─── */
-.hero{position:relative;background:linear-gradient(135deg,rgba(29,78,216,0.85),rgba(37,99,235,0.80)),url('/build/assets/smkTop.png');background-size:cover;background-position:center;overflow:hidden;padding:100px 24px 70px;min-height:550px;display:flex;align-items:center}
+.hero{position:relative;background:linear-gradient(135deg,rgba(29,78,216,0.85),rgba(37,99,235,0.80)),url('/build/assets/sekolaheskasaba.jpeg');background-size:cover;background-position:center;overflow:hidden;padding:100px 24px 70px;min-height:550px;display:flex;align-items:center}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 40%,rgba(59,130,246,.1) 0%,transparent 70%)}
 .hero-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:2}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:#1d4ed8;border:1px solid rgba(255,255,255,.3);border-radius:999px;font-size:11px;font-weight:700;color:#ffffff;margin-bottom:20px;box-shadow:0 4px 16px rgba(29,78,216,.5);letter-spacing:.02em;text-transform:uppercase}
@@ -916,7 +916,7 @@ html.dark .footer-copy { color: #64748b !important }
 html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.5) }
 html.dark .hero-badge { background:#1e40af !important; color:#ffffff !important; border-color:rgba(255,255,255,.4) !important }
 html.dark .hero-badge-pulse { background:#ffffff !important; opacity:.9 !important }
-html.dark .hero { background:linear-gradient(135deg,rgba(30,64,175,0.85),rgba(37,99,235,0.80)),url('/build/assets/smkTop.png') !important }
+html.dark .hero { background:linear-gradient(135deg,rgba(30,64,175,0.85),rgba(37,99,235,0.80)),url('/build/assets/sekolaheskasaba.jpeg') !important }
 html.dark .hero-btn-main { background:rgba(255,255,255,.2) !important; color:#ffffff !important; border-color:rgba(255,255,255,.4) !important }
 html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; border-color:rgba(255,255,255,.6) !important }
 /* ─── MOBILE NAV LINKS ─── */
@@ -933,7 +933,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
     {{-- Brand Logo & Text --}}
     <a href="{{ route('home') }}" class="nav-brand" aria-label="SIPBAR Homepage">
       <div class="nav-logo-wrap">
-        <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="nav-brand-img">
+        <img src="/build/assets/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="nav-brand-img">
       </div>
       <div class="nav-brand-text">
         <div class="nav-brand-title">SIPBAR</div>
@@ -1426,7 +1426,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
         <div class="school-photo-frame-redesigned">
           <div class="photo-wrapper">
             <img 
-              src="/build/assets/smkTop.png" 
+              src="/build/assets/sekolaheskasaba.jpeg" 
               alt="Gedung SMKN 1 Bangsri" 
               class="school-photo"
             />
