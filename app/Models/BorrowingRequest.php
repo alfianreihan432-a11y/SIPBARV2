@@ -64,7 +64,7 @@ class BorrowingRequest extends Model
      */
     public function itemWithTrashed(): BelongsTo
     {
-        return $this->belongsTo(Item::class, 'item_id')->withoutGlobalScope(\Illuminate\Database\Eloquent\SoftDeletingScope::class);
+        return $this->belongsTo(Item::class, 'item_id')->withTrashed();
     }
 
     public function teacher(): BelongsTo
