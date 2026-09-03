@@ -1,7 +1,7 @@
 <aside class="sidebar" id="sidebar">
     <a href="{{ route('dashboard') }}" class="sidebar-brand">
         <div class="sidebar-logo-wrap">
-            <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+            <img src="/build/assets/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
         </div>
         <div>
             <div class="brand-name">SIPBAR</div>
