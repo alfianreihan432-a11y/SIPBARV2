@@ -109,10 +109,10 @@
             color: var(--text-primary);
         }
         .sidebar-logo-wrap {
-            width: 46px; height: 46px; border-radius: 50%;
+            width: 48px; height: 48px; border-radius: 50%;
             background: rgba(255,255,255,.92);
             display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; overflow: hidden; padding: 4px;
+            flex-shrink: 0; overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,.35), 0 0 0 1.5px rgba(255,255,255,.12);
             transition: transform .2s ease, box-shadow .2s ease;
         }
@@ -121,7 +121,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,.12), 0 0 0 1.5px rgba(0,0,0,.07);
         }
         .sidebar-brand:hover .sidebar-logo-wrap { transform: scale(1.05); box-shadow: 0 4px 14px rgba(0,0,0,.4); }
-        .sidebar-brand-img { width: 100%; height: 100%; object-fit: contain; }
+        .sidebar-brand-img { width: 100%; height: 100%; object-fit: cover; }
         .brand-name { font-size: 16px; font-weight: 800; color: var(--text-primary); line-height: 1.15; }
         .brand-sub { font-size: 10px; font-weight: 700; color: var(--text-muted); line-height: 1.2; letter-spacing: .08em; text-transform: uppercase; }
         .sidebar-search {
@@ -490,7 +490,7 @@
     <aside class="sidebar" id="sidebar">
         <a href="{{ route('dashboard') }}" class="sidebar-brand">
             <div class="sidebar-logo-wrap">
-                <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+                <img src="/build/assets/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
             </div>
             <div>
                 <div class="brand-name">SIPBAR</div>
