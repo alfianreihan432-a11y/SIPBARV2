@@ -41,9 +41,9 @@ body{display:flex;background:var(--content-bg);color:var(--text);overflow:hidden
 /* ══ SIDEBAR ══ */
 .sidebar{width:220px;flex-shrink:0;background:var(--sidebar-bg);display:flex;flex-direction:column;height:100vh;position:fixed;left:0;top:0;z-index:40;transition:background .25s,transform .3s;box-shadow:2px 0 16px rgba(0,0,0,.08)}
 .sidebar-brand{display:flex;align-items:center;gap:14px;padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.12);text-decoration:none}
-.sidebar-logo-wrap{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.3),0 0 0 1.5px rgba(255,255,255,.15);transition:transform .2s ease,box-shadow .2s ease}
+.sidebar-logo-wrap{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.3),0 0 0 1.5px rgba(255,255,255,.15);transition:transform .2s ease,box-shadow .2s ease}
 .sidebar-brand:hover .sidebar-logo-wrap{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}
-.sidebar-brand-img{width:100%;height:100%;object-fit:contain}
+.sidebar-brand-img{width:100%;height:100%;object-fit:cover}
 .brand-name{font-size:18px;font-weight:800;color:#ffffff;letter-spacing:-.02em;line-height:1.15}
 .brand-badge{font-size:9.5px;font-weight:800;color:#10b981;background:rgba(255,255,255,.95);padding:2px 6px;border-radius:4px;letter-spacing:.05em;display:inline-block;margin-top:2px}
 .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
@@ -165,7 +165,7 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
 <aside class="sidebar" id="sidebar">
     <a href="{{ route('teacher.dashboard') }}" class="sidebar-brand">
         <div class="sidebar-logo-wrap">
-            <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+            <img src="/build/assets/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
         </div>
         <div>
             <div class="brand-name">SIPBAR</div>
