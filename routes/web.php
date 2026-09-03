@@ -12,6 +12,10 @@ use App\Http\Controllers\Student\StudentQRCodeController;
 use App\Http\Controllers\Student\StudentReturnController;
 use App\Http\Controllers\TeacherApprovalController;
 use App\Http\Controllers\TransactionHistoryController;
+use App\Livewire\AddStudent;
+use App\Livewire\AddTeacher;
+use App\Livewire\AddClassroom;
+use App\Livewire\AddExtracurricular;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
@@ -50,6 +54,14 @@ Route::middleware(['auth'])->group(function () {
     Route::view('kelola-barang', 'pages.admin.kelola-barang')->name('kelola-barang.index');
     Route::view('categories', 'pages.admin.categories')->name('categories.index');
     Route::view('loans', 'pages.admin.loans')->name('loans.index');
+    
+    // Add forms routes
+    Route::middleware('role:admin')->group(function () {
+        Route::get('admin/tambah-siswa', AddStudent::class)->name('admin.add-student');
+        Route::get('admin/tambah-guru', AddTeacher::class)->name('admin.add-teacher');
+        Route::get('admin/tambah-kelas', AddClassroom::class)->name('admin.add-classroom');
+        Route::get('admin/tambah-ekstra', AddExtracurricular::class)->name('admin.add-extracurricular');
+    });
     
     // Admin Return Verification routes
     Route::get('returns', [AdminReturnController::class, 'index'])->name('returns.index');
