@@ -1,2 +1,0 @@
-<img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" <?php echo e($attributes->merge(['class' => 'object-contain'])); ?>>
-<?php /**PATH C:\Users\ASUS\SIPBARV2\resources\views/components/app-logo-icon.blade.php ENDPATH**/ ?>
