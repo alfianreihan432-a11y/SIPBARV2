@@ -160,13 +160,31 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                 <div class="um-card-title">{{ $editingId ? 'Edit Data Siswa' : 'Form Tambah Siswa' }}</div>
             </div>
         </div>
-        @else
+        @elseif($activeTab === 'guru')
         <div style="display:flex;align-items:center;gap:12px">
             <div style="width:42px;height:42px;background:linear-gradient(135deg,#0f766e,#0d9488);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(15,118,110,.4)">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1"/></svg>
             </div>
             <div>
                 <div class="um-card-title">{{ $editingId ? 'Edit Data Guru' : 'Form Tambah Guru' }}</div>
+            </div>
+        </div>
+        @elseif($activeTab === 'kelas')
+        <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;background:linear-gradient(135deg,#a855f7,#c084fc);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(168,85,247,.4)">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            </div>
+            <div>
+                <div class="um-card-title">{{ $editingId ? 'Edit Data Kelas' : 'Form Tambah Kelas' }}</div>
+            </div>
+        </div>
+        @else
+        <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;background:linear-gradient(135deg,#f97316,#fb923c);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(249,115,22,.4)">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            </div>
+            <div>
+                <div class="um-card-title">{{ $editingId ? 'Edit Data Ekstrakurikuler' : 'Form Tambah Ekstrakurikuler' }}</div>
             </div>
         </div>
         @endif
