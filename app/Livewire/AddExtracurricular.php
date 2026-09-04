@@ -29,19 +29,34 @@ class AddExtracurricular extends Component
     {
         $this->validate();
 
-        Extracurricular::create([
-            'name' => $this->name,
-            'kode' => $this->kode,
-            'description' => $this->description,
-            'pembina' => $this->pembina,
-            'pembina_phone' => $this->pembina_phone,
-            'jadwal' => $this->jadwal,
-            'status' => $this->status,
-        ]);
+        try {
+            Extracurricular::create([
+                'name' => $this->name,
+                'kode' => $this->kode,
+                'description' => $this->description,
+                'pembina' => $this->pembina,
+                'pembina_phone' => $this->pembina_phone,
+                'jadwal' => $this->jadwal,
+                'status' => $this->status,
+            ]);
 
-        session()->flash('success', 'Ekstrakurikuler berhasil ditambahkan.');
+            session()->flash('success', 'Ekstrakurikuler berhasil ditambahkan.');
 
-        $this->reset(['name', 'kode', 'description', 'pembina', 'pembina_phone', 'jadwal', 'status']);
+            $this->reset(['name', 'kode', 'description', 'pembina', 'pembina_phone', 'jadwal', 'status']);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menambahkan ekstrakurikuler: ' . $e->getMessage());
+            \Log::error('AddExtracurricular error: ' . $e->getMessage(), [
+                'data' => [
+                    'name' => $this->name,
+                    'kode' => $this->kode,
+                    'description' => $this->description,
+                    'pembina' => $this->pembina,
+                    'pembina_phone' => $this->pembina_phone,
+                    'jadwal' => $this->jadwal,
+                    'status' => $this->status,
+                ]
+            ]);
+        }
     }
 
     public function render()

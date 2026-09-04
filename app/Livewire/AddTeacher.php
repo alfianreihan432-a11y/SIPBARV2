@@ -30,24 +30,39 @@ class AddTeacher extends Component
     {
         $this->validate();
 
-        $user = User::create([
-            'name' => $this->name,
-            'nip' => $this->nip,
-            'phone' => $this->phone,
-            'jabatan' => $this->jabatan,
-            'jurusan' => $this->jurusan,
-            'tanggal_lahir' => $this->tanggal_lahir,
-            'alamat' => $this->alamat,
-            'password' => Hash::make('guru' . $this->nip),
-            'email' => $this->nip . '@sipbar.sch.id',
-            'email_verified_at' => now(),
-        ]);
+        try {
+            $user = User::create([
+                'name' => $this->name,
+                'nip' => $this->nip,
+                'phone' => $this->phone,
+                'jabatan' => $this->jabatan,
+                'jurusan' => $this->jurusan,
+                'tanggal_lahir' => $this->tanggal_lahir,
+                'alamat' => $this->alamat,
+                'password' => Hash::make('guru' . $this->nip),
+                'email' => $this->nip . '@sipbar.sch.id',
+                'email_verified_at' => now(),
+            ]);
 
-        $user->assignRole('guru');
+            $user->assignRole('guru');
 
-        session()->flash('success', 'Guru berhasil ditambahkan. Password default: guru' . $this->nip);
+            session()->flash('success', 'Guru berhasil ditambahkan. Password default: guru' . $this->nip);
 
-        $this->reset(['nip', 'name', 'phone', 'jabatan', 'jurusan', 'tanggal_lahir', 'alamat']);
+            $this->reset(['nip', 'name', 'phone', 'jabatan', 'jurusan', 'tanggal_lahir', 'alamat']);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menambahkan guru: ' . $e->getMessage());
+            \Log::error('AddTeacher error: ' . $e->getMessage(), [
+                'data' => [
+                    'name' => $this->name,
+                    'nip' => $this->nip,
+                    'phone' => $this->phone,
+                    'jabatan' => $this->jabatan,
+                    'jurusan' => $this->jurusan,
+                    'tanggal_lahir' => $this->tanggal_lahir,
+                    'alamat' => $this->alamat,
+                ]
+            ]);
+        }
     }
 
     public function render()

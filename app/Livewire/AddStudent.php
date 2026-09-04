@@ -40,25 +40,41 @@ class AddStudent extends Component
     {
         $this->validate();
 
-        $user = User::create([
-            'name' => $this->name,
-            'nis' => $this->nis,
-            'kelas' => $this->kelas,
-            'jurusan' => $this->jurusan,
-            'tanggal_lahir' => $this->tanggal_lahir,
-            'phone' => $this->phone,
-            'alamat' => $this->alamat,
-            'classroom_id' => $this->classroom_id,
-            'password' => Hash::make('siswa' . $this->nis),
-            'email' => $this->nis . '@sipbar.sch.id',
-            'email_verified_at' => now(),
-        ]);
+        try {
+            $user = User::create([
+                'name' => $this->name,
+                'nis' => $this->nis,
+                'kelas' => $this->kelas,
+                'jurusan' => $this->jurusan,
+                'tanggal_lahir' => $this->tanggal_lahir,
+                'phone' => $this->phone,
+                'alamat' => $this->alamat,
+                'classroom_id' => $this->classroom_id,
+                'password' => Hash::make('siswa' . $this->nis),
+                'email' => $this->nis . '@sipbar.sch.id',
+                'email_verified_at' => now(),
+            ]);
 
-        $user->assignRole('siswa');
+            $user->assignRole('siswa');
 
-        session()->flash('success', 'Siswa berhasil ditambahkan. Password default: siswa' . $this->nis);
+            session()->flash('success', 'Siswa berhasil ditambahkan. Password default: siswa' . $this->nis);
 
-        $this->reset(['nis', 'name', 'kelas', 'jurusan', 'tanggal_lahir', 'phone', 'alamat', 'classroom_id']);
+            $this->reset(['nis', 'name', 'kelas', 'jurusan', 'tanggal_lahir', 'phone', 'alamat', 'classroom_id']);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menambahkan siswa: ' . $e->getMessage());
+            \Log::error('AddStudent error: ' . $e->getMessage(), [
+                'data' => [
+                    'name' => $this->name,
+                    'nis' => $this->nis,
+                    'kelas' => $this->kelas,
+                    'jurusan' => $this->jurusan,
+                    'tanggal_lahir' => $this->tanggal_lahir,
+                    'phone' => $this->phone,
+                    'alamat' => $this->alamat,
+                    'classroom_id' => $this->classroom_id,
+                ]
+            ]);
+        }
     }
 
     public function render()

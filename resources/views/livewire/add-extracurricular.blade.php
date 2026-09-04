@@ -23,6 +23,15 @@
             </div>
         @endif
 
+        @if(session()->has('error'))
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-red-800 font-medium">{{ session('error') }}</span>
+            </div>
+        @endif
+
         <form wire:submit="submit" class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Nama Ekstrakurikuler -->

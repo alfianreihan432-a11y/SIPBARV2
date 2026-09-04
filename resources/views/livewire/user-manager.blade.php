@@ -9,6 +9,8 @@
 .um-tab.active{color:#fff}
 .um-tab-siswa.active{background:var(--blue-dark);box-shadow:0 4px 12px rgba(29,78,216,.3)}
 .um-tab-guru.active{background:#0f766e;box-shadow:0 4px 12px rgba(15,118,110,.3)}
+.um-tab-kelas.active{background:linear-gradient(135deg,#a855f7,#c084fc);box-shadow:0 4px 12px rgba(168,85,247,.4)}
+.um-tab-ekstra.active{background:linear-gradient(135deg,#f97316,#fb923c);box-shadow:0 4px 12px rgba(249,115,22,.4)}
 /* ── FORM CARD ── */
 .um-card{background:var(--bg-card);border:1px solid var(--border-alt);border-radius:18px;overflow:hidden;box-shadow:var(--card-shadow)}
 .um-card-top{padding:20px 24px 18px;border-bottom:1px solid var(--border-subtle)}
@@ -126,6 +128,16 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
             wire:click="setTab('guru')" type="button">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
             Tambah Guru
+        </button>
+        <button class="um-tab um-tab-kelas {{ $activeTab === 'kelas' ? 'active' : '' }}"
+            wire:click="setTab('kelas')" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            Tambah Kelas
+        </button>
+        <button class="um-tab um-tab-ekstra {{ $activeTab === 'ekstra' ? 'active' : '' }}"
+            wire:click="setTab('ekstra')" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            Tambah Ekstra
         </button>
     </div>
     @if($editingId)
@@ -312,18 +324,136 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                 <div>Email dan password akan dibuat otomatis dari NIP. Format: <strong>198505152010011001@sipbar.sch.id</strong> / password: <strong>guru198505152010011001</strong></div>
             </div>
             @endif
+
+            @elseif($activeTab === 'kelas')
+            {{-- ══ KELAS FIELDS ══ --}}
+            <div class="um-grid um-grid-2">
+                {{-- Nama Kelas --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        Nama Kelas <span class="um-req">*</span>
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        <input wire:model="nama_kelas" type="text" class="um-input" placeholder="Contoh: XII PPLG 1" autocomplete="off">
+                    </div>
+                    @error('nama_kelas')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+
+                {{-- Nama Ketua Kelas --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        Nama Ketua Kelas <span class="um-req">*</span>
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <input wire:model="ketua_kelas" type="text" class="um-input" placeholder="Nama ketua kelas" autocomplete="off">
+                    </div>
+                    @error('ketua_kelas')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+
+                {{-- NIS Ketua --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/></svg>
+                        NIS Ketua Kelas <span class="um-req">*</span>
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/></svg>
+                        <input wire:model="nis_ketua" type="text" class="um-input" placeholder="NIS ketua kelas" autocomplete="off">
+                    </div>
+                    @error('nis_ketua')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+
+                {{-- Nama Wali Kelas --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        Nama Wali Kelas <span class="um-req">*</span>
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <input wire:model="wali_kelas" type="text" class="um-input" placeholder="Nama wali kelas" autocomplete="off">
+                    </div>
+                    @error('wali_kelas')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+            </div>
+
+            @if(!$editingId)
+            <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.2);border-radius:11px;padding:12px 16px;margin-top:16px;font-size:12px;color:#a855f7">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0;margin-top:1px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>User login akan dibuat otomatis. Email: <strong>{nama-kelas}@sipbar.sch.id</strong> / Password: <strong>{nama-kelas}123</strong></div>
+            </div>
+            @endif
+
+            @else
+            {{-- ══ EKSTRA FIELDS ══ --}}
+            <div class="um-grid um-grid-3">
+                {{-- Nama Ekstra --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                        Nama Ekstrakurikuler <span class="um-req">*</span>
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                        <input wire:model="nama_ekstra" type="text" class="um-input" placeholder="Contoh: Pramuka, PMR" autocomplete="off">
+                    </div>
+                    @error('nama_ekstra')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+
+                {{-- Ketua Ekstra --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        Ketua Ekstra
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <input wire:model="ketua_ekstra" type="text" class="um-input" placeholder="Nama ketua ekstra" autocomplete="off">
+                    </div>
+                    @error('ketua_ekstra')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+
+                {{-- Pembina Ekstra --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        Guru Pembina
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <input wire:model="pembina_ekstra" type="text" class="um-input" placeholder="Nama guru pembina" autocomplete="off">
+                    </div>
+                    @error('pembina_ekstra')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+            </div>
+
+            @if(!$editingId)
+            <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(249,115,22,.07);border:1px solid rgba(249,115,22,.2);border-radius:11px;padding:12px 16px;margin-top:16px;font-size:12px;color:#f97316">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0;margin-top:1px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div>User login akan dibuat otomatis. Email: <strong>{nama-ekstra}@sipbar.sch.id</strong> / Password: <strong>{nama-ekstra}123</strong></div>
+            </div>
+            @endif
             @endif
 
         </div>
 
         <div class="um-actions">
-            <button type="submit" class="um-btn {{ $activeTab === 'siswa' ? 'um-btn-siswa' : 'um-btn-guru' }}">
+            <button type="submit" class="um-btn 
+                @if($activeTab === 'siswa') um-btn-siswa
+                @elseif($activeTab === 'guru') um-btn-guru
+                @elseif($activeTab === 'kelas') um-btn-kelas
+                @else um-btn-ekstra
+                @endif">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     @if($editingId)<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     @else<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
                     @endif
                 </svg>
-                {{ $editingId ? 'Simpan Perubahan' : ($activeTab === 'siswa' ? 'Tambah Siswa' : 'Tambah Guru') }}
+                {{ $editingId ? 'Simpan Perubahan' : 'Tambah ' . ucfirst($activeTab) }}
             </button>
             <button type="button" wire:click="resetForm" class="um-btn um-btn-secondary">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>

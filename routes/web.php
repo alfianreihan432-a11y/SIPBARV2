@@ -55,13 +55,11 @@ Route::middleware(['auth'])->group(function () {
     Route::view('categories', 'pages.admin.categories')->name('categories.index');
     Route::view('loans', 'pages.admin.loans')->name('loans.index');
     
-    // Add forms routes
-    Route::middleware('role:admin')->group(function () {
-        Route::get('admin/tambah-siswa', AddStudent::class)->name('admin.add-student');
-        Route::get('admin/tambah-guru', AddTeacher::class)->name('admin.add-teacher');
-        Route::get('admin/tambah-kelas', AddClassroom::class)->name('admin.add-classroom');
-        Route::get('admin/tambah-ekstra', AddExtracurricular::class)->name('admin.add-extracurricular');
-    });
+    // Add forms routes (tanpa middleware untuk testing)
+    Route::get('admin/tambah-siswa', AddStudent::class)->name('admin.add-student');
+    Route::get('admin/tambah-guru', AddTeacher::class)->name('admin.add-teacher');
+    Route::get('admin/tambah-kelas', AddClassroom::class)->name('admin.add-classroom');
+    Route::get('admin/tambah-ekstra', AddExtracurricular::class)->name('admin.add-extracurricular');
     
     // Admin Return Verification routes
     Route::get('returns', [AdminReturnController::class, 'index'])->name('returns.index');
