@@ -7,9 +7,13 @@
 /storage/*.key
 /storage/pail
 /vendor
+
+# Environment files
 .env
 .env.backup
 .env.production
+
+# Development tools
 .phpactor.json
 .phpunit.result.cache
 Homestead.json
@@ -17,10 +21,13 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 /auth.json
+
+# IDE
 /.fleet
 /.idea
 /.nova
 /.vscode
 /.zed
+
+# Laravel
 /storage/framework/views/*
-.env
