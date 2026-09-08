@@ -181,7 +181,7 @@ class SipintuSyncUsers extends Command
                 // Map SiPintu fields to local users table
                 $studentsToUpsert[] = [
                     'name' => $student['nama'] ?? $student['name'] ?? 'Siswa',
-                    'email' => $nis . '@sipbar.sch.id',
+                    'email' => $nis . '@smkn1bangsri.sch.id',
                     'nis' => $nis,
                     'kelas' => $student['kelas'] ?? $student['rombel'] ?? null,
                     'alamat' => $student['alamat'] ?? null,
@@ -285,7 +285,7 @@ class SipintuSyncUsers extends Command
                 // Map SiPintu fields to local users table
                 $teachersToUpsert[] = [
                     'name' => $teacher['nama'] ?? $teacher['name'] ?? 'Guru',
-                    'email' => $nip . '@sipbar.sch.id',
+                    'email' => $nip . '@smkn1bangsri.sch.id',
                     'nip' => $nip,
                     'jabatan' => $teacher['jabatan'] ?? $teacher['position'] ?? null,
                     'alamat' => $teacher['alamat'] ?? null,

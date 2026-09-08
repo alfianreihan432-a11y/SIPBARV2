@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
 
         // Admin
         $admin = User::firstOrCreate(
-            ['email' => 'admin@sipbar.sch.id'],
+            ['email' => 'admin@smkn1bangsri.sch.id'],
             [
                 'name' => 'Super Admin',
                 'password' => bcrypt('admin123'),
@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
 
         // Guru (gunakan email dummy, NIP disimpan di name sementara)
         $guru = User::firstOrCreate(
-            ['email' => '198505@sipbar.sch.id'],
+            ['email' => '198505@smkn1bangsri.sch.id'],
             [
                 'name' => 'Budi Santoso',
                 'password' => bcrypt('guru123'),
@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
 
         // Siswa
         $siswa = User::firstOrCreate(
-            ['email' => '4692@sipbar.sch.id'],
+            ['email' => '4692@smkn1bangsri.sch.id'],
             [
                 'name' => 'Ahmad Fauzi',
                 'password' => bcrypt('siswa123'),

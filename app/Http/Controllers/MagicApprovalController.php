@@ -53,15 +53,23 @@ class MagicApprovalController extends Controller
         }
 
         try {
-            // Gunakan teacher_id dari pengajuan itu sendiri sebagai approver
-            $this->approvalService->approve($borrowingRequest, $borrowingRequest->teacher_id);
+            // Gunakan teacher_id dari pengajuan itu sendiri sebagai approver (fallback ke guru default)
+            $teacherId = (int) ($borrowingRequest->teacher_id ?? \App\Models\User::role('guru')->first()?->id ?? 1);
+
+            $this->approvalService->approve($borrowingRequest, $teacherId);
+
+            // Refresh model dan pastikan relasi qrCode ter-generate
+            $borrowingRequest->refresh();
+            if (! $borrowingRequest->qrCode) {
+                app(\App\Services\QRCodeService::class)->generateForRequest($borrowingRequest);
+            }
 
             return redirect()
                 ->route('approval.show', array_merge(
                     ['borrowingRequest' => $borrowingRequest->id],
                     $request->query()
                 ))
-                ->with('success', 'Pengajuan berhasil disetujui. QR Code telah dikirim ke email siswa.');
+                ->with('success', 'Pengajuan berhasil disetujui. QR Code telah digenerate dan dikirim ke siswa.');
 
         } catch (\App\Exceptions\InsufficientStockException $e) {
             return redirect()

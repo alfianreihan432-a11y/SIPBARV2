@@ -155,7 +155,7 @@ class SyncSipintuUsersJob implements ShouldQueue
                         // Create new user
                         $newUser = User::create([
                             'name' => $student['nama'] ?? $student['name'] ?? 'Siswa',
-                            'email' => $nis . '@sipbar.sch.id',
+                            'email' => $nis . '@smkn1bangsri.sch.id',
                             'password' => Hash::make('siswa123'),
                             'nis' => $nis,
                             'kelas' => $student['kelas'] ?? $student['rombel'] ?? null,

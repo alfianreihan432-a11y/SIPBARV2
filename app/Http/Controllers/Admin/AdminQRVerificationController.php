@@ -16,14 +16,20 @@ class AdminQRVerificationController extends Controller
     public function verify(string $token)
     {
         $qrRecord = QRCode::where('code', $token)
-            ->where('is_active', true)
-            ->with(['borrowingRequest.user', 'borrowingRequest.itemWithTrashed', 'borrowingRequest.teacher'])
+            ->with(['borrowingRequest.user.classroom', 'borrowingRequest.itemWithTrashed', 'borrowingRequest.teacher'])
             ->first();
 
-        if (! $qrRecord || $qrRecord->isExpired()) {
+        if (! $qrRecord) {
             return view('pages.admin.qr-verify', [
                 'valid'   => false,
-                'message' => 'QR Code tidak valid atau sudah kadaluarsa.',
+                'message' => 'QR Code tidak ditemukan dalam sistem.',
+            ]);
+        }
+
+        if ($qrRecord->isExpired()) {
+            return view('pages.admin.qr-verify', [
+                'valid'   => false,
+                'message' => 'QR Code sudah kadaluarsa.',
             ]);
         }
 
@@ -33,6 +39,13 @@ class AdminQRVerificationController extends Controller
             return view('pages.admin.qr-verify', [
                 'valid'   => false,
                 'message' => 'Data permohonan peminjaman tidak ditemukan.',
+            ]);
+        }
+
+        if (! $qrRecord->is_active && $borrowingRequest->status !== BorrowingRequest::STATUS_REJECTED) {
+            return view('pages.admin.qr-verify', [
+                'valid'   => false,
+                'message' => 'QR Code sudah tidak aktif.',
             ]);
         }
 
@@ -82,5 +95,44 @@ class AdminQRVerificationController extends Controller
 
         return redirect()->route('admin.qr.verify', ['token' => $borrowingRequest->qrCode->code ?? ''])
             ->with('success', 'Pengambilan barang berhasil dikonfirmasi! Status kini menjadi Dipinjam.');
+    }
+
+    /**
+     * Tolak pengambilan barang oleh admin/petugas inventaris.
+     * Wajib menyertakan alasan penolakan dan diproses lewat BorrowingApprovalService.
+     */
+    public function rejectCheckout(Request $request, int $id, \App\Services\BorrowingApprovalService $approvalService)
+    {
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|min:5|max:500',
+        ], [
+            'rejection_reason.required' => 'Alasan penolakan pengambilan barang wajib diisi.',
+            'rejection_reason.min' => 'Alasan penolakan minimal 5 karakter.',
+            'rejection_reason.max' => 'Alasan penolakan maksimal 500 karakter.',
+        ]);
+
+        $borrowingRequest = BorrowingRequest::with(['itemWithTrashed', 'qrCode'])->findOrFail($id);
+
+        if (! in_array($borrowingRequest->status, ['approved', 'qr_ready'])) {
+            return redirect()->back()->with('error', 'Peminjaman dengan status saat ini (' . $borrowingRequest->status_label . ') tidak dapat ditolak.');
+        }
+
+        try {
+            $approvalService->reject(
+                $borrowingRequest,
+                $validated['rejection_reason'],
+                Auth::id()
+            );
+
+            // Non-aktifkan QR Code
+            if ($borrowingRequest->qrCode) {
+                $borrowingRequest->qrCode->update(['is_active' => false]);
+            }
+
+            return redirect()->route('admin.qr.verify', ['token' => $borrowingRequest->qrCode?->code ?? ''])
+                ->with('success', 'Pengambilan barang berhasil ditolak dan alasan telah disimpan.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menolak pengambilan: ' . $e->getMessage());
+        }
     }
 }

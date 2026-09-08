@@ -27,16 +27,18 @@ class AuthenticateUser
         // 1. Cari exact match email
         $user = User::where('email', $input)->first();
 
-        // 2. Jika belum ketemu, coba cari dengan domain @sipbar.sch.id atau NIP guru
+        // 2. Jika belum ketemu, coba cari dengan domain @smkn1bangsri.sch.id / @smkn1bangsri.sch.id atau NIP/NIS
         if (! $user) {
-            $clean = strtolower(trim(str_replace('@sipbar.sch.id', '', $input)));
+            $clean = strtolower(trim(str_replace(['@smkn1bangsri.sch.id', '@smkn1bangsri.sch.id'], '', $input)));
 
-            // Coba cari via email @sipbar.sch.id
-            $user = User::where('email', "{$clean}@sipbar.sch.id")->first();
+            // Coba cari via email @smkn1bangsri.sch.id atau @smkn1bangsri.sch.id
+            $user = User::where('email', "{$clean}@smkn1bangsri.sch.id")
+                ->orWhere('email', "{$clean}@smkn1bangsri.sch.id")
+                ->first();
 
-            // Jika masih belum ketemu, coba cari via NIP (khusus guru)
+            // Jika masih belum ketemu, coba cari via NIP atau NIS
             if (! $user) {
-                $user = User::where('nip', $clean)->first();
+                $user = User::where('nip', $clean)->orWhere('nis', $clean)->first();
             }
 
             // Jika masih belum ketemu dan input 8 digit (kasus tanggal lahir guru format terbalik)
@@ -44,7 +46,7 @@ class AuthenticateUser
                 // Jika input YYYYMMDD (19840514) -> coba DDMMYYYY (14051984)
                 if (preg_match('/^(19\d{2}|20\d{2})(\d{2})(\d{2})$/', $clean, $m)) {
                     $reversed = $m[3] . $m[2] . $m[1]; // DDMMYYYY
-                    $user = User::where('email', "{$reversed}@sipbar.sch.id")
+                    $user = User::where('email', "{$reversed}@smkn1bangsri.sch.id")
                         ->orWhere('nip', 'like', "{$clean}%")
                         ->first();
                 }
@@ -54,7 +56,7 @@ class AuthenticateUser
                     $month = substr($clean, 2, 2);
                     $year = substr($clean, 4, 4);
                     $reversed = $year . $month . $day; // YYYYMMDD
-                    $user = User::where('email', "{$reversed}@sipbar.sch.id")
+                    $user = User::where('email', "{$reversed}@smkn1bangsri.sch.id")
                         ->orWhere('nip', 'like', "{$reversed}%")
                         ->first();
                 }
@@ -96,8 +98,8 @@ class AuthenticateUser
                         continue;
                     }
 
-                    $itemNis = str_replace('@sipbar.sch.id', '', $item);
-                    $itemEmail = str_contains($item, '@') ? $item : "{$item}@sipbar.sch.id";
+                    $itemNis = str_replace('@smkn1bangsri.sch.id', '', $item);
+                    $itemEmail = str_contains($item, '@') ? $item : "{$item}@smkn1bangsri.sch.id";
 
                     if ($userEmail === $item || $userEmail === $itemEmail || ($userNis !== '' && ($userNis === $item || $userNis === $itemNis))) {
                         $isWhitelisted = true;

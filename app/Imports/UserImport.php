@@ -59,11 +59,11 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation, SkipsEmptyR
             }
         }
 
-        // 3. Generate Email Otomatis: Guru (DDMMYYYY@sipbar.sch.id), Siswa ({nis}@sipbar.sch.id)
+        // 3. Generate Email Otomatis: Guru (DDMMYYYY@smkn1bangsri.sch.id), Siswa ({nis}@smkn1bangsri.sch.id)
         if ($nip) {
             $email = User::generateTeacherEmail($nip, $tanggalLahir);
         } else {
-            $email = "{$nis}@sipbar.sch.id";
+            $email = "{$nis}@smkn1bangsri.sch.id";
         }
 
         // 4. Instansiasi Model User

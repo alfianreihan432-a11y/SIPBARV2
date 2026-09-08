@@ -17,11 +17,11 @@
         ->whereDate('return_date', '<=', now()->addDays(2))
         ->get();
 
-    $recentApprovals = \App\Models\BorrowingRequest::with('itemWithTrashed')
+    $recentApprovals = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'qrCode'])
         ->where('user_id', auth()->id())
-        ->where('status', 'approved')
-        ->latest('approved_at')
-        ->take(3)->get();
+        ->whereIn('status', ['approved', 'qr_ready'])
+        ->latest('updated_at')
+        ->get();
 
     $recentRejections = \App\Models\BorrowingRequest::with('itemWithTrashed')
         ->where('user_id', auth()->id())

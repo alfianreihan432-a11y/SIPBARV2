@@ -40,7 +40,7 @@ class AddTeacher extends Component
                 'tanggal_lahir' => $this->tanggal_lahir,
                 'alamat' => $this->alamat,
                 'password' => Hash::make('guru' . $this->nip),
-                'email' => $this->nip . '@sipbar.sch.id',
+                'email' => $this->nip . '@smkn1bangsri.sch.id',
                 'email_verified_at' => now(),
             ]);
 

@@ -153,13 +153,13 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     /**
-     * Generate email login unik untuk Guru berdasarkan Tanggal Lahir (YYYYMMDD@sipbar.sch.id).
+     * Generate email login unik untuk Guru berdasarkan Tanggal Lahir (YYYYMMDD@smkn1bangsri.sch.id).
      * Jika terjadi duplikat tanggal lahir dengan guru lain, otomatis ditambahkan suffix (-2, -3, dst).
      */
     public static function generateTeacherEmail(?string $nip, ?string $tanggalLahir = null, ?int $excludeUserId = null): string
     {
         $baseCode = static::extractBirthDateCode($nip, $tanggalLahir);
-        $email = $baseCode . '@sipbar.sch.id';
+        $email = $baseCode . '@smkn1bangsri.sch.id';
 
         // Cek apakah email sudah dipakai oleh user lain
         $query = static::where('email', $email);
@@ -170,7 +170,7 @@ class User extends Authenticatable implements PasskeyUser
         if ($query->exists()) {
             $suffix = 2;
             while (true) {
-                $candidate = "{$baseCode}-{$suffix}@sipbar.sch.id";
+                $candidate = "{$baseCode}-{$suffix}@smkn1bangsri.sch.id";
                 $chk = static::where('email', $candidate);
                 if ($excludeUserId) {
                     $chk->where('id', '!=', $excludeUserId);

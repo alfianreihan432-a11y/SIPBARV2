@@ -47,8 +47,8 @@ class CheckLoginRestriction
                 continue;
             }
 
-            $itemNis = str_replace('@sipbar.sch.id', '', $item);
-            $itemEmail = str_contains($item, '@') ? $item : "{$item}@sipbar.sch.id";
+            $itemNis = str_replace('@smkn1bangsri.sch.id', '', $item);
+            $itemEmail = str_contains($item, '@') ? $item : "{$item}@smkn1bangsri.sch.id";
 
             if ($userEmail === $item || $userEmail === $itemEmail || ($userNis !== '' && ($userNis === $item || $userNis === $itemNis))) {
                 $isWhitelisted = true;

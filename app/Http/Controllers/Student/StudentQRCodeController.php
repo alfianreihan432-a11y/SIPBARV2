@@ -26,8 +26,8 @@ class StudentQRCodeController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-        // Hanya boleh akses jika status approved atau borrowed
-        if (! in_array($borrowingRequest->status, ['approved', 'borrowed'])) {
+        // Hanya boleh akses jika status approved, qr_ready, atau borrowed
+        if (! in_array($borrowingRequest->status, ['approved', 'qr_ready', 'borrowed'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'QR Code hanya tersedia untuk peminjaman yang sudah disetujui.',

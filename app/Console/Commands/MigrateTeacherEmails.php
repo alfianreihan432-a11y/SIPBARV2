@@ -22,7 +22,7 @@ class MigrateTeacherEmails extends Command
      *
      * @var string
      */
-    protected $description = 'Migrasi format email login Guru menjadi Tanggal Lahir ({YYYYMMDD}@sipbar.sch.id) dari 8 digit pertama NIP';
+    protected $description = 'Migrasi format email login Guru menjadi Tanggal Lahir ({YYYYMMDD}@smkn1bangsri.sch.id) dari 8 digit pertama NIP';
 
     /**
      * Execute the console command.
@@ -32,7 +32,7 @@ class MigrateTeacherEmails extends Command
         $this->info('================================================================');
         $this->info('   SIPBAR - Migrasi Format Email Guru ke Tanggal Lahir (8 Digit NIP)');
         $this->info('================================================================');
-        $this->line('Format Target : <info>{YYYYMMDD}@sipbar.sch.id</info> (contoh: 19840514@sipbar.sch.id)');
+        $this->line('Format Target : <info>{YYYYMMDD}@smkn1bangsri.sch.id</info> (contoh: 19840514@smkn1bangsri.sch.id)');
         $this->line('Penanganan Duplikat: Otomatis ditambahkan suffix (-2, -3, dst)');
         $this->newLine();
 
@@ -73,7 +73,7 @@ class MigrateTeacherEmails extends Command
 
             foreach ($teachers as $teacher) {
                 $baseCode = User::extractBirthDateCode($teacher->nip, $teacher->tanggal_lahir);
-                $candidateEmail = $baseCode . '@sipbar.sch.id';
+                $candidateEmail = $baseCode . '@smkn1bangsri.sch.id';
                 $isDuplicate = false;
 
                 // Cek bentrok dengan akun yang sudah di-assign di batch ini atau di database (selain dirinya sendiri)
@@ -82,11 +82,11 @@ class MigrateTeacherEmails extends Command
                     $duplicateCount++;
 
                     $suffix = 2;
-                    while (in_array("{$baseCode}-{$suffix}@sipbar.sch.id", $assignedEmails) || 
-                           User::where('email', "{$baseCode}-{$suffix}@sipbar.sch.id")->where('id', '!=', $teacher->id)->exists()) {
+                    while (in_array("{$baseCode}-{$suffix}@smkn1bangsri.sch.id", $assignedEmails) || 
+                           User::where('email', "{$baseCode}-{$suffix}@smkn1bangsri.sch.id")->where('id', '!=', $teacher->id)->exists()) {
                         $suffix++;
                     }
-                    $candidateEmail = "{$baseCode}-{$suffix}@sipbar.sch.id";
+                    $candidateEmail = "{$baseCode}-{$suffix}@smkn1bangsri.sch.id";
                 }
 
                 $assignedEmails[] = $candidateEmail;

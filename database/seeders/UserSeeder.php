@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
 
         // Admin
         $admin = User::updateOrCreate(
-            ['email' => 'admin@sipbar.sch.id'],
+            ['email' => 'admin@smkn1bangsri.sch.id'],
             [
                 'name'               => 'Super Admin',
                 'password'           => bcrypt('admin123'),
@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
 
         // Guru
         $guru = User::updateOrCreate(
-            ['email' => '198505@sipbar.sch.id'],
+            ['email' => '198505@smkn1bangsri.sch.id'],
             [
                 'name'               => 'Budi Santoso',
                 'password'           => bcrypt('guru123'),
@@ -44,7 +44,7 @@ class UserSeeder extends Seeder
 
         // Siswa
         $siswa = User::updateOrCreate(
-            ['email' => '4692@sipbar.sch.id'],
+            ['email' => '4692@smkn1bangsri.sch.id'],
             [
                 'name'               => 'Ahmad Fauzi',
                 'password'           => bcrypt('siswa123'),
@@ -54,6 +54,6 @@ class UserSeeder extends Seeder
         );
         $siswa->syncRoles(['siswa']);
 
-        $this->command->info('Users seeded: admin@sipbar.sch.id, guru@sipbar.sch.id, siswa@sipbar.sch.id');
+        $this->command->info('Users seeded: admin@smkn1bangsri.sch.id, guru@smkn1bangsri.sch.id, siswa@smkn1bangsri.sch.id');
     }
 }

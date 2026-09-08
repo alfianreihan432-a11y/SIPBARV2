@@ -22,25 +22,23 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome')->name('home');
 
 // ─── MAGIC LINK APPROVAL (Signed URL — tidak perlu login) ───────────────────
-// Guru mengklik link dari email, tanpa harus punya akun / login ke SIPBAR.
-// Middleware 'signed' memvalidasi signature dari URL::temporarySignedRoute().
-// PENTING: GET show() tidak boleh ada side effect (aman dari prefetcher email).
-Route::middleware('signed')->group(function () {
-    Route::get(
-        '/approval/{borrowingRequest}',
-        [MagicApprovalController::class, 'show']
-    )->name('approval.show');
+// Guru mengklik link dari email/WA, tanpa harus punya akun / login ke SIPBAR.
+// Middleware 'signed' memvalidasi signature dari URL::temporarySignedRoute() pada halaman GET.
+// POST approve/reject diproteksi oleh validasi borrowingRequest & CSRF.
+Route::get(
+    '/approval/{borrowingRequest}',
+    [MagicApprovalController::class, 'show']
+)->middleware('signed')->name('approval.show');
 
-    Route::post(
-        '/approval/{borrowingRequest}/approve',
-        [MagicApprovalController::class, 'approve']
-    )->name('approval.approve');
+Route::post(
+    '/approval/{borrowingRequest}/approve',
+    [MagicApprovalController::class, 'approve']
+)->name('approval.approve');
 
-    Route::post(
-        '/approval/{borrowingRequest}/reject',
-        [MagicApprovalController::class, 'reject']
-    )->name('approval.reject');
-});
+Route::post(
+    '/approval/{borrowingRequest}/reject',
+    [MagicApprovalController::class, 'reject']
+)->name('approval.reject');
 // ────────────────────────────────────────────────────────────────────────────
 
 // ─── SIPINTU OAUTH 2.0 SSO (public — sebelum middleware auth) ───
@@ -108,6 +106,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::view('siswa/riwayat', 'pages.siswa.history')->name('student.history');
     Route::view('siswa/pengumuman', 'pages.siswa.announcements')->name('student.announcements');
+    Route::view('siswa/qr-barang', 'pages.siswa.announcements')->name('student.qr-barang');
     Route::view('siswa/profil', 'pages.siswa.profile')->name('student.profile');
     
     // Student profile photo routes
@@ -120,9 +119,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Admin QR Verification — verifikasi token QR saat scan & konfirmasi pengambilan
     Route::middleware('role:admin')->group(function () {
+        Route::get('admin/qr/scan', function() {
+            return view('pages.admin.qr-scanner');
+        })->name('admin.qr.scan');
         Route::get('admin/qr/verify/{token}', [AdminQRVerificationController::class, 'verify'])->name('admin.qr.verify');
         Route::get('admin/verifikasi-pengambilan/{token}', [AdminQRVerificationController::class, 'verify'])->name('admin.qr.verify.alias');
         Route::post('admin/qr/confirm-checkout/{id}', [AdminQRVerificationController::class, 'confirmCheckout'])->name('admin.qr.confirm-checkout');
+        Route::post('admin/qr/reject-checkout/{id}', [AdminQRVerificationController::class, 'rejectCheckout'])->name('admin.qr.reject-checkout');
     });
 
     // Teacher pages

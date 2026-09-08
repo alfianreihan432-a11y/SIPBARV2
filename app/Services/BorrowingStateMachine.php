@@ -20,6 +20,7 @@ class BorrowingStateMachine
             ],
             BorrowingRequest::STATUS_APPROVED => [
                 BorrowingRequest::STATUS_BORROWED,
+                BorrowingRequest::STATUS_REJECTED,
             ],
             BorrowingRequest::STATUS_BORROWED => [
                 BorrowingRequest::STATUS_RETURNED,
@@ -86,6 +87,7 @@ class BorrowingStateMachine
             ],
             BorrowingRequest::STATUS_APPROVED => [
                 BorrowingRequest::STATUS_BORROWED => 'Checkout (Scan QR)',
+                BorrowingRequest::STATUS_REJECTED => 'Tolak Pengambilan',
             ],
             BorrowingRequest::STATUS_BORROWED => [
                 BorrowingRequest::STATUS_RETURNED => 'Checkin (Scan QR)',

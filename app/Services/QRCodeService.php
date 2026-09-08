@@ -37,18 +37,24 @@ class QRCodeService
         $filename = "qr-codes/{$request->id}_{$token}.png";
         Storage::disk('public')->put($filename, $result->getString());
         
-        // Create QR code record
-        $qrCode = QRCode::create([
-            'borrowing_request_id' => $request->id,
-            'code' => $token,
-            'data' => json_encode([
-                'borrowing_request_id' => $request->id,
-                'student_name' => $request->user->name,
-                'item_name' => $request->item->name,
-            ]),
-            'image_path' => $filename,
-            'is_active' => true,
-        ]);
+        $studentName = $request->user?->name ?? 'Siswa';
+        $itemName = $request->itemWithTrashed?->name ?? ($request->item?->name ?? 'Barang');
+
+        // Create or update QR code record
+        $qrCode = QRCode::updateOrCreate(
+            ['borrowing_request_id' => $request->id],
+            [
+                'code' => $token,
+                'data' => json_encode([
+                    'borrowing_request_id' => $request->id,
+                    'student_name' => $studentName,
+                    'item_name' => $itemName,
+                ]),
+                'image_path' => $filename,
+                'is_active' => true,
+                'expires_at' => now()->addDays(7),
+            ]
+        );
         
         // Denormalize token to borrowing_requests for fast lookup
         $request->update(['qr_token' => $token]);

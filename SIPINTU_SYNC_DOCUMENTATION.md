@@ -26,7 +26,7 @@ Kolom yang ditambahkan untuk tracking sync:
 | `jurusan` | `jurusan` | Jurusan |
 | `alamat` | `alamat` | Alamat |
 | `tanggal_lahir` / `birth_date` | `tanggal_lahir` | Tanggal lahir |
-| - | `email` | Auto-generate: `{nis}@sipbar.sch.id` |
+| - | `email` | Auto-generate: `{nis}@smkn1bangsri.sch.id` |
 | - | `password` | Auto-generate: `siswa{nis}` (hashed) |
 | - | `data_source` | Set ke 'sipintu' |
 | - | `sipintu_synced_at` | Timestamp saat sync |
@@ -40,7 +40,7 @@ Kolom yang ditambahkan untuk tracking sync:
 | `alamat` | `alamat` | Alamat |
 | `tanggal_lahir` / `birth_date` | `tanggal_lahir` | Tanggal lahir |
 | `no_hp` / `phone` | `phone` | Nomor HP |
-| - | `email` | Auto-generate: `{nip}@sipbar.sch.id` |
+| - | `email` | Auto-generate: `{nip}@smkn1bangsri.sch.id` |
 | - | `password` | Auto-generate: `guru{nip}` (hashed) |
 | - | `data_source` | Set ke 'sipintu' |
 | - | `sipintu_synced_at` | Timestamp saat sync |

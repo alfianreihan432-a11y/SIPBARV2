@@ -51,7 +51,7 @@ class AddStudent extends Component
                 'alamat' => $this->alamat,
                 'classroom_id' => $this->classroom_id,
                 'password' => Hash::make('siswa' . $this->nis),
-                'email' => $this->nis . '@sipbar.sch.id',
+                'email' => $this->nis . '@smkn1bangsri.sch.id',
                 'email_verified_at' => now(),
             ]);
 

@@ -19,7 +19,7 @@ return [
         'whitelisted_students' => array_values(array_filter(
             array_map('trim', explode(',', (string) env(
                 'STUDENT_LOGIN_WHITELIST',
-                '4714@sipbar.sch.id,webdev@sipbar.sch.id,basket@sipbar.sch.id,pmr@sipbar.sch.id'
+                '4714@smkn1bangsri.sch.id,webdev@smkn1bangsri.sch.id,basket@smkn1bangsri.sch.id,pmr@smkn1bangsri.sch.id'
             )))
         )),
 

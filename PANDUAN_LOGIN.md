@@ -11,13 +11,13 @@ Dokumen ini menjelaskan cara login ke sistem SIPBAR (Sistem Peminjaman Barang) u
 ### 2. Isi Form Login
 
 #### Untuk Guru:
-- **Email**: Gunakan email guru yang terdaftar di sistem (format: `nama@sipbar.sch.id`)
+- **Email**: Gunakan email guru yang terdaftar di sistem (format: `nama@smkn1bangsri.sch.id`)
 - **Password**: Masukkan password akun guru
 - Centang "Ingat saya" (opsional) untuk tetap login di browser ini
 - Klik tombol "Masuk"
 
 #### Untuk Siswa:
-- **Email**: Gunakan email siswa yang terdaftar di sistem (format: `nama@sipbar.sch.id`)
+- **Email**: Gunakan email siswa yang terdaftar di sistem (format: `nama@smkn1bangsri.sch.id`)
 - **Password**: Masukkan password akun siswa
 - Centang "Ingat saya" (opsional) untuk tetap login di browser ini
 - Klik tombol "Masuk"
@@ -91,7 +91,7 @@ Setelah berhasil login, siswa akan diarahkan ke dashboard siswa yang berisi:
 
 Jika mengalami masalah yang tidak dapat diselesaikan:
 - Hubungi admin SIPBAR di sekolah
-- Email: admin@sipbar.sch.id
+- Email: admin@smkn1bangsri.sch.id
 - Atau datang ke ruang inventaris untuk bantuan langsung
 
 ---

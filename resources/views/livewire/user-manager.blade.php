@@ -295,7 +295,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
             @if(!$editingId)
             <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(29,78,216,.07);border:1px solid rgba(29,78,216,.18);border-radius:11px;padding:12px 16px;margin-top:16px;font-size:12px;color:#60a5fa">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0;margin-top:1px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>Email dan password dibuat otomatis. Format: <strong>{NIS}@sipbar.sch.id</strong> / password: <strong>siswa123</strong></div>
+                <div>Email dan password dibuat otomatis. Format: <strong>{NIS}@smkn1bangsri.sch.id</strong> / password: <strong>siswa123</strong></div>
             </div>
             @endif
 
@@ -366,7 +366,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
             @if(!$editingId)
             <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(15,118,110,.07);border:1px solid rgba(15,118,110,.2);border-radius:11px;padding:12px 16px;margin-top:16px;font-size:12px;color:#34d399">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0;margin-top:1px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>Email dan password dibuat otomatis dari 8 digit pertama NIP. Format: <strong>{YYYYMMDD}@sipbar.sch.id</strong> (contoh: 19840514@sipbar.sch.id) / password: <strong>guru123</strong></div>
+                <div>Email dan password dibuat otomatis dari 8 digit pertama NIP. Format: <strong>{YYYYMMDD}@smkn1bangsri.sch.id</strong> (contoh: 19840514@smkn1bangsri.sch.id) / password: <strong>guru123</strong></div>
             </div>
             @endif
 
@@ -429,7 +429,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
             @if(!$editingId)
             <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(168,85,247,.07);border:1px solid rgba(168,85,247,.2);border-radius:11px;padding:12px 16px;margin-top:16px;font-size:12px;color:#a855f7">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0;margin-top:1px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>User login akan dibuat otomatis. Email: <strong>{nama-kelas}@sipbar.sch.id</strong> / Password: <strong>{nama-kelas}123</strong></div>
+                <div>User login akan dibuat otomatis. Email: <strong>{nama-kelas}@smkn1bangsri.sch.id</strong> / Password: <strong>{nama-kelas}123</strong></div>
             </div>
             @endif
 
@@ -479,7 +479,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
             @if(!$editingId)
             <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(249,115,22,.07);border:1px solid rgba(249,115,22,.2);border-radius:11px;padding:12px 16px;margin-top:16px;font-size:12px;color:#f97316">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0;margin-top:1px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <div>User login akan dibuat otomatis. Email: <strong>{nama-ekstra}@sipbar.sch.id</strong> / Password: <strong>{nama-ekstra}123</strong></div>
+                <div>User login akan dibuat otomatis. Email: <strong>{nama-ekstra}@smkn1bangsri.sch.id</strong> / Password: <strong>{nama-ekstra}123</strong></div>
             </div>
             @endif
             @endif

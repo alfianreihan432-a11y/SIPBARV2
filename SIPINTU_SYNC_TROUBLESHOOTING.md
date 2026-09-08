@@ -185,8 +185,8 @@ Password di-generate otomatis oleh job sync:
 - Disimpan sebagai hash di database
 
 **Email:**
-- Siswa: `{NIS}@sipbar.sch.id`
-- Guru: `{NIP}@sipbar.sch.id`
+- Siswa: `{NIS}@smkn1bangsri.sch.id`
+- Guru: `{NIP}@smkn1bangsri.sch.id`
 
 ## Checklist Sebelum Sync
 

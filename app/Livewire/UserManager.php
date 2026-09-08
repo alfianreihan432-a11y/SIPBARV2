@@ -235,7 +235,7 @@ class UserManager extends Component
                 $slug = Str::slug($this->name, '.');
                 $base = strtolower(trim($this->nis ?: $slug));
 
-                $this->email = $base . '@sipbar.sch.id';
+                $this->email = $base . '@smkn1bangsri.sch.id';
                 $this->password = 'siswa123';
             } else {
                 $this->email = User::generateTeacherEmail(
@@ -524,7 +524,7 @@ class UserManager extends Component
 
             User::create([
                 'name' => $this->nama_kelas,
-                'email' => $classSlug . '@sipbar.sch.id',
+                'email' => $classSlug . '@smkn1bangsri.sch.id',
                 'password' => bcrypt($classSlug . '123'),
             ])->assignRole('siswa');
         }
@@ -550,7 +550,7 @@ class UserManager extends Component
             );
 
             session()->flash('credentials', [
-                'email' => $classSlug . '@sipbar.sch.id',
+                'email' => $classSlug . '@smkn1bangsri.sch.id',
                 'password' => $classSlug . '123',
             ]);
         }
@@ -612,7 +612,7 @@ class UserManager extends Component
 
             $user = User::create([
                 'name' => $this->nama_ekstra,
-                'email' => $ekstraSlug . '@sipbar.sch.id',
+                'email' => $ekstraSlug . '@smkn1bangsri.sch.id',
                 'password' => bcrypt($ekstraSlug . '123'),
             ]);
 
@@ -648,7 +648,7 @@ class UserManager extends Component
             );
 
             session()->flash('credentials', [
-                'email' => $ekstraSlug . '@sipbar.sch.id',
+                'email' => $ekstraSlug . '@smkn1bangsri.sch.id',
                 'password' => $ekstraSlug . '123',
             ]);
         }

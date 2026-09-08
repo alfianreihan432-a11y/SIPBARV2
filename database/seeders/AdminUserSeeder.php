@@ -15,7 +15,7 @@ class AdminUserSeeder extends Seeder
 
         // Create admin user
         $admin = User::firstOrCreate(
-            ['email' => 'admin@sipbar.sch.id'],
+            ['email' => 'admin@smkn1bangsri.sch.id'],
             [
                 'name' => 'Admin',
                 'password' => bcrypt('admin123'),
@@ -26,6 +26,6 @@ class AdminUserSeeder extends Seeder
         // Assign admin role
         $admin->assignRole('admin');
 
-        $this->command->info('Admin user created: admin@sipbar.sch.id / admin123');
+        $this->command->info('Admin user created: admin@smkn1bangsri.sch.id / admin123');
     }
 }
