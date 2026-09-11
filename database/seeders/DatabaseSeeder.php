@@ -61,41 +61,54 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            Category::create($category);
+            Category::firstOrCreate(
+                ['name' => $category['name']],
+                $category
+            );
         }
 
-        $supplier = Supplier::create([
-            'name' => 'CV Sumber Ilmu',
-            'address' => 'Bandung',
-            'email' => 'sales@sumberilmu.test',
-            'phone' => '081234567890',
-        ]);
+        $supplier = Supplier::firstOrCreate(
+            ['name' => 'CV Sumber Ilmu'],
+            [
+                'address' => 'Bandung',
+                'email' => 'sales@sumberilmu.test',
+                'phone' => '081234567890',
+            ]
+        );
 
-        $location = Location::create([
-            'building' => 'Gedung A',
-            'floor' => '2',
-            'room' => 'R-201',
-        ]);
+        $location = Location::firstOrCreate(
+            [
+                'building' => 'Gedung A',
+                'floor' => '2',
+                'room' => 'R-201',
+            ]
+        );
 
-        Item::create([
-            'code' => 'BRG-001',
-            'inventory_number' => 'INV-0001',
-            'name' => 'Laptop Lenovo ThinkPad',
-            'description' => 'Laptop untuk kebutuhan administrasi sekolah',
-            'category_id' => Category::first()->id,
-            'location_id' => $location->id,
-            'supplier_id' => $supplier->id,
-            'brand' => 'Lenovo',
-            'type' => 'ThinkPad',
-            'purchase_year' => 2024,
-            'price' => 14500000,
-            'condition' => 'Baik',
-            'status' => 'Tersedia',
-            'stock' => 1,
-            'barcode' => 'INV-0001',
-        ]);
+        $item = Item::withTrashed()->firstOrCreate(
+            ['code' => 'BRG-001'],
+            [
+                'inventory_number' => 'INV-0001',
+                'name' => 'Laptop Lenovo ThinkPad',
+                'description' => 'Laptop untuk kebutuhan administrasi sekolah',
+                'category_id' => Category::first()->id,
+                'location_id' => $location->id,
+                'supplier_id' => $supplier->id,
+                'brand' => 'Lenovo',
+                'type' => 'ThinkPad',
+                'purchase_year' => 2024,
+                'price' => 14500000,
+                'condition' => 'Baik',
+                'status' => 'Tersedia',
+                'stock' => 1,
+                'barcode' => 'INV-0001',
+            ]
+        );
+
+        if ($item->trashed()) {
+            $item->restore();
+        }
 
         // Call KepalaJurusanSeeder
         $this->call(KepalaJurusanSeeder::class);
     }
-}
+}   
