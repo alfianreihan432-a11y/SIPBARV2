@@ -10,6 +10,11 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
+        // Super Admin - redirect to superadmin dashboard
+        if ($user->hasAnyRole(['superadmin', 'super-admin', 'super_admin'])) {
+            return redirect()->route('superadmin.dashboard');
+        }
+
         if ($user->hasRole('siswa')) {
             return view('dashboard-siswa');
         }
@@ -22,7 +27,7 @@ class DashboardController extends Controller
             return redirect()->route('kajur.dashboard');
         }
 
-        // admin / super-admin / petugas
+        // admin / petugas
         return view('dashboard');
     }
 }
