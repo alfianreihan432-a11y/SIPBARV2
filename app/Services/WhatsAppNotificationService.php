@@ -76,6 +76,15 @@ class WhatsAppNotificationService
         );
     }
 
+    public function getApprovalUrlForKajur(BorrowingRequest $request): string
+    {
+        return URL::temporarySignedRoute(
+            'approval-guru.show',
+            now()->addDays(7),
+            ['borrowingRequest' => $request->id]
+        );
+    }
+
     public function getDirectWaLink(BorrowingRequest $request): string
     {
         $teacherPhone = trim((string) ($request->teacher?->phone ?? ''));
@@ -99,6 +108,38 @@ class WhatsAppNotificationService
         }
 
         // Jika nomor guru belum diisi, buat link share WA umum (user dapat memilih kontak di WhatsApp)
+        return "https://api.whatsapp.com/send?text={$message}";
+    }
+
+    public function getDirectWaLinkForKajur(BorrowingRequest $request): string
+    {
+        $kajurPhone = trim((string) ($request->approvedByKajur?->phone ?? ''));
+        $approvalUrl = $this->getApprovalUrlForKajur($request);
+
+        $teacherName = $request->user?->name ?? 'Guru';
+        $jurusanName = $request->user?->jurusan?->nama ?? ($request->approvedByKajur?->jurusan?->nama ?? '');
+        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+        $borrowDate = $request->borrow_date ? $request->borrow_date->format('d/m/Y') : '-';
+        $returnDate = $request->return_date ? $request->return_date->format('d/m/Y') : '-';
+        $returnTime = $request->return_time ?? '';
+
+        $message = urlencode(
+            "Halo Bapak/Ibu Kepala Jurusan, ada pengajuan peminjaman barang baru dari Guru.\n\n" .
+            "• Guru: {$teacherName}\n" .
+            ($jurusanName ? "• Jurusan: {$jurusanName}\n" : "") .
+            "• Barang: {$itemName}\n" .
+            "• Jumlah: {$request->quantity} unit\n" .
+            "• Tgl Pinjam: {$borrowDate}\n" .
+            "• Tgl Kembali: {$returnDate} {$returnTime}\n" .
+            "• Keperluan: {$request->purpose}\n\n" .
+            "Silakan klik link berikut untuk meninjau dan menyetujui permohonan ini:\n{$approvalUrl}"
+        );
+
+        if ($kajurPhone !== '') {
+            $waPhone = $this->normalizePhone($kajurPhone);
+            return "https://api.whatsapp.com/send?phone={$waPhone}&text={$message}";
+        }
+
         return "https://api.whatsapp.com/send?text={$message}";
     }
     

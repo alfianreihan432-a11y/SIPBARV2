@@ -26,12 +26,12 @@ class CheckLoginRestriction
         }
 
         // 1. Super Admin & Admin: Selalu diizinkan
-        if ($user->hasAnyRole(['admin', 'super-admin']) || $user->hasRole('super_admin')) {
+        if ($user->hasAnyRole(['admin', 'superadmin', 'super-admin', 'super_admin'])) {
             return $next($request);
         }
 
-        // 2. Guru: Selalu diizinkan
-        if ($user->hasRole('guru')) {
+        // 2. Guru & Kepala Jurusan: Selalu diizinkan
+        if ($user->hasRole('guru') || $user->hasRole('kepala_jurusan')) {
             return $next($request);
         }
 

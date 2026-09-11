@@ -28,12 +28,22 @@ class Item extends Model
         'photo_path',
         'qr_code',
         'barcode',
+        'kode_kibb',
+        'nomor_reg',
+        'nomor_registrasi',
+        'ukuran',
+        'bahan',
+        'tahun_pembelian',
+        'asal_usul',
+        'harga',
     ];
 
     protected $casts = [
-        'price'         => 'decimal:2',
-        'purchase_year' => 'integer',
-        'stock'         => 'integer',
+        'price'            => 'decimal:2',
+        'purchase_year'    => 'integer',
+        'stock'            => 'integer',
+        'tahun_pembelian'  => 'integer',
+        'harga'            => 'decimal:2',
     ];
 
     // ==========================================

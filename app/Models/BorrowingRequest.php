@@ -26,8 +26,11 @@ class BorrowingRequest extends Model
         'returned_at',
         'return_condition',
         'return_notes',
+        'foto_bukti',
         'checkout_by',
         'checkin_by',
+        'tipe_peminjam',
+        'approved_by_kajur_id',
     ];
 
     protected $casts = [
@@ -86,6 +89,11 @@ class BorrowingRequest extends Model
     public function checkinBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'checkin_by');
+    }
+
+    public function approvedByKajur(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by_kajur_id');
     }
     
     public function whatsappLogs()

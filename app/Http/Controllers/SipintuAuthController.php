@@ -162,8 +162,10 @@ class SipintuAuthController extends Controller
         // ── Redirect ke dashboard sesuai role ──
         $roles = $user->getRoleNames();
 
-        if ($roles->contains('admin')) {
+        if ($roles->contains('admin') || $roles->contains('super-admin') || $roles->contains('super_admin')) {
             return redirect()->route('dashboard');
+        } elseif ($roles->contains('kepala_jurusan')) {
+            return redirect()->route('kajur.dashboard');
         } elseif ($roles->contains('guru')) {
             return redirect()->route('teacher.dashboard');
         } else {

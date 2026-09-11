@@ -18,6 +18,10 @@ class DashboardController extends Controller
             return view('dashboard-guru');
         }
 
+        if ($user->hasRole('kepala_jurusan')) {
+            return redirect()->route('kajur.dashboard');
+        }
+
         // admin / super-admin / petugas
         return view('dashboard');
     }

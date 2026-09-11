@@ -22,8 +22,10 @@ class AdminReturnController extends Controller
     {
         $status = $request->query('status', 'semua');
         $search = $request->query('q');
+        $isSuperadmin = Auth::check() && Auth::user()->hasRole('superadmin');
 
-        $query = ItemReturn::with([
+        // Admin hanya menangani pengembalian SISWA
+        $query = ItemReturn::siswa()->with([
             'borrowingRequest.item.category',
             'user',
             'verifier'
@@ -47,13 +49,15 @@ class AdminReturnController extends Controller
 
         $returns = $query->paginate(12)->withQueryString();
 
-        // Hitung statistik untuk badge & widget filter
-        $countSemua = ItemReturn::count();
-        $countMenunggu = ItemReturn::where('status', ItemReturn::STATUS_MENUNGGU)->count();
-        $countDisetujui = ItemReturn::where('status', ItemReturn::STATUS_DISETUJUI)->count();
-        $countDitolak = ItemReturn::where('status', ItemReturn::STATUS_DITOLAK)->count();
+        // Statistik khusus siswa
+        $countSemua    = ItemReturn::siswa()->count();
+        $countMenunggu = ItemReturn::siswa()->where('status', ItemReturn::STATUS_MENUNGGU)->count();
+        $countDisetujui= ItemReturn::siswa()->where('status', ItemReturn::STATUS_DISETUJUI)->count();
+        $countDitolak  = ItemReturn::siswa()->where('status', ItemReturn::STATUS_DITOLAK)->count();
 
-        return view('pages.admin.returns', compact(
+        $view = $isSuperadmin ? 'pages.superadmin.returns' : 'pages.admin.returns';
+
+        return view($view, compact(
             'returns',
             'status',
             'search',
@@ -92,6 +96,11 @@ class AdminReturnController extends Controller
     public function approve(Request $request, $id)
     {
         $return = ItemReturn::with(['borrowingRequest.item', 'user'])->findOrFail($id);
+
+        // Guard: Admin tidak boleh verifikasi pengembalian GURU
+        if ($return->tipe_peminjam === 'guru') {
+            return back()->with('error', 'Pengembalian dari guru harus diverifikasi oleh Kepala Jurusan, bukan Admin.');
+        }
 
         if ($return->status !== ItemReturn::STATUS_MENUNGGU) {
             return back()->with('error', 'Pengembalian ini sudah diverifikasi sebelumnya.');
@@ -180,6 +189,11 @@ class AdminReturnController extends Controller
         ]);
 
         $return = ItemReturn::with(['borrowingRequest.item', 'user'])->findOrFail($id);
+
+        // Guard: Admin tidak boleh verifikasi pengembalian GURU
+        if ($return->tipe_peminjam === 'guru') {
+            return back()->with('error', 'Pengembalian dari guru harus diverifikasi oleh Kepala Jurusan, bukan Admin.');
+        }
 
         if ($return->status !== ItemReturn::STATUS_MENUNGGU) {
             return back()->with('error', 'Pengembalian ini sudah diverifikasi sebelumnya.');

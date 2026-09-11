@@ -39,6 +39,12 @@ class InventoryManager extends Component
     public $stock = 1;
     public $photo;
     public $editingId = null;
+    public $nomor_registrasi = '';
+    public $ukuran = '';
+    public $bahan = '';
+    public $tahun_pembelian = '';
+    public $asal_usul = '';
+    public $harga = '';
 
     protected $rules = [
         'name' => 'required|string|min:3',
@@ -54,6 +60,12 @@ class InventoryManager extends Component
         'status' => 'required|string',
         'stock' => 'required|integer|min:1',
         'photo' => 'nullable|image|max:2048',
+        'nomor_registrasi' => 'nullable|string',
+        'ukuran' => 'nullable|in:Kecil,Sedang,Besar',
+        'bahan' => 'nullable|string',
+        'tahun_pembelian' => 'nullable|integer|min:1900|max:2100',
+        'asal_usul' => 'nullable|string',
+        'harga' => 'nullable|numeric|min:0',
     ];
 
     public function mount(): void
@@ -165,6 +177,12 @@ class InventoryManager extends Component
             'photo_path' => $path,
             'code' => strtoupper('BRG-'.substr(md5(uniqid()), 0, 6)),
             'inventory_number' => $this->generateInventoryNumber(),
+            'nomor_registrasi' => $this->nomor_registrasi ?: null,
+            'ukuran' => $this->ukuran ?: null,
+            'bahan' => $this->bahan ?: null,
+            'tahun_pembelian' => $this->tahun_pembelian ?: null,
+            'asal_usul' => $this->asal_usul ?: null,
+            'harga' => $this->harga ?: null,
         ];
 
         if ($this->editingId) {
@@ -195,6 +213,12 @@ class InventoryManager extends Component
         $this->condition = $item->condition;
         $this->status = $item->status;
         $this->stock = $item->stock;
+        $this->nomor_registrasi = $item->nomor_registrasi;
+        $this->ukuran = $item->ukuran;
+        $this->bahan = $item->bahan;
+        $this->tahun_pembelian = $item->tahun_pembelian;
+        $this->asal_usul = $item->asal_usul;
+        $this->harga = $item->harga;
     }
 
     public function delete($id): void
@@ -237,5 +261,11 @@ class InventoryManager extends Component
         $this->stock = 1;
         $this->photo = null;
         $this->editingId = null;
+        $this->nomor_registrasi = '';
+        $this->ukuran = '';
+        $this->bahan = '';
+        $this->tahun_pembelian = '';
+        $this->asal_usul = '';
+        $this->harga = '';
     }
 }

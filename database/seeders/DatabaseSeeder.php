@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $roles = ['super-admin', 'admin', 'petugas', 'guru', 'siswa'];
+        $roles = ['superadmin', 'admin', 'petugas', 'guru', 'siswa', 'kepala_jurusan'];
         foreach ($roles as $roleName) {
             Role::firstOrCreate(['name' => $roleName]);
         }
@@ -27,17 +27,8 @@ class DatabaseSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'manage users']);
         Permission::firstOrCreate(['name' => 'manage borrowings']);
 
-        // Admin
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@smkn1bangsri.sch.id'],
-            [
-                'name' => 'Super Admin',
-                'password' => bcrypt('admin123'),
-                'email_verified_at' => now(),
-            ]
-        );
-        $admin->assignRole('super-admin');
-        $admin->assignRole('admin');
+        // Note: Admin and Superadmin users are now created in AdminUserSeeder
+        // This seeder only handles roles, permissions, and sample data
 
         // Guru (gunakan email dummy, NIP disimpan di name sementara)
         $guru = User::firstOrCreate(
@@ -103,5 +94,8 @@ class DatabaseSeeder extends Seeder
             'stock' => 1,
             'barcode' => 'INV-0001',
         ]);
+
+        // Call KepalaJurusanSeeder
+        $this->call(KepalaJurusanSeeder::class);
     }
 }

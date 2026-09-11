@@ -13,12 +13,23 @@ class AdminUserSeeder extends Seeder
         // Create admin role if not exists
         Role::firstOrCreate(['name' => 'admin']);
 
-        // Create admin user
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@smkn1bangsri.sch.id'],
+        // Disable old admin account if it exists
+        $oldAdmin = User::where('email', 'admin@smkn1bangsri.sch.id')->first();
+        if ($oldAdmin) {
+            // Change email to make it invalid
+            $oldAdmin->update([
+                'email' => 'admin_old_disabled@smkn1bangsri.sch.id',
+                'email_verified_at' => null,
+            ]);
+            $this->command->info('Old admin account disabled: admin@smkn1bangsri.sch.id');
+        }
+
+        // Create/update admin user with new credentials
+        $admin = User::updateOrCreate(
+            ['email' => 'admintu@smkn1bangsri.sch.id'],
             [
-                'name' => 'Admin',
-                'password' => bcrypt('admin123'),
+                'name' => 'Admin TU',
+                'password' => bcrypt('admintu123'),
                 'email_verified_at' => now(),
             ]
         );
@@ -26,6 +37,24 @@ class AdminUserSeeder extends Seeder
         // Assign admin role
         $admin->assignRole('admin');
 
-        $this->command->info('Admin user created: admin@smkn1bangsri.sch.id / admin123');
+        $this->command->info('Admin user created/updated: admintu@smkn1bangsri.sch.id / admintu123');
+
+        // Create superadmin role if not exists
+        Role::firstOrCreate(['name' => 'superadmin']);
+
+        // Create superadmin user with all required fields
+        $superadmin = User::updateOrCreate(
+            ['email' => 'superadmin@smkn1bangsri.sch.id'],
+            [
+                'name' => 'Superadmin',
+                'password' => bcrypt('superadmin123'),
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Assign superadmin role
+        $superadmin->assignRole('superadmin');
+
+        $this->command->info('Superadmin user created/updated: superadmin@smkn1bangsri.sch.id / superadmin123');
     }
 }

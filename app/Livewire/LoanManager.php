@@ -8,7 +8,11 @@ use Livewire\Component;
 class LoanManager extends Component
 {
     public $borrowings;
-    public $filterStatus = 'semua';
+    public string $filterStatus = 'semua';
+    public string $filterType = 'semua'; // 'semua' | 'siswa' | 'guru'
+
+    public bool $showModal = false;
+    public ?BorrowingRequest $selectedBorrowing = null;
 
     public function mount(): void
     {
@@ -17,7 +21,10 @@ class LoanManager extends Component
 
     public function render()
     {
-        return view('livewire.loan-manager');
+        return view('livewire.loan-manager', [
+            'typeCounts'   => $this->getTypeCounts(),
+            'statusCounts' => $this->getStatusCounts(),
+        ]);
     }
 
     public function updatedFilterStatus(): void
@@ -25,10 +32,65 @@ class LoanManager extends Component
         $this->loadBorrowings();
     }
 
+    public function updatedFilterType(): void
+    {
+        $this->loadBorrowings();
+    }
+
+    public function getTypeCounts(): array
+    {
+        return [
+            'semua' => BorrowingRequest::count(),
+            'siswa' => BorrowingRequest::where(function ($q) {
+                $q->where('tipe_peminjam', 'siswa')->orWhereNull('tipe_peminjam');
+            })->count(),
+            'guru'  => BorrowingRequest::where('tipe_peminjam', 'guru')->count(),
+        ];
+    }
+
+    public function getStatusCounts(): array
+    {
+        $baseQuery = BorrowingRequest::query();
+
+        if ($this->filterType === 'siswa') {
+            $baseQuery->where(function ($q) {
+                $q->where('tipe_peminjam', 'siswa')->orWhereNull('tipe_peminjam');
+            });
+        } elseif ($this->filterType === 'guru') {
+            $baseQuery->where('tipe_peminjam', 'guru');
+        }
+
+        return [
+            'semua'     => (clone $baseQuery)->count(),
+            'pending'   => (clone $baseQuery)->where('status', 'pending')->count(),
+            'approved'  => (clone $baseQuery)->where('status', 'approved')->count(),
+            'borrowed'  => (clone $baseQuery)->where('status', 'borrowed')->count(),
+            'returned'  => (clone $baseQuery)->where('status', 'returned')->count(),
+            'overdue'   => (clone $baseQuery)->where('status', 'overdue')->count(),
+        ];
+    }
+
     public function loadBorrowings(): void
     {
-        $query = BorrowingRequest::with(['user', 'item'])->latest();
+        $query = BorrowingRequest::with([
+            'user.classroom',
+            'user.jurusan',
+            'itemWithTrashed.category',
+            'teacher',
+            'approvedByKajur',
+            'qrCode'
+        ])->latest();
 
+        // Filter Tipe (Siswa / Guru)
+        if ($this->filterType === 'siswa') {
+            $query->where(function ($q) {
+                $q->where('tipe_peminjam', 'siswa')->orWhereNull('tipe_peminjam');
+            });
+        } elseif ($this->filterType === 'guru') {
+            $query->where('tipe_peminjam', 'guru');
+        }
+
+        // Filter Status
         if ($this->filterStatus !== 'semua') {
             $query->where('status', $this->filterStatus);
         }
@@ -37,18 +99,65 @@ class LoanManager extends Component
     }
 
     /**
+     * Buka Modal Detail Peminjaman
+     */
+    public function openDetail(int $id): void
+    {
+        $this->selectedBorrowing = BorrowingRequest::with([
+            'user.classroom',
+            'user.jurusan',
+            'itemWithTrashed.category',
+            'teacher',
+            'approvedByKajur',
+            'qrCode'
+        ])->find($id);
+
+        if ($this->selectedBorrowing) {
+            $this->showModal = true;
+        }
+    }
+
+    /**
+     * Tutup Modal Detail
+     */
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+        $this->selectedBorrowing = null;
+    }
+
+    /**
      * Setujui peminjaman (pending → approved)
+     * Hanya berlaku untuk peminjaman SISWA. Peminjaman GURU disetujui oleh Kepala Jurusan.
      */
     public function approve(int $id): void
     {
         $borrowing = BorrowingRequest::findOrFail($id);
-        $borrowing->update([
-            'status'      => 'approved',
-            'approved_at' => now(),
-        ]);
+
+        // Role-based validation: Admin cannot approve teacher requests
+        if (auth()->user()->hasRole('admin') && $borrowing->tipe_peminjam === 'guru') {
+            session()->flash('error', 'Akses ditolak: Admin tidak dapat menyetujui peminjaman Guru. Silakan hubungi Kepala Jurusan terkait.');
+            return;
+        }
+
+        // Type-based validation: Teacher requests must go through Kajur
+        if ($borrowing->tipe_peminjam === 'guru') {
+            session()->flash('error', 'Peminjaman Guru hanya dapat disetujui oleh Kepala Jurusan yang bersangkutan.');
+            return;
+        }
+
+        try {
+            app(\App\Services\BorrowingApprovalService::class)->approve($borrowing, (int) auth()->id());
+        } catch (\Exception $e) {
+            $borrowing->update([
+                'status'      => 'approved',
+                'approved_at' => now(),
+            ]);
+            app(\App\Services\QRCodeService::class)->generateForRequest($borrowing);
+        }
 
         $this->loadBorrowings();
-        session()->flash('message', 'Peminjaman #BR-' . str_pad($borrowing->id, 4, '0', STR_PAD_LEFT) . ' telah disetujui.');
+        session()->flash('message', 'Peminjaman Siswa #BR-' . str_pad($borrowing->id, 4, '0', STR_PAD_LEFT) . ' telah disetujui.');
     }
 
     /**
@@ -57,6 +166,13 @@ class LoanManager extends Component
     public function markBorrowed(int $id): void
     {
         $borrowing = BorrowingRequest::findOrFail($id);
+
+        // Admin cannot manage teacher borrowing status
+        if (auth()->user()->hasRole('admin') && $borrowing->tipe_peminjam === 'guru') {
+            session()->flash('error', 'Akses ditolak: Admin tidak dapat mengelola status peminjaman Guru.');
+            return;
+        }
+
         $borrowing->update([
             'status'      => 'borrowed',
             'borrowed_at' => now(),
@@ -72,6 +188,13 @@ class LoanManager extends Component
     public function markReturned(int $id): void
     {
         $borrowing = BorrowingRequest::with('item')->findOrFail($id);
+
+        // Admin cannot manage teacher borrowing status
+        if (auth()->user()->hasRole('admin') && $borrowing->tipe_peminjam === 'guru') {
+            session()->flash('error', 'Akses ditolak: Admin tidak dapat mengelola status peminjaman Guru.');
+            return;
+        }
+
         $borrowing->update([
             'status'      => 'returned',
             'returned_at' => now(),
@@ -88,13 +211,29 @@ class LoanManager extends Component
 
     /**
      * Tolak peminjaman (pending → rejected)
+     * Hanya berlaku untuk peminjaman SISWA. Peminjaman GURU ditolak oleh Kepala Jurusan.
      */
     public function reject(int $id): void
     {
         $borrowing = BorrowingRequest::findOrFail($id);
-        $borrowing->update(['status' => 'rejected']);
+
+        // Role-based validation: Admin cannot reject teacher requests
+        if (auth()->user()->hasRole('admin') && $borrowing->tipe_peminjam === 'guru') {
+            session()->flash('error', 'Akses ditolak: Admin tidak dapat menolak peminjaman Guru. Silakan hubungi Kepala Jurusan terkait.');
+            return;
+        }
+
+        // Type-based validation: Teacher requests must go through Kajur
+        if ($borrowing->tipe_peminjam === 'guru') {
+            session()->flash('error', 'Peminjaman Guru hanya dapat ditolak oleh Kepala Jurusan yang bersangkutan.');
+            return;
+        }
+
+        $borrowing->update([
+            'status' => 'rejected',
+        ]);
 
         $this->loadBorrowings();
-        session()->flash('message', 'Peminjaman #BR-' . str_pad($borrowing->id, 4, '0', STR_PAD_LEFT) . ' telah ditolak.');
+        session()->flash('message', 'Peminjaman Siswa #BR-' . str_pad($borrowing->id, 4, '0', STR_PAD_LEFT) . ' telah ditolak.');
     }
 }

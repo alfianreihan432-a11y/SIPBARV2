@@ -69,7 +69,7 @@ class AuthenticateUser
 
         $role = $request->input('role');
         $hasRole = ! $role || ($role === 'admin'
-            ? $user->hasAnyRole(['admin', 'super-admin'])
+            ? $user->hasAnyRole(['admin', 'superadmin', 'super-admin', 'super_admin'])
             : $user->hasRole($role));
 
         if (! $role) {
@@ -82,11 +82,12 @@ class AuthenticateUser
 
         // 3. Pengecekan Mode Pembatasan Akses / Maintenance Login
         if (config('sipbar.login_restriction.enabled', true)) {
-            $isAdminOrSuperAdmin = $user->hasAnyRole(['admin', 'super-admin']) || $user->hasRole('super_admin');
+            $isAdminOrSuperAdmin = $user->hasAnyRole(['admin', 'superadmin', 'super-admin', 'super_admin']);
             $isTeacher = $user->hasRole('guru');
+            $isKepalaJurusan = $user->hasRole('kepala_jurusan');
 
-            // Guru & Super Admin/Admin selalu diizinkan login
-            if (! $isAdminOrSuperAdmin && ! $isTeacher) {
+            // Guru, Kepala Jurusan & Super Admin/Admin selalu diizinkan login
+            if (! $isAdminOrSuperAdmin && ! $isTeacher && ! $isKepalaJurusan) {
                 $whitelist = config('sipbar.login_restriction.whitelisted_students', []);
                 $userEmail = strtolower(trim($user->email));
                 $userNis = strtolower(trim($user->nis ?? ''));

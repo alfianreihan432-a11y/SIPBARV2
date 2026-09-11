@@ -163,7 +163,8 @@ class UserManager extends Component
         $query = User::with('roles', 'classroom')->latest();
 
         if ($this->filterClassroom) {
-            $query->where('classroom_id', $this->filterClassroom);
+            // Filter by kelas field directly (since dropdown now uses kelas values)
+            $query->where('kelas', $this->filterClassroom);
         }
 
         $this->users = $query->get();
@@ -181,7 +182,12 @@ class UserManager extends Component
 
     public function loadClassrooms(): void
     {
-        $this->classrooms = Classroom::orderBy('name')->pluck('name', 'id');
+        // Load distinct kelas values from users table for dropdown filter
+        $this->classrooms = User::whereNotNull('kelas')
+            ->where('kelas', '!=', '')
+            ->distinct()
+            ->orderBy('kelas')
+            ->pluck('kelas', 'kelas');
     }
 
     public function loadClassesAndExtras(): void

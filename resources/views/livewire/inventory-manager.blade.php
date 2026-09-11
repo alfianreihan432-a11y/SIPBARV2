@@ -656,7 +656,111 @@
             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;transition:transform .2s;{{ $showForm ? 'transform:rotate(45deg)' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
             <span>{{ $showForm ? 'Tutup Form' : 'Tambah Barang' }}</span>
         </button>
+
+        {{-- Import KIBB Button --}}
+        <button type="button" onclick="openImportModal()" class="im-add-btn" style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);border-color:#059669">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <span>Import KIBB</span>
+        </button>
     </div>
+
+    {{-- Import Modal --}}
+    <div id="importModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-[9999]">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <!-- Header -->
+            <div class="border-b border-gray-200 px-6 py-4 bg-white rounded-t-xl">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-900">Import Data KIBB</h2>
+                    <button onclick="closeImportModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 py-4">
+                <form id="uploadForm" onsubmit="handleUpload(event)">
+                    @csrf
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">File Excel <span class="text-red-500">*</span></label>
+                        <input type="file" name="file" accept=".xlsx,.xls" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <p class="text-xs text-gray-500 mt-2">Format KIBB dengan sheet "KIBB". Maksimal ukuran 10MB.</p>
+                    </div>
+                    <div id="uploadError" class="hidden mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"></div>
+                    <div id="uploadSuccess" class="hidden mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700"></div>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeImportModal()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Batal</button>
+                        <button type="submit" id="uploadBtn" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Import</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openImportModal() {
+            document.getElementById('importModal').classList.remove('hidden');
+            document.getElementById('importModal').classList.add('flex');
+            document.getElementById('uploadForm').reset();
+            document.getElementById('uploadError').classList.add('hidden');
+            document.getElementById('uploadSuccess').classList.add('hidden');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.add('hidden');
+            document.getElementById('importModal').classList.remove('flex');
+        }
+
+        async function handleUpload(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const errorDiv = document.getElementById('uploadError');
+            const successDiv = document.getElementById('uploadSuccess');
+            const uploadBtn = document.getElementById('uploadBtn');
+
+            try {
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = 'Importing...';
+
+                const response = await fetch('{{ route('items.import.upload') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    successDiv.textContent = data.message;
+                    successDiv.classList.remove('hidden');
+                    errorDiv.classList.add('hidden');
+                    
+                    // Refresh Livewire component after 2 seconds
+                    setTimeout(() => {
+                        closeImportModal();
+                        @this.$refresh();
+                    }, 2000);
+                } else {
+                    errorDiv.textContent = data.error || 'Gagal memproses file';
+                    errorDiv.classList.remove('hidden');
+                    successDiv.classList.add('hidden');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Terjadi kesalahan saat upload: ' + error.message;
+                errorDiv.classList.remove('hidden');
+                successDiv.classList.add('hidden');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = 'Import';
+            }
+        }
+    </script>
 
     {{-- ── FORM PANEL ───────────────────────────────────────── --}}
     @if($showForm || $editingId)
@@ -730,6 +834,35 @@
                     <div>
                         <label class="im-label">Tipe / Model</label>
                         <input wire:model="type" type="text" class="im-input" placeholder="G513, MX Master 3...">
+                    </div>
+                    <div>
+                        <label class="im-label">Nomor Registrasi</label>
+                        <input wire:model="nomor_registrasi" type="text" class="im-input" placeholder="REG-12345">
+                    </div>
+                    <div>
+                        <label class="im-label">Ukuran</label>
+                        <select wire:model="ukuran" class="im-select-field">
+                            <option value="">— Pilih Ukuran —</option>
+                            <option value="Kecil">Kecil</option>
+                            <option value="Sedang">Sedang</option>
+                            <option value="Besar">Besar</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="im-label">Bahan</label>
+                        <input wire:model="bahan" type="text" class="im-input" placeholder="Kayu, Besi, Plastik...">
+                    </div>
+                    <div>
+                        <label class="im-label">Tahun Pembelian</label>
+                        <input wire:model="tahun_pembelian" type="number" min="1900" max="{{ date('Y') }}" class="im-input" placeholder="2024">
+                    </div>
+                    <div>
+                        <label class="im-label">Asal Usul</label>
+                        <input wire:model="asal_usul" type="text" class="im-input" placeholder="Hibah, Pembelian, Bantuan...">
+                    </div>
+                    <div>
+                        <label class="im-label">Harga (Rp)</label>
+                        <input wire:model="harga" type="number" min="0" step="0.01" class="im-input" placeholder="0.00">
                     </div>
                 </div>
             </div>
@@ -864,6 +997,11 @@
                         <span style="width:5px;height:5px;border-radius:50%;background:currentColor"></span>
                         {{ $item->status }}
                     </span>
+                    @if($item->needs_review)
+                    <span style="position:absolute;top:10px;right:10px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fbbf24;border-radius:999px;padding:2px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">
+                        Perlu Review
+                    </span>
+                    @endif
                 </div>
 
                 {{-- Body --}}
@@ -888,6 +1026,46 @@
                             <div class="im-cell-val" style="color:{{ $condColor }}">{{ $item->condition }}</div>
                         </div>
                     </div>
+                    @if($item->nomor_registrasi || $item->ukuran || $item->bahan || $item->tahun_pembelian || $item->asal_usul || $item->harga)
+                    <div class="im-card-info-row">
+                        @if($item->nomor_registrasi)
+                        <div class="im-card-info-cell">
+                            <div class="im-cell-label">No. Registrasi</div>
+                            <div class="im-cell-val">{{ $item->nomor_registrasi }}</div>
+                        </div>
+                        @endif
+                        @if($item->ukuran)
+                        <div class="im-card-info-cell">
+                            <div class="im-cell-label">Ukuran</div>
+                            <div class="im-cell-val">{{ $item->ukuran }}</div>
+                        </div>
+                        @endif
+                        @if($item->bahan)
+                        <div class="im-card-info-cell">
+                            <div class="im-cell-label">Bahan</div>
+                            <div class="im-cell-val">{{ $item->bahan }}</div>
+                        </div>
+                        @endif
+                        @if($item->tahun_pembelian)
+                        <div class="im-card-info-cell">
+                            <div class="im-cell-label">Th. Pembelian</div>
+                            <div class="im-cell-val">{{ $item->tahun_pembelian }}</div>
+                        </div>
+                        @endif
+                        @if($item->asal_usul)
+                        <div class="im-card-info-cell">
+                            <div class="im-cell-label">Asal Usul</div>
+                            <div class="im-cell-val">{{ $item->asal_usul }}</div>
+                        </div>
+                        @endif
+                        @if($item->harga)
+                        <div class="im-card-info-cell">
+                            <div class="im-cell-label">Harga</div>
+                            <div class="im-cell-val">Rp {{ number_format($item->harga, 0, ',', '.') }}</div>
+                        </div>
+                        @endif
+                    </div>
+                    @endif
                 </div>
 
                 {{-- Footer --}}
@@ -924,6 +1102,7 @@
                             <th>Kondisi</th>
                             <th>Status</th>
                             <th class="center">Tersedia / Total</th>
+                            <th>Detail Tambahan</th>
                             <th class="right">Aksi</th>
                         </tr>
                     </thead>
@@ -971,6 +1150,17 @@
                                 </span>
                             </td>
                             <td class="center" style="font-weight:900;color:#60a5fa;font-size:14px">{{ $item->available_stock }} <span style="font-size:11px;color:#64748b;font-weight:600">/ {{ $item->stock }}</span></td>
+                            <td>
+                                <div style="font-size:11px;color:#94a3b8">
+                                    @if($item->nomor_registrasi)<div style="margin-bottom:2px"><span style="color:#64748b">Reg:</span> {{ $item->nomor_registrasi }}</div>@endif
+                                    @if($item->ukuran)<div style="margin-bottom:2px"><span style="color:#64748b">Ukuran:</span> {{ $item->ukuran }}</div>@endif
+                                    @if($item->bahan)<div style="margin-bottom:2px"><span style="color:#64748b">Bahan:</span> {{ $item->bahan }}</div>@endif
+                                    @if($item->tahun_pembelian)<div style="margin-bottom:2px"><span style="color:#64748b">Th:</span> {{ $item->tahun_pembelian }}</div>@endif
+                                    @if($item->asal_usul)<div style="margin-bottom:2px"><span style="color:#64748b">Asal:</span> {{ $item->asal_usul }}</div>@endif
+                                    @if($item->harga)<div><span style="color:#64748b">Harga:</span> Rp {{ number_format($item->harga, 0, ',', '.') }}</div>@endif
+                                    @if(!$item->nomor_registrasi && !$item->ukuran && !$item->bahan && !$item->tahun_pembelian && !$item->asal_usul && !$item->harga)<span style="color:#64748b">—</span>@endif
+                                </div>
+                            </td>
                             <td class="right">
                                 <div class="im-table-actions">
                                     <button type="button" wire:click="edit({{ $item->id }})" class="im-tbl-btn im-tbl-btn-edit" title="Edit Barang">

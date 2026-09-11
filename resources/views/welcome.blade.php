@@ -459,33 +459,30 @@ html.dark .mob-t-moon{display:none}
 .cat-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px;font-weight:400}
 .cat-link{font-size:12px;font-weight:700;color:#1d4ed8;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:gap .15s}
 .cat-link:hover{gap:8px}
-/* ─── FEATURES (BENTO GRID) ─── */
+/* ─── FEATURES (BALANCED BENTO GRID) ─── */
 .feat-bg{background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);position:relative}
 .feat-bg::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#e2e8f0 50%,transparent)}
-.feat-bento{display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
-.feat-bento-card{background:#ffffff;border:1.5px solid #e5e7eb;border-radius:20px;padding:32px 28px;text-align:left;transition:all .3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;display:flex;flex-direction:column;justify-content:space-between}
-.feat-bento-card:hover{transform:translateY(-5px);border-color:#2563eb;box-shadow:0 16px 36px rgba(37,99,235,.08)}
-.feat-card-hero{grid-column:span 7;background:linear-gradient(135deg,#ffffff 0%,#f0f7ff 100%);border-color:#dbeafe}
-.feat-card-side{grid-column:span 5}
-.feat-card-sub{grid-column:span 4}
+.feat-bento{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.feat-bento-card{background:#ffffff;border:1.5px solid #e2e8f0;border-radius:16px;padding:22px 20px;text-align:left;transition:all .25s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 2px 6px rgba(0,0,0,.02)}
+.feat-bento-card:hover{transform:translateY(-3px);border-color:#2563eb;box-shadow:0 12px 28px rgba(37,99,235,.09)}
+.feat-card-row1{grid-column:span 6}
+.feat-card-row2{grid-column:span 4}
 
-.feat-top-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.feat-index{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;letter-spacing:.05em;color:#2563eb;background:rgba(37,99,235,.08);padding:4px 10px;border-radius:999px}
-.feat-badge-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;border:1px solid rgba(29,78,216,.15)}
-.feat-icon-duo{width:48px;height:48px;border-radius:14px;background:#eff6ff;border:1px solid #dbeafe;display:flex;align-items:center;justify-content:center;color:#1d4ed8;transition:all .3s}
-.feat-bento-card:hover .feat-icon-duo{background:#1d4ed8;color:#fff;border-color:#1d4ed8;transform:scale(1.05)}
+.feat-top-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.feat-index{font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;font-weight:800;letter-spacing:.04em;color:#2563eb;background:rgba(37,99,235,.08);padding:3px 9px;border-radius:999px;flex-shrink:0}
+.feat-icon-wrap{width:52px;height:52px;border-radius:14px;background:#eff6ff;border:1.5px solid #dbeafe;display:flex;align-items:center;justify-content:center;color:#1d4ed8;flex-shrink:0;transition:all .25s ease}
+.feat-bento-card:hover .feat-icon-wrap{background:#1d4ed8;color:#ffffff;border-color:#1d4ed8;transform:scale(1.05)}
 
-.feat-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:800;color:#0f172a;margin-bottom:10px;line-height:1.3;letter-spacing:-.02em;transition:color .2s}
+.feat-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:16.5px;font-weight:800;color:#0f172a;margin:0 0 6px 0;line-height:1.3;letter-spacing:-.015em;transition:color .2s}
 .feat-bento-card:hover .feat-title{color:#1d4ed8}
-.feat-card-hero .feat-title{font-size:22px}
-.feat-summary{font-size:14px;color:#64748b;line-height:1.65;font-weight:400;margin-bottom:20px}
+.feat-summary{font-size:13.5px;color:#64748b;line-height:1.55;font-weight:400;margin:0 0 10px 0}
 
-.feat-workflow-flow{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.9);border:1px solid #dbeafe;border-radius:14px;padding:12px 14px;margin-top:16px;margin-bottom:20px}
-.feat-flow-step{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#1e293b}
-.feat-flow-dot{width:20px;height:20px;border-radius:6px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800}
-.feat-flow-arrow{color:#94a3b8}
+.feat-workflow-flow{display:flex;align-items:center;gap:6px;background:rgba(239,246,255,.6);border:1px solid #dbeafe;border-radius:10px;padding:8px 12px;margin-bottom:10px}
+.feat-flow-step{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#1e293b}
+.feat-flow-dot{width:18px;height:18px;border-radius:5px;background:#1d4ed8;color:#ffffff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800}
+.feat-flow-arrow{color:#94a3b8;flex-shrink:0}
 
-.feat-action-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1d4ed8;margin-top:auto;transition:gap .2s}
+.feat-action-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1d4ed8;margin-top:auto;padding-top:10px;transition:all .2s ease}
 .feat-bento-card:hover .feat-action-link{gap:10px;color:#1e40af}
 
 /* ─── STATS / DATA INVENTARIS ─── */
@@ -607,9 +604,8 @@ html.dark .mob-t-moon{display:none}
   .hero-trust{grid-template-columns:repeat(2,1fr)}
   .cat-grid{grid-template-columns:repeat(3,1fr)}
   .feat-bento{grid-template-columns:repeat(6,1fr)}
-  .feat-card-hero{grid-column:span 6}
-  .feat-card-side{grid-column:span 6}
-  .feat-card-sub{grid-column:span 3}
+  .feat-card-row1{grid-column:span 3}
+  .feat-card-row2{grid-column:span 2}
   .about-grid-modern{grid-template-columns:1fr;gap:40px}
   .footer-grid{grid-template-columns:repeat(2,1fr);gap:40px 32px}
   .section{padding:60px 24px}
@@ -628,7 +624,7 @@ html.dark .mob-t-moon{display:none}
   .stats-h2{font-size:26px}
   .cat-grid{grid-template-columns:repeat(2,1fr)}
   .feat-bento{grid-template-columns:1fr}
-  .feat-card-hero,.feat-card-side,.feat-card-sub{grid-column:span 1}
+  .feat-card-row1,.feat-card-row2{grid-column:span 1}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
   
   /* About section responsive */
@@ -788,25 +784,16 @@ html.dark .feat-bento-card:hover{
   border-color: #3b82f6 !important;
   box-shadow: 0 16px 36px rgba(0,0,0,.5), 0 0 20px rgba(59, 130, 246, 0.2) !important;
 }
-html.dark .feat-card-hero{
-  background: linear-gradient(135deg, rgba(26, 42, 77, 0.85) 0%, rgba(18, 29, 54, 0.8) 100%) !important;
-  border-color: rgba(59, 130, 246, 0.35) !important;
-}
 html.dark .feat-index{
   color: #60a5fa !important;
   background: rgba(59, 130, 246, 0.15) !important;
 }
-html.dark .feat-badge-pill{
-  background: rgba(59, 130, 246, 0.15) !important;
-  color: #93c5fd !important;
-  border-color: rgba(59, 130, 246, 0.25) !important;
-}
-html.dark .feat-icon-duo{
+html.dark .feat-icon-wrap{
   background: rgba(59, 130, 246, 0.12) !important;
   border-color: rgba(59, 130, 246, 0.25) !important;
   color: #60a5fa !important;
 }
-html.dark .feat-bento-card:hover .feat-icon-duo{
+html.dark .feat-bento-card:hover .feat-icon-wrap{
   background: #3b82f6 !important;
   color: #ffffff !important;
   border-color: #3b82f6 !important;
@@ -1081,19 +1068,21 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
     </div>
 
     <div class="feat-bento">
-      {{-- HERO BENTO CARD: Peminjaman & Validasi QR --}}
+      {{-- BENTO CARD 1: Peminjaman & Validasi QR (Row 1 - Span 6) --}}
       @auth
-      <a href="{{ route('loans.index') }}" class="feat-bento-card feat-card-hero">
+      <a href="{{ route('loans.index') }}" class="feat-bento-card feat-card-row1">
       @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-hero">
+      <a href="{{ route('login') }}" class="feat-bento-card feat-card-row1">
       @endauth
         <div>
           <div class="feat-top-meta">
-            <span class="feat-index">01 / WORKFLOW UTAMA</span>
-            <span class="feat-badge-pill">Approval Cepat & QR</span>
+            <div class="feat-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            </div>
+            <span class="feat-index">01</span>
           </div>
           <div class="feat-title">Sirkulasi Peminjaman Digital & Validasi QR Code</div>
-          <p class="feat-summary">Siswa dapat mengajukan peminjaman secara mandiri melalui web. Guru pembimbing memberikan persetujuan seketika lewat tautan resmi, dan pengambilan barang divalidasi dengan pemindaian QR Code di ruang sarpras tanpa formulir kertas.</p>
+          <p class="feat-summary">Pengajuan mandiri & verifikasi ambil barang via QR code tanpa formulir kertas.</p>
           
           {{-- Mini interactive workflow preview --}}
           <div class="feat-workflow-flow">
@@ -1119,21 +1108,21 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
         </div>
       </a>
 
-      {{-- BENTO CARD 2: Manajemen Stok & Aset --}}
+      {{-- BENTO CARD 2: Manajemen Stok & Aset (Row 1 - Span 6) --}}
       @auth
-      <a href="{{ route('inventory.index') }}" class="feat-bento-card feat-card-side">
+      <a href="{{ route('inventory.index') }}" class="feat-bento-card feat-card-row1">
       @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-side">
+      <a href="{{ route('login') }}" class="feat-bento-card feat-card-row1">
       @endauth
         <div>
           <div class="feat-top-meta">
-            <span class="feat-index">02</span>
-            <div class="feat-icon-duo">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            <div class="feat-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             </div>
+            <span class="feat-index">02</span>
           </div>
           <div class="feat-title">Manajemen Stok & Tracking Aset</div>
-          <p class="feat-summary">Katalogisasi seluruh barang sekolah secara terstruktur lengkap dengan kategori, nomor seri, status kondisi fisik, dan lokasi penempatan.</p>
+          <p class="feat-summary">Katalog aset lengkap dengan nomor registrasi, kondisi fisik, dan lokasi penempatan.</p>
         </div>
         <div class="feat-action-link">
           <span>Kelola Inventaris</span>
@@ -1141,21 +1130,21 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
         </div>
       </a>
 
-      {{-- BENTO CARD 3: Pengembalian & Kondisi --}}
+      {{-- BENTO CARD 3: Verifikasi Pengembalian (Row 2 - Span 4) --}}
       @auth
-      <a href="{{ route('returns.index') }}" class="feat-bento-card feat-card-sub">
+      <a href="{{ route('returns.index') }}" class="feat-bento-card feat-card-row2">
       @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-sub">
+      <a href="{{ route('login') }}" class="feat-bento-card feat-card-row2">
       @endauth
         <div>
           <div class="feat-top-meta">
-            <span class="feat-index">03</span>
-            <div class="feat-icon-duo">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div class="feat-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
+            <span class="feat-index">03</span>
           </div>
           <div class="feat-title">Verifikasi Pengembalian</div>
-          <p class="feat-summary">Pengecekan kondisi fisik barang saat dikembalikan memastikan aset sekolah tetap terawat dan pencatatan mutasi berlangsung transparan.</p>
+          <p class="feat-summary">Cek kondisi fisik barang otomatis saat dikembalikan guna menjaga kualitas aset.</p>
         </div>
         <div class="feat-action-link">
           <span>Lihat Pengembalian</span>
@@ -1163,21 +1152,21 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
         </div>
       </a>
 
-      {{-- BENTO CARD 4: Laporan & Audit --}}
+      {{-- BENTO CARD 4: Audit & Rekapitulasi Otomatis (Row 2 - Span 4) --}}
       @auth
-      <a href="{{ route('reports.index') }}" class="feat-bento-card feat-card-sub">
+      <a href="{{ route('reports.index') }}" class="feat-bento-card feat-card-row2">
       @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-sub">
+      <a href="{{ route('login') }}" class="feat-bento-card feat-card-row2">
       @endauth
         <div>
           <div class="feat-top-meta">
-            <span class="feat-index">04</span>
-            <div class="feat-icon-duo">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <div class="feat-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             </div>
+            <span class="feat-index">04</span>
           </div>
           <div class="feat-title">Audit & Rekapitulasi Otomatis</div>
-          <p class="feat-summary">Hasilkan laporan sirkulasi barang berkala dan statistik frekuensi pemakaian untuk kebutuhan evaluasi dan audit sarana prasarana sekolah.</p>
+          <p class="feat-summary">Laporan sirkulasi & statistik pemakaian barang berkala secara instan dan akurat.</p>
         </div>
         <div class="feat-action-link">
           <span>Buka Laporan</span>
@@ -1185,21 +1174,21 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
         </div>
       </a>
 
-      {{-- BENTO CARD 5: Manajemen Pengguna RBAC --}}
+      {{-- BENTO CARD 5: Kontrol Akses Multi-Peran (Row 2 - Span 4) --}}
       @auth
-      <a href="{{ route('users.index') }}" class="feat-bento-card feat-card-sub">
+      <a href="{{ route('users.index') }}" class="feat-bento-card feat-card-row2">
       @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-sub">
+      <a href="{{ route('login') }}" class="feat-bento-card feat-card-row2">
       @endauth
         <div>
           <div class="feat-top-meta">
-            <span class="feat-index">05</span>
-            <div class="feat-icon-duo">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <div class="feat-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
+            <span class="feat-index">05</span>
           </div>
           <div class="feat-title">Kontrol Akses Multi-Peran</div>
-          <p class="feat-summary">Manajemen otorisasi yang fleksibel untuk Siswa, Guru Pembimbing, dan Tim Sarpras sesuai batas wewenang operasional masing-masing.</p>
+          <p class="feat-summary">Hak akses terstruktur untuk Siswa, Guru Pembimbing, Kepala Jurusan, dan Sarpras.</p>
         </div>
         <div class="feat-action-link">
           <span>Atur Pengguna</span>

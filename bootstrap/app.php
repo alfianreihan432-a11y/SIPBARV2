@@ -18,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'bot.auth' => \App\Http\Middleware\BotAuth::class,
             'login.restriction' => \App\Http\Middleware\CheckLoginRestriction::class,
+            'kajur.scope' => \App\Http\Middleware\KepalaJurusanScope::class,
+            'superadmin.restrict' => \App\Http\Middleware\SuperadminRestrictApprove::class,
         ]);
         $middleware->appendToGroup('web', [
             \App\Http\Middleware\CheckLoginRestriction::class,

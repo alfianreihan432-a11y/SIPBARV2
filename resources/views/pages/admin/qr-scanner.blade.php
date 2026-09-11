@@ -251,8 +251,9 @@
     </form>
 </div>
 
-{{-- Load html5-qrcode dari CDN --}}
+{{-- Load html5-qrcode dan jsQR dari CDN --}}
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
 <script>
 var html5QrCode = null;
@@ -399,6 +400,26 @@ function handleFileUpload(event) {
     event.target.value = '';
 }
 
+function handleDecodedToken(decodedText) {
+    var overlay = document.getElementById('scan-success-overlay');
+    var overlayTitle = document.getElementById('scan-success-title');
+    var overlaySub = document.getElementById('scan-success-sub');
+
+    if (overlayTitle) overlayTitle.textContent = 'QR Berhasil Terbaca!';
+    if (overlaySub) overlaySub.textContent = 'Mengalihkan ke halaman verifikasi...';
+    if (overlay) overlay.style.display = 'flex';
+
+    var token = extractToken(decodedText);
+    if (token) {
+        setTimeout(function() {
+            window.location.href = "{{ url('/admin/qr/verify') }}/" + encodeURIComponent(token);
+        }, 350);
+    } else {
+        if (overlay) overlay.style.display = 'none';
+        showCameraError('QR Code tidak berisi token yang valid.');
+    }
+}
+
 function scanImageFile(file) {
     if (!file || !file.type.startsWith('image/')) {
         showCameraError('File yang dipilih harus berupa gambar (JPG, PNG, WEBP, dll).');
@@ -415,47 +436,102 @@ function scanImageFile(file) {
     if (overlaySub) overlaySub.textContent = 'Mencari kode QR pada foto yang diunggah...';
     if (overlay) overlay.style.display = 'flex';
 
-    if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("qr-reader");
-    }
-
-    var doScan = function() {
-        html5QrCode.scanFile(file, true)
-            .then(function(decodedText) {
-                if (overlayTitle) overlayTitle.textContent = 'QR Berhasil Terbaca!';
-                if (overlaySub) overlaySub.textContent = 'Mengalihkan ke halaman verifikasi...';
-                if (overlay) overlay.style.display = 'flex';
-
-                var token = extractToken(decodedText);
-                if (token) {
-                    setTimeout(function() {
-                        window.location.href = "{{ url('/admin/qr/verify') }}/" + encodeURIComponent(token);
-                    }, 400);
-                } else {
-                    if (overlay) overlay.style.display = 'none';
-                    if (placeholder) placeholder.style.display = 'flex';
-                    showCameraError('QR Code tidak berisi token yang valid.');
-                }
-            })
-            .catch(function(err) {
-                if (overlay) overlay.style.display = 'none';
-                if (placeholder) placeholder.style.display = 'flex';
-                showCameraError('Tidak dapat mendeteksi QR Code pada foto tersebut. Pastikan gambar jelas, fokus, dan tidak terpotong.');
-            });
-    };
-
     if (isScanning && html5QrCode) {
         html5QrCode.stop().then(function() {
             isScanning = false;
             var controls = document.getElementById('camera-controls');
             if (controls) controls.style.display = 'none';
-            doScan();
+            runMultiPassScan(file);
         }).catch(function() {
-            doScan();
+            runMultiPassScan(file);
         });
     } else {
-        doScan();
+        runMultiPassScan(file);
     }
+}
+
+function runMultiPassScan(file) {
+    var overlay = document.getElementById('scan-success-overlay');
+    var placeholder = document.getElementById('camera-placeholder');
+
+    decodeWithJsQR(file)
+        .then(function(resultText) {
+            handleDecodedToken(resultText);
+        })
+        .catch(function() {
+            // Fallback to html5QrCode engine
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("qr-reader");
+            }
+
+            html5QrCode.scanFile(file, false)
+                .then(function(decodedText) {
+                    handleDecodedToken(decodedText);
+                })
+                .catch(function() {
+                    if (overlay) overlay.style.display = 'none';
+                    if (placeholder) placeholder.style.display = 'flex';
+                    showCameraError('Tidak dapat mendeteksi QR Code pada foto tersebut. Pastikan gambar jelas, fokus, dan tidak terpotong.');
+                });
+        });
+}
+
+function decodeWithJsQR(file) {
+    return new Promise(function(resolve, reject) {
+        if (typeof jsQR === 'undefined') {
+            reject(new Error('jsQR library not loaded'));
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var img = new Image();
+            img.onload = function() {
+                var maxSizes = [
+                    { w: img.width, h: img.height },
+                    { w: 1200, h: Math.round(img.height * (1200 / img.width)) },
+                    { w: 800,  h: Math.round(img.height * (800 / img.width)) },
+                    { w: 500,  h: Math.round(img.height * (500 / img.width)) }
+                ];
+
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+                for (var i = 0; i < maxSizes.length; i++) {
+                    var targetW = maxSizes[i].w;
+                    var targetH = maxSizes[i].h;
+                    if (targetW <= 0 || targetH <= 0) continue;
+                    if (i > 0 && targetW >= img.width) continue;
+
+                    canvas.width = targetW;
+                    canvas.height = targetH;
+                    ctx.drawImage(img, 0, 0, targetW, targetH);
+
+                    var imageData = ctx.getImageData(0, 0, targetW, targetH);
+                    var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert"
+                    });
+
+                    if (!code) {
+                        code = jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: "attemptBoth"
+                        });
+                    }
+
+                    if (code && code.data && code.data.trim().length > 0) {
+                        resolve(code.data);
+                        return;
+                    }
+                }
+
+                reject(new Error('QR code not detected in image'));
+            };
+            img.onerror = function() { reject(new Error('Failed to load image')); };
+            img.src = e.target.result;
+        };
+        reader.onerror = function() { reject(new Error('Failed to read file')); };
+        reader.readAsDataURL(file);
+    });
 }
 
 // Drag and drop handler pada viewport

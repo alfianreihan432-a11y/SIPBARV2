@@ -2,19 +2,113 @@
 
 @section('title', 'Riwayat Peminjaman – SIPBAR')
 
+@push('styles')
+<style>
+    .btn-detail-link {
+        background: none;
+        border: none;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s ease;
+    }
+    /* BELUM dikembalikan -> Font ABU-ABU */
+    .btn-detail-link.is-not-returned {
+        color: #64748b !important;
+    }
+    .btn-detail-link.is-not-returned:hover {
+        color: #334155 !important;
+        background: #f1f5f9;
+    }
+    /* SUDAH dikembalikan -> Font BIRU */
+    .btn-detail-link.is-returned {
+        color: #2563eb !important;
+    }
+    .btn-detail-link.is-returned:hover {
+        color: #1d4ed8 !important;
+        background: #eff6ff;
+    }
+    
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    .modal-backdrop.active {
+        display: flex;
+    }
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .modal-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .modal-body {
+        padding: 20px;
+    }
+    .modal-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .modal-row:last-child {
+        border-bottom: none;
+    }
+    .modal-label {
+        color: #6b7280;
+        font-weight: 500;
+        font-size: 13px;
+    }
+    .modal-value {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 13px;
+        text-align: right;
+    }
+</style>
+@endpush
+
 @section('content')
 @php
-    $query = \App\Models\BorrowingRequest::with(['item', 'teacher'])
+    $query = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'teacher', 'itemReturns'])
         ->where('user_id', auth()->id());
     if (request('search')) {
-        $query->whereHas('item', fn($q) => $q->where('name', 'like', '%'.request('search').'%'));
+        $query->whereHas('itemWithTrashed', fn($q) => $q->where('name', 'like', '%'.request('search').'%'));
     }
     if (request('status')) $query->where('status', request('status'));
     if (request('date_from')) $query->whereDate('borrow_date', '>=', request('date_from'));
     if (request('date_to'))   $query->whereDate('borrow_date', '<=', request('date_to'));
     $histories = $query->latest()->paginate(10);
     $totalAll      = \App\Models\BorrowingRequest::where('user_id', auth()->id())->count();
-    $totalReturned = \App\Models\BorrowingRequest::where('user_id', auth()->id())->where('status','returned')->count();
+    // Count returned as either status='returned' OR has approved item return
+    $totalReturned = \App\Models\BorrowingRequest::where('user_id', auth()->id())
+        ->where(function($q) {
+            $q->where('status', 'returned')
+              ->orWhereHas('itemReturns', function($returnQ) {
+                  $returnQ->where('status', 'disetujui');
+              });
+        })->count();
 
     $statusMap = [
         'pending'  => ['label'=>'Menunggu',    'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
@@ -103,14 +197,19 @@
     </div>
 
     @foreach($histories as $h)
-    @php $st = $statusMap[$h->status] ?? $statusMap['pending']; @endphp
+    @php 
+        $st = $statusMap[$h->status] ?? $statusMap['pending']; 
+        // Check if truly returned (either status returned OR has approved item return)
+        $isReturned = ($h->status === 'returned') || 
+                      ($h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->status === 'disetujui');
+    @endphp
     <div class="s-loan-row {{ $st['row'] }}">
         <div class="s-loan-icon">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         </div>
         <div class="s-loan-content">
-            <div class="s-loan-name">{{ $h->item?->name ?? 'Barang tidak tersedia' }}</div>
-            <div class="s-loan-code">Kode: {{ $h->item?->code ?? '-' }} · Qty: {{ $h->quantity }} unit</div>
+            <div class="s-loan-name">{{ $h->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
+            <div class="s-loan-code">Kode: {{ $h->itemWithTrashed?->code ?? '-' }} · Qty: {{ $h->quantity }} unit</div>
 
             <div class="s-loan-meta" style="margin-top:8px">
                 <div class="s-loan-meta-item">
@@ -171,6 +270,34 @@
                 {{ $st['label'] }}
             </span>
             <span class="s-loan-time">{{ $h->created_at->diffForHumans() }}</span>
+            <button type="button" 
+                    class="btn-detail-link {{ $isReturned ? 'is-returned' : 'is-not-returned' }}"
+                    title="{{ $isReturned ? 'Barang sudah dikembalikan (Klik untuk detail)' : 'Barang belum dikembalikan (Klik untuk detail)' }}"
+                    onclick="openDetailModal({{ json_encode([
+                        'id' => $h->id,
+                        'item_name' => $h->itemWithTrashed?->name ?? ($h->item?->name ?? 'Barang tidak tersedia'),
+                        'item_code' => $h->itemWithTrashed?->code ?? ($h->item?->code ?? '-'),
+                        'quantity' => $h->quantity,
+                        'borrow_date' => $h->borrow_date ? $h->borrow_date->format('d F Y') : '-',
+                        'return_date' => $h->return_date ? $h->return_date->format('d F Y') : '-',
+                        'return_time' => $h->return_time ?? '-',
+                        'purpose' => $h->purpose ?? '-',
+                        'notes' => $h->notes ?? '-',
+                        'status' => $st['label'],
+                        'teacher_name' => $h->teacher?->name ?? '-',
+                        'approved_at' => $h->approved_at ? $h->approved_at->format('d F Y H:i') : '-',
+                        'borrowed_at' => $h->borrowed_at ? $h->borrowed_at->format('d F Y H:i') : '-',
+                        'returned_at' => $h->returned_at ? $h->returned_at->format('d F Y H:i') : '-',
+                        'return_condition' => $h->return_condition ? ucfirst($h->return_condition) : '-',
+                        'return_notes' => $h->return_notes ?? '-',
+                        'is_returned' => $isReturned,
+                        'rejection_reason' => $h->rejection_reason ?? '-',
+                        'item_return_status' => $h->itemReturns && $h->itemReturns->isNotEmpty() ? $h->itemReturns->first()->status : '-',
+                        'item_return_verified_by' => $h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->verifier ? $h->itemReturns->first()->verifier->name : '-',
+                        'item_return_verified_at' => $h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->tanggal_verifikasi ? $h->itemReturns->first()->tanggal_verifikasi->format('d F Y H:i') : '-'
+                    ]) }})">
+                Detail
+            </button>
         </div>
     </div>
     @endforeach
@@ -208,4 +335,158 @@
     </div>
 </div>
 @endif
+
+{{-- Detail Modal --}}
+<div id="detailModal" class="modal-backdrop">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 style="margin:0;font-size:16px;font-weight:700">Detail Peminjaman</h3>
+            <button type="button" onclick="closeDetailModal()" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px;border-radius:4px">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<script>
+function openDetailModal(data) {
+    const modal = document.getElementById('detailModal');
+    const modalBody = document.getElementById('modalBody');
+    
+    let html = `
+        <div class="modal-row">
+            <span class="modal-label">No. Peminjaman</span>
+            <span class="modal-value">#${data.id}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Nama Barang</span>
+            <span class="modal-value">${data.item_name}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Kode Barang</span>
+            <span class="modal-value">${data.item_code}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Jumlah</span>
+            <span class="modal-value">${data.quantity} unit</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Tanggal Pinjam</span>
+            <span class="modal-value">${data.borrow_date}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Tanggal Kembali</span>
+            <span class="modal-value">${data.return_date}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Jam Kembali</span>
+            <span class="modal-value">${data.return_time}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Keperluan</span>
+            <span class="modal-value">${data.purpose}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Catatan</span>
+            <span class="modal-value">${data.notes}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Guru Pembimbing</span>
+            <span class="modal-value">${data.teacher_name}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Status</span>
+            <span class="modal-value">${data.status}</span>
+        </div>
+    `;
+    
+    if (data.approved_at && data.approved_at !== '-') {
+        html += `
+        <div class="modal-row">
+            <span class="modal-label">Disetujui Pada</span>
+            <span class="modal-value">${data.approved_at}</span>
+        </div>
+        `;
+    }
+    
+    if (data.borrowed_at && data.borrowed_at !== '-') {
+        html += `
+        <div class="modal-row">
+            <span class="modal-label">Diambil Pada</span>
+            <span class="modal-value">${data.borrowed_at}</span>
+        </div>
+        `;
+    }
+    
+    if (data.is_returned) {
+        html += `
+        <div class="modal-row">
+            <span class="modal-label">Dikembalikan Pada</span>
+            <span class="modal-value">${data.returned_at}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Kondisi Barang</span>
+            <span class="modal-value">${data.return_condition}</span>
+        </div>
+        <div class="modal-row">
+            <span class="modal-label">Catatan Pengembalian</span>
+            <span class="modal-value">${data.return_notes}</span>
+        </div>
+        `;
+        
+        // Add item return verification info if available
+        if (data.item_return_status && data.item_return_status !== '-') {
+            html += `
+            <div class="modal-row">
+                <span class="modal-label">Status Pengembalian</span>
+                <span class="modal-value">${data.item_return_status === 'disetujui' ? 'Disetujui' : ucfirst(data.item_return_status)}</span>
+            </div>
+            `;
+        }
+        
+        if (data.item_return_verified_by && data.item_return_verified_by !== '-') {
+            html += `
+            <div class="modal-row">
+                <span class="modal-label">Diverifikasi Oleh</span>
+                <span class="modal-value">${data.item_return_verified_by}</span>
+            </div>
+            `;
+        }
+        
+        if (data.item_return_verified_at && data.item_return_verified_at !== '-') {
+            html += `
+            <div class="modal-row">
+                <span class="modal-label">Waktu Verifikasi</span>
+                <span class="modal-value">${data.item_return_verified_at}</span>
+            </div>
+            `;
+        }
+    }
+    
+    if (data.rejection_reason && data.rejection_reason !== '-') {
+        html += `
+        <div class="modal-row">
+            <span class="modal-label">Alasan Penolakan</span>
+            <span class="modal-value" style="color:#dc2626">${data.rejection_reason}</span>
+        </div>
+        `;
+    }
+    
+    modalBody.innerHTML = html;
+    modal.classList.add('active');
+}
+
+function closeDetailModal() {
+    const modal = document.getElementById('detailModal');
+    modal.classList.remove('active');
+}
+
+// Close modal when clicking outside
+document.getElementById('detailModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDetailModal();
+    }
+});
+</script>
 @endsection

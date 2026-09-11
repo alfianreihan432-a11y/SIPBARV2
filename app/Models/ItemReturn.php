@@ -13,6 +13,8 @@ class ItemReturn extends Model
     protected $fillable = [
         'borrowing_request_id',
         'user_id',
+        'tipe_peminjam',
+        'kajur_id',
         'kondisi_barang',
         'catatan',
         'foto_bukti',
@@ -50,6 +52,27 @@ class ItemReturn extends Model
     public function verifier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'diverifikasi_oleh');
+    }
+
+    public function kajur(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'kajur_id');
+    }
+
+    /**
+     * Scope: Only siswa returns (for Admin verification)
+     */
+    public function scopeSiswa($query)
+    {
+        return $query->where('tipe_peminjam', 'siswa');
+    }
+
+    /**
+     * Scope: Only guru returns (for Kepala Jurusan verification)
+     */
+    public function scopeGuru($query)
+    {
+        return $query->where('tipe_peminjam', 'guru');
     }
 
     public function getKondisiLabelAttribute(): string
