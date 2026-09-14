@@ -14,8 +14,12 @@ class LoanManager extends Component
     public bool $showModal = false;
     public ?BorrowingRequest $selectedBorrowing = null;
 
-    public function mount(): void
+    // ── READONLY MODE for Superadmin ──
+    public bool $readonly = false;
+
+    public function mount(bool $readonly = false): void
     {
+        $this->readonly = $readonly;
         $this->loadBorrowings();
     }
 
@@ -132,6 +136,12 @@ class LoanManager extends Component
      */
     public function approve(int $id): void
     {
+        // ── READONLY CHECK: Superadmin cannot approve ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk menyetujui peminjaman. Halaman ini read-only.');
+            return;
+        }
+
         $borrowing = BorrowingRequest::findOrFail($id);
 
         // Role-based validation: Admin cannot approve teacher requests
@@ -165,6 +175,12 @@ class LoanManager extends Component
      */
     public function markBorrowed(int $id): void
     {
+        // ── READONLY CHECK: Superadmin cannot mark borrowed ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk mengubah status peminjaman. Halaman ini read-only.');
+            return;
+        }
+
         $borrowing = BorrowingRequest::findOrFail($id);
 
         // Admin cannot manage teacher borrowing status
@@ -187,6 +203,12 @@ class LoanManager extends Component
      */
     public function markReturned(int $id): void
     {
+        // ── READONLY CHECK: Superadmin cannot mark returned ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk mengubah status peminjaman. Halaman ini read-only.');
+            return;
+        }
+
         $borrowing = BorrowingRequest::with('item')->findOrFail($id);
 
         // Admin cannot manage teacher borrowing status
@@ -215,6 +237,12 @@ class LoanManager extends Component
      */
     public function reject(int $id): void
     {
+        // ── READONLY CHECK: Superadmin cannot reject ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk menolak peminjaman. Halaman ini read-only.');
+            return;
+        }
+
         $borrowing = BorrowingRequest::findOrFail($id);
 
         // Role-based validation: Admin cannot reject teacher requests

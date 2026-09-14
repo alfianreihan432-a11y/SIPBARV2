@@ -286,6 +286,13 @@ table.cm-table tbody td { padding: 13px 18px; font-size: 13px; color: var(--text
                         </td>
                         <td>
                             <div class="cm-actions-cell">
+                                @if($readonly)
+                                    {{-- READONLY MODE: No actions for Superadmin --}}
+                                    <span style="font-size:11px;font-weight:600;color:var(--text-muted);padding:5px 10px;background:rgba(255,255,255,0.05);border-radius:6px;display:inline-flex;align-items:center;gap:4px">
+                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                        Read-Only
+                                    </span>
+                                @else
                                 <button wire:click="edit({{ $cat->id }})" class="cm-btn cm-btn-edit">
                                     <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     Edit
@@ -296,6 +303,7 @@ table.cm-table tbody td { padding: 13px 18px; font-size: 13px; color: var(--text
                                     <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     Hapus
                                 </button>
+                                @endif
                             </div>
                         </td>
                     </tr>

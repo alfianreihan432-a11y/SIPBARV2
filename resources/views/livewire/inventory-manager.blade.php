@@ -652,6 +652,7 @@
         </div>
 
         {{-- Add Button --}}
+        @if(!$readonly)
         <button type="button" wire:click="toggleForm" class="im-add-btn">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;transition:transform .2s;{{ $showForm ? 'transform:rotate(45deg)' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
             <span>{{ $showForm ? 'Tutup Form' : 'Tambah Barang' }}</span>
@@ -662,6 +663,13 @@
             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
             <span>Import KIBB</span>
         </button>
+        @else
+        {{-- READONLY MODE: Show read-only badge instead of buttons --}}
+        <div class="im-add-btn" style="background:rgba(255,255,255,0.05);cursor:default;border:1px solid rgba(255,255,255,0.1)">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <span>Mode Read-Only (Superadmin)</span>
+        </div>
+        @endif
     </div>
 
     {{-- Import Modal --}}
@@ -963,7 +971,9 @@
                 @if($search || $filterCategory || $filterStatus || $filterCondition)
                 <button type="button" wire:click="$set('search','');$set('filterCategory','');$set('filterStatus','');$set('filterCondition','')" class="im-btn-cancel">Bersihkan Filter</button>
                 @endif
+                @if(!$readonly)
                 <button type="button" wire:click="toggleForm" class="im-add-btn">+ Tambah Barang Baru</button>
+                @endif
             </div>
         </div>
 
@@ -1075,6 +1085,7 @@
                         <div class="im-stock-sub">Tersedia / Total</div>
                     </div>
                     <div class="im-card-actions">
+                        @if(!$readonly)
                         <button type="button" wire:click="edit({{ $item->id }})" class="im-btn-edit">
                             <svg style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             Edit
@@ -1082,6 +1093,12 @@
                         <button type="button" wire:click="delete({{ $item->id }})" wire:confirm="Hapus barang '{{ $item->name }}'?" class="im-btn-del">
                             <svg style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                         </button>
+                        @else
+                        <span style="font-size:11px;font-weight:600;color:var(--text-muted);padding:6px 10px;background:rgba(255,255,255,0.05);border-radius:6px;display:inline-flex;align-items:center;gap:4px">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            Read-Only
+                        </span>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -1163,12 +1180,19 @@
                             </td>
                             <td class="right">
                                 <div class="im-table-actions">
+                                    @if(!$readonly)
                                     <button type="button" wire:click="edit({{ $item->id }})" class="im-tbl-btn im-tbl-btn-edit" title="Edit Barang">
                                         <svg style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     </button>
                                     <button type="button" wire:click="delete({{ $item->id }})" wire:confirm="Hapus barang '{{ $item->name }}'?" class="im-tbl-btn im-tbl-btn-del" title="Hapus Barang">
                                         <svg style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </button>
+                                    @else
+                                    <span style="font-size:11px;font-weight:600;color:var(--text-muted);padding:5px 10px;background:rgba(255,255,255,0.05);border-radius:6px;display:inline-flex;align-items:center;gap:4px">
+                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                        Read-Only
+                                    </span>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

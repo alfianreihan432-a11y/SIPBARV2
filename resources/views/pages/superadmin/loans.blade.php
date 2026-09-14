@@ -36,18 +36,18 @@
             <div style="font-size:13px;color:var(--text-muted)">Mode baca saja. Superadmin tidak dapat melakukan approve/reject peminjaman.</div>
         </div>
         <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0">
-            <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:10px 16px;text-align:center;min-width:105px">
-                <div style="font-size:18px;font-weight:800;color:#f59e0b">{{ $pendingTotal }}</div>
+            <div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:10px 16px;text-align:center;min-width:105px">
+                <div style="font-size:18px;font-weight:800;color:var(--color-warning)">{{ $pendingTotal }}</div>
                 <div style="font-size:11px;font-weight:700;color:var(--text-primary);margin-top:2px">Menunggu</div>
                 <div style="font-size:10px;color:var(--text-muted);margin-top:2px">{{ $pendingSiswa }} Siswa · {{ $pendingGuru }} Guru</div>
             </div>
-            <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:10px 16px;text-align:center;min-width:105px">
-                <div style="font-size:18px;font-weight:800;color:var(--blue)">{{ $activeTotal }}</div>
+            <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.2);border-radius:12px;padding:10px 16px;text-align:center;min-width:105px">
+                <div style="font-size:18px;font-weight:800;color:var(--color-info)">{{ $activeTotal }}</div>
                 <div style="font-size:11px;font-weight:700;color:var(--text-primary);margin-top:2px">Aktif</div>
                 <div style="font-size:10px;color:var(--text-muted);margin-top:2px">{{ $activeSiswa }} Siswa · {{ $activeGuru }} Guru</div>
             </div>
             <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:10px 16px;text-align:center;min-width:105px">
-                <div style="font-size:18px;font-weight:800;color:#f87171">{{ $overdueTotal }}</div>
+                <div style="font-size:18px;font-weight:800;color:var(--color-danger)">{{ $overdueTotal }}</div>
                 <div style="font-size:11px;font-weight:700;color:var(--text-primary);margin-top:2px">Terlambat</div>
                 <div style="font-size:10px;color:var(--text-muted);margin-top:2px">{{ $overdueSiswa }} Siswa · {{ $overdueGuru }} Guru</div>
             </div>

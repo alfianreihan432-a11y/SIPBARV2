@@ -18,18 +18,18 @@
 .lm-filter-btn.act-guru{background:#059669;color:#fff;border-color:#059669;box-shadow:0 2px 6px rgba(5,150,105,.3)}
 .lm-filter-btn.act-siswa{background:#2563eb;color:#fff;border-color:#2563eb;box-shadow:0 2px 6px rgba(37,99,235,.3)}
 
-/* Badges */
+/* Badges - Bug #3 Fix: Using CSS variables for better dark mode contrast */
 .lm-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;white-space:nowrap}
-.badge-pending{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.2)}
-.badge-approved{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
-.badge-borrowed{background:rgba(234,179,8,.12);color:#eab308;border:1px solid rgba(234,179,8,.2)}
-.badge-returned{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.2)}
-.badge-rejected{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.2)}
-.badge-overdue{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+.badge-pending{background:rgba(251,191,36,.12);color:var(--color-pending);border:1px solid rgba(251,191,36,.2)}
+.badge-approved{background:rgba(96,165,250,.12);color:var(--color-approved);border:1px solid rgba(96,165,250,.2)}
+.badge-borrowed{background:rgba(234,179,8,.12);color:var(--color-borrowed);border:1px solid rgba(234,179,8,.2)}
+.badge-returned{background:rgba(16,185,129,.12);color:var(--color-returned);border:1px solid rgba(16,185,129,.2)}
+.badge-rejected{background:rgba(248,113,113,.12);color:var(--color-rejected);border:1px solid rgba(248,113,113,.2)}
+.badge-overdue{background:rgba(239,68,68,.15);color:var(--color-overdue);border:1px solid rgba(239,68,68,.25)}
 
-/* Type Badges */
-.badge-type-siswa{background:rgba(59,130,246,.12);color:#3b82f6;border:1px solid rgba(59,130,246,.25);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
-.badge-type-guru{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.25);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
+/* Type Badges - Bug #3 Fix: Using CSS variables for better dark mode contrast */
+.badge-type-siswa{background:rgba(96,165,250,.12);color:var(--color-info);border:1px solid rgba(96,165,250,.25);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
+.badge-type-guru{background:rgba(16,185,129,.12);color:var(--color-success);border:1px solid rgba(16,185,129,.25);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
 
 /* Table */
 table.lmt{width:100%;border-collapse:collapse}
@@ -46,32 +46,32 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
 .lmt-name{font-size:13px;font-weight:600;color:var(--text-primary)}
 .lmt-sub{font-size:11px;color:var(--text-muted)}
 .lmt-item{font-size:13px;color:var(--text-secondary);line-height:1.4}
-.lmt-qty{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:rgba(59,130,246,.12);color:var(--blue);font-weight:700;font-size:12px;border-radius:6px}
+.lmt-qty{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:rgba(96,165,250,.12);color:var(--color-info);font-weight:700;font-size:12px;border-radius:6px}
 .lmt-date{font-size:12px;color:var(--text-muted)}
 .lmt-due{font-size:12px}
-.lmt-due.ok{color:#10b981}
-.lmt-due.warn{color:#f59e0b}
-.lmt-due.over{color:#f87171;font-weight:700}
+.lmt-due.ok{color:var(--color-success)}
+.lmt-due.warn{color:var(--color-warning)}
+.lmt-due.over{color:var(--color-danger);font-weight:700}
 
-/* Action Buttons */
+/* Action Buttons - Using CSS Variables */
 .lm-act-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
-.btn-approve{background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.2)}
-.btn-approve:hover{background:#10b981;color:#fff}
-.btn-borrowed{background:rgba(234,179,8,.12);color:#eab308;border:1px solid rgba(234,179,8,.2)}
-.btn-borrowed:hover{background:#eab308;color:#fff}
-.btn-return{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
-.btn-return:hover{background:var(--blue);color:#fff}
-.btn-reject{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.2)}
-.btn-reject:hover{background:#f87171;color:#fff}
+.btn-approve{background:rgba(16,185,129,.12);color:var(--color-success);border:1px solid rgba(16,185,129,.2)}
+.btn-approve:hover{background:var(--color-success);color:#fff}
+.btn-borrowed{background:rgba(234,179,8,.12);color:var(--color-borrowed);border:1px solid rgba(234,179,8,.2)}
+.btn-borrowed:hover{background:var(--color-borrowed);color:#fff}
+.btn-return{background:rgba(96,165,250,.12);color:var(--color-info);border:1px solid rgba(96,165,250,.2)}
+.btn-return:hover{background:var(--color-info);color:#fff}
+.btn-reject{background:rgba(248,113,113,.08);color:var(--color-danger);border:1px solid rgba(248,113,113,.2)}
+.btn-reject:hover{background:var(--color-danger);color:#fff}
 .btn-detail{background:rgba(148,163,184,.12);color:var(--text-secondary);border:1px solid var(--border-subtle)}
 .btn-detail:hover{background:var(--bg-hover);color:var(--text-primary)}
 
-/* Kajur Notice Badge */
-.lm-kajur-notice{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(245,158,11,.1);color:#d97706;border:1px dashed rgba(245,158,11,.3);cursor:default}
+/* Kajur Notice Badge - Using CSS Variables */
+.lm-kajur-notice{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(251,191,36,.1);color:var(--color-warning);border:1px dashed rgba(251,191,36,.3);cursor:default}
 
 .lm-empty{padding:56px;text-align:center;color:var(--text-muted)}
-.lm-alert-success{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:11px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#10b981;font-size:13px;font-weight:600;margin-bottom:16px;animation:lmIn .3s ease}
-.lm-alert-danger{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:11px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#ef4444;font-size:13px;font-weight:600;margin-bottom:16px;animation:lmIn .3s ease}
+.lm-alert-success{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:11px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--color-success);font-size:13px;font-weight:600;margin-bottom:16px;animation:lmIn .3s ease}
+.lm-alert-danger{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:11px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--color-danger);font-size:13px;font-weight:600;margin-bottom:16px;animation:lmIn .3s ease}
 @keyframes lmIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 
 /* Modal */
@@ -304,7 +304,17 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
                     {{-- 8. Aksi --}}
                     <td>
                         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-                            @if($isGuru)
+                            @if($readonly)
+                                {{-- READONLY MODE: Superadmin only sees Detail button --}}
+                                <span class="lm-kajur-notice" title="Mode Read-Only untuk Superadmin">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                    Read-Only
+                                </span>
+                                <button wire:click="openDetail({{ $b->id }})" class="lm-act-btn btn-detail">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    Lihat Detail
+                                </button>
+                            @elseif($isGuru)
                                 {{-- Baris GURU: Approval khusus Kepala Jurusan, Admin HANYA read-only / Lihat Detail --}}
                                 @if($b->status === 'pending')
                                 <span class="lm-kajur-notice" title="Persetujuan dilakukan oleh Kepala Jurusan terkait">

@@ -19,6 +19,9 @@ class CategoryManager extends Component
     public $editingId = null;
     public $search = '';
 
+    // ── READONLY MODE for Superadmin ──
+    public bool $readonly = false;
+
     protected $rules = [
         'name' => 'required|string|min:3',
         'icon' => 'nullable|string|max:50',
@@ -26,8 +29,9 @@ class CategoryManager extends Component
         'description' => 'nullable|string',
     ];
 
-    public function mount(): void
+    public function mount(bool $readonly = false): void
     {
+        $this->readonly = $readonly;
         $this->loadCategories();
     }
 
@@ -48,6 +52,12 @@ class CategoryManager extends Component
 
     public function save(): void
     {
+        // ── READONLY CHECK: Superadmin cannot save ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk mengelola kategori. Halaman ini read-only.');
+            return;
+        }
+
         $this->validate();
 
         $data = [
@@ -72,6 +82,12 @@ class CategoryManager extends Component
 
     public function edit(int $id): void
     {
+        // ── READONLY CHECK: Superadmin cannot edit ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk mengedit kategori. Halaman ini read-only.');
+            return;
+        }
+
         $category = Category::findOrFail($id);
 
         $this->editingId = $category->id;
@@ -83,6 +99,12 @@ class CategoryManager extends Component
 
     public function delete(int $id): void
     {
+        // ── READONLY CHECK: Superadmin cannot delete ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk menghapus kategori. Halaman ini read-only.');
+            return;
+        }
+
         Category::findOrFail($id)->delete();
         $this->dispatch('categoryUpdated');
         $this->loadCategories();

@@ -170,18 +170,18 @@
         letter-spacing: 0.02em;
     }
     .badge-menunggu {
-        background: rgba(245, 158, 11, 0.15);
-        color: #f59e0b;
-        border: 1px solid rgba(245, 158, 11, 0.3);
+        background: rgba(251, 191, 36, 0.15);
+        color: var(--color-warning);
+        border: 1px solid rgba(251, 191, 36, 0.3);
     }
     .badge-disetujui {
         background: rgba(16, 185, 129, 0.15);
-        color: #10b981;
+        color: var(--color-success);
         border: 1px solid rgba(16, 185, 129, 0.3);
     }
     .badge-ditolak {
         background: rgba(239, 68, 68, 0.15);
-        color: #ef4444;
+        color: var(--color-danger);
         border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
@@ -211,7 +211,7 @@
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        background: #10b981;
+        background: var(--color-success);
         color: #fff;
         font-size: 11px;
         font-weight: 700;
@@ -228,7 +228,7 @@
         align-items: center;
         gap: 4px;
         background: transparent;
-        color: #ef4444;
+        color: var(--color-danger);
         border: 1px solid rgba(239, 68, 68, 0.3);
         font-size: 11px;
         font-weight: 700;
@@ -239,7 +239,7 @@
     }
     .btn-reject:hover {
         background: rgba(239, 68, 68, 0.1);
-        border-color: #ef4444;
+        border-color: var(--color-danger);
     }
 
     /* Modal Styles */
@@ -306,7 +306,7 @@
         font-size: 12px;
         font-weight: 700;
         color: #fff;
-        background: #ef4444;
+        background: var(--color-danger);
         border: none;
         cursor: pointer;
     }
@@ -343,7 +343,7 @@
                 <div class="stat-card-label">Semua Pengajuan</div>
                 <div class="stat-card-value">{{ $countSemua }}</div>
             </div>
-            <div class="stat-card-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+            <div class="stat-card-icon" style="background: rgba(96, 165, 250, 0.15); color: var(--color-info);">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
@@ -353,9 +353,9 @@
         <div class="stat-card-admin">
             <div>
                 <div class="stat-card-label">Menunggu Verifikasi</div>
-                <div class="stat-card-value" style="color: #f59e0b;">{{ $countMenunggu }}</div>
+                <div class="stat-card-value" style="color: var(--color-warning);">{{ $countMenunggu }}</div>
             </div>
-            <div class="stat-card-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+            <div class="stat-card-icon" style="background: rgba(251, 191, 36, 0.15); color: var(--color-warning);">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
@@ -365,9 +365,9 @@
         <div class="stat-card-admin">
             <div>
                 <div class="stat-card-label">Disetujui</div>
-                <div class="stat-card-value" style="color: #10b981;">{{ $countDisetujui }}</div>
+                <div class="stat-card-value" style="color: var(--color-success);">{{ $countDisetujui }}</div>
             </div>
-            <div class="stat-card-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+            <div class="stat-card-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--color-success);">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -377,9 +377,9 @@
         <div class="stat-card-admin">
             <div>
                 <div class="stat-card-label">Ditolak</div>
-                <div class="stat-card-value" style="color: #ef4444;">{{ $countDitolak }}</div>
+                <div class="stat-card-value" style="color: var(--color-danger);">{{ $countDitolak }}</div>
             </div>
-            <div class="stat-card-icon" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+            <div class="stat-card-icon" style="background: rgba(239, 68, 68, 0.15); color: var(--color-danger);">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>

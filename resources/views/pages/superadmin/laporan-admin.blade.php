@@ -40,7 +40,7 @@
                             {{ $report->periode_awal->format('d M Y') }} - {{ $report->periode_akhir->format('d M Y') }}
                         </td>
                         <td style="padding: 12px 16px;">
-                            <span style="padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba({{ $report->status_color === 'success' ? '16, 185, 129' : ($report->status_color === 'danger' ? '239, 68, 68' : '245, 158, 11') }}, 0.15); color: {{ $report->status_color === 'success' ? '#10b981' : ($report->status_color === 'danger' ? '#ef4444' : '#f59e0b') }}; border: 1px solid rgba({{ $report->status_color === 'success' ? '16, 185, 129' : ($report->status_color === 'danger' ? '239, 68, 68' : '245, 158, 11') }}, 0.3);">
+                            <span style="padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba({{ $report->status_color === 'success' ? '16, 185, 129' : ($report->status_color === 'danger' ? '239, 68, 68' : '251, 191, 36') }}, 0.15); color: {{ $report->status_color === 'success' ? 'var(--color-success)' : ($report->status_color === 'danger' ? 'var(--color-danger)' : 'var(--color-warning)') }}; border: 1px solid rgba({{ $report->status_color === 'success' ? '16, 185, 129' : ($report->status_color === 'danger' ? '239, 68, 68' : '251, 191, 36') }}, 0.3);">
                                 {{ $report->status_label }}
                             </span>
                         </td>

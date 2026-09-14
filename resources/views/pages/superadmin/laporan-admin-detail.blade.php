@@ -34,7 +34,7 @@
         <div>
             <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Status</div>
             <div>
-                <span style="padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba({{ $report->status_color === 'success' ? '16, 185, 129' : ($report->status_color === 'danger' ? '239, 68, 68' : '245, 158, 11') }}, 0.15); color: {{ $report->status_color === 'success' ? '#10b981' : ($report->status_color === 'danger' ? '#ef4444' : '#f59e0b') }}; border: 1px solid rgba({{ $report->status_color === 'success' ? '16, 185, 129' : ($report->status_color === 'danger' ? '239, 68, 68' : '245, 158, 11') }}, 0.3);">
+                <span style="padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; background: rgba({{ $report->status_color === 'success' ? '16, 185, 129' : ($report->status_color === 'danger' ? '239, 68, 68' : '251, 191, 36') }}, 0.15); color: {{ $report->status_color === 'success' ? 'var(--color-success)' : ($report->status_color === 'danger' ? 'var(--color-danger)' : 'var(--color-warning)') }}; border: 1px solid rgba({{ $report->status_color === 'success' ? '16, 185, 129' : ($report->status_color === 'danger' ? '239, 68, 68' : '251, 191, 36') }}, 0.3);">
                     {{ $report->status_label }}
                 </span>
             </div>
@@ -69,11 +69,11 @@
             </div>
             <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 16px;">
                 <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Dikembalikan</div>
-                <div style="font-size: 24px; font-weight: 800; color: #10b981;">{{ $report->data_rekap['total_dikembalikan'] ?? 0 }}</div>
+                <div style="font-size: 24px; font-weight: 800; color: var(--color-success);">{{ $report->data_rekap['total_dikembalikan'] ?? 0 }}</div>
             </div>
             <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 16px;">
                 <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Pending</div>
-                <div style="font-size: 24px; font-weight: 800; color: #f59e0b;">{{ $report->data_rekap['total_pending'] ?? 0 }}</div>
+                <div style="font-size: 24px; font-weight: 800; color: var(--color-warning);">{{ $report->data_rekap['total_pending'] ?? 0 }}</div>
             </div>
         </div>
         
@@ -107,10 +107,10 @@
             </div>
             
             <div style="display: flex; gap: 12px;">
-                <button type="submit" style="padding: 10px 20px; background: #10b981; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
+                <button type="submit" style="padding: 10px 20px; background: var(--color-success); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
                     Setujui Laporan
                 </button>
-                <button type="button" onclick="document.getElementById('rejectForm').style.display='block'" style="padding: 10px 20px; background: transparent; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
+                <button type="button" onclick="document.getElementById('rejectForm').style.display='block'" style="padding: 10px 20px; background: transparent; color: var(--color-danger); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
                     Tolak Laporan
                 </button>
             </div>
@@ -124,7 +124,7 @@
             </div>
             
             <div style="display: flex; gap: 12px;">
-                <button type="submit" style="padding: 10px 20px; background: #ef4444; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
+                <button type="submit" style="padding: 10px 20px; background: var(--color-danger); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
                     Konfirmasi Penolakan
                 </button>
                 <button type="button" onclick="document.getElementById('rejectForm').style.display='none'" style="padding: 10px 20px; background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-subtle); border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">

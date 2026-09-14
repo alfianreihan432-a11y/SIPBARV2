@@ -5,12 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SIPBAR Superadmin')</title>
-    {{-- Anti-flash: apply theme BEFORE CSS renders --}}
+    {{-- ══════════════════════════════════════════════════════════════
+        CONSOLIDATED THEME SYSTEM - Bug #2 Fix
+        Single source of truth for theme management
+        Supports: localStorage, system preference fallback, Livewire
+    ══════════════════════════════════════════════════════════════ --}}
     <script>
     (function(){
-        var s=localStorage.getItem('sipbar-superadmin-theme');
-        if(s==='light') document.documentElement.classList.add('light');
-        else document.documentElement.classList.remove('light');
+        var KEY = 'sipbar-superadmin-theme';
+        
+        // ── Get initial theme with system preference fallback ──
+        function getInitialTheme() {
+            var saved = localStorage.getItem(KEY);
+            
+            // If user explicitly set theme, use it
+            if (saved === 'light' || saved === 'dark') {
+                return saved;
+            }
+            
+            // Fallback to system preference
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                return 'light';
+            }
+            
+            // Default to dark
+            return 'dark';
+        }
+        
+        // ── Apply theme IMMEDIATELY (before CSS loads) ──
+        var initialTheme = getInitialTheme();
+        if (initialTheme === 'light') {
+            document.documentElement.classList.add('light');
+        } else {
+            document.documentElement.classList.remove('light');
+        }
+        
+        // Store theme manager globally for use in toggle script
+        window.__sipbarTheme = {
+            current: initialTheme,
+            key: KEY
+        };
     })();
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -21,6 +55,7 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         
         /* ══════ DARK MODE TOKENS (default) ══════ */
+        /* Bug #3 Fix: Improved contrast ratios for WCAG AA compliance */
         :root {
             --bg-main: #000000;
             --bg-alt: #111111;
@@ -32,8 +67,8 @@
             --border-subtle: rgba(255,255,255,0.1);
             --text-primary: #ffffff;
             --text-secondary: #e0e0e0;
-            --text-muted: #a0a0a0;
-            --text-subtle: #707070;
+            --text-muted: #b0b0b0;              /* Improved from #a0a0a0 → Better contrast */
+            --text-subtle: #8a8a8a;              /* Improved from #707070 → Better contrast */
             --blue: #ffffff;
             --blue-dark: #e0e0e0;
             --sidebar-bg: #000000;
@@ -41,9 +76,21 @@
             --content-bg: #050505;
             --scrollbar: #333333;
             --notif-border: #000000;
-            --table-head-bg: #111111;
+            --table-head-bg: #1a1a1a;           /* Improved from #111111 → Better contrast with text */
             --table-hover: rgba(34,34,34,0.6);
             --input-bg: #111111;
+            
+            /* Badge & Status Colors - Improved for dark mode */
+            --color-success: #10b981;            /* Green - visible on dark */
+            --color-warning: #fbbf24;            /* Amber - improved from #f59e0b */
+            --color-danger: #f87171;             /* Red - visible on dark */
+            --color-info: #60a5fa;               /* Blue - visible on dark */
+            --color-pending: #fbbf24;            /* Amber */
+            --color-approved: #60a5fa;           /* Blue */
+            --color-borrowed: #eab308;           /* Yellow */
+            --color-returned: #10b981;           /* Green */
+            --color-rejected: #f87171;           /* Red */
+            --color-overdue: #ef4444;            /* Bright red */
             --input-border: rgba(255,255,255,0.15);
             --hero-bg: #000000;
             --card-shadow: 0 4px 20px rgba(0,0,0,0.5);
@@ -546,7 +593,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
                 Pengembalian
                 @if($pendingReturnCount > 0)
-                <span class="nav-badge" style="background:#f59e0b;color:#0f172a;">{{ $pendingReturnCount }}</span>
+                <span class="nav-badge" style="background:var(--color-warning);color:#0f172a;">{{ $pendingReturnCount }}</span>
                 @endif
             </a>
 
@@ -689,41 +736,141 @@
             }
         })();
 
-        // ── THEME TOGGLE ──
+        // ══════════════════════════════════════════════════════════════
+        // CONSOLIDATED THEME TOGGLE - Bug #2 Fix
+        // Uses global __sipbarTheme from head script
+        // Supports: Manual toggle, keyboard shortcut, Livewire navigation
+        // ══════════════════════════════════════════════════════════════
         (function(){
-            var KEY = 'sipbar-superadmin-theme';
             var html = document.documentElement;
             var sun  = document.getElementById('iconSun');
             var moon = document.getElementById('iconMoon');
             var btn  = document.getElementById('themeBtn');
+            
+            // Use consolidated theme manager from head
+            var themeManager = window.__sipbarTheme || { 
+                current: 'dark', 
+                key: 'sipbar-superadmin-theme' 
+            };
 
-            function applyTheme(isLight) {
+            // ── Apply theme to UI elements ──
+            function applyTheme(theme) {
+                var isLight = (theme === 'light');
+                
+                // Update HTML class
                 if (isLight) {
                     html.classList.add('light');
-                    if(sun)  sun.style.display  = 'block';
-                    if(moon) moon.style.display = 'none';
-                    if(btn)  btn.title = 'Mode Gelap (Alt+D)';
                 } else {
                     html.classList.remove('light');
-                    if(sun)  sun.style.display  = 'none';
-                    if(moon) moon.style.display = 'block';
-                    if(btn)  btn.title = 'Mode Terang (Alt+D)';
                 }
+                
+                // Update icons
+                if (sun && moon) {
+                    sun.style.display  = isLight ? 'block' : 'none';
+                    moon.style.display = isLight ? 'none' : 'block';
+                }
+                
+                // Update button title
+                if (btn) {
+                    btn.title = isLight ? 'Mode Gelap (Alt+D)' : 'Mode Terang (Alt+D)';
+                }
+                
+                // Update global state
+                themeManager.current = theme;
+                
+                // Debug log (remove in production)
+                console.log('[Theme] Applied:', theme);
             }
 
-            function toggle() {
-                var isLight = !html.classList.contains('light');
-                localStorage.setItem(KEY, isLight ? 'light' : 'dark');
-                applyTheme(isLight);
-                if(btn){ btn.style.transform='rotate(20deg) scale(.85)'; setTimeout(function(){btn.style.transform=''},250); }
+            // ── Toggle theme ──
+            function toggleTheme() {
+                var newTheme = (themeManager.current === 'light') ? 'dark' : 'light';
+                
+                // Save to localStorage
+                localStorage.setItem(themeManager.key, newTheme);
+                
+                // Apply immediately
+                applyTheme(newTheme);
+                
+                // Visual feedback
+                if (btn) {
+                    btn.style.transform = 'rotate(20deg) scale(.85)';
+                    setTimeout(function(){ btn.style.transform = ''; }, 250);
+                }
+                
+                console.log('[Theme] Toggled to:', newTheme);
             }
 
-            // Init from storage
-            var saved = localStorage.getItem(KEY);
-            applyTheme(saved === 'light');
+            // ── Initialize theme on page load ──
+            function initTheme() {
+                // Get theme from localStorage with system preference fallback
+                var saved = localStorage.getItem(themeManager.key);
+                var initialTheme;
+                
+                if (saved === 'light' || saved === 'dark') {
+                    initialTheme = saved;
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                    initialTheme = 'light';
+                } else {
+                    initialTheme = 'dark';
+                }
+                
+                applyTheme(initialTheme);
+                console.log('[Theme] Initialized:', initialTheme);
+            }
 
-            if(btn) btn.addEventListener('click', toggle);
-            document.addEventListener('keydown', function(e){ if(e.altKey && e.key==='d') toggle(); });
+            // ── Event Listeners ──
+            
+            // Click event
+            if (btn) {
+                btn.addEventListener('click', toggleTheme);
+            }
+            
+            // Keyboard shortcut (Alt+D)
+            document.addEventListener('keydown', function(e) {
+                if (e.altKey && e.key === 'd') {
+                    e.preventDefault();
+                    toggleTheme();
+                }
+            });
+
+            // ── Livewire Navigation Support ──
+            // Re-apply theme after Livewire navigates to new page
+            document.addEventListener('livewire:navigated', function() {
+                console.log('[Theme] Livewire navigated, re-applying theme');
+                initTheme();
+            });
+
+            // Turbo/Turbolinks support (if used)
+            document.addEventListener('turbo:load', function() {
+                console.log('[Theme] Turbo loaded, re-applying theme');
+                initTheme();
+            });
+
+            // ── System Preference Change Listener ──
+            // Auto-switch if user changes system dark mode preference
+            if (window.matchMedia) {
+                var darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                
+                // Only auto-switch if user hasn't explicitly set preference
+                darkModeQuery.addEventListener('change', function(e) {
+                    var saved = localStorage.getItem(themeManager.key);
+                    
+                    // Only auto-switch if no explicit preference saved
+                    if (!saved || saved === '') {
+                        var newTheme = e.matches ? 'dark' : 'light';
+                        console.log('[Theme] System preference changed to:', newTheme);
+                        applyTheme(newTheme);
+                    }
+                });
+            }
+
+            // ── Initialize on DOMContentLoaded (backup) ──
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initTheme);
+            } else {
+                initTheme();
+            }
         })();
     </script>
 </body>

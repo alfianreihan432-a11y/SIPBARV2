@@ -46,6 +46,9 @@ class InventoryManager extends Component
     public $asal_usul = '';
     public $harga = '';
 
+    // ── READONLY MODE for Superadmin ──
+    public bool $readonly = false;
+
     protected $rules = [
         'name' => 'required|string|min:3',
         'description' => 'nullable|string',
@@ -68,8 +71,9 @@ class InventoryManager extends Component
         'harga' => 'nullable|numeric|min:0',
     ];
 
-    public function mount(): void
+    public function mount(bool $readonly = false): void
     {
+        $this->readonly = $readonly;
         $this->loadItems();
     }
 
@@ -95,6 +99,12 @@ class InventoryManager extends Component
 
     public function toggleForm(): void
     {
+        // ── READONLY CHECK: Superadmin cannot toggle form ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk menambah inventaris. Halaman ini read-only.');
+            return;
+        }
+
         $this->showForm = !$this->showForm;
     }
 
@@ -154,6 +164,12 @@ class InventoryManager extends Component
 
     public function save(): void
     {
+        // ── READONLY CHECK: Superadmin cannot save ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk mengelola inventaris. Halaman ini read-only.');
+            return;
+        }
+
         $this->validate();
 
         $path = null;
@@ -198,6 +214,12 @@ class InventoryManager extends Component
 
     public function edit($id): void
     {
+        // ── READONLY CHECK: Superadmin cannot edit ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk mengedit inventaris. Halaman ini read-only.');
+            return;
+        }
+
         $item = Item::findOrFail($id);
         $this->editingId = $item->id;
         $this->showForm = true;
@@ -223,6 +245,12 @@ class InventoryManager extends Component
 
     public function delete($id): void
     {
+        // ── READONLY CHECK: Superadmin cannot delete ──
+        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+            session()->flash('error', 'Superadmin tidak memiliki izin untuk menghapus inventaris. Halaman ini read-only.');
+            return;
+        }
+
         Item::findOrFail($id)->delete();
         $this->loadItems();
         $this->dispatch('itemUpdated');
