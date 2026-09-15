@@ -10,18 +10,52 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\QrCode as EndroidQrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class StudentQRCodeController extends Controller
 {
     /**
-     * Generate (atau ambil yang sudah ada) dan kirim QR Code sebagai JSON
-     * untuk ditampilkan dalam modal siswa tanpa pindah halaman.
+     * Tampilkan halaman HTML view QR Code peminjaman siswa.
+     * Jika diakses via AJAX / JSON, otomatis fallback mengembalikan JSON.
      */
-    public function show(int $id): JsonResponse
+    public function show(int $id, Request $request): View|JsonResponse
+    {
+        $qrData = $this->getQRCodeData($id);
+
+        if ($qrData instanceof JsonResponse) {
+            return $qrData;
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json($qrData);
+        }
+
+        return view('pages.siswa.qr-result', $qrData);
+    }
+
+    /**
+     * Mengembalikan data QR Code sebagai JSON untuk AJAX modal.
+     */
+    public function data(int $id): JsonResponse
+    {
+        $qrData = $this->getQRCodeData($id);
+
+        if ($qrData instanceof JsonResponse) {
+            return $qrData;
+        }
+
+        return response()->json($qrData);
+    }
+
+    /**
+     * Helper privat untuk memproses dan mengambil data QR Code.
+     */
+    private function getQRCodeData(int $id): array|JsonResponse
     {
         // Ambil borrowing request milik siswa yang login
-        $borrowingRequest = BorrowingRequest::with('itemWithTrashed', 'user')
+        $borrowingRequest = BorrowingRequest::with('itemWithTrashed', 'user', 'qrCode')
             ->where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
@@ -42,7 +76,7 @@ class StudentQRCodeController extends Controller
             $token = Str::random(32);
 
             // Data yang di-encode dalam QR
-            $qrData = json_encode([
+            $qrDataString = json_encode([
                 'borrowing_id' => $borrowingRequest->id,
                 'user_id'      => $borrowingRequest->user_id,
                 'item_id'      => $borrowingRequest->item_id,
@@ -55,7 +89,7 @@ class StudentQRCodeController extends Controller
                 ['borrowing_request_id' => $borrowingRequest->id],
                 [
                     'code'       => $token,
-                    'data'       => $qrData,
+                    'data'       => $qrDataString,
                     'is_active'  => true,
                     'expires_at' => now()->addDays(7), // valid 7 hari
                 ]
@@ -77,14 +111,22 @@ class StudentQRCodeController extends Controller
         $writer = new PngWriter();
         $result = $writer->write($qrCode);
 
-        return response()->json([
+        $statusLabel = match($borrowingRequest->status) {
+            'approved' => 'Disetujui',
+            'qr_ready' => 'Siap Ambil',
+            'borrowed' => 'Sedang Dipinjam',
+            default    => ucfirst($borrowingRequest->status),
+        };
+
+        return [
             'success'      => true,
             'qr_image'     => $result->getDataUri(),
             'token'        => $qrCodeRecord->code,
             'item_name'    => $borrowingRequest->itemWithTrashed?->name ?? 'Barang tidak tersedia',
             'borrowing_id' => $borrowingRequest->id,
-            'expires_at'   => $qrCodeRecord->expires_at?->format('d M Y'),
+            'expires_at'   => $qrCodeRecord->expires_at?->format('d M Y, H:i'),
             'status'       => $borrowingRequest->status,
-        ]);
+            'status_label' => $statusLabel,
+        ];
     }
 }

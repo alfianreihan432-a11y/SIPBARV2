@@ -32,28 +32,7 @@
     $totalAlerts = $overdueBorrowings->count() + $dueSoonBorrowings->count() + $recentApprovals->count() + $recentRejections->count();
 @endphp
 
-{{-- QR Code Modal --}}
-<div id="qr-modal-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s ease">
-    <div id="qr-modal" style="background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center;transform:scale(.94) translateY(12px);transition:transform .28s cubic-bezier(.34,1.56,.64,1),opacity .25s;opacity:0;position:relative">
-        <button onclick="closeQRModal()" style="position:absolute;top:14px;right:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted)">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-        <div style="font-family:var(--font-head);font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px">QR Code Peminjaman</div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Tunjukkan kepada petugas saat mengambil barang</div>
-        <div id="qr-spinner" style="width:40px;height:40px;border:3px solid var(--border2);border-top-color:var(--primary);border-radius:50%;animation:qr-spin .7s linear infinite;margin:40px auto"></div>
-        <div id="qr-error" style="display:none;color:var(--s-rejected);font-size:13px;padding:16px;background:var(--s-rejected-bg);border-radius:10px;margin-bottom:12px"></div>
-        <div id="qr-img-wrap" style="display:none;width:260px;height:260px;margin:0 auto 16px;border-radius:14px;border:2px solid var(--border2);overflow:hidden;background:#fff">
-            <img id="qr-img" src="" alt="QR Code" style="width:100%;height:100%;object-fit:contain">
-        </div>
-        <div id="qr-item-name" style="font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px"></div>
-        <div id="qr-token" style="font-size:11px;color:var(--muted);font-family:monospace;background:var(--bg3);border-radius:6px;padding:4px 10px;display:inline-block;margin-bottom:14px;letter-spacing:.04em"></div>
-        <div style="font-size:12px;color:var(--muted);line-height:1.6;background:var(--primary-light);border:1px solid var(--primary-muted);border-radius:10px;padding:10px 14px;margin-bottom:12px;text-align:left">
-            Petugas inventaris akan men-scan QR Code ini untuk konfirmasi pengambilan barang.
-        </div>
-        <div id="qr-expires" style="font-size:11px;color:var(--subtle)"></div>
-    </div>
-</div>
-<style>@keyframes qr-spin{to{transform:rotate(360deg)}}</style>
+
 
 {{-- Page Header --}}
 <div class="page-header">
@@ -166,7 +145,7 @@
         </div>
         <div class="s-loan-right">
             <span class="s-badge s-badge--approved">Disetujui</span>
-            <button onclick="openQRModal({{ $approval->id }}, '{{ addslashes($approval->itemWithTrashed?->name ?? 'Barang') }}')" class="s-btn s-btn--sm s-btn--primary">
+            <button onclick="openQRModal({{ $approval->id }})" class="s-btn s-btn--sm s-btn--primary">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
                 QR Code
             </button>
@@ -258,69 +237,3 @@
 </div>
 @endif
 @endsection
-
-@push('scripts')
-<script>
-var qrOverlay  = document.getElementById('qr-modal-overlay');
-var qrModal    = document.getElementById('qr-modal');
-var qrImgWrap  = document.getElementById('qr-img-wrap');
-var qrImgEl    = document.getElementById('qr-img');
-var qrItemName = document.getElementById('qr-item-name');
-var qrToken    = document.getElementById('qr-token');
-var qrExpires  = document.getElementById('qr-expires');
-var qrSpinner  = document.getElementById('qr-spinner');
-var qrError    = document.getElementById('qr-error');
-
-function openQRModal(borrowingId, itemName) {
-    qrImgWrap.style.display = 'none';
-    qrSpinner.style.display = 'block';
-    qrError.style.display   = 'none';
-    qrItemName.textContent  = itemName;
-    qrToken.textContent     = '';
-    qrExpires.textContent   = '';
-
-    qrOverlay.style.opacity        = '1';
-    qrOverlay.style.pointerEvents  = 'all';
-    qrModal.style.opacity           = '1';
-    qrModal.style.transform         = 'scale(1) translateY(0)';
-    document.body.style.overflow    = 'hidden';
-
-    fetch('/siswa/peminjaman/' + borrowingId + '/qrcode', {
-        headers: {'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}
-    })
-    .then(function(r){return r.json();})
-    .then(function(data) {
-        qrSpinner.style.display = 'none';
-        if(data.success) {
-            qrImgEl.src = data.qr_image;
-            qrImgWrap.style.display = 'flex';
-            qrToken.textContent = '#' + data.borrowing_id + ' · ' + data.token.substring(0,8).toUpperCase() + '...';
-            qrExpires.textContent = data.expires_at ? 'Berlaku hingga: ' + data.expires_at : '';
-        } else {
-            qrError.style.display = 'block';
-            qrError.textContent = data.message || 'Gagal memuat QR Code.';
-        }
-    })
-    .catch(function() {
-        qrSpinner.style.display = 'none';
-        qrError.style.display = 'block';
-        qrError.textContent = 'Koneksi gagal. Coba lagi beberapa saat.';
-    });
-}
-
-function closeQRModal() {
-    qrOverlay.style.opacity       = '0';
-    qrOverlay.style.pointerEvents = 'none';
-    qrModal.style.opacity          = '0';
-    qrModal.style.transform        = 'scale(.94) translateY(12px)';
-    document.body.style.overflow   = '';
-}
-
-qrOverlay.addEventListener('click', function(e) {
-    if(e.target === qrOverlay) closeQRModal();
-});
-document.addEventListener('keydown', function(e) {
-    if(e.key === 'Escape') closeQRModal();
-});
-</script>
-@endpush

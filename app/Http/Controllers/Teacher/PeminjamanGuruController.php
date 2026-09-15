@@ -65,7 +65,12 @@ class PeminjamanGuruController extends Controller
         // Get all Kepala Jurusan users with their jurusan relationship
         $kepalaJurusans = User::whereHas('roles', function($query) {
             $query->where('name', 'kepala_jurusan');
-        })->whereNotNull('jurusan_id')->with('jurusan')->get();
+        })->whereNotNull('jurusan_id')->get();
+        
+        // Manually load jurusan relationship for each user
+        foreach ($kepalaJurusans as $kajur) {
+            $kajur->load('jurusan');
+        }
 
         // Get current user's jurusan for default selection
         $currentUserJurusan = Auth::user()->jurusan;
@@ -149,7 +154,12 @@ class PeminjamanGuruController extends Controller
         // Get all Kepala Jurusan users with their jurusan relationship
         $kepalaJurusans = User::whereHas('roles', function($query) {
             $query->where('name', 'kepala_jurusan');
-        })->whereNotNull('jurusan_id')->with('jurusan')->get();
+        })->whereNotNull('jurusan_id')->get();
+        
+        // Manually load jurusan relationship for each user
+        foreach ($kepalaJurusans as $kajur) {
+            $kajur->load('jurusan');
+        }
 
         // Get current user's jurusan for default selection
         $currentUserJurusan = Auth::user()->jurusan;

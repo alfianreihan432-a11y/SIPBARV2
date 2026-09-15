@@ -5,6 +5,9 @@ use App\Http\Controllers\Admin\AdminReturnController;
 use App\Http\Controllers\Admin\LaporanJurusanController;
 use App\Http\Controllers\Admin\LaporanAdminController;
 use App\Http\Controllers\Superadmin\LaporanAdminController as SuperadminLaporanAdminController;
+use App\Http\Controllers\Superadmin\SuperadminReportController;
+use App\Http\Controllers\Superadmin\SuperadminTeacherReportController;
+use App\Http\Controllers\Teacher\TeacherReportSendController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ItemImportController;
@@ -71,8 +74,8 @@ Route::get('/oauth/callback', [SipintuAuthController::class, 'callback'])->name(
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ─── ADMIN ONLY routes (role:admin required) ────────────────────────────
-    Route::middleware('role:admin')->group(function () {
+    // ─── ADMIN ONLY routes (role:admin or superadmin can access) ────────────
+    Route::middleware('role:admin|superadmin')->group(function () {
         // Inventory & barang
         Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
         Route::view('kelola-barang', 'pages.admin.kelola-barang')->name('kelola-barang.index');
@@ -96,6 +99,7 @@ Route::middleware(['auth'])->group(function () {
 
         // KIBB Import routes
         Route::prefix('items/import')->name('items.import.')->group(function () {
+            Route::get('template', [ItemImportController::class, 'downloadTemplate'])->name('template');
             Route::post('upload', [ItemImportController::class, 'upload'])->name('upload');
             Route::get('preview', [ItemImportController::class, 'preview'])->name('preview');
             Route::post('confirm', [ItemImportController::class, 'confirm'])->name('confirm');
@@ -146,8 +150,8 @@ Route::middleware(['auth'])->group(function () {
         Route::view('loans', 'pages.superadmin.loans')->name('loans');
         Route::get('returns', [AdminReturnController::class, 'index'])->name('returns');
 
-        // Reports (can approve/reject)
-        Route::view('reports', 'pages.superadmin.reports')->name('reports');
+        // Reports (System-wide statistics)
+        Route::get('reports', [SuperadminReportController::class, 'index'])->name('reports');
         Route::prefix('laporan-jurusan')->group(function () {
             Route::get('/', [LaporanJurusanController::class, 'index'])->name('laporan-jurusan');
             Route::get('/{id}', [LaporanJurusanController::class, 'show'])->name('laporan-jurusan.show');
@@ -162,6 +166,13 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{id}/approve', [SuperadminLaporanAdminController::class, 'approve'])->name('laporan-admin.approve');
             Route::post('/{id}/reject', [SuperadminLaporanAdminController::class, 'reject'])->name('laporan-admin.reject');
             Route::delete('/{id}', [SuperadminLaporanAdminController::class, 'destroy'])->name('laporan-admin.destroy');
+        });
+
+        // Teacher Reports (received from teachers)
+        Route::prefix('laporan-guru')->name('laporan-guru.')->group(function () {
+            Route::get('/', [SuperadminTeacherReportController::class, 'index'])->name('index');
+            Route::get('/{id}', [SuperadminTeacherReportController::class, 'show'])->name('show');
+            Route::delete('/{id}', [SuperadminTeacherReportController::class, 'destroy'])->name('destroy');
         });
 
         // Users & Settings
@@ -207,10 +218,13 @@ Route::middleware(['auth'])->group(function () {
     // Student profile photo routes
     Route::post('siswa/profil/foto', [SettingsController::class, 'updateProfilePhoto'])->name('student.profile.photo.update');
     Route::delete('siswa/profil/foto', [SettingsController::class, 'deleteProfilePhoto'])->name('student.profile.photo.delete');
+    Route::post('siswa/profil/phone', [SettingsController::class, 'updatePhone'])->name('student.profile.phone.update');
 
     // Student QR Code — generate/tampilkan QR untuk peminjaman yang disetujui
     Route::get('siswa/peminjaman/{id}/qrcode', [StudentQRCodeController::class, 'show'])
         ->name('student.qrcode.show');
+    Route::get('siswa/peminjaman/{id}/qrcode/data', [StudentQRCodeController::class, 'data'])
+        ->name('student.qrcode.data');
 
     // Admin QR Verification — verifikasi token QR saat scan & konfirmasi pengambilan
     Route::middleware('role:admin')->group(function () {
@@ -291,6 +305,7 @@ Route::middleware(['auth'])->group(function () {
     Route::view('guru/peminjaman-aktif', 'pages.guru.loans')->name('teacher.loans');
     Route::view('guru/pengembalian', 'pages.guru.returns')->name('teacher.returns');
     Route::view('guru/laporan', 'pages.guru.reports')->name('teacher.reports');
+    Route::post('guru/laporan/kirim', [TeacherReportSendController::class, 'store'])->name('teacher.reports.send')->middleware('role:guru');
     Route::view('guru/profil', 'pages.guru.profile')->name('teacher.profile');
 
     // Kepala Jurusan routes
@@ -311,11 +326,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('profil', [KepalaJurusanController::class, 'profile'])->name('profile');
         Route::post('profil/foto', [SettingsController::class, 'updateProfilePhoto'])->name('profile.photo.update');
         Route::delete('profil/foto', [SettingsController::class, 'deleteProfilePhoto'])->name('profile.photo.delete');
+        Route::post('profil/phone', [SettingsController::class, 'updatePhone'])->name('profile.phone.update');
     });
 
     // Teacher profile photo routes
     Route::post('guru/profil/foto', [SettingsController::class, 'updateProfilePhoto'])->name('teacher.profile.photo.update');
     Route::delete('guru/profil/foto', [SettingsController::class, 'deleteProfilePhoto'])->name('teacher.profile.photo.delete');
+    Route::post('guru/profil/phone', [SettingsController::class, 'updatePhone'])->name('teacher.profile.phone.update');
 
     // ─── Notification & Message APIs ───
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');

@@ -537,7 +537,7 @@
     <aside class="sidebar" id="sidebar">
         <a href="{{ route('superadmin.dashboard') }}" class="sidebar-brand">
             <div class="sidebar-logo-wrap">
-                <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+                <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
             </div>
             <div>
                 <div class="brand-name">SIPBAR</div>
@@ -612,6 +612,17 @@
             <a href="{{ route('superadmin.laporan-admin') }}" class="nav-item {{ request()->routeIs('superadmin.laporan-admin*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Laporan dari Admin
+            </a>
+
+            @php
+                $unreadTeacherReportCount = \App\Models\LaporanGuru::where('status', 'belum_dibaca')->count();
+            @endphp
+            <a href="{{ route('superadmin.laporan-guru.index') }}" class="nav-item {{ request()->routeIs('superadmin.laporan-guru*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                Laporan Guru
+                @if($unreadTeacherReportCount > 0)
+                <span class="nav-badge" style="background:var(--color-warning);color:#0f172a;">{{ $unreadTeacherReportCount }}</span>
+                @endif
             </a>
 
             <a href="{{ route('superadmin.statistics') }}" class="nav-item {{ request()->routeIs('superadmin.statistics') ? 'active' : '' }}">

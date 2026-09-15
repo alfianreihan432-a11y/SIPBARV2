@@ -112,10 +112,10 @@
                     </div>
                     @if(in_array($request->status, ['approved', 'qr_ready']))
                         <div style="margin-top:10px">
-                            <a href="{{ route('student.qrcode.show', $request->id) }}" class="s-btn s-btn--sm s-btn--primary" target="_blank">
+                            <button type="button" onclick="openQRModal({{ $request->id }})" class="s-btn s-btn--sm s-btn--primary">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-5v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V8a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1zm12 0h2a1 1 0 001-1V8a1 1 0 00-1-1h-2a1 1 0 00-1 1v1a1 1 0 001 1zM5 20h2a1 1 0 001-1v-1a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1z"/></svg>
                                 Lihat QR Code
-                            </a>
+                            </button>
                         </div>
                     @elseif($request->status === 'pending')
                         @php

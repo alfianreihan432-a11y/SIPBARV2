@@ -228,7 +228,7 @@
     <div class="login-card">
         {{-- Logo container at top-center --}}
         <div class="logo-container">
-            <img src="/build/assets/logosmkn.png" alt="Logo SMKN 1 Bangsri" class="logo-img">
+            <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="logo-img">
             <a href="{{ route('home') }}" class="back-link">
                 Kembali ke Beranda
             </a>

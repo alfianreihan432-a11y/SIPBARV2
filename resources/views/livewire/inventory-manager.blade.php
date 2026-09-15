@@ -672,100 +672,404 @@
         @endif
     </div>
 
-    {{-- Import Modal --}}
-    <div id="importModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-[9999]">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
-            <!-- Header -->
-            <div class="border-b border-gray-200 px-6 py-4 bg-white rounded-t-xl">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-xl font-bold text-gray-900">Import Data KIBB</h2>
-                    <button onclick="closeImportModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    {{-- ── REDESIGNED KIBB IMPORT MODAL ───────────────────────── --}}
+    <div id="importModal" class="fixed inset-0 hidden items-center justify-center p-4 z-[99999]" style="background:rgba(0,0,0,0.65);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all .25s ease" onclick="if(event.target===this) closeImportModal()">
+        <div class="w-full max-w-xl mx-auto overflow-hidden animate-in fade-in zoom-in-95 duration-200" style="background:var(--bg-card);border:1px solid var(--border-alt);border-radius:22px;box-shadow:0 25px 60px -15px rgba(0,0,0,0.45);display:flex;flex-direction:column;max-height:90vh">
+            
+            {{-- Modal Header --}}
+            <div style="padding:20px 24px 18px;border-bottom:1px solid var(--border-alt);display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--bg-card)">
+                <div style="display:flex;align-items:center;gap:14px">
+                    <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 6px 16px rgba(16,185,129,0.3);flex-shrink:0">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                    </button>
+                    </div>
+                    <div>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <h2 style="font-size:18px;font-weight:800;color:var(--text-primary);margin:0;line-height:1.2">Import Data KIBB</h2>
+                            <span style="font-size:10px;font-weight:700;letter-spacing:.05em;padding:3px 8px;border-radius:999px;background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25);text-transform:uppercase">Excel .xlsx</span>
+                        </div>
+                        <p style="font-size:12.5px;color:var(--text-muted);margin:3px 0 0;line-height:1.3">Impor massal data inventaris aset dari lembar kerja Excel KIBB.</p>
+                    </div>
                 </div>
+                <button type="button" onclick="closeImportModal()" style="background:var(--input-bg);border:1px solid var(--border-alt);border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;transition:all .15s;flex-shrink:0" onmouseover="this.style.color='var(--text-primary)';this.style.borderColor='var(--blue)'" onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-alt)'">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
-            <!-- Body -->
-            <div class="px-6 py-4">
-                <form id="uploadForm" onsubmit="handleUpload(event)">
-                    @csrf
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">File Excel <span class="text-red-500">*</span></label>
-                        <input type="file" name="file" accept=".xlsx,.xls" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <p class="text-xs text-gray-500 mt-2">Format KIBB dengan sheet "KIBB". Maksimal ukuran 10MB.</p>
+            {{-- Modal Body (Scrollable if needed) --}}
+            <div style="padding:22px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:18px">
+                
+                {{-- Template Download Callout --}}
+                <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.22);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <div style="width:32px;height:32px;border-radius:8px;background:rgba(59,130,246,0.15);color:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div style="font-size:12.5px;font-weight:700;color:var(--text-primary)">Belum punya format Excel yang sesuai?</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Gunakan template KIBB resmi dengan kolom dan sheet yang telah dikonfigurasi.</div>
+                        </div>
                     </div>
-                    <div id="uploadError" class="hidden mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700"></div>
-                    <div id="uploadSuccess" class="hidden mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700"></div>
-                    <div class="flex gap-3">
-                        <button type="button" onclick="closeImportModal()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Batal</button>
-                        <button type="submit" id="uploadBtn" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Import</button>
+                    <a href="{{ route('items.import.template') }}" download style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;background:var(--blue);color:#fff;border-radius:9px;font-size:11.5px;font-weight:700;text-decoration:none;transition:all .18s;box-shadow:0 3px 8px rgba(37,99,235,0.25)" onmouseover="this.style.opacity='.9';this.style.transform='translateY(-1px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span>Download Template</span>
+                    </a>
+                </div>
+
+                {{-- Upload Form --}}
+                <form id="kibbUploadForm" onsubmit="handleKibbUpload(event)">
+                    @csrf
+                    
+                    {{-- Hidden Native File Input --}}
+                    <input type="file" id="kibbFileInput" name="file" accept=".xlsx,.xls" style="display:none" onchange="handleKibbFileSelected(this)">
+
+                    {{-- Drag & Drop Area --}}
+                    <div id="kibbDropzone" onclick="document.getElementById('kibbFileInput').click()" style="border:2px dashed var(--input-border);border-radius:16px;padding:26px 20px;text-align:center;cursor:pointer;background:var(--input-bg);transition:all .2s ease;position:relative" ondragover="handleKibbDragOver(event)" ondragleave="handleKibbDragLeave(event)" ondrop="handleKibbDrop(event)">
+                        
+                        {{-- Empty State --}}
+                        <div id="kibbDropzoneEmpty" style="display:flex;flex-direction:column;align-items:center;gap:10px">
+                            <div style="width:52px;height:52px;border-radius:16px;background:rgba(59,130,246,0.1);color:var(--blue);display:flex;align-items:center;justify-content:center;transition:transform .2s">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div style="font-size:13.5px;font-weight:700;color:var(--text-primary)">
+                                    Tarik & lepas file Excel di sini, atau <span style="color:var(--blue);text-decoration:underline">Pilih File</span>
+                                </div>
+                                <div style="font-size:11.5px;color:var(--text-muted);margin-top:3px">
+                                    Mendukung format <strong>.xlsx</strong> dan <strong>.xls</strong> (Maksimal 10 MB)
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Selected File State --}}
+                        <div id="kibbDropzoneSelected" style="display:none;align-items:center;justify-content:space-between;gap:12px;background:var(--bg-card);border:1px solid var(--border-alt);border-radius:12px;padding:12px 14px">
+                            <div style="display:flex;align-items:center;gap:12px;overflow:hidden">
+                                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;letter-spacing:.05em;flex-shrink:0">
+                                    XLSX
+                                </div>
+                                <div style="text-align:left;overflow:hidden">
+                                    <div id="kibbSelectedFileName" style="font-size:13px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                                        nama_file.xlsx
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+                                        <span id="kibbSelectedFileSize" style="font-size:11px;color:var(--text-muted)">0 KB</span>
+                                        <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(16,185,129,0.12);color:#10b981;font-weight:700">Siap Diimpor</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="event.stopPropagation(); resetKibbFileSelection()" style="background:rgba(239,68,68,0.1);color:#ef4444;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all .15s" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                <span>Ganti</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Format Requirements Info Box --}}
+                    <div style="background:var(--input-bg);border:1px solid var(--border-alt);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:11.5px;color:var(--text-muted)">
+                        <div style="font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:6px">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:var(--blue)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Ketentuan Import KIBB:</span>
+                        </div>
+                        <ul style="margin:0;padding-left:20px;line-height:1.6;list-style-type:disc">
+                            <li>File harus memiliki sheet aktif bernama <strong style="color:var(--text-primary)">"KIBB"</strong>.</li>
+                            <li>Kolom wajib: <strong style="color:var(--text-primary)">Kode Barang</strong> dan <strong style="color:var(--text-primary)">Jenis Barang / Nama Barang</strong>.</li>
+                            <li>Baris dengan Kode KIBB yang sudah ada di inventaris akan dilewati secara otomatis (mencegah duplikasi).</li>
+                        </ul>
+                    </div>
+
+                    {{-- Feedback / Result Container --}}
+                    <div id="kibbResultContainer" style="display:none;margin-top:14px;display:flex;flex-direction:column;gap:10px">
+                        {{-- Injected dynamically via JS --}}
+                    </div>
+
+                    {{-- Loading Overlay / Indicator --}}
+                    <div id="kibbLoadingIndicator" style="display:none;align-items:center;justify-content:center;gap:12px;padding:18px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:12px;margin-top:14px">
+                        <svg class="animate-spin" style="width:22px;height:22px;color:var(--blue)" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <div>
+                            <div style="font-size:13px;font-weight:700;color:var(--text-primary)">Memproses & Mengimpor Data...</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Sistem sedang membaca sheet KIBB dan memetakan data barang ke inventaris.</div>
+                        </div>
+                    </div>
+
+                    {{-- Modal Footer Actions --}}
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border-alt)">
+                        <button type="button" id="kibbCancelBtn" onclick="closeImportModal()" style="padding:10px 18px;border-radius:10px;background:var(--input-bg);border:1.5px solid var(--border-alt);font-size:13px;font-weight:700;color:var(--text-primary);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border-alt)'">
+                            Batal
+                        </button>
+                        <button type="submit" id="kibbSubmitBtn" style="padding:10px 22px;border-radius:10px;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 100%);border:none;font-size:13px;font-weight:700;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(37,99,235,0.3);transition:all .18s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(37,99,235,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(37,99,235,0.3)'">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            <span>Mulai Import</span>
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
+    {{-- KIBB Import Script --}}
     <script>
         function openImportModal() {
-            document.getElementById('importModal').classList.remove('hidden');
-            document.getElementById('importModal').classList.add('flex');
-            document.getElementById('uploadForm').reset();
-            document.getElementById('uploadError').classList.add('hidden');
-            document.getElementById('uploadSuccess').classList.add('hidden');
+            const modal = document.getElementById('importModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            resetKibbImportState();
         }
 
         function closeImportModal() {
-            document.getElementById('importModal').classList.add('hidden');
-            document.getElementById('importModal').classList.remove('flex');
+            const modal = document.getElementById('importModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            resetKibbImportState();
         }
 
-        async function handleUpload(event) {
+        function resetKibbImportState() {
+            document.getElementById('kibbUploadForm').reset();
+            resetKibbFileSelection();
+            const resultBox = document.getElementById('kibbResultContainer');
+            resultBox.innerHTML = '';
+            resultBox.style.display = 'none';
+            document.getElementById('kibbLoadingIndicator').style.display = 'none';
+            document.getElementById('kibbSubmitBtn').disabled = false;
+            document.getElementById('kibbCancelBtn').disabled = false;
+            document.getElementById('kibbSubmitBtn').innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span>Mulai Import</span>
+            `;
+        }
+
+        function formatKibbFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function handleKibbFileSelected(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                document.getElementById('kibbDropzoneEmpty').style.display = 'none';
+                const selectedBox = document.getElementById('kibbDropzoneSelected');
+                selectedBox.style.display = 'flex';
+                document.getElementById('kibbSelectedFileName').textContent = file.name;
+                document.getElementById('kibbSelectedFileSize').textContent = formatKibbFileSize(file.size);
+                
+                // Clear any previous error messages
+                const resultBox = document.getElementById('kibbResultContainer');
+                resultBox.innerHTML = '';
+                resultBox.style.display = 'none';
+            }
+        }
+
+        function resetKibbFileSelection() {
+            const input = document.getElementById('kibbFileInput');
+            input.value = '';
+            document.getElementById('kibbDropzoneEmpty').style.display = 'flex';
+            document.getElementById('kibbDropzoneSelected').style.display = 'none';
+        }
+
+        function handleKibbDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropzone = document.getElementById('kibbDropzone');
+            dropzone.style.borderColor = 'var(--blue)';
+            dropzone.style.background = 'rgba(59,130,246,0.08)';
+        }
+
+        function handleKibbDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropzone = document.getElementById('kibbDropzone');
+            dropzone.style.borderColor = 'var(--input-border)';
+            dropzone.style.background = 'var(--input-bg)';
+        }
+
+        function handleKibbDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropzone = document.getElementById('kibbDropzone');
+            dropzone.style.borderColor = 'var(--input-border)';
+            dropzone.style.background = 'var(--input-bg)';
+
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                const input = document.getElementById('kibbFileInput');
+                input.files = e.dataTransfer.files;
+                handleKibbFileSelected(input);
+            }
+        }
+
+        async function handleKibbUpload(event) {
             event.preventDefault();
             const form = event.target;
+            const fileInput = document.getElementById('kibbFileInput');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Silakan pilih atau tarik file Excel KIBB terlebih dahulu.');
+                return;
+            }
+
             const formData = new FormData(form);
-            const errorDiv = document.getElementById('uploadError');
-            const successDiv = document.getElementById('uploadSuccess');
-            const uploadBtn = document.getElementById('uploadBtn');
+            const submitBtn = document.getElementById('kibbSubmitBtn');
+            const cancelBtn = document.getElementById('kibbCancelBtn');
+            const loadingIndicator = document.getElementById('kibbLoadingIndicator');
+            const resultBox = document.getElementById('kibbResultContainer');
+
+            // Set Loading UI
+            submitBtn.disabled = true;
+            cancelBtn.disabled = true;
+            loadingIndicator.style.display = 'flex';
+            resultBox.innerHTML = '';
+            resultBox.style.display = 'none';
 
             try {
-                uploadBtn.disabled = true;
-                uploadBtn.textContent = 'Importing...';
-
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+                
                 const response = await fetch('{{ route('items.import.upload') }}', {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
                     },
                     body: formData
                 });
 
                 const data = await response.json();
 
-                if (data.success) {
-                    successDiv.textContent = data.message;
-                    successDiv.classList.remove('hidden');
-                    errorDiv.classList.add('hidden');
-                    
-                    // Refresh Livewire component after 2 seconds
-                    setTimeout(() => {
+                loadingIndicator.style.display = 'none';
+                resultBox.style.display = 'flex';
+
+                if (response.ok && data.success) {
+                    let resultHtml = `
+                        <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px">
+                            <div style="width:28px;height:28px;border-radius:8px;background:#10b981;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div style="flex:1">
+                                <div style="font-size:13.5px;font-weight:800;color:#10b981">Import Berhasil Dilakukan!</div>
+                                <div style="font-size:12px;color:var(--text-primary);margin-top:2px">${data.message || ''}</div>
+                                <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+                                    <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(16,185,129,0.2);color:#059669">
+                                        ✓ ${data.success_count || 0} Berhasil
+                                    </span>
+                                    ${data.skipped_count > 0 ? `
+                                        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(245,158,11,0.2);color:#d97706">
+                                            ℹ ${data.skipped_count} Dilewati
+                                        </span>
+                                    ` : ''}
+                                    ${data.error_count > 0 ? `
+                                        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(239,68,68,0.2);color:#dc2626">
+                                            ⚠ ${data.error_count} Gagal
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // If there are skipped rows or errors, show detail accordion
+                    if ((data.skipped && data.skipped.length > 0) || (data.errors && data.errors.length > 0)) {
+                        resultHtml += `
+                            <div style="background:var(--input-bg);border:1px solid var(--border-alt);border-radius:10px;padding:10px 14px;max-height:140px;overflow-y:auto;font-size:11.5px">
+                                <div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">Rincian Baris Data:</div>
+                        `;
+
+                        if (data.skipped && data.skipped.length > 0) {
+                            data.skipped.forEach(s => {
+                                resultHtml += `<div style="color:#d97706;margin-bottom:3px">• Baris ${s.row}: ${s.reason}</div>`;
+                            });
+                        }
+
+                        if (data.errors && data.errors.length > 0) {
+                            data.errors.forEach(e => {
+                                const reason = typeof e === 'object' ? (e.reason || JSON.stringify(e)) : e;
+                                const row = typeof e === 'object' && e.row ? `Baris ${e.row}: ` : '';
+                                resultHtml += `<div style="color:#dc2626;margin-bottom:3px">• ${row}${reason}</div>`;
+                            });
+                        }
+
+                        resultHtml += `</div>`;
+                    }
+
+                    resultBox.innerHTML = resultHtml;
+
+                    // Trigger Livewire refresh
+                    if (window.Livewire) {
+                        Livewire.dispatch('itemUpdated');
+                    }
+
+                    // Transform submit button into "Selesai" button
+                    submitBtn.disabled = false;
+                    cancelBtn.disabled = false;
+                    submitBtn.innerHTML = `<span>Selesai</span>`;
+                    submitBtn.onclick = function(e) {
+                        e.preventDefault();
                         closeImportModal();
-                        @this.$refresh();
-                    }, 2000);
+                    };
+
                 } else {
-                    errorDiv.textContent = data.error || 'Gagal memproses file';
-                    errorDiv.classList.remove('hidden');
-                    successDiv.classList.add('hidden');
+                    // Handle Error response
+                    const errorMsg = data.error || (data.errors && data.errors.length > 0 ? (typeof data.errors[0] === 'object' ? data.errors[0].reason : data.errors[0]) : 'Gagal memproses file Excel.');
+                    
+                    let errorHtml = `
+                        <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px">
+                            <div style="width:28px;height:28px;border-radius:8px;background:#ef4444;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <div style="flex:1">
+                                <div style="font-size:13.5px;font-weight:800;color:#ef4444">Import Gagal / Tidak Valid</div>
+                                <div style="font-size:12px;color:var(--text-primary);margin-top:2px">${errorMsg}</div>
+                            </div>
+                        </div>
+                    `;
+
+                    resultBox.innerHTML = errorHtml;
+                    submitBtn.disabled = false;
+                    cancelBtn.disabled = false;
                 }
-            } catch (error) {
-                errorDiv.textContent = 'Terjadi kesalahan saat upload: ' + error.message;
-                errorDiv.classList.remove('hidden');
-                successDiv.classList.add('hidden');
-            } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.textContent = 'Import';
+            } catch (err) {
+                loadingIndicator.style.display = 'none';
+                resultBox.style.display = 'flex';
+                resultBox.innerHTML = `
+                    <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px">
+                        <div style="width:28px;height:28px;border-radius:8px;background:#ef4444;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </div>
+                        <div style="flex:1">
+                            <div style="font-size:13.5px;font-weight:800;color:#ef4444">Kesalahan Jaringan / Server</div>
+                            <div style="font-size:12px;color:var(--text-primary);margin-top:2px">${err.message || 'Terjadi gangguan komunikasi dengan server.'}</div>
+                        </div>
+                    </div>
+                `;
+                submitBtn.disabled = false;
+                cancelBtn.disabled = false;
             }
         }
     </script>

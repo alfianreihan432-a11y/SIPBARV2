@@ -180,12 +180,21 @@
         border: 1px solid var(--border);
         border-radius: 8px;
         font-size: 13px;
-        background: var(--input-bg);
-        color: var(--text);
+        background: var(--input-bg) !important;
+        color: var(--text) !important;
         outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        color-scheme: light;
+    }
+    html.dark .form-select {
+        color: var(--text) !important;
+        background: var(--input-bg) !important;
+        color-scheme: dark;
     }
     .form-select:focus {
         border-color: var(--accent);
+        color: var(--text) !important;
     }
     .modal-actions {
         display: flex;

@@ -233,6 +233,28 @@
                     {{ auth()->check() ? \Carbon\Carbon::parse(auth()->user()->created_at)->format('d M Y') : '-' }}
                 </div>
             </div>
+            <div class="info-item" style="position:relative">
+                <div class="info-label">Nomor WhatsApp</div>
+                <div class="info-value" id="phoneDisplay">
+                    {{ auth()->check() && auth()->user()->phone ? auth()->user()->phone : 'Belum diisi' }}
+                </div>
+                <button onclick="togglePhoneEdit()" style="position:absolute;top:16px;right:16px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    Edit
+                </button>
+                <div id="phoneEditForm" style="display:none;margin-top:12px">
+                    <form onsubmit="updatePhone(event)">
+                        <div style="display:flex;gap:8px;align-items:flex-start">
+                            <div style="flex:1">
+                                <input type="tel" id="phoneInput" name="phone" value="{{ auth()->check() ? auth()->user()->phone : '' }}" placeholder="08xx-xxxx-xxxx" style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:8px;font-size:13px;background:var(--bg3);color:var(--text);outline:none" pattern="[0-9]{10,13}" title="Nomor telepon harus 10-13 digit">
+                                <small style="display:block;margin-top:4px;font-size:11px;color:var(--muted)">Format: 08xxxxxxxxxx (tanpa +62 atau 62)</small>
+                            </div>
+                            <button type="submit" style="padding:10px 16px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">Simpan</button>
+                            <button type="button" onclick="togglePhoneEdit()" style="padding:10px 16px;background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -249,6 +271,85 @@
 </div>
 
 <script>
+function togglePhoneEdit() {
+    const display = document.getElementById('phoneDisplay');
+    const form = document.getElementById('phoneEditForm');
+    
+    if (form.style.display === 'none') {
+        display.style.display = 'none';
+        form.style.display = 'block';
+        document.getElementById('phoneInput').focus();
+    } else {
+        display.style.display = 'block';
+        form.style.display = 'none';
+    }
+}
+
+function updatePhone(event) {
+    event.preventDefault();
+    
+    const phoneInput = document.getElementById('phoneInput');
+    const phone = phoneInput.value.trim();
+    
+    // Validate phone number
+    if (phone && !/^[0-9]{10,13}$/.test(phone)) {
+        alert('Nomor telepon harus 10-13 digit angka');
+        return;
+    }
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (!csrfToken) {
+        alert('CSRF token tidak ditemukan. Silakan refresh halaman.');
+        return;
+    }
+    
+    // Create FormData
+    const formData = new FormData();
+    formData.append('phone', phone);
+    formData.append('_token', csrfToken);
+    
+    // Show loading state
+    const submitBtn = event.target.querySelector('[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Menyimpan...';
+    submitBtn.disabled = true;
+    
+    // Send AJAX request
+    fetch('{{ route("teacher.profile.phone.update") }}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.status === 419) {
+            throw new Error('CSRF token expired. Silakan refresh halaman.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Update display
+            document.getElementById('phoneDisplay').textContent = phone || 'Belum diisi';
+            togglePhoneEdit();
+            alert('Nomor WhatsApp berhasil diperbarui!');
+        } else {
+            alert(data.message || 'Gagal memperbarui nomor WhatsApp');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(error.message || 'Terjadi kesalahan saat memperbarui nomor WhatsApp');
+    })
+    .finally(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
 function previewAndUpload(input) {
     if (input.files && input.files[0]) {
         const file = input.files[0];

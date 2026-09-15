@@ -80,16 +80,25 @@
     }
     .form-select {
         padding: 8px 12px;
-        border: 1px solid #f0d5da;
+        border: 1px solid var(--border);
         border-radius: 8px;
         font-size: 13px;
-        background: #ffffff;
-        color: #0f172a;
+        background: var(--input-bg) !important;
+        color: var(--text) !important;
         outline: none;
         min-width: 130px;
+        appearance: none;
+        -webkit-appearance: none;
+        color-scheme: light;
+    }
+    html.dark .form-select {
+        color: var(--text) !important;
+        background: var(--input-bg) !important;
+        color-scheme: dark;
     }
     .form-select:focus {
-        border-color: var(--accent);
+        border-color: var(--primary);
+        color: var(--text) !important;
     }
     .filter-btn {
         padding: 8px 16px;

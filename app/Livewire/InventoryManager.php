@@ -183,27 +183,31 @@ class InventoryManager extends Component
             'category_id' => $this->category_id ?: null,
             'location_id' => $this->location_id ?: null,
             'supplier_id' => $this->supplier_id ?: null,
-            'brand' => $this->brand,
-            'type' => $this->type,
-            'purchase_year' => $this->purchase_year ?: null,
-            'price' => $this->price ?: 0,
+            'brand' => $this->brand ?: null,
+            'type' => $this->type ?: null,
+            'purchase_year' => $this->tahun_pembelian ?: ($this->purchase_year ?: null),
+            'tahun_pembelian' => $this->tahun_pembelian ?: ($this->purchase_year ?: null),
+            'price' => $this->harga ?: ($this->price ?: 0),
+            'harga' => $this->harga ?: ($this->price ?: 0),
             'condition' => $this->condition,
             'status' => $this->status,
             'stock' => $this->stock,
-            'photo_path' => $path,
-            'code' => strtoupper('BRG-'.substr(md5(uniqid()), 0, 6)),
-            'inventory_number' => $this->generateInventoryNumber(),
             'nomor_registrasi' => $this->nomor_registrasi ?: null,
+            'nomor_reg' => $this->nomor_registrasi ?: null,
             'ukuran' => $this->ukuran ?: null,
             'bahan' => $this->bahan ?: null,
-            'tahun_pembelian' => $this->tahun_pembelian ?: null,
             'asal_usul' => $this->asal_usul ?: null,
-            'harga' => $this->harga ?: null,
         ];
+
+        if ($path) {
+            $data['photo_path'] = $path;
+        }
 
         if ($this->editingId) {
             Item::findOrFail($this->editingId)->update($data);
         } else {
+            $data['code'] = strtoupper('BRG-'.substr(md5(uniqid()), 0, 6));
+            $data['inventory_number'] = $this->generateInventoryNumber();
             Item::create($data);
         }
 
@@ -215,7 +219,7 @@ class InventoryManager extends Component
     public function edit($id): void
     {
         // ── READONLY CHECK: Superadmin cannot edit ──
-        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+        if ($this->readonly || auth()->user()?->hasRole('superadmin')) {
             session()->flash('error', 'Superadmin tidak memiliki izin untuk mengedit inventaris. Halaman ini read-only.');
             return;
         }
@@ -230,23 +234,23 @@ class InventoryManager extends Component
         $this->supplier_id = $item->supplier_id;
         $this->brand = $item->brand;
         $this->type = $item->type;
-        $this->purchase_year = $item->purchase_year;
-        $this->price = $item->price;
+        $this->purchase_year = $item->purchase_year ?: $item->tahun_pembelian;
+        $this->price = $item->price ?: $item->harga;
         $this->condition = $item->condition;
         $this->status = $item->status;
         $this->stock = $item->stock;
-        $this->nomor_registrasi = $item->nomor_registrasi;
+        $this->nomor_registrasi = $item->nomor_registrasi ?: $item->nomor_reg;
         $this->ukuran = $item->ukuran;
         $this->bahan = $item->bahan;
-        $this->tahun_pembelian = $item->tahun_pembelian;
+        $this->tahun_pembelian = $item->tahun_pembelian ?: $item->purchase_year;
         $this->asal_usul = $item->asal_usul;
-        $this->harga = $item->harga;
+        $this->harga = $item->harga ?: $item->price;
     }
 
     public function delete($id): void
     {
         // ── READONLY CHECK: Superadmin cannot delete ──
-        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
+        if ($this->readonly || auth()->user()?->hasRole('superadmin')) {
             session()->flash('error', 'Superadmin tidak memiliki izin untuk menghapus inventaris. Halaman ini read-only.');
             return;
         }

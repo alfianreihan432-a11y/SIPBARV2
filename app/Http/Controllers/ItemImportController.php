@@ -8,241 +8,363 @@ use App\Models\Item;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Session;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ItemImportController extends Controller
 {
+    /**
+     * Download the official KIBB Excel Template
+     */
+    public function downloadTemplate(): StreamedResponse
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('KIBB');
+
+        // Headers
+        $headers = [
+            'A1' => 'No',
+            'B1' => 'Kode Barang',
+            'C1' => 'Jenis Barang / Nama Barang',
+            'D1' => 'Nomor Register',
+            'E1' => 'Merk / Type',
+            'F1' => 'Ukuran / CC',
+            'G1' => 'Bahan',
+            'H1' => 'Warna',
+            'I1' => 'Tahun Pembelian',
+            'J1' => 'Nomor Pabrik',
+            'K1' => 'Nomor Rangka',
+            'L1' => 'Nomor Mesin',
+            'M1' => 'Nomor Polisi',
+            'N1' => 'Nomor BPKB',
+            'O1' => 'Asal Usul',
+            'P1' => 'Harga (Rp)',
+            'Q1' => 'Keterangan',
+        ];
+
+        foreach ($headers as $cell => $value) {
+            $sheet->setCellValue($cell, $value);
+        }
+
+        // Header Styling
+        $headerStyle = [
+            'font' => [
+                'bold'  => true,
+                'color' => ['rgb' => 'FFFFFF'],
+                'size'  => 11,
+                'name'  => 'Segoe UI',
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            'fill' => [
+                'fillType'   => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '1D4ED8'], // Blue-700
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color'       => ['rgb' => '93C5FD'],
+                ],
+            ],
+        ];
+        $sheet->getStyle('A1:Q1')->applyFromArray($headerStyle);
+        $sheet->getRowDimension(1)->setRowHeight(32);
+
+        // Sample Data Rows
+        $sampleData = [
+            [
+                1,
+                '11.01.33.20.010101.00009.00314.2024-1.3.2.03.03.05.024',
+                'Laptop Asus Vivobook 14',
+                '0001',
+                'ASUS - Vivobook 14 Core i5',
+                '14 Inch',
+                'Aluminium / Plastik',
+                'Silver',
+                2024,
+                'PB-ASUS-99881',
+                '-',
+                '-',
+                '-',
+                '-',
+                'Pembelian APBD',
+                8500000,
+                'Gedung A - R. R-201 (Lt. 2)',
+            ],
+            [
+                2,
+                '11.01.33.20.010101.00009.00315.2023-1.3.2.03.03.05.025',
+                'Proyektor Epson EB-X500',
+                '0002',
+                'Epson - EB-X500 3600 Lumens',
+                '30x23 cm',
+                'Plastik Keras',
+                'Putih',
+                2023,
+                'PB-EPS-44122',
+                '-',
+                '-',
+                '-',
+                '-',
+                'Dana BOS',
+                6200000,
+                'Gedung A - R. R-201 (Lt. 2)',
+            ],
+            [
+                3,
+                '11.01.33.20.010101.00009.00316.2024-1.3.2.03.03.05.026',
+                'Meja Guru Kayu Jati',
+                '0003',
+                'Kayu Jati Grade A',
+                '120x60x75 cm',
+                'Kayu Jati',
+                'Coklat Natural',
+                2024,
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                'Pembelian Sekolah',
+                1500000,
+                'Gedung A - R. R-201 (Lt. 2)',
+            ],
+            [
+                4,
+                '11.01.33.20.010101.00009.00317.2024-1.3.2.03.03.05.027',
+                'Printer Canon PIXMA G2010',
+                '0004',
+                'Canon - PIXMA G2010 All-in-One',
+                '44x33 cm',
+                'Plastik ABS',
+                'Hitam',
+                2024,
+                'PB-CAN-77112',
+                '-',
+                '-',
+                '-',
+                '-',
+                'Dana BOS',
+                2400000,
+                'Gedung A - R. R-201 (Lt. 2)',
+            ],
+        ];
+
+        $rowIdx = 2;
+        foreach ($sampleData as $row) {
+            $colLetter = 'A';
+            foreach ($row as $val) {
+                $sheet->setCellValue($colLetter . $rowIdx, $val);
+                $colLetter++;
+            }
+            $sheet->getRowDimension($rowIdx)->setRowHeight(24);
+            $rowIdx++;
+        }
+
+        // Data Rows Styling
+        $dataStyle = [
+            'font' => [
+                'size' => 10,
+                'name' => 'Segoe UI',
+            ],
+            'alignment' => [
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color'       => ['rgb' => 'E2E8F0'],
+                ],
+            ],
+        ];
+        $sheet->getStyle('A2:Q' . ($rowIdx - 1))->applyFromArray($dataStyle);
+
+        // Center align specific columns (No, Kode, Reg, Tahun)
+        $sheet->getStyle('A2:A' . ($rowIdx - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('D2:D' . ($rowIdx - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('I2:I' . ($rowIdx - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('P2:P' . ($rowIdx - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+        // Auto-fit column widths
+        foreach (range('A', 'Q') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'template-import-kibb-' . date('Ymd') . '.xlsx';
+
+        return response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, $filename, [
+            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Cache-Control'       => 'max-age=0',
+        ]);
+    }
+
+    /**
+     * Upload & Process KIBB Excel File
+     */
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls|max:10240',
+            'file' => 'required|file|mimes:xlsx,xls|max:10240',
+        ], [
+            'file.required' => 'File Excel wajib dipilih.',
+            'file.mimes'    => 'File harus berformat Excel (.xlsx atau .xls).',
+            'file.max'      => 'Ukuran file maksimal adalah 10MB.',
         ]);
 
         try {
-            $import = new KibbImport();
-            
-            // Load the file and find the KIBB sheet (exact match by name)
-            $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($request->file('file')->getPathname());
-            $reader->setReadDataOnly(true);
-            $spreadsheet = $reader->load($request->file('file')->getPathname());
+            $uploadedFile = $request->file('file');
+            $pathname = $uploadedFile->getPathname();
 
-            // Get sheet by exact name using loop with index
-            $kibbSheet = null;
+            // Load spreadsheet
+            $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($pathname);
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($pathname);
+
+            // Find sheet named "KIBB" (case-insensitive & trimmed)
             $kibbSheetIndex = null;
             $sheetNames = $spreadsheet->getSheetNames();
-            \Log::info('KIBB Import - Available sheets: ' . implode(', ', $sheetNames));
-            error_log('KIBB Import - Available sheets: ' . implode(', ', $sheetNames));
 
-            foreach ($sheetNames as $i => $name) {
-                $trimmedName = trim($name);
-                $upperName = strtoupper($trimmedName);
-                \Log::info("KIBB Import - Checking index $i: \"$name\" (trimmed: \"$trimmedName\", upper: \"$upperName\")");
-                error_log("KIBB Import - Checking index $i: \"$name\" (trimmed: \"$trimmedName\", upper: \"$upperName\")");
-
-                if ($upperName === 'KIBB') {
-                    $kibbSheet = $spreadsheet->getSheet($i);
-                    $kibbSheetIndex = $i;
-                    \Log::info("KIBB Import - MATCH FOUND at index $i: \"$name\"");
-                    error_log("KIBB Import - MATCH FOUND at index $i: \"$name\"");
+            foreach ($sheetNames as $idx => $name) {
+                if (strcasecmp(trim($name), 'KIBB') === 0) {
+                    $kibbSheetIndex = $idx;
                     break;
                 }
             }
 
-            if ($kibbSheet === null) {
-                \Log::error('KIBB Import - Sheet KIBB not found. Available: ' . implode(', ', $sheetNames));
-                error_log('KIBB Import - Sheet KIBB not found. Available: ' . implode(', ', $sheetNames));
+            if ($kibbSheetIndex === null) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'Sheet "KIBB" tidak ditemukan dalam file Excel. Sheet yang tersedia: ' . implode(', ', $sheetNames),
-                    'debug_sheet_selected' => 'NONE',
-                ], 400);
+                    'error'   => 'Sheet bernama "KIBB" tidak ditemukan dalam file Excel. Sheet yang terdeteksi: [' . implode(', ', $sheetNames) . ']. Silakan pastikan nama sheet adalah "KIBB" atau unduh Template Excel yang disediakan.',
+                ], 422);
             }
 
-            // Get the actual sheet name from the sheet object
-            $actualSheetName = $kibbSheet->getTitle();
-            \Log::info('KIBB Import - Selected sheet at index ' . $kibbSheetIndex . ': ' . $actualSheetName);
-            error_log('KIBB Import - Selected sheet at index ' . $kibbSheetIndex . ': ' . $actualSheetName);
-
-            // Extract data directly from the selected sheet
+            // Extract rows from KIBB sheet
             $worksheet = $spreadsheet->getSheet($kibbSheetIndex);
-            $dataArray = $worksheet->toArray();
+            $dataArray = $worksheet->toArray(null, true, false, false);
             $collection = new \Illuminate\Support\Collection($dataArray);
 
-            \Log::info('KIBB Import - Extracted ' . count($collection) . ' rows from sheet');
-            error_log('KIBB Import - Extracted ' . count($collection) . ' rows from sheet');
-
-            // Process the collection directly and save to DB
+            $import = new KibbImport();
             $import->collection($collection);
 
             $previewData = $import->getPreviewData();
-            $errors = $import->getErrors();
-            $skipped = $import->getSkipped();
+            $errors      = $import->getErrors();
+            $skipped     = $import->getSkipped();
 
-            // Get default category, location, and condition
-            $defaultCategory = Category::where('name', 'Umum')->first();
-            $defaultLocation = Location::where('building', 'Gudang Inventaris')->first();
+            if (empty($previewData) && empty($errors) && empty($skipped)) {
+                return response()->json([
+                    'success' => false,
+                    'error'   => 'Tidak ada data barang yang ditemukan pada sheet "KIBB". Pastikan baris data tidak kosong.',
+                ], 422);
+            }
 
-            // Save items to database
-            DB::beginTransaction();
+            // Fallback default category
+            $defaultCategory = Category::firstOrCreate(
+                ['name' => 'Umum'],
+                ['icon' => '📦', 'color' => '#2563eb', 'description' => 'Kategori umum']
+            );
+
+            // Insert items to DB
             $successCount = 0;
             $errorCount = 0;
             $errorMessages = [];
 
-            try {
-                foreach ($previewData as $itemData) {
-                    try {
-                        $code = strtoupper('BRG-' . substr(md5(uniqid()), 0, 6));
-                        $inventoryNumber = $this->generateInventoryNumber();
-
-                        Item::create([
-                            'code' => $code,
-                            'inventory_number' => $inventoryNumber,
-                            'name' => $itemData['name'] ?? 'Tanpa Nama',
-                            'description' => $itemData['description'] ?? '',
-                            'category_id' => $itemData['category_id'] ?? $defaultCategory?->id,
-                            'location_id' => $itemData['location_id'] ?? $defaultLocation?->id,
-                            'condition' => 'Baik',
-                            'status' => 'Tersedia',
-                            'quantity' => 1,
-                            'needs_review' => $itemData['needs_review'] ?? false,
-                            'kode_kibb' => $itemData['kode_kibb'] ?? null,
-                        ]);
-
-                        $successCount++;
-                    } catch (\Exception $e) {
-                        $errorCount++;
-                        $errorMessages[] = "Baris {$itemData['row']}: " . $e->getMessage();
-                    }
-                }
-
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return response()->json([
-                    'success' => false,
-                    'error' => 'Gagal menyimpan data: ' . $e->getMessage(),
-                ], 400);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => "{$successCount} barang berhasil diimport. " . ($errorCount > 0 ? "{$errorCount} gagal." : ''),
-                'success_count' => $successCount,
-                'error_count' => $errorCount,
-                'errors' => $errorMessages,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e->getMessage(),
-            ], 400);
-        }
-    }
-
-    public function preview()
-    {
-        // This method is no longer needed for the new flow
-        // Preview is now handled via JSON response from upload()
-        return response()->json(['error' => 'Use upload endpoint instead'], 400);
-    }
-
-    public function confirm(Request $request)
-    {
-        $batchId = $request->input('batch_id');
-        $sessionData = Session::get($batchId);
-
-        if (!$sessionData || empty($sessionData['preview'])) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Sesi import tidak ditemukan atau sudah kadaluarsa.',
-            ], 400);
-        }
-
-        $previewData = $sessionData['preview'];
-        $skipped = $sessionData['skipped'];
-
-        // Get updated data from request (user may have edited category/location)
-        $updatedData = $request->input('items', []);
-
-        // Ensure default category exists
-        $defaultCategory = Category::firstOrCreate(
-            ['name' => 'Belum Dikategorikan'],
-            ['icon' => '📦', 'color' => '#9ca3af', 'description' => 'Kategori default untuk barang yang belum dikategorikan']
-        );
-
-        $successCount = 0;
-        $errorCount = 0;
-        $errorMessages = [];
-
-        DB::beginTransaction();
-
-        try {
-            foreach ($previewData as $index => $itemData) {
+            foreach ($previewData as $itemData) {
                 try {
-                    // Apply user edits if any
-                    $categoryId = $itemData['category_id'];
-                    $locationId = $itemData['location_id'];
-
-                    if (isset($updatedData[$index])) {
-                        $categoryId = $updatedData[$index]['category_id'] ?: null;
-                        $locationId = $updatedData[$index]['location_id'] ?: null;
-                    }
-
-                    // Use default category if null
-                    if (!$categoryId) {
-                        $categoryId = $defaultCategory->id;
-                    }
-
-                    // Generate code and inventory_number using existing logic
-                    $code = strtoupper('BRG-' . substr(md5(uniqid()), 0, 6));
+                    $code = strtoupper('BRG-' . substr(md5(uniqid((string)mt_rand(), true)), 0, 6));
                     $inventoryNumber = $this->generateInventoryNumber();
 
-                    // Create item
                     Item::create([
-                        'code' => $code,
+                        'code'             => $code,
                         'inventory_number' => $inventoryNumber,
-                        'name' => $itemData['name'],
-                        'description' => $itemData['description'],
-                        'category_id' => $categoryId,
-                        'location_id' => $locationId,
-                        'brand' => $itemData['merk'],
-                        'type' => $itemData['tipe'],
-                        'purchase_year' => $itemData['purchase_year'],
-                        'price' => $itemData['price'],
-                        'condition' => $itemData['condition'],
-                        'status' => $itemData['status'],
-                        'stock' => $itemData['stock'],
-                        'kode_kibb' => $itemData['kode_kibb'],
-                        'nomor_reg' => $itemData['nomor_reg'],
+                        'name'             => $itemData['name'] ?? 'Tanpa Nama',
+                        'kode_kibb'        => $itemData['kode_kibb'] ?? null,
+                        'nomor_reg'        => $itemData['nomor_reg'] ?? null,
+                        'nomor_registrasi' => $itemData['nomor_registrasi'] ?? ($itemData['nomor_reg'] ?? null),
+                        'brand'            => $itemData['brand'] ?? null,
+                        'type'             => $itemData['type'] ?? null,
+                        'ukuran'           => $itemData['ukuran'] ?? null,
+                        'bahan'            => $itemData['bahan'] ?? null,
+                        'purchase_year'    => $itemData['purchase_year'] ?? null,
+                        'tahun_pembelian'  => $itemData['tahun_pembelian'] ?? ($itemData['purchase_year'] ?? null),
+                        'price'            => $itemData['price'] ?? 0,
+                        'harga'            => $itemData['harga'] ?? ($itemData['price'] ?? 0),
+                        'asal_usul'        => $itemData['asal_usul'] ?? null,
+                        'condition'        => $itemData['condition'] ?? 'Baik',
+                        'status'           => $itemData['status'] ?? 'Tersedia',
+                        'stock'            => $itemData['stock'] ?? 1,
+                        'description'      => $itemData['description'] ?? '',
+                        'category_id'      => $itemData['category_id'] ?? $defaultCategory->id,
+                        'location_id'      => $itemData['location_id'] ?? null,
                     ]);
 
                     $successCount++;
                 } catch (\Exception $e) {
                     $errorCount++;
-                    $errorMessages[] = "Baris {$itemData['row']}: " . $e->getMessage();
+                    $errorMessages[] = [
+                        'row'    => $itemData['row'] ?? '-',
+                        'reason' => 'Gagal menyimpan data barang (' . ($itemData['name'] ?? '-') . '): ' . $e->getMessage(),
+                    ];
                 }
             }
 
-            DB::commit();
+            $allErrors = array_merge($errors, $errorMessages);
+            $isSuccess = $successCount > 0;
 
-            // Clear session
-            Session::forget($batchId);
+            $messageParts = [];
+            if ($successCount > 0) {
+                $messageParts[] = "{$successCount} barang berhasil diimpor.";
+            }
+            if (count($skipped) > 0) {
+                $messageParts[] = count($skipped) . " barang dilewati (duplikat).";
+            }
+            if (count($allErrors) > 0) {
+                $messageParts[] = count($allErrors) . " baris bermasalah / gagal.";
+            }
+
+            $message = !empty($messageParts) ? implode(' ', $messageParts) : 'Tidak ada data yang diproses.';
 
             return response()->json([
-                'success' => true,
+                'success'       => $isSuccess,
+                'message'       => $message,
                 'success_count' => $successCount,
                 'skipped_count' => count($skipped),
-                'error_count' => $errorCount,
-                'error_messages' => $errorMessages,
+                'error_count'   => count($allErrors),
+                'errors'        => $allErrors,
+                'skipped'       => $skipped,
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
+            \Log::error('KIBB Import Exception: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,
-                'error' => 'Gagal menyimpan data: ' . $e->getMessage(),
+                'error'   => 'Terjadi kesalahan saat memproses file: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function preview()
+    {
+        return response()->json(['error' => 'Use upload endpoint instead'], 400);
+    }
+
+    public function confirm(Request $request)
+    {
+        return response()->json(['error' => 'Direct import is handled via upload endpoint'], 400);
+    }
+
+    public function cancel(Request $request)
+    {
+        return response()->json(['success' => true]);
     }
 
     protected function generateInventoryNumber(): string
@@ -258,15 +380,6 @@ class ItemImportController extends Controller
             $number = 1;
         }
 
-        return 'INV-' . str_pad($number, 4, '0', STR_PAD_LEFT);
-    }
-
-    public function cancel(Request $request)
-    {
-        $batchId = $request->input('batch_id');
-        if ($batchId) {
-            Session::forget($batchId);
-        }
-        return response()->json(['success' => true]);
+        return 'INV-' . str_pad((string)$number, 4, '0', STR_PAD_LEFT);
     }
 }

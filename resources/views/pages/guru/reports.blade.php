@@ -271,6 +271,13 @@
 </style>
 
 <div>
+    @if(session('success'))
+    <div style="margin-bottom:18px;padding:12px 16px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);color:#059669;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        {{ session('success') }}
+    </div>
+    @endif
+
     {{-- Page Header --}}
     <div class="page-header">
         <div class="page-header-content">
@@ -278,10 +285,11 @@
                 <h1 class="page-title">Laporan & Statistik</h1>
                 <p class="page-subtitle">Ringkasan peminjaman siswa bimbingan Anda</p>
             </div>
-            <div class="page-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:var(--accent)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <button type="button" onclick="openSendReportModal()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--accent,#2563eb);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 8px rgba(37,99,235,0.25);">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    Kirim Laporan ke Admin
+                </button>
             </div>
         </div>
     </div>
@@ -480,4 +488,77 @@
     </div>
     @endif
 </div>
+
+{{-- Modal Konfirmasi Kirim Laporan ke Admin --}}
+<div id="sendReportModal" style="position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s ease">
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:18px;max-width:480px;width:100%;padding:24px;position:relative;box-shadow:0 20px 40px rgba(0,0,0,.25);transform:scale(.94);transition:transform .25s ease">
+        <button type="button" onclick="closeSendReportModal()" style="position:absolute;top:16px;right:16px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted)">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">Kirim Laporan ke Super Admin</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:20px">Snapshot data statistik berikut akan dikirimkan secara langsung ke sistem Super Admin.</div>
+
+        <form method="POST" action="{{ route('teacher.reports.send') }}">
+            @csrf
+
+            {{-- Ringkasan Snapshot --}}
+            <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:14px;margin-bottom:18px">
+                <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Ringkasan Laporan</div>
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;font-size:12.5px">
+                    <div>
+                        <span style="color:var(--muted)">Periode:</span>
+                        <div style="font-weight:700;color:var(--text)">Bulan {{ now()->translatedFormat('F Y') }}</div>
+                    </div>
+                    <div>
+                        <span style="color:var(--muted)">Total Pengajuan:</span>
+                        <div style="font-weight:700;color:var(--text)">{{ $totalRequests }} transaksi</div>
+                    </div>
+                    <div>
+                        <span style="color:var(--muted)">Siswa Aktif:</span>
+                        <div style="font-weight:700;color:var(--text)">{{ $activeStudents }} siswa</div>
+                    </div>
+                    <div>
+                        <span style="color:var(--muted)">Status Selesai:</span>
+                        <div style="font-weight:700;color:#10b981">{{ $completedRequests }} ({{ round($totalRequests > 0 ? ($completedRequests / $totalRequests) * 100 : 0) }}%)</div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Catatan Opsional --}}
+            <div style="margin-bottom:20px">
+                <label style="display:block;font-size:12.5px;font-weight:600;color:var(--text);margin-bottom:6px">Catatan / Pesan Tambahan (Opsional)</label>
+                <textarea name="catatan" rows="3" placeholder="Tuliskan pesan atau catatan khusus untuk Super Admin..." style="width:100%;padding:10px 12px;background:var(--input-bg,#fff);border:1px solid var(--border2);border-radius:10px;font-size:13px;color:var(--text);font-family:inherit;outline:none;resize:vertical"></textarea>
+            </div>
+
+            {{-- Tombol Aksi --}}
+            <div style="display:flex;justify-content:flex-end;gap:10px">
+                <button type="button" onclick="closeSendReportModal()" style="padding:9px 16px;background:var(--bg3);border:1px solid var(--border2);border-radius:9px;font-size:12.5px;font-weight:600;color:var(--text);cursor:pointer">
+                    Batal
+                </button>
+                <button type="submit" style="padding:9px 18px;background:var(--accent,#2563eb);border:none;border-radius:9px;font-size:12.5px;font-weight:700;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    Kirim Sekarang
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openSendReportModal() {
+    var modal = document.getElementById('sendReportModal');
+    if(!modal) return;
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'all';
+    modal.querySelector('div').style.transform = 'scale(1)';
+}
+function closeSendReportModal() {
+    var modal = document.getElementById('sendReportModal');
+    if(!modal) return;
+    modal.style.opacity = '0';
+    modal.style.pointerEvents = 'none';
+    modal.querySelector('div').style.transform = 'scale(.94)';
+}
+</script>
 @endsection

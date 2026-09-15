@@ -223,6 +223,23 @@
                 <div class="info-lbl">Status Akun</div>
                 <div class="info-val" style="color:#10b981">✓ Aktif</div>
             </div>
+            <div class="info-row" style="position:relative">
+                <div class="info-lbl">Nomor WhatsApp</div>
+                <div class="info-val" id="phoneDisplay">{{ $user->phone ?? 'Belum diisi' }}</div>
+                <button onclick="togglePhoneEdit()" style="position:absolute;top:14px;right:14px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                    Edit
+                </button>
+                <div id="phoneEditForm" style="display:none;margin-top:10px">
+                    <form onsubmit="updatePhone(event)">
+                        <div style="display:flex;gap:6px;align-items:flex-start">
+                            <input type="tel" id="phoneInput" name="phone" value="{{ $user->phone ?? '' }}" placeholder="08xx-xxxx-xxxx" style="flex:1;padding:8px 10px;border:1px solid #f2dbe0;border-radius:7px;font-size:13px;background:#fff;color:#0f172a;outline:none" pattern="[0-9]{10,13}" title="10-13 digit">
+                            <button type="submit" style="padding:8px 12px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">Simpan</button>
+                            <button type="button" onclick="togglePhoneEdit()" style="padding:8px 12px;background:#fdf6f7;color:#0f172a;border:1px solid #f2dbe0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">Batal</button>
+                        </div>
+                        <small style="display:block;margin-top:4px;font-size:10px;color:#64748b">Format: 08xxxxxxxxxx</small>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -254,6 +271,61 @@
 </div>
 
 <script>
+function togglePhoneEdit() {
+    const display = document.getElementById('phoneDisplay');
+    const form = document.getElementById('phoneEditForm');
+    if (form.style.display === 'none') {
+        display.style.display = 'none';
+        form.style.display = 'block';
+        document.getElementById('phoneInput').focus();
+    } else {
+        display.style.display = 'block';
+        form.style.display = 'none';
+    }
+}
+
+function updatePhone(event) {
+    event.preventDefault();
+    const phoneInput = document.getElementById('phoneInput');
+    const phone = phoneInput.value.trim();
+    if (phone && !/^[0-9]{10,13}$/.test(phone)) {
+        alert('Nomor telepon harus 10-13 digit angka');
+        return;
+    }
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (!csrf) { alert('CSRF token tidak ditemukan. Refresh halaman.'); return; }
+    const fd = new FormData();
+    fd.append('phone', phone);
+    fd.append('_token', csrf);
+    const btn = event.target.querySelector('[type="submit"]');
+    const orig = btn.textContent;
+    btn.textContent = 'Menyimpan...';
+    btn.disabled = true;
+    fetch('{{ route("kajur.profile.phone.update") }}', {
+        method: 'POST',
+        body: fd,
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+    })
+    .then(r => {
+        if (r.status === 419) throw new Error('CSRF expired. Refresh halaman.');
+        return r.json();
+    })
+    .then(data => {
+        if (data.success) {
+            document.getElementById('phoneDisplay').textContent = phone || 'Belum diisi';
+            togglePhoneEdit();
+            alert('Nomor WhatsApp berhasil diperbarui!');
+        } else {
+            alert(data.message || 'Gagal memperbarui');
+        }
+    })
+    .catch(err => alert(err.message || 'Terjadi kesalahan'))
+    .finally(() => {
+        btn.textContent = orig;
+        btn.disabled = false;
+    });
+}
+
 function uploadAvatar(input) {
     if (!input.files || !input.files[0]) return;
     const file = input.files[0];

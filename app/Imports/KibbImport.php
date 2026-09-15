@@ -15,91 +15,154 @@ class KibbImport implements ToCollection
     protected $skipped = [];
     protected $categories = [];
     protected $locations = [];
-    protected $currentSheetName = '';
 
     public function __construct()
     {
         $this->categories = Category::all()->pluck('name', 'id')->toArray();
-        $this->locations = Location::all()->pluck('name', 'id')->toArray();
+        
+        $this->locations = Location::all()->mapWithKeys(function ($loc) {
+            $parts = array_filter([$loc->building, $loc->room ? "R. {$loc->room}" : null, $loc->floor ? "Lt. {$loc->floor}" : null]);
+            return [$loc->id => implode(' - ', $parts)];
+        })->toArray();
     }
 
     public function collection(Collection $collection): void
     {
-        // Log for verification
         \Log::info('KIBB Import - Processing collection with ' . count($collection) . ' rows');
 
-        // Find header row with "Kode Barang" AND "Jenis Barang" to avoid empty merged cell rows
-        $headerRow = null;
-        $searchTerm1 = 'kode barang';
-        $searchTerm2 = 'jenis barang';
+        if ($collection->isEmpty()) {
+            throw new \Exception('File Excel tidak memiliki data.');
+        }
 
-        // Collect debug info for first 15 rows
-        $headerDebugInfo = "First 15 rows (all cells):\n";
+        // 1. Find Header Row
+        $headerRowIndex = null;
+        $columnMap = [];
 
         foreach ($collection as $index => $row) {
-            $hasKodeBarang = false;
-            $hasJenisBarang = false;
+            $rowValues = array_map(function ($val) {
+                return strtolower(trim(preg_replace('/\r\n|\r|\n/', ' ', (string) $val)));
+            }, is_array($row) ? $row : $row->toArray());
 
-            // Debug: collect cell values for first 15 rows
-            if ($index < 15) {
-                $cellValues = [];
-                foreach ($row as $cell) {
-                    $cellValue = (string) $cell;
-                    $cellValue = trim($cellValue);
-                    $cellValue = preg_replace('/\r\n|\r|\n/', ' ', $cellValue);
-                    if (strlen($cellValue) > 0) {
-                        $cellValues[] = "\"$cellValue\"";
+            $hasKode = false;
+            $hasNama = false;
+
+            foreach ($rowValues as $colIdx => $val) {
+                if (stripos($val, 'kode barang') !== false || stripos($val, 'kode_barang') !== false || $val === 'kode') {
+                    $hasKode = true;
+                }
+                if (stripos($val, 'jenis barang') !== false || stripos($val, 'nama barang') !== false || stripos($val, 'nama') !== false || stripos($val, 'uraian') !== false) {
+                    $hasNama = true;
+                }
+            }
+
+            if ($hasKode && $hasNama) {
+                $headerRowIndex = $index;
+                // Build dynamic column map based on header names
+                foreach ($rowValues as $colIdx => $val) {
+                    if (stripos($val, 'kode barang') !== false || stripos($val, 'kode_barang') !== false || $val === 'kode') {
+                        $columnMap['kode_barang'] = $colIdx;
+                    } elseif (stripos($val, 'jenis barang') !== false || stripos($val, 'nama barang') !== false || stripos($val, 'nama') !== false || stripos($val, 'uraian') !== false) {
+                        $columnMap['nama_barang'] = $colIdx;
+                    } elseif (stripos($val, 'reg') !== false || stripos($val, 'register') !== false) {
+                        $columnMap['nomor_reg'] = $colIdx;
+                    } elseif (stripos($val, 'merk') !== false || stripos($val, 'type') !== false || stripos($val, 'tipe') !== false) {
+                        $columnMap['merk_type'] = $colIdx;
+                    } elseif (stripos($val, 'ukuran') !== false || stripos($val, 'cc') !== false) {
+                        $columnMap['ukuran'] = $colIdx;
+                    } elseif (stripos($val, 'bahan') !== false) {
+                        $columnMap['bahan'] = $colIdx;
+                    } elseif (stripos($val, 'warna') !== false) {
+                        $columnMap['warna'] = $colIdx;
+                    } elseif (stripos($val, 'tahun') !== false) {
+                        $columnMap['tahun'] = $colIdx;
+                    } elseif (stripos($val, 'pabrik') !== false) {
+                        $columnMap['no_pabrik'] = $colIdx;
+                    } elseif (stripos($val, 'rangka') !== false) {
+                        $columnMap['no_rangka'] = $colIdx;
+                    } elseif (stripos($val, 'mesin') !== false) {
+                        $columnMap['no_mesin'] = $colIdx;
+                    } elseif (stripos($val, 'polisi') !== false) {
+                        $columnMap['no_polisi'] = $colIdx;
+                    } elseif (stripos($val, 'bpkb') !== false) {
+                        $columnMap['no_bpkb'] = $colIdx;
+                    } elseif (stripos($val, 'asal') !== false || stripos($val, 'perolehan') !== false) {
+                        $columnMap['asal_usul'] = $colIdx;
+                    } elseif (stripos($val, 'harga') !== false || stripos($val, 'nilai') !== false) {
+                        $columnMap['harga'] = $colIdx;
+                    } elseif (stripos($val, 'keterangan') !== false || stripos($val, 'ket') !== false || stripos($val, 'lokasi') !== false) {
+                        $columnMap['keterangan'] = $colIdx;
                     }
                 }
-                $headerDebugInfo .= "Row $index: [" . implode(', ', $cellValues) . "]\n";
-            }
-
-            foreach ($row as $cell) {
-                // Normalize cell value: cast to string, trim, replace line breaks
-                $cellValue = (string) $cell;
-                $cellValue = trim($cellValue);
-                $cellValue = preg_replace('/\r\n|\r|\n/', ' ', $cellValue);
-                $cellValueLower = strtolower($cellValue);
-
-                if (stripos($cellValueLower, $searchTerm1) !== false) {
-                    $hasKodeBarang = true;
-                }
-                if (stripos($cellValueLower, $searchTerm2) !== false) {
-                    $hasJenisBarang = true;
-                }
-
-                if ($hasKodeBarang && $hasJenisBarang) {
-                    $headerRow = $index;
-                    break 2;
-                }
+                break;
             }
         }
 
-        if ($headerRow === null) {
-            throw new \Exception('Header "Kode Barang" dan "Jenis Barang" tidak ditemukan dalam file Excel. Pastikan sheet KIBB memiliki header tabel dengan kolom tersebut.' . "\n\n" . $headerDebugInfo);
+        // Fallback default column indexes if header not found by exact string
+        if ($headerRowIndex === null) {
+            $headerRowIndex = 0;
+            $columnMap = [
+                'kode_barang' => 1,
+                'nama_barang' => 2,
+                'nomor_reg'   => 3,
+                'merk_type'   => 4,
+                'ukuran'      => 5,
+                'bahan'       => 6,
+                'warna'       => 7,
+                'tahun'       => 8,
+                'no_pabrik'   => 9,
+                'no_rangka'   => 10,
+                'no_mesin'    => 11,
+                'no_polisi'   => 12,
+                'no_bpkb'     => 13,
+                'asal_usul'   => 14,
+                'harga'       => 15,
+                'keterangan'  => 16,
+            ];
         }
 
-        \Log::info('KIBB Import - Header row found at: ' . $headerRow);
-        error_log('KIBB Import - Header row found at: ' . $headerRow);
+        // Set default column positions if any missing
+        $defaultMap = [
+            'kode_barang' => 1,
+            'nama_barang' => 2,
+            'nomor_reg'   => 3,
+            'merk_type'   => 4,
+            'ukuran'      => 5,
+            'bahan'       => 6,
+            'warna'       => 7,
+            'tahun'       => 8,
+            'no_pabrik'   => 9,
+            'no_rangka'   => 10,
+            'no_mesin'    => 11,
+            'no_polisi'   => 12,
+            'no_bpkb'     => 13,
+            'asal_usul'   => 14,
+            'harga'       => 15,
+            'keterangan'  => 16,
+        ];
+        $columnMap = array_merge($defaultMap, $columnMap);
 
-        // Find data start row using BMN code pattern matching
-        $dataStartRow = null;
-        for ($i = $headerRow + 1; $i < count($collection); $i++) {
-            $row = $collection[$i];
-            $kodeBarang = trim((string) ($row[1] ?? ''));
-            $jenisBarang = trim((string) ($row[2] ?? ''));
+        // 2. Iterate through data rows
+        $dataStartRow = $headerRowIndex + 1;
+        $totalRows = count($collection);
 
-            // Skip if either is empty
-            if (empty($kodeBarang) || empty($jenisBarang)) {
+        for ($i = $dataStartRow; $i < $totalRows; $i++) {
+            $row = is_array($collection[$i]) ? $collection[$i] : $collection[$i]->toArray();
+            $rowNumber = $i + 1;
+
+            // Check if entire row is empty
+            $nonEmptyCells = array_filter($row, fn($c) => trim((string)$c) !== '');
+            if (empty($nonEmptyCells)) {
                 continue;
             }
 
-            // Skip sub-header rows (Pabrik, Rangka, Mesin, Polisi, BPKB)
-            $subHeaderKeywords = ['pabrik', 'rangka', 'mesin', 'polisi', 'bpkb'];
+            $kodeBarang = trim((string) ($row[$columnMap['kode_barang']] ?? ''));
+            $namaBarang = trim((string) ($row[$columnMap['nama_barang']] ?? ''));
+
+            // Check if this is a subheader row or index row
+            $subHeaderKeywords = ['pabrik', 'rangka', 'mesin', 'polisi', 'bpkb', 'bertengger', 'bertengggar', 'sub rincian'];
             $isSubHeader = false;
-            foreach ($subHeaderKeywords as $keyword) {
-                if (stripos(strtolower($kodeBarang), $keyword) !== false || 
-                    stripos(strtolower($jenisBarang), $keyword) !== false) {
+            foreach ($subHeaderKeywords as $kw) {
+                if (stripos($kodeBarang, $kw) !== false || stripos($namaBarang, $kw) !== false) {
                     $isSubHeader = true;
                     break;
                 }
@@ -108,217 +171,199 @@ class KibbImport implements ToCollection
                 continue;
             }
 
-            // Skip if kode barang is just a number (index row like 1, 2, 3, etc)
-            if (is_numeric($kodeBarang) && strlen($kodeBarang) <= 3) {
+            // Skip numbering row where columns are just 1, 2, 3...
+            if (is_numeric($kodeBarang) && (int)$kodeBarang <= 20 && is_numeric($namaBarang) && (int)$namaBarang <= 20) {
                 continue;
             }
 
-            // Skip if jenis barang is just a number
-            if (is_numeric($jenisBarang) && strlen($jenisBarang) <= 3) {
-                continue;
-            }
-
-            // Check if kode barang matches BMN code pattern (contains dots and/or dashes, length > 10)
-            // Example: "11.01.33.20.010101.00009.00314.2026-1.3.2.03.03.05.024"
-            $hasDots = strpos($kodeBarang, '.') !== false;
-            $hasDashes = strpos($kodeBarang, '-') !== false;
-            $isBmnCode = ($hasDots || $hasDashes) && strlen($kodeBarang) > 10;
-
-            // Check if this looks like data row
-            // Criteria: BMN code pattern OR (code length > 5 AND name length > 3)
-            if ($isBmnCode || (strlen($kodeBarang) > 5 && strlen($jenisBarang) > 3)) {
-                // Ensure it's not the header row itself
-                $headerText = trim((string) ($collection[$headerRow][1] ?? ''));
-                if (strcasecmp($kodeBarang, $headerText) !== 0) {
-                    $dataStartRow = $i;
+            // Skip summary/footer rows
+            $footerKeywords = ['jumlah', 'total', 'mengetahui', 'kepala sekolah', 'pengurus barang', 'nip.'];
+            $isFooter = false;
+            foreach ($footerKeywords as $kw) {
+                if (stripos($kodeBarang, $kw) !== false || stripos($namaBarang, $kw) !== false) {
+                    $isFooter = true;
                     break;
                 }
             }
-        }
-
-        if ($dataStartRow === null) {
-            // Enhanced debug: show 25 rows after headerRow to see more context
-            $debugInfo = "Header row: $headerRow\n";
-            $debugInfo .= "Next 25 rows (cols 1 & 2):\n";
-            for ($i = $headerRow + 1, $count = 0; $i < count($collection) && $count < 25; $i++, $count++) {
-                $row = $collection[$i];
-                $col1 = trim((string) ($row[1] ?? ''));
-                $col2 = trim((string) ($row[2] ?? ''));
-                $hasDots = strpos($col1, '.') !== false;
-                $hasDashes = strpos($col1, '-') !== false;
-                $debugInfo .= "Row $i: col1=\"$col1\" (len=" . strlen($col1) . ", dots=" . ($hasDots ? 'yes' : 'no') . ", dashes=" . ($hasDashes ? 'yes' : 'no') . "), col2=\"$col2\" (len=" . strlen($col2) . ")\n";
-            }
-            $debugInfo .= "\nTotal rows in sheet: " . count($collection) . "\n";
-            $debugInfo .= "Expected format: Kode Barang BMN (contains dots/dashes, length > 10, e.g., \"11.01.33.20.010101.00009.00314.2026-1.3.2.03.03.05.024\"), Jenis Barang (length > 3, text)\n";
-            throw new \Exception('Data start row tidak ditemukan. Tidak ada baris dengan format kode KIBB yang valid.' . "\n\n" . $debugInfo);
-        }
-
-        \Log::info('KIBB Import - Data start row found at: ' . $dataStartRow);
-        error_log('KIBB Import - Data start row found at: ' . $dataStartRow);
-
-        // Parse data rows
-        foreach ($collection as $index => $row) {
-            if ($index < $dataStartRow) {
+            if ($isFooter) {
                 continue;
             }
 
-            // Stop if both Kode Barang and Jenis Barang are empty
-            $kodeBarang = trim((string) ($row[1] ?? ''));
-            $jenisBarang = trim((string) ($row[2] ?? ''));
-
-            if (empty($kodeBarang) && empty($jenisBarang)) {
-                break;
-            }
-
-            // Skip if name is empty
-            if (empty($jenisBarang)) {
+            // If nama barang is empty, record error
+            if (empty($namaBarang)) {
+                if (empty($kodeBarang)) {
+                    continue;
+                }
                 $this->errors[] = [
-                    'row' => $index + 1,
-                    'reason' => 'Jenis Barang/Nama Barang kosong',
-                    'data' => $row,
+                    'row' => $rowNumber,
+                    'reason' => 'Nama / Jenis Barang tidak boleh kosong.',
                 ];
                 continue;
             }
 
-            // Check for duplicate kode_kibb
+            // Check duplicate by KIBB code and register number if provided
             if (!empty($kodeBarang)) {
-                $existing = Item::where('kode_kibb', $kodeBarang)->first();
+                $query = Item::where('kode_kibb', $kodeBarang);
+                if (!empty($nomorReg)) {
+                    $query->where(function ($q) use ($nomorReg) {
+                        $q->where('nomor_reg', $nomorReg)
+                          ->orWhere('nomor_registrasi', $nomorReg);
+                    });
+                }
+                $existing = $query->first();
+
                 if ($existing) {
+                    $regText = !empty($nomorReg) ? " (Reg: {$nomorReg})" : '';
                     $this->skipped[] = [
-                        'row' => $index + 1,
+                        'row' => $rowNumber,
                         'kode_kibb' => $kodeBarang,
-                        'reason' => 'Duplikat kode_kibb',
+                        'name' => $namaBarang,
+                        'reason' => "Barang dengan Kode KIBB '{$kodeBarang}'{$regText} sudah ada di inventaris ({$existing->name}).",
                     ];
                     continue;
                 }
             }
 
-            // Parse row data
-            $itemData = $this->parseRow($row, $index + 1);
+            // Parse valid item data
+            $itemData = $this->parseRowData($row, $columnMap, $rowNumber);
             $this->previewData[] = $itemData;
         }
     }
 
-    protected function parseRow($row, $rowNumber)
+    protected function parseRowData(array $row, array $map, int $rowNumber): array
     {
-        // Column mapping based on KIBB format
-        // 0: No, 1: Kode Barang, 2: Jenis Barang/Nama Barang, 3: Reg., 4: Merk type,
-        // 5: Ukuran/CC, 6: Bahan, 7: Warna, 8: Tahun Pembelian, 9: Nomor Pabrik, 10: Nomor Rangka,
-        // 11: Nomor Mesin, 12: Nomor Polisi, 13: Nomor BPKB, 14: Asal Usul, 15: Harga, 16: Keterangan
+        $kodeBarang     = trim((string) ($row[$map['kode_barang']] ?? ''));
+        $namaBarang     = trim((string) ($row[$map['nama_barang']] ?? ''));
+        $nomorReg       = trim((string) ($row[$map['nomor_reg']] ?? ''));
+        $merkType       = trim((string) ($row[$map['merk_type']] ?? ''));
+        $ukuran         = trim((string) ($row[$map['ukuran']] ?? ''));
+        $bahan          = trim((string) ($row[$map['bahan']] ?? ''));
+        $warna          = trim((string) ($row[$map['warna']] ?? ''));
+        $tahunPembelian = trim((string) ($row[$map['tahun']] ?? ''));
+        $noPabrik       = trim((string) ($row[$map['no_pabrik']] ?? ''));
+        $noRangka       = trim((string) ($row[$map['no_rangka']] ?? ''));
+        $noMesin        = trim((string) ($row[$map['no_mesin']] ?? ''));
+        $noPolisi       = trim((string) ($row[$map['no_polisi']] ?? ''));
+        $noBpkb         = trim((string) ($row[$map['no_bpkb']] ?? ''));
+        $asalUsul       = trim((string) ($row[$map['asal_usul']] ?? ''));
+        $hargaRaw       = trim((string) ($row[$map['harga']] ?? ''));
+        $keterangan     = trim((string) ($row[$map['keterangan']] ?? ''));
 
-        $kodeBarang = trim((string) ($row[1] ?? ''));
-        $jenisBarang = trim((string) ($row[2] ?? ''));
-        $nomorReg = trim((string) ($row[3] ?? ''));
-        $merkType = trim((string) ($row[4] ?? ''));
-        $ukuranCc = trim((string) ($row[5] ?? ''));
-        $bahan = trim((string) ($row[6] ?? ''));
-        $warna = trim((string) ($row[7] ?? ''));
-        $tahunPembelian = trim((string) ($row[8] ?? ''));
-        $nomorPabrik = trim((string) ($row[9] ?? ''));
-        $nomorRangka = trim((string) ($row[10] ?? ''));
-        $nomorMesin = trim((string) ($row[11] ?? ''));
-        $nomorPolisi = trim((string) ($row[12] ?? ''));
-        $nomorBpkb = trim((string) ($row[13] ?? ''));
-        $asalUsul = trim((string) ($row[14] ?? ''));
-        $harga = trim((string) ($row[15] ?? ''));
-        $keterangan = trim((string) ($row[16] ?? ''));
-
-        // Parse merk and tipe
-        $merk = null;
-        $tipe = null;
+        // Parse Brand & Type
+        $brand = null;
+        $type = null;
         if (!empty($merkType)) {
             if (strpos($merkType, ' - ') !== false) {
                 $parts = explode(' - ', $merkType, 2);
-                $merk = trim($parts[0]);
-                $tipe = trim($parts[1] ?? null);
+                $brand = trim($parts[0]);
+                $type  = trim($parts[1] ?? '');
+            } elseif (strpos($merkType, '/') !== false) {
+                $parts = explode('/', $merkType, 2);
+                $brand = trim($parts[0]);
+                $type  = trim($parts[1] ?? '');
             } else {
-                $merk = trim($merkType);
+                $brand = $merkType;
             }
         }
 
-        // Build description
-        $descriptionParts = [];
-        if (!empty($ukuranCc)) {
-            $descriptionParts[] = "Ukuran: {$ukuranCc}";
-        }
-        if (!empty($bahan)) {
-            $descriptionParts[] = "Bahan: {$bahan}";
-        }
-        if (!empty($warna)) {
-            $descriptionParts[] = "Warna: {$warna}";
-        }
-
-        // Add vehicle numbers if present
-        $vehicleNumbers = [];
-        if (!empty($nomorRangka)) {
-            $vehicleNumbers[] = "No. Rangka: {$nomorRangka}";
-        }
-        if (!empty($nomorMesin)) {
-            $vehicleNumbers[] = "No. Mesin: {$nomorMesin}";
-        }
-        if (!empty($nomorPolisi)) {
-            $vehicleNumbers[] = "No. Polisi: {$nomorPolisi}";
-        }
-        if (!empty($nomorBpkb)) {
-            $vehicleNumbers[] = "No. BPKB: {$nomorBpkb}";
-        }
-        if (!empty($nomorPabrik)) {
-            $vehicleNumbers[] = "No. Pabrik: {$nomorPabrik}";
-        }
-        if (!empty($vehicleNumbers)) {
-            $descriptionParts[] = implode(', ', $vehicleNumbers);
-        }
-
-        if (!empty($asalUsul)) {
-            $descriptionParts[] = "Asal Usul: {$asalUsul}";
-        }
-
-        if (!empty($keterangan)) {
-            $descriptionParts[] = "Keterangan: {$keterangan}";
-        }
-
-        $description = implode('. ', $descriptionParts);
-
-        // Match category from name
-        $categoryId = $this->matchCategory($jenisBarang);
-
-        // Match location from keterangan
-        $locationId = $this->matchLocation($keterangan);
-
-        // Parse price
+        // Parse Price
         $price = 0;
-        if (!empty($harga)) {
-            $price = (float) str_replace(['.', ','], '', $harga);
+        if (!empty($hargaRaw)) {
+            $cleanedPrice = preg_replace('/[^0-9]/', '', $hargaRaw);
+            if (is_numeric($cleanedPrice)) {
+                $price = (float) $cleanedPrice;
+            }
         }
 
-        // Parse purchase year
+        // Parse Year
         $purchaseYear = null;
         if (!empty($tahunPembelian)) {
-            $purchaseYear = (int) $tahunPembelian;
+            if (preg_match('/\b(19\d{2}|20\d{2})\b/', $tahunPembelian, $yearMatches)) {
+                $purchaseYear = (int) $yearMatches[1];
+            }
         }
 
+        // Match Category & Location
+        $categoryId = $this->matchCategory($namaBarang);
+        $locationId = $this->matchLocation($keterangan);
+
+        // Normalize ukuran to dropdown options 'Kecil', 'Sedang', 'Besar'
+        $ukuranEnum = $this->normalizeUkuran($ukuran);
+
+        // Build clean description containing only extra notes & serial identifiers
+        $descLines = [];
+        if (!empty($keterangan)) {
+            $descLines[] = $keterangan;
+        }
+        if (!empty($warna)) {
+            $descLines[] = "Warna: {$warna}";
+        }
+        if (!empty($noPabrik) && $noPabrik !== '-') {
+            $descLines[] = "No. Pabrik: {$noPabrik}";
+        }
+        if (!empty($noRangka) && $noRangka !== '-') {
+            $descLines[] = "No. Rangka: {$noRangka}";
+        }
+        if (!empty($noMesin) && $noMesin !== '-') {
+            $descLines[] = "No. Mesin: {$noMesin}";
+        }
+        if (!empty($noPolisi) && $noPolisi !== '-') {
+            $descLines[] = "No. Polisi: {$noPolisi}";
+        }
+        if (!empty($noBpkb) && $noBpkb !== '-') {
+            $descLines[] = "No. BPKB: {$noBpkb}";
+        }
+        if (!empty($ukuran) && !$ukuranEnum && $ukuran !== '-') {
+            $descLines[] = "Spesifikasi Ukuran: {$ukuran}";
+        }
+
+        $description = implode(' | ', $descLines);
+
         return [
-            'row' => $rowNumber,
-            'kode_kibb' => $kodeBarang,
-            'nomor_reg' => $nomorReg,
-            'name' => $jenisBarang,
-            'merk' => $merk,
-            'tipe' => $tipe,
-            'description' => $description,
-            'purchase_year' => $purchaseYear,
-            'price' => $price,
-            'category_id' => $categoryId,
-            'category_name' => $categoryId ? $this->categories[$categoryId] : 'Belum Dikategorikan',
-            'location_id' => $locationId,
-            'location_name' => $locationId ? $this->locations[$locationId] : null,
-            'stock' => 1,
-            'condition' => 'Baik',
-            'status' => 'Tersedia',
-            'needs_review' => !$categoryId || !$locationId,
+            'row'              => $rowNumber,
+            'name'             => $namaBarang,
+            'kode_kibb'        => $kodeBarang ?: null,
+            'nomor_reg'        => $nomorReg ?: null,
+            'nomor_registrasi' => $nomorReg ?: null,
+            'brand'            => $brand ?: null,
+            'type'             => $type ?: null,
+            'ukuran'           => $ukuranEnum,
+            'bahan'            => $bahan ?: null,
+            'purchase_year'    => $purchaseYear,
+            'tahun_pembelian'  => $purchaseYear,
+            'price'            => $price,
+            'harga'            => $price,
+            'asal_usul'        => $asalUsul ?: null,
+            'category_id'      => $categoryId,
+            'location_id'      => $locationId,
+            'description'      => $description,
+            'stock'            => 1,
+            'condition'        => 'Baik',
+            'status'           => 'Tersedia',
         ];
     }
 
-    protected function matchCategory($name)
+    public static function normalizeUkuran(?string $val): ?string
+    {
+        if (empty($val)) {
+            return null;
+        }
+
+        $v = strtolower(trim($val));
+        if ($v === 'kecil' || str_contains($v, 'kecil') || str_contains($v, 'small')) {
+            return 'Kecil';
+        }
+        if ($v === 'sedang' || str_contains($v, 'sedang') || str_contains($v, 'medium')) {
+            return 'Sedang';
+        }
+        if ($v === 'besar' || str_contains($v, 'besar') || str_contains($v, 'large')) {
+            return 'Besar';
+        }
+
+        return null;
+    }
+
+    protected function matchCategory(string $name): ?int
     {
         if (empty($name)) {
             return null;
@@ -326,20 +371,58 @@ class KibbImport implements ToCollection
 
         $nameLower = strtolower($name);
 
-        // Try to find matching category by keyword
-        foreach ($this->categories as $id => $categoryName) {
-            $categoryLower = strtolower($categoryName);
-            if (strpos($nameLower, $categoryLower) !== false || strpos($categoryLower, $nameLower) !== false) {
+        foreach ($this->categories as $id => $catName) {
+            $catLower = strtolower($catName);
+            if (strpos($nameLower, $catLower) !== false || strpos($catLower, $nameLower) !== false) {
                 return $id;
             }
         }
 
-        // Try partial word matching
-        $words = explode(' ', $nameLower);
-        foreach ($this->categories as $id => $categoryName) {
-            $categoryLower = strtolower($categoryName);
-            foreach ($words as $word) {
-                if (strlen($word) > 3 && strpos($categoryLower, $word) !== false) {
+        $keywordMap = [
+            'laptop'    => 'Laptop',
+            'notebook'  => 'Laptop',
+            'pc'        => 'elektronik',
+            'komputer'  => 'elektronik',
+            'printer'   => 'elektronik',
+            'scanner'   => 'elektronik',
+            'proyektor' => 'Proyektor',
+            'projector' => 'Proyektor',
+            'infocus'   => 'Proyektor',
+            'meja'      => 'Meja',
+            'kursi'     => 'Meja',
+            'lemari'    => 'Meja',
+        ];
+
+        foreach ($keywordMap as $kw => $targetCat) {
+            if (strpos($nameLower, $kw) !== false) {
+                foreach ($this->categories as $id => $catName) {
+                    if (strcasecmp($catName, $targetCat) === 0) {
+                        return $id;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    protected function matchLocation(string $text): ?int
+    {
+        if (empty($text)) {
+            return null;
+        }
+
+        $textLower = strtolower($text);
+
+        foreach ($this->locations as $id => $locName) {
+            $locLower = strtolower($locName);
+            if (strpos($textLower, $locLower) !== false || strpos($locLower, $textLower) !== false) {
+                return $id;
+            }
+
+            $words = preg_split('/[\s\-_,\.\/]+/', $locLower);
+            foreach ($words as $w) {
+                if (strlen($w) >= 3 && strpos($textLower, $w) !== false) {
                     return $id;
                 }
             }
@@ -348,35 +431,17 @@ class KibbImport implements ToCollection
         return null;
     }
 
-    protected function matchLocation($keterangan)
-    {
-        if (empty($keterangan)) {
-            return null;
-        }
-
-        $keteranganLower = strtolower($keterangan);
-
-        foreach ($this->locations as $id => $locationName) {
-            $locationLower = strtolower($locationName);
-            if (strpos($keteranganLower, $locationLower) !== false) {
-                return $id;
-            }
-        }
-
-        return null;
-    }
-
-    public function getPreviewData()
+    public function getPreviewData(): array
     {
         return $this->previewData;
     }
 
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
 
-    public function getSkipped()
+    public function getSkipped(): array
     {
         return $this->skipped;
     }

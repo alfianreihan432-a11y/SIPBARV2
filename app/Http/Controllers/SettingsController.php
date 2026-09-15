@@ -104,4 +104,26 @@ class SettingsController extends Controller
 
         return back()->with('success', 'Foto profil berhasil dihapus');
     }
+
+    /** Update phone number (WhatsApp) */
+    public function updatePhone(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'phone' => ['nullable', 'string', 'regex:/^[0-9]{10,13}$/', 'max:13'],
+        ]);
+
+        $user->update(['phone' => $validated['phone']]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true, 
+                'message' => 'Nomor WhatsApp berhasil diperbarui',
+                'phone' => $user->phone
+            ]);
+        }
+
+        return back()->with('success', 'Nomor WhatsApp berhasil diperbarui');
+    }
 }

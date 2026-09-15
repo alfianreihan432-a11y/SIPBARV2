@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LaporanAdmin extends Model
 {
+    protected $table = 'laporan_admin';
+    
     protected $fillable = [
         'judul',
         'deskripsi',

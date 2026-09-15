@@ -165,7 +165,7 @@ html.dark .t-sun{display:block}html.dark .t-moon{display:none}
 <aside class="sidebar" id="sidebar">
     <a href="{{ route('teacher.dashboard') }}" class="sidebar-brand">
         <div class="sidebar-logo-wrap">
-            <img src="/build/assets/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+            <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
         </div>
         <div>
             <div class="brand-name">SIPBAR</div>

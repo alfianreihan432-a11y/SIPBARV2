@@ -13,15 +13,18 @@ class JurusanSeeder extends Seeder
     public function run(): void
     {
         $jurusans = [
-            ['nama' => 'PPLG', 'kode' => 'PPLG'],
-            ['nama' => 'AKL', 'kode' => 'AKL'],
-            ['nama' => 'PM', 'kode' => 'PM'],
-            ['nama' => 'MPLB', 'kode' => 'MPLB'],
-            ['nama' => 'TO', 'kode' => 'TO'],
+            ['nama' => 'Pengembangan Perangkat Lunak dan Gim (PPLG)', 'kode' => 'PPLG'],
+            ['nama' => 'Akuntansi dan Keuangan Lembaga (AKL)',         'kode' => 'AKL'],
+            ['nama' => 'Manajemen Perkantoran dan Layanan Bisnis (MPLB)', 'kode' => 'MPLB'],
+            ['nama' => 'Teknik Otomotif (TO)',                           'kode' => 'TO'],
+            ['nama' => 'Pemasaran (PM)',                                 'kode' => 'PM'],
         ];
 
-        foreach ($jurusans as $jurusan) {
-            \App\Models\Jurusan::create($jurusan);
+        foreach ($jurusans as $data) {
+            \App\Models\Jurusan::firstOrCreate(
+                ['kode' => $data['kode']],
+                ['nama' => $data['nama']]
+            );
         }
     }
 }
