@@ -91,7 +91,7 @@
 
 @section('content')
 @php
-    $query = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'teacher', 'itemReturns'])
+    $query = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'teacher', 'itemReturns', 'items.itemWithTrashed'])
         ->where('user_id', auth()->id());
     if (request('search')) {
         $query->whereHas('itemWithTrashed', fn($q) => $q->where('name', 'like', '%'.request('search').'%'));
@@ -208,8 +208,19 @@
             <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         </div>
         <div class="s-loan-content">
-            <div class="s-loan-name">{{ $h->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
-            <div class="s-loan-code">Kode: {{ $h->itemWithTrashed?->code ?? '-' }} · Qty: {{ $h->quantity }} unit</div>
+            @if($h->items->isNotEmpty())
+                {{-- Multi-item display --}}
+                <div class="s-loan-name">{{ $h->items->count() }} Barang</div>
+                @foreach($h->items as $index => $detail)
+                    <div class="s-loan-code" style="margin-bottom: {{ $index < $h->items->count() - 1 ? '4px' : '0' }}">
+                        {{ $detail->itemWithTrashed?->name ?? 'Barang tidak tersedia' }} ({{ $detail->quantity }} unit)
+                    </div>
+                @endforeach
+            @else
+                {{-- Legacy single-item display --}}
+                <div class="s-loan-name">{{ $h->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
+                <div class="s-loan-code">Kode: {{ $h->itemWithTrashed?->code ?? '-' }} · Qty: {{ $h->quantity }} unit</div>
+            @endif
 
             <div class="s-loan-meta" style="margin-top:8px">
                 <div class="s-loan-meta-item">
@@ -275,9 +286,14 @@
                     title="{{ $isReturned ? 'Barang sudah dikembalikan (Klik untuk detail)' : 'Barang belum dikembalikan (Klik untuk detail)' }}"
                     onclick="openDetailModal({{ json_encode([
                         'id' => $h->id,
-                        'item_name' => $h->itemWithTrashed?->name ?? ($h->item?->name ?? 'Barang tidak tersedia'),
+                        'item_name' => $h->items->isNotEmpty() ? $h->items->count() . ' Barang' : ($h->itemWithTrashed?->name ?? ($h->item?->name ?? 'Barang tidak tersedia')),
                         'item_code' => $h->itemWithTrashed?->code ?? ($h->item?->code ?? '-'),
                         'quantity' => $h->quantity,
+                        'items' => $h->items->isNotEmpty() ? $h->items->map(fn($item) => [
+                            'name' => $item->itemWithTrashed?->name ?? ($item->item?->name ?? 'Barang tidak tersedia'),
+                            'code' => $item->itemWithTrashed?->code ?? ($item->item?->code ?? '-'),
+                            'quantity' => $item->quantity
+                        ])->toArray() : null,
                         'borrow_date' => $h->borrow_date ? $h->borrow_date->format('d F Y') : '-',
                         'return_date' => $h->return_date ? $h->return_date->format('d F Y') : '-',
                         'return_time' => $h->return_time ?? '-',
@@ -365,6 +381,29 @@ function openDetailModal(data) {
             <span class="modal-label">Nama Barang</span>
             <span class="modal-value">${data.item_name}</span>
         </div>
+    `;
+    
+    // Display multi-item details if available
+    if (data.items && data.items.length > 0) {
+        data.items.forEach((item, index) => {
+            html += `
+            <div class="modal-row">
+                <span class="modal-label">Barang ${index + 1}</span>
+                <span class="modal-value">${item.name}</span>
+            </div>
+            <div class="modal-row">
+                <span class="modal-label">Kode Barang ${index + 1}</span>
+                <span class="modal-value">${item.code}</span>
+            </div>
+            <div class="modal-row">
+                <span class="modal-label">Jumlah ${index + 1}</span>
+                <span class="modal-value">${item.quantity} unit</span>
+            </div>
+            `;
+        });
+    } else {
+        // Legacy single-item display
+        html += `
         <div class="modal-row">
             <span class="modal-label">Kode Barang</span>
             <span class="modal-value">${data.item_code}</span>
@@ -373,6 +412,10 @@ function openDetailModal(data) {
             <span class="modal-label">Jumlah</span>
             <span class="modal-value">${data.quantity} unit</span>
         </div>
+        `;
+    }
+    
+    html += `
         <div class="modal-row">
             <span class="modal-label">Tanggal Pinjam</span>
             <span class="modal-value">${data.borrow_date}</span>

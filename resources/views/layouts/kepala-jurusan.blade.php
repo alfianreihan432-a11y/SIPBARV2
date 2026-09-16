@@ -345,6 +345,22 @@
         </div>
 
         <div class="content">
+            @if(session('error'))
+                <div style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#dc2626;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px;">
+                    <svg style="width:18px;height:18px;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {{ session('error') }}
+                </div>
+            @endif
+            @if(session('success'))
+                <div style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#059669;padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px;">
+                    <svg style="width:18px;height:18px;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    {{ session('success') }}
+                </div>
+            @endif
             @yield('content')
         </div>
     </div>

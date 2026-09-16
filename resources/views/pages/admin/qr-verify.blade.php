@@ -272,34 +272,74 @@
                     <td>Kelas</td>
                     <td>{{ $br->user?->classroom?->name ?? $br->user?->kelas ?? '-' }}</td>
                 </tr>
-                <tr>
-                    <td>Barang</td>
-                    <td>{{ $br->itemWithTrashed?->name ?? $br->item?->name ?? 'Tidak tersedia' }}</td>
-                </tr>
-                <tr>
-                    <td>Stok Tersedia</td>
-                    <td>
-                        @php
-                            $item = $br->itemWithTrashed ?? $br->item;
-                            $availableStock = $item ? $item->available_stock : 0;
-                            $totalStock = $item ? $item->stock : 0;
-                        @endphp
-                        @if($item)
-                            <span style="color: {{ $availableStock > 0 ? '#10b981' : '#ef4444' }}; font-weight: 700;">
-                                {{ $availableStock }} unit
-                            </span>
-                            <span style="color: var(--text-muted); font-weight: 400; font-size: 12px;">
-                                (dari {{ $totalStock }} total)
-                            </span>
-                        @else
-                            <span style="color: var(--text-muted);">-</span>
-                        @endif
-                    </td>
-                </tr>
-                <tr>
-                    <td>Jumlah</td>
-                    <td>{{ $br->quantity }} unit</td>
-                </tr>
+                @if($br->items->isNotEmpty())
+                    {{-- Multi-item display --}}
+                    <tr>
+                        <td>Barang</td>
+                        <td>
+                            @foreach($br->items as $index => $detail)
+                                <div style="margin-bottom: {{ $index < $br->items->count() - 1 ? '8px' : '0' }};">
+                                    <div style="font-weight: 600;">{{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia' }}</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">Qty: {{ $detail->quantity }} unit</div>
+                                </div>
+                            @endforeach
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Stok Tersedia</td>
+                        <td>
+                            @foreach($br->items as $index => $detail)
+                                @php
+                                    $item = $detail->itemWithTrashed ?? $detail->item;
+                                    $availableStock = $item ? $item->available_stock : 0;
+                                    $totalStock = $item ? $item->stock : 0;
+                                @endphp
+                                <div style="margin-bottom: {{ $index < $br->items->count() - 1 ? '8px' : '0' }};">
+                                    <span style="color: {{ $availableStock > 0 ? '#10b981' : '#ef4444' }}; font-weight: 700;">
+                                        {{ $availableStock }} unit
+                                    </span>
+                                    <span style="color: var(--text-muted); font-weight: 400; font-size: 12px;">
+                                        (dari {{ $totalStock }} total)
+                                    </span>
+                                </div>
+                            @endforeach
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Total Barang</td>
+                        <td>{{ $br->items->count() }} jenis barang</td>
+                    </tr>
+                @else
+                    {{-- Legacy single-item display --}}
+                    <tr>
+                        <td>Barang</td>
+                        <td>{{ $br->itemWithTrashed?->name ?? $br->item?->name ?? 'Tidak tersedia' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Stok Tersedia</td>
+                        <td>
+                            @php
+                                $item = $br->itemWithTrashed ?? $br->item;
+                                $availableStock = $item ? $item->available_stock : 0;
+                                $totalStock = $item ? $item->stock : 0;
+                            @endphp
+                            @if($item)
+                                <span style="color: {{ $availableStock > 0 ? '#10b981' : '#ef4444' }}; font-weight: 700;">
+                                    {{ $availableStock }} unit
+                                </span>
+                                <span style="color: var(--text-muted); font-weight: 400; font-size: 12px;">
+                                    (dari {{ $totalStock }} total)
+                                </span>
+                            @else
+                                <span style="color: var(--text-muted);">-</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Jumlah</td>
+                        <td>{{ $br->quantity }} unit</td>
+                    </tr>
+                @endif
                 <tr>
                     <td>Tgl Pinjam</td>
                     <td>{{ \Carbon\Carbon::parse($br->borrow_date)->format('d M Y') }}</td>
