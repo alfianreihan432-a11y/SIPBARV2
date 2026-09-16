@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\Supplier;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -99,9 +100,8 @@ class InventoryManager extends Component
 
     public function toggleForm(): void
     {
-        // ── READONLY CHECK: Superadmin cannot toggle form ──
-        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
-            session()->flash('error', 'Superadmin tidak memiliki izin untuk menambah inventaris. Halaman ini read-only.');
+        if ($this->readonly) {
+            session()->flash('error', 'Mode read-only aktif untuk halaman ini.');
             return;
         }
 
@@ -164,9 +164,8 @@ class InventoryManager extends Component
 
     public function save(): void
     {
-        // ── READONLY CHECK: Superadmin cannot save ──
-        if ($this->readonly || auth()->user()->hasRole('superadmin')) {
-            session()->flash('error', 'Superadmin tidak memiliki izin untuk mengelola inventaris. Halaman ini read-only.');
+        if ($this->readonly) {
+            session()->flash('error', 'Mode read-only aktif untuk halaman ini.');
             return;
         }
 
@@ -211,6 +210,7 @@ class InventoryManager extends Component
             Item::create($data);
         }
 
+        $this->clearItemCaches();
         $this->resetForm();
         $this->loadItems();
         session()->flash('message', 'Inventaris berhasil disimpan.');
@@ -218,9 +218,8 @@ class InventoryManager extends Component
 
     public function edit($id): void
     {
-        // ── READONLY CHECK: Superadmin cannot edit ──
-        if ($this->readonly || auth()->user()?->hasRole('superadmin')) {
-            session()->flash('error', 'Superadmin tidak memiliki izin untuk mengedit inventaris. Halaman ini read-only.');
+        if ($this->readonly) {
+            session()->flash('error', 'Mode read-only aktif untuk halaman ini.');
             return;
         }
 
@@ -249,16 +248,31 @@ class InventoryManager extends Component
 
     public function delete($id): void
     {
-        // ── READONLY CHECK: Superadmin cannot delete ──
-        if ($this->readonly || auth()->user()?->hasRole('superadmin')) {
-            session()->flash('error', 'Superadmin tidak memiliki izin untuk menghapus inventaris. Halaman ini read-only.');
+        if ($this->readonly) {
+            session()->flash('error', 'Mode read-only aktif untuk halaman ini.');
             return;
         }
 
         Item::findOrFail($id)->delete();
+        $this->clearItemCaches();
         $this->loadItems();
         $this->dispatch('itemUpdated');
         session()->flash('message', 'Inventaris berhasil dihapus.');
+    }
+
+    protected function clearItemCaches(): void
+    {
+        $keys = [
+            'inventory.items',
+            'inventory.stats',
+            'inventory.total',
+            'inventory.summary',
+            'inventory.dashboard',
+        ];
+
+        foreach ($keys as $key) {
+            Cache::forget($key);
+        }
     }
 
     protected function generateInventoryNumber(): string

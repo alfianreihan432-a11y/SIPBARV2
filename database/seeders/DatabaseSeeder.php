@@ -108,7 +108,7 @@ class DatabaseSeeder extends Seeder
             $item->restore();
         }
 
-        // Call KepalaJurusanSeeder
         $this->call(KepalaJurusanSeeder::class);
+        $this->call(SiteSettingSeeder::class);
     }
 }   

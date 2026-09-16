@@ -38,7 +38,9 @@ class QRCodeService
         Storage::disk('public')->put($filename, $result->getString());
         
         $studentName = $request->user?->name ?? 'Siswa';
-        $itemName = $request->itemWithTrashed?->name ?? ($request->item?->name ?? 'Barang');
+        $itemName = $request->items->isNotEmpty()
+            ? $request->items->map(fn ($detail) => ($detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia') . ' (' . ($detail->quantity ?? 1) . ')')->implode(', ')
+            : ($request->itemWithTrashed?->name ?? ($request->item?->name ?? 'Barang'));
 
         // Create or update QR code record
         $qrCode = QRCode::updateOrCreate(

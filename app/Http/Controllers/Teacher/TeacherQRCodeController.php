@@ -21,7 +21,7 @@ class TeacherQRCodeController extends Controller
     public function show(int $id): View
     {
         // Get borrowing request for the logged-in teacher
-        $borrowingRequest = BorrowingRequest::with(['item', 'approvedByKajur'])
+        $borrowingRequest = BorrowingRequest::with(['item', 'itemWithTrashed', 'items.itemWithTrashed', 'approvedByKajur'])
             ->where('id', $id)
             ->where('user_id', auth()->id())
             ->where('tipe_peminjam', 'guru')
@@ -43,7 +43,7 @@ class TeacherQRCodeController extends Controller
     public function generate(int $id): JsonResponse
     {
         // Get borrowing request for the logged-in teacher
-        $borrowingRequest = BorrowingRequest::with(['item', 'itemWithTrashed', 'approvedByKajur', 'qrCode'])
+        $borrowingRequest = BorrowingRequest::with(['item', 'itemWithTrashed', 'items.itemWithTrashed', 'approvedByKajur', 'qrCode'])
             ->where('id', $id)
             ->where('user_id', auth()->id())
             ->where('tipe_peminjam', 'guru')
@@ -101,11 +101,15 @@ class TeacherQRCodeController extends Controller
         $writer = new PngWriter();
         $result = $writer->write($qrCode);
 
+        $itemNames = $borrowingRequest->items->isNotEmpty()
+            ? $borrowingRequest->items->map(fn ($detail) => ($detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia') . ' (' . ($detail->quantity ?? 1) . ')')->implode(', ')
+            : ($borrowingRequest->itemWithTrashed?->name ?? $borrowingRequest->item?->name ?? 'Barang tidak tersedia');
+
         return response()->json([
             'success'      => true,
             'qr_image'     => $result->getDataUri(),
             'token'        => $qrCodeRecord->code,
-            'item_name'    => $borrowingRequest->itemWithTrashed?->name ?? $borrowingRequest->item?->name ?? 'Barang tidak tersedia',
+            'item_name'    => $itemNames,
             'borrowing_id' => $borrowingRequest->id,
             'expires_at'   => $qrCodeRecord->expires_at?->format('d M Y'),
             'status'       => $borrowingRequest->status,

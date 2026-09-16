@@ -14,8 +14,6 @@ class ItemCatalog extends Component
 
     public $search = '';
     public $categoryFilter = '';
-    public $showBorrowModal = false;
-    public $selectedItem = null;
 
     protected $paginationTheme = 'tailwind';
 
@@ -34,17 +32,30 @@ class ItemCatalog extends Component
         $this->resetPage();
     }
 
-    public function openBorrowModal($itemId)
+    public function addToCart(int $itemId): void
     {
-        $this->selectedItem = Item::with('category')->findOrFail($itemId);
-        $this->showBorrowModal = true;
-    }
+        $item = Item::findOrFail($itemId);
 
-    #[On('close-borrow-modal')]
-    public function closeBorrowModal()
-    {
-        $this->showBorrowModal = false;
-        $this->selectedItem = null;
+        if ($item->available_stock <= 0) {
+            session()->flash('error', 'Barang tidak tersedia saat ini.');
+            return;
+        }
+
+        $cart = session('student_borrowing_cart', []);
+
+        if (isset($cart[$itemId])) {
+            $cart[$itemId]['quantity'] = (int) $cart[$itemId]['quantity'] + 1;
+        } else {
+            $cart[$itemId] = [
+                'quantity' => 1,
+                'teacher_id' => null,
+                'purpose' => '',
+            ];
+        }
+
+        session(['student_borrowing_cart' => $cart]);
+
+        $this->redirect(route('student.loans.cart'), navigate: true);
     }
 
     public function getItemsProperty()

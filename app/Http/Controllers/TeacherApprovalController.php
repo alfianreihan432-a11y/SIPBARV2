@@ -22,7 +22,7 @@ class TeacherApprovalController extends Controller
     {
         $pendingRequests = BorrowingRequest::where('teacher_id', Auth::id())
             ->where('status', BorrowingRequest::STATUS_PENDING)
-            ->with(['user', 'item'])
+            ->with(['user', 'item', 'items.itemWithTrashed'])
             ->latest()
             ->get();
         

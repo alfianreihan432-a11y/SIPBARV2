@@ -58,8 +58,9 @@
 
 {{-- Flash messages --}}
 @if(session('success'))
-<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#065f46;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:600">
-    ✓ {{ session('success') }}
+<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#065f46;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    {{ session('success') }}
 </div>
 @endif
 
@@ -97,8 +98,9 @@
                     </div>
                     @php $isOverdue = $b->return_date->isPast() && $b->status === 'borrowed'; @endphp
                     @if($isOverdue)
-                    <div class="g-loan-meta-item" style="color:#ef4444;font-weight:600">
-                        ⚠ Melewati batas waktu
+                    <div class="g-loan-meta-item" style="color:#ef4444;font-weight:600;display:flex;align-items:center;gap:5px">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                        Melewati batas waktu
                     </div>
                     @endif
                 </div>
@@ -185,8 +187,9 @@
                     @endif
                 </div>
                 @if($ret->return_notes)
-                <div style="margin-top:6px;font-size:12px;color:var(--muted);background:var(--bg3);padding:6px 10px;border-radius:6px;display:inline-block">
-                    📝 {{ Str::limit($ret->return_notes, 60) }}
+                <div style="margin-top:6px;font-size:12px;color:var(--muted);background:var(--bg3);padding:6px 10px;border-radius:6px;display:inline-flex;align-items:center;gap:6px">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    {{ Str::limit($ret->return_notes, 60) }}
                 </div>
                 @endif
             </div>

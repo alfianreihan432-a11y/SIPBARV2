@@ -16,7 +16,12 @@ class AdminQRVerificationController extends Controller
     public function verify(string $token)
     {
         $qrRecord = QRCode::where('code', $token)
-            ->with(['borrowingRequest.user.classroom', 'borrowingRequest.itemWithTrashed', 'borrowingRequest.teacher'])
+            ->with([
+                'borrowingRequest.user.classroom',
+                'borrowingRequest.itemWithTrashed',
+                'borrowingRequest.items.itemWithTrashed',
+                'borrowingRequest.teacher',
+            ])
             ->first();
 
         if (! $qrRecord) {
@@ -68,13 +73,18 @@ class AdminQRVerificationController extends Controller
         }
 
         // Cek stok barang jika item masih ada di inventaris aktif
-        $item = $borrowingRequest->item;
-        if ($item) {
-            if ($item->stock < $borrowingRequest->quantity) {
-                return redirect()->back()->with('error', 'Stok barang tidak mencukupi untuk memenuhi peminjaman.');
+        foreach ($borrowingRequest->items->isNotEmpty() ? $borrowingRequest->items : collect([$borrowingRequest]) as $detail) {
+            $item = $detail instanceof \App\Models\BorrowingRequest ? $detail->item : $detail->item;
+
+            if ($item) {
+                $needed = $detail instanceof \App\Models\BorrowingRequest ? (int) ($detail->quantity ?? 0) : (int) ($detail->quantity ?? 0);
+
+                if ($item->stock < $needed) {
+                    return redirect()->back()->with('error', 'Stok barang tidak mencukupi untuk memenuhi peminjaman.');
+                }
+
+                $item->decrement('stock', $needed);
             }
-            // Kurangi stok barang
-            $item->decrement('stock', $borrowingRequest->quantity);
         }
 
         // Update status peminjaman menjadi borrowed / barang diambil

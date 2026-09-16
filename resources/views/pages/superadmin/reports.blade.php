@@ -267,7 +267,7 @@
         height: 32px;
         border-radius: 50%;
         background: var(--blue-dark);
-        color: #ffffff;
+        color: #ffffff !important;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -534,8 +534,9 @@
                                     default    => 'sa-badge-pending'
                                 };
                             @endphp
-                            <span class="sa-badge {{ $badgeCls }}">
-                                ● {{ $act->status_label }}
+                            <span class="sa-badge {{ $badgeCls }}" style="display:inline-flex;align-items:center;gap:5px">
+                                <span style="width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;display:inline-block"></span>
+                                {{ $act->status_label }}
                             </span>
                         </td>
                         <td style="font-size:12px;color:var(--text-muted)">

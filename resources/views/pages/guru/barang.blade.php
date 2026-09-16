@@ -213,13 +213,17 @@
                         </div>
 
                         @if($item->stock > 0)
-                            <a href="{{ route('teacher.peminjaman-guru.create', ['barang_id' => $item->id]) }}"
-                               class="borrow-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                Pinjam Barang
-                            </a>
+                            <form method="POST" action="{{ route('teacher.peminjaman-guru.cart.add') }}">
+                                @csrf
+                                <input type="hidden" name="item_id" value="{{ $item->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="borrow-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                    Pinjam Barang
+                                </button>
+                            </form>
                         @else
                             <button disabled class="borrow-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">

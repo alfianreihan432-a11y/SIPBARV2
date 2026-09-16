@@ -202,7 +202,7 @@
         padding: 9px 18px;
         font-size: 12px; font-weight: 700; color: #fff;
         cursor: pointer; white-space: nowrap;
-        box-shadow: 0 4px 12px rgba(29,78,216,.3);
+        box-shadow: 0 4px 12px rgba(255,255,255,.2);
         transition: opacity .15s, transform .15s;
     }
     .im-add-btn:hover { opacity: .9; transform: translateY(-1px); }
@@ -381,9 +381,9 @@
         width: 32px; height: 32px; border-radius: 9px;
         display: flex; align-items: center; justify-content: center;
         background: rgba(244,63,94,.1); border: 1px solid rgba(244,63,94,.2);
-        color: #fb7185; cursor: pointer; transition: all .15s;
+        color: var(--color-danger); cursor: pointer; transition: all .15s;
     }
-    .im-btn-del:hover { background: #f43f5e; color: #fff; }
+    .im-btn-del:hover { background: var(--color-danger); color: #fff; }
 
     /* ── Table ─────────────────────────────────────────────── */
     .im-table-wrap {
@@ -426,8 +426,8 @@
     }
     .im-tbl-btn-edit { background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.18); color: var(--blue); }
     .im-tbl-btn-edit:hover { background: var(--blue); color: #fff; }
-    .im-tbl-btn-del  { background: rgba(244,63,94,.1); border: 1px solid rgba(244,63,94,.18); color: #fb7185; }
-    .im-tbl-btn-del:hover  { background: #f43f5e; color: #fff; }
+    .im-tbl-btn-del  { background: rgba(244,63,94,.1); border: 1px solid rgba(244,63,94,.18); color: var(--color-danger); }
+    .im-tbl-btn-del:hover  { background: var(--color-danger); color: #fff; }
 
     /* ── Empty State ─────────────────────────────────────────── */
     .im-empty {
@@ -442,9 +442,9 @@
     }
 
     /* ── Status Badges ────────────────────────────────────────── */
-    .badge-tersedia   { background: rgba(16,185,129,.12); color: #10b981; border: 1px solid rgba(16,185,129,.2); }
-    .badge-dipinjam   { background: rgba(244,63,94,.12);  color: #f43f5e; border: 1px solid rgba(244,63,94,.2); }
-    .badge-maintenance{ background: rgba(245,158,11,.12); color: #f59e0b; border: 1px solid rgba(245,158,11,.2); }
+    .badge-tersedia   { background: rgba(16,185,129,.12); color: var(--color-success); border: 1px solid rgba(16,185,129,.2); }
+    .badge-dipinjam   { background: rgba(244,63,94,.12);  color: var(--color-danger); border: 1px solid rgba(244,63,94,.2); }
+    .badge-maintenance{ background: rgba(245,158,11,.12); color: var(--color-warning); border: 1px solid rgba(245,158,11,.2); }
     .badge-hilang     { background: rgba(148,163,184,.12);color: var(--text-muted); border: 1px solid rgba(148,163,184,.2); }
 
     /* ── Alert ─────────────────────────────────────────────────── */
@@ -483,7 +483,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between">
                 <span class="im-kpi-label">Total Inventaris</span>
                 <div class="im-kpi-icon" style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2)">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:#2563eb" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--color-info)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
             </div>
             <div class="im-kpi-num">{{ $stats['total'] ?? 0 }}</div>
@@ -495,12 +495,12 @@
             <div style="display:flex;align-items:center;justify-content:space-between">
                 <span class="im-kpi-label">Siap Dipinjam</span>
                 <div class="im-kpi-icon" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.2)">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:#10b981" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--color-success)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
             <div class="im-kpi-num">{{ $stats['tersedia'] ?? 0 }}</div>
             <div class="im-kpi-sub" style="display:flex;align-items:center;gap:5px">
-                <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;animation:pulse 1.5s infinite"></span>
+                <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--color-success);animation:pulse 1.5s infinite"></span>
                 Barang siap pakai
             </div>
         </div>
@@ -510,7 +510,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between">
                 <span class="im-kpi-label">Sedang Dipinjam</span>
                 <div class="im-kpi-icon" style="background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.2)">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:#f43f5e" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--color-danger)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
                 </div>
             </div>
             <div class="im-kpi-num">{{ $stats['dipinjam'] ?? 0 }}</div>
@@ -522,11 +522,11 @@
             <div style="display:flex;align-items:center;justify-content:space-between">
                 <span class="im-kpi-label">Maintenance</span>
                 <div class="im-kpi-icon" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2)">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:#f59e0b" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--color-warning)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
                 </div>
             </div>
             <div class="im-kpi-num">{{ $stats['maintenance'] ?? 0 }}</div>
-            <div class="im-kpi-sub"><span style="color:#10b981;font-weight:700">{{ $stats['baik'] ?? 0 }}</span> kondisi baik</div>
+            <div class="im-kpi-sub"><span style="color:var(--color-success);font-weight:700">{{ $stats['baik'] ?? 0 }}</span> kondisi baik</div>
         </div>
     </div>
 
@@ -539,7 +539,7 @@
                 placeholder="Cari nama, kode, merk, tipe barang..."
                 class="im-search-input">
             @if($search)
-            <button type="button" wire:click="$set('search','')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748b;cursor:pointer">
+            <button type="button" wire:click="$set('search','')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer">
                 <svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
             @endif
@@ -548,7 +548,7 @@
         {{-- Category Filter Dropdown --}}
         <div class="im-dropdown" id="imDropCat" data-wire="filterCategory">
             <button type="button" class="im-dropdown-btn" onclick="imToggleDrop('imDropCat', event)">
-                <span class="im-dropdown-dot" style="background:#6366f1"></span>
+                <span class="im-dropdown-dot" style="background:var(--color-info)"></span>
                 <span class="im-dropdown-label">Semua Kategori</span>
                 <svg class="im-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
             </button>
@@ -570,7 +570,7 @@
         {{-- Status Filter Dropdown --}}
         <div class="im-dropdown" id="imDropStatus" data-wire="filterStatus">
             <button type="button" class="im-dropdown-btn" onclick="imToggleDrop('imDropStatus', event)">
-                <span class="im-dropdown-dot" style="background:#10b981"></span>
+                <span class="im-dropdown-dot" style="background:var(--color-success)"></span>
                 <span class="im-dropdown-label">Semua Status</span>
                 <svg class="im-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
             </button>
@@ -583,25 +583,25 @@
                 <div class="im-dropdown-item" data-value="Tersedia" onclick="imSelectItem('imDropStatus', 'Tersedia', 'Tersedia', this)">
                     <svg class="im-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                     <span style="display:inline-flex;align-items:center;gap:6px">
-                        <span style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0"></span> Tersedia
+                        <span style="width:7px;height:7px;border-radius:50%;background:var(--color-success);flex-shrink:0"></span> Tersedia
                     </span>
                 </div>
                 <div class="im-dropdown-item" data-value="Dipinjam" onclick="imSelectItem('imDropStatus', 'Dipinjam', 'Dipinjam', this)">
                     <svg class="im-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                     <span style="display:inline-flex;align-items:center;gap:6px">
-                        <span style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0"></span> Dipinjam
+                        <span style="width:7px;height:7px;border-radius:50%;background:var(--color-warning);flex-shrink:0"></span> Dipinjam
                     </span>
                 </div>
                 <div class="im-dropdown-item" data-value="Maintenance" onclick="imSelectItem('imDropStatus', 'Maintenance', 'Maintenance', this)">
                     <svg class="im-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                     <span style="display:inline-flex;align-items:center;gap:6px">
-                        <span style="width:7px;height:7px;border-radius:50%;background:#6366f1;flex-shrink:0"></span> Maintenance
+                        <span style="width:7px;height:7px;border-radius:50%;background:var(--color-info);flex-shrink:0"></span> Maintenance
                     </span>
                 </div>
                 <div class="im-dropdown-item" data-value="Hilang" onclick="imSelectItem('imDropStatus', 'Hilang', 'Hilang', this)">
                     <svg class="im-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                     <span style="display:inline-flex;align-items:center;gap:6px">
-                        <span style="width:7px;height:7px;border-radius:50%;background:#94a3b8;flex-shrink:0"></span> Hilang
+                        <span style="width:7px;height:7px;border-radius:50%;background:var(--text-muted);flex-shrink:0"></span> Hilang
                     </span>
                 </div>
             </div>
@@ -610,7 +610,7 @@
         {{-- Condition Filter Dropdown --}}
         <div class="im-dropdown" id="imDropCond" data-wire="filterCondition">
             <button type="button" class="im-dropdown-btn" onclick="imToggleDrop('imDropCond', event)">
-                <span class="im-dropdown-dot" style="background:#f59e0b"></span>
+                <span class="im-dropdown-dot" style="background:var(--color-warning)"></span>
                 <span class="im-dropdown-label">Semua Kondisi</span>
                 <svg class="im-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
             </button>
@@ -623,19 +623,19 @@
                 <div class="im-dropdown-item" data-value="Baik" onclick="imSelectItem('imDropCond', 'Baik', 'Baik', this)">
                     <svg class="im-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                     <span style="display:inline-flex;align-items:center;gap:6px">
-                        <span style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0"></span> Baik
+                        <span style="width:7px;height:7px;border-radius:50%;background:var(--color-success);flex-shrink:0"></span> Baik
                     </span>
                 </div>
                 <div class="im-dropdown-item" data-value="Rusak Ringan" onclick="imSelectItem('imDropCond', 'Rusak Ringan', 'Rusak Ringan', this)">
                     <svg class="im-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                     <span style="display:inline-flex;align-items:center;gap:6px">
-                        <span style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0"></span> Rusak Ringan
+                        <span style="width:7px;height:7px;border-radius:50%;background:var(--color-warning);flex-shrink:0"></span> Rusak Ringan
                     </span>
                 </div>
                 <div class="im-dropdown-item" data-value="Rusak Berat" onclick="imSelectItem('imDropCond', 'Rusak Berat', 'Rusak Berat', this)">
                     <svg class="im-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                     <span style="display:inline-flex;align-items:center;gap:6px">
-                        <span style="width:7px;height:7px;border-radius:50%;background:#ef4444;flex-shrink:0"></span> Rusak Berat
+                        <span style="width:7px;height:7px;border-radius:50%;background:var(--color-danger);flex-shrink:0"></span> Rusak Berat
                     </span>
                 </div>
             </div>
@@ -659,7 +659,7 @@
         </button>
 
         {{-- Import KIBB Button --}}
-        <button type="button" onclick="openImportModal()" class="im-add-btn" style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);border-color:#059669">
+        <button type="button" onclick="openImportModal()" class="im-add-btn" style="background:linear-gradient(135deg,var(--color-success) 0%,#059669 100%);border-color:var(--color-success)">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
             <span>Import KIBB</span>
         </button>
@@ -679,7 +679,7 @@
             {{-- Modal Header --}}
             <div style="padding:20px 24px 18px;border-bottom:1px solid var(--border-alt);display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--bg-card)">
                 <div style="display:flex;align-items:center;gap:14px">
-                    <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 6px 16px rgba(16,185,129,0.3);flex-shrink:0">
+                    <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--color-success) 0%,#059669 100%);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 6px 16px rgba(16,185,129,0.3);flex-shrink:0">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
@@ -687,7 +687,7 @@
                     <div>
                         <div style="display:flex;align-items:center;gap:8px">
                             <h2 style="font-size:18px;font-weight:800;color:var(--text-primary);margin:0;line-height:1.2">Import Data KIBB</h2>
-                            <span style="font-size:10px;font-weight:700;letter-spacing:.05em;padding:3px 8px;border-radius:999px;background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25);text-transform:uppercase">Excel .xlsx</span>
+                            <span style="font-size:10px;font-weight:700;letter-spacing:.05em;padding:3px 8px;border-radius:999px;background:rgba(16,185,129,0.12);color:var(--color-success);border:1px solid rgba(16,185,129,0.25);text-transform:uppercase">Excel .xlsx</span>
                         </div>
                         <p style="font-size:12.5px;color:var(--text-muted);margin:3px 0 0;line-height:1.3">Impor massal data inventaris aset dari lembar kerja Excel KIBB.</p>
                     </div>
@@ -972,17 +972,20 @@
                                 <div style="font-size:13.5px;font-weight:800;color:#10b981">Import Berhasil Dilakukan!</div>
                                 <div style="font-size:12px;color:var(--text-primary);margin-top:2px">${data.message || ''}</div>
                                 <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-                                    <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(16,185,129,0.2);color:#059669">
-                                        ✓ ${data.success_count || 0} Berhasil
+                                    <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(16,185,129,0.2);color:#059669;display:inline-flex;align-items:center;gap:4px">
+                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                        ${data.success_count || 0} Berhasil
                                     </span>
                                     ${data.skipped_count > 0 ? `
-                                        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(245,158,11,0.2);color:#d97706">
-                                            ℹ ${data.skipped_count} Dilewati
+                                        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(245,158,11,0.2);color:#d97706;display:inline-flex;align-items:center;gap:4px">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                                            ${data.skipped_count} Dilewati
                                         </span>
                                     ` : ''}
                                     ${data.error_count > 0 ? `
-                                        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(239,68,68,0.2);color:#dc2626">
-                                            ⚠ ${data.error_count} Gagal
+                                        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(239,68,68,0.2);color:#dc2626;display:inline-flex;align-items:center;gap:4px">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                                            ${data.error_count} Gagal
                                         </span>
                                     ` : ''}
                                 </div>

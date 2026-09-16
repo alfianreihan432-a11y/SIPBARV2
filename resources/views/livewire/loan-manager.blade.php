@@ -14,9 +14,9 @@
 .lm-filter-label{font-size:11px;color:var(--text-subtle);font-weight:700;text-transform:uppercase;letter-spacing:.06em;min-width:55px}
 .lm-filter-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);transition:all .15s}
 .lm-filter-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
-.lm-filter-btn.act{background:var(--blue-dark);color:#fff;border-color:var(--blue-dark);box-shadow:0 2px 6px rgba(29,78,216,.3)}
-.lm-filter-btn.act-guru{background:#059669;color:#fff;border-color:#059669;box-shadow:0 2px 6px rgba(5,150,105,.3)}
-.lm-filter-btn.act-siswa{background:#2563eb;color:#fff;border-color:#2563eb;box-shadow:0 2px 6px rgba(37,99,235,.3)}
+.lm-filter-btn.act{background:var(--blue-dark);color:#fff;border-color:var(--blue-dark);box-shadow:0 2px 6px rgba(255,255,255,.2)}
+.lm-filter-btn.act-guru{background:var(--color-success);color:#fff;border-color:var(--color-success);box-shadow:0 2px 6px rgba(16,185,129,.3)}
+.lm-filter-btn.act-siswa{background:var(--color-info);color:#fff;border-color:var(--color-info);box-shadow:0 2px 6px rgba(96,165,250,.3)}
 
 /* Badges - Bug #3 Fix: Using CSS variables for better dark mode contrast */
 .lm-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;white-space:nowrap}
@@ -42,7 +42,7 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
 .lmt-num{font-size:12px;font-weight:700;color:var(--text-primary);font-family:monospace}
 .lmt-student{display:flex;align-items:center;gap:9px}
 .lmt-avatar{width:32px;height:32px;border-radius:50%;background:var(--blue-dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
-.lmt-avatar.guru-avatar{background:linear-gradient(135deg,#059669,#10b981)}
+.lmt-avatar.guru-avatar{background:linear-gradient(135deg,var(--color-success),#10b981)}
 .lmt-name{font-size:13px;font-weight:600;color:var(--text-primary)}
 .lmt-sub{font-size:11px;color:var(--text-muted)}
 .lmt-item{font-size:13px;color:var(--text-secondary);line-height:1.4}
@@ -105,7 +105,7 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
     {{-- Header --}}
     <div class="lm-header">
         <div style="display:flex;align-items:center;gap:12px">
-            <div style="width:38px;height:38px;background:linear-gradient(135deg,#1d4ed8,#06b6d4);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,var(--color-info),#06b6d4);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             </div>
             <div>
@@ -132,13 +132,13 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
             </button>
             <button class="lm-filter-btn {{ $filterType === 'siswa' ? 'act-siswa' : '' }}"
                 wire:click="$set('filterType', 'siswa')">
-                <span style="width:6px;height:6px;border-radius:50%;background:#3b82f6"></span>
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--color-info)"></span>
                 Siswa
                 <span style="font-size:10px;opacity:.8">({{ $typeCounts['siswa'] ?? 0 }})</span>
             </button>
             <button class="lm-filter-btn {{ $filterType === 'guru' ? 'act-guru' : '' }}"
                 wire:click="$set('filterType', 'guru')">
-                <span style="width:6px;height:6px;border-radius:50%;background:#10b981"></span>
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--color-success)"></span>
                 Guru
                 <span style="font-size:10px;opacity:.8">({{ $typeCounts['guru'] ?? 0 }})</span>
             </button>

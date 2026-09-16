@@ -20,7 +20,6 @@ class SuperadminReportController extends Controller
         $pendingRequests   = BorrowingRequest::where('status', BorrowingRequest::STATUS_PENDING)->count();
         $approvedRequests  = BorrowingRequest::whereIn('status', [
             BorrowingRequest::STATUS_APPROVED,
-            BorrowingRequest::STATUS_QR_READY,
             BorrowingRequest::STATUS_BORROWED,
         ])->count();
         $completedRequests = BorrowingRequest::where('status', BorrowingRequest::STATUS_RETURNED)->count();
@@ -31,7 +30,6 @@ class SuperadminReportController extends Controller
         $totalItemStock  = (int) Item::sum('stock');
         $borrowedStock   = (int) BorrowingRequest::whereIn('status', [
             BorrowingRequest::STATUS_APPROVED,
-            BorrowingRequest::STATUS_QR_READY,
             BorrowingRequest::STATUS_BORROWED,
         ])->sum('quantity');
         $availableStock  = max(0, $totalItemStock - $borrowedStock);

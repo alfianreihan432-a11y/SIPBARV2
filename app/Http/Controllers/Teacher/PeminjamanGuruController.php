@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teacher;
 
 use App\Http\Controllers\Controller;
 use App\Models\BorrowingRequest;
+use App\Models\BorrowingRequestItem;
 use App\Models\Item;
 use App\Models\Jurusan;
 use App\Models\User;
@@ -15,6 +16,112 @@ use Illuminate\View\View;
 
 class PeminjamanGuruController extends Controller
 {
+    public function cart(): View
+    {
+        $items = Item::where('status', 'Tersedia')->where('stock', '>', 0)->get();
+        $cart = session('teacher_borrowing_cart', []);
+
+        $cartItems = [];
+        foreach ($cart as $itemId => $entry) {
+            $item = Item::find($itemId);
+            if ($item) {
+                $cartItems[] = [
+                    'item' => $item,
+                    'quantity' => (int) ($entry['quantity'] ?? 1),
+                ];
+            }
+        }
+
+        return view('pages.guru.peminjaman-guru-cart', [
+            'items' => $items,
+            'cartItems' => $cartItems,
+            'kepalaJurusans' => User::whereHas('roles', fn ($query) => $query->where('name', 'kepala_jurusan'))->get(),
+        ]);
+    }
+
+    public function addToCart(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'item_id' => 'required|exists:items,id',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $cart = session('teacher_borrowing_cart', []);
+        $itemId = (int) $validated['item_id'];
+
+        if (isset($cart[$itemId])) {
+            $cart[$itemId]['quantity'] = (int) $cart[$itemId]['quantity'] + (int) $validated['quantity'];
+        } else {
+            $cart[$itemId] = [
+                'quantity' => (int) $validated['quantity'],
+            ];
+        }
+
+        session(['teacher_borrowing_cart' => $cart]);
+
+        return redirect()->route('teacher.peminjaman-guru.cart')->with('success', 'Barang ditambahkan ke keranjang guru.');
+    }
+
+    public function removeFromCart(int $itemId): RedirectResponse
+    {
+        $cart = session('teacher_borrowing_cart', []);
+        unset($cart[$itemId]);
+        session(['teacher_borrowing_cart' => $cart]);
+
+        return redirect()->route('teacher.peminjaman-guru.cart')->with('success', 'Barang dihapus dari keranjang.');
+    }
+
+    public function submitCart(Request $request): RedirectResponse
+    {
+        $cart = session('teacher_borrowing_cart', []);
+
+        if (empty($cart)) {
+            return redirect()->route('teacher.peminjaman-guru.cart')->with('error', 'Keranjang masih kosong.');
+        }
+
+        $validated = $request->validate([
+            'kepala_jurusan_id' => 'required|exists:users,id',
+            'borrow_date' => 'required|date|after_or_equal:today',
+            'return_date' => 'required|date|after_or_equal:borrow_date',
+            'return_time' => 'required|date_format:H:i',
+            'purpose' => 'required|string|min:5',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        $header = BorrowingRequest::create([
+            'user_id' => Auth::id(),
+            'item_id' => null,
+            'teacher_id' => Auth::id(),
+            'quantity' => null,
+            'purpose' => $validated['purpose'],
+            'borrow_date' => $validated['borrow_date'],
+            'return_date' => $validated['return_date'],
+            'return_time' => $validated['return_time'],
+            'notes' => $validated['notes'] ?? null,
+            'status' => BorrowingRequest::STATUS_PENDING,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $validated['kepala_jurusan_id'],
+        ]);
+
+        foreach ($cart as $itemId => $entry) {
+            $item = Item::find($itemId);
+            if (! $item) {
+                continue;
+            }
+
+            BorrowingRequestItem::create([
+                'borrowing_request_id' => $header->id,
+                'item_id' => $item->id,
+                'quantity' => (int) ($entry['quantity'] ?? 1),
+                'kondisi_saat_pinjam' => 'baik',
+            ]);
+        }
+
+        session()->forget('teacher_borrowing_cart');
+
+        return redirect()->route('teacher.peminjaman-guru')->with('success', 'Permohonan peminjaman multi-barang berhasil diajukan.');
+    }
+
     /**
      * Display teacher's own borrowing requests
      */

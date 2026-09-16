@@ -88,6 +88,10 @@
                     {{-- Card Body --}}
                     <div class="ta-card-body">
                         {{-- Item Info --}}
+                        @php
+                            $displayItems = $request->items->count() ? $request->items : collect([$request->item])->filter();
+                            $displayQuantity = $request->items->sum('quantity') ?: ($request->quantity ?? 0);
+                        @endphp
                         <div class="ta-item-highlight">
                             <div class="ta-item-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -97,11 +101,15 @@
                             </div>
                             <div class="ta-item-detail">
                                 <span class="ta-field-label">Nama Barang</span>
-                                <span class="ta-item-name">{{ $request->item->name ?? 'N/A' }}</span>
+                                <span class="ta-item-name">
+                                    @foreach($displayItems as $detail)
+                                        {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'N/A' }}{{ !$loop->last ? ', ' : '' }}
+                                    @endforeach
+                                </span>
                             </div>
-                            <div class="ta-stock-info {{ $request->item && $request->item->available_stock >= $request->quantity ? 'ta-stock-ok' : 'ta-stock-low' }}">
-                                <span class="ta-field-label">Stok Tersedia</span>
-                                <span class="ta-stock-num">{{ $request->item->available_stock ?? 'N/A' }} unit</span>
+                            <div class="ta-stock-info ta-stock-ok">
+                                <span class="ta-field-label">Total Qty</span>
+                                <span class="ta-stock-num">{{ $displayQuantity }} unit</span>
                             </div>
                         </div>
 
@@ -114,7 +122,7 @@
                                     </svg>
                                     Jumlah
                                 </span>
-                                <span class="ta-field-value ta-qty">{{ $request->quantity }} unit</span>
+                                <span class="ta-field-value ta-qty">{{ $displayQuantity }} unit</span>
                             </div>
                             <div class="ta-detail-item">
                                 <span class="ta-field-label">

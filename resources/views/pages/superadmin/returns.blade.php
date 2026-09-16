@@ -77,7 +77,7 @@
     }
     .pill-btn.active {
         background: var(--blue-dark);
-        color: #fff;
+        color: #ffffff !important;
         border-color: var(--blue-dark);
     }
     .pill-badge {
@@ -212,7 +212,7 @@
         align-items: center;
         gap: 4px;
         background: var(--color-success);
-        color: #fff;
+        color: #ffffff !important;
         font-size: 11px;
         font-weight: 700;
         padding: 6px 12px;
@@ -221,7 +221,7 @@
         cursor: pointer;
         transition: all .15s;
     }
-    .btn-approve:hover { background: #059669; }
+    .btn-approve:hover { background: var(--color-success-dark, #059669); }
 
     .btn-reject {
         display: inline-flex;
@@ -305,12 +305,12 @@
         border-radius: 8px;
         font-size: 12px;
         font-weight: 700;
-        color: #fff;
+        color: #ffffff !important;
         background: var(--color-danger);
         border: none;
         cursor: pointer;
     }
-    .btn-submit-reject:hover { background: #dc2626; }
+    .btn-submit-reject:hover { background: var(--color-danger-dark, #dc2626); }
 
     /* Read-only badge */
     .readonly-badge {

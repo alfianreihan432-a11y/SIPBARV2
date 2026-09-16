@@ -57,7 +57,7 @@
         </div>
         <div class="g-page-subtitle">Semua permohonan peminjaman barang yang kamu ajukan sebagai guru</div>
     </div>
-    <a href="{{ route('teacher.peminjaman-guru.create') }}" class="g-btn g-btn--primary">
+    <a href="{{ route('teacher.peminjaman-guru.cart') }}" class="g-btn g-btn--primary">
         <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
         Ajukan Peminjaman
     </a>
@@ -119,13 +119,15 @@
 
 {{-- Flash messages --}}
 @if(session('success'))
-<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#065f46;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:600">
-    ✓ {{ session('success') }}
+<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#065f46;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    {{ session('success') }}
 </div>
 @endif
 @if(session('error'))
-<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#b91c1c;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:600">
-    ✗ {{ session('error') }}
+<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#b91c1c;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    {{ session('error') }}
 </div>
 @endif
 
@@ -388,17 +390,17 @@
     window.copyLink = function(url, btn) {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(url).then(function() {
-                var orig = btn.textContent;
-                btn.textContent = '✓ Tersalin!';
-                setTimeout(function(){ btn.textContent = orig.trim(); }, 2000);
+                var orig = btn.innerHTML;
+                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tersalin!';
+                setTimeout(function(){ btn.innerHTML = orig; }, 2000);
             });
         } else {
             var t = document.createElement('textarea');
             t.value = url; document.body.appendChild(t); t.select();
             document.execCommand('copy'); document.body.removeChild(t);
-            var orig = btn.textContent;
-            btn.textContent = '✓ Tersalin!';
-            setTimeout(function(){ btn.textContent = orig.trim(); }, 2000);
+            var orig = btn.innerHTML;
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tersalin!';
+            setTimeout(function(){ btn.innerHTML = orig; }, 2000);
         }
     };
 

@@ -84,7 +84,7 @@
                     @endif
                     <div style="margin-top:auto;padding-top:12px">
                         @if($item->available_stock > 0)
-                        <button wire:click="openBorrowModal({{ $item->id }})"
+                        <button wire:click="addToCart({{ $item->id }})"
                                 class="s-btn s-btn--primary" style="width:100%;justify-content:center">
                             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                             Pinjam Barang
@@ -114,12 +114,4 @@
         </div>
     @endif
 
-    {{-- Borrow Form Modal --}}
-    @if($showBorrowModal && $selectedItem)
-    <div style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;backdrop-filter:blur(3px)">
-        <div style="background:var(--card);border-radius:20px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 48px rgba(0,0,0,.3)">
-            <livewire:borrowing-form :itemId="$selectedItem->id" :key="'borrowing-form-'.$selectedItem->id" />
-        </div>
-    </div>
-    @endif
 </div>

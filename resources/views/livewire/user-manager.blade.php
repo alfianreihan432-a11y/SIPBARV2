@@ -11,6 +11,7 @@
 .um-tab-guru.active{background:#0f766e;box-shadow:0 4px 12px rgba(15,118,110,.3)}
 .um-tab-kelas.active{background:linear-gradient(135deg,#a855f7,#c084fc);box-shadow:0 4px 12px rgba(168,85,247,.4)}
 .um-tab-ekstra.active{background:linear-gradient(135deg,#f97316,#fb923c);box-shadow:0 4px 12px rgba(249,115,22,.4)}
+.um-tab-admin.active{background:linear-gradient(135deg,#b91c1c,#ef4444);box-shadow:0 4px 12px rgba(185,28,28,.4)}
 /* ── FORM CARD ── */
 .um-card{background:var(--bg-card);border:1px solid var(--border-alt);border-radius:18px;overflow:hidden;box-shadow:var(--card-shadow)}
 .um-card-top{padding:20px 24px 18px;border-bottom:1px solid var(--border-subtle)}
@@ -44,6 +45,13 @@
 .um-btn-siswa:hover{background:var(--blue);transform:translateY(-1px)}
 .um-btn-guru{background:#0f766e;color:#fff;box-shadow:0 4px 12px rgba(15,118,110,.3)}
 .um-btn-guru:hover{background:#0d9488;transform:translateY(-1px)}
+.um-btn-kelas{background:#7c3aed;color:#fff;box-shadow:0 4px 12px rgba(124,58,237,.3)}
+.um-btn-kelas:hover{background:#8b5cf6;transform:translateY(-1px)}
+.um-btn-ekstra{background:#ea580c;color:#fff;box-shadow:0 4px 12px rgba(234,88,12,.3)}
+.um-btn-ekstra:hover{background:#f97316;transform:translateY(-1px)}
+.um-btn-admin{background:#b91c1c;color:#fff;box-shadow:0 4px 12px rgba(185,28,28,.3)}
+.um-btn-admin:hover{background:#dc2626;transform:translateY(-1px)}
+.um-denied{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(148,163,184,.1);border:1px solid rgba(148,163,184,.15);color:var(--text-muted)}
 .um-btn-secondary{background:var(--bg-card-subtle);color:var(--text-muted);border:1px solid var(--border-subtle)}
 .um-btn-secondary:hover{background:var(--bg-hover);color:var(--text-primary)}
 .um-edit-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#f59e0b;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;margin-left:auto}
@@ -201,6 +209,29 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
 
     <form wire:submit.prevent="save">
         <div class="um-card-body">
+
+            {{-- ── PERAN PENGGUNA (ubah role — hanya Superadmin) ── --}}
+            @if($editingId && $canChangeRoles)
+            <div style="margin-bottom:20px">
+                <label class="um-label">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Peran Pengguna (Role) <span class="um-req">*</span>
+                </label>
+                <div class="um-input-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <select wire:model.live="editRole" class="um-input" style="cursor:pointer">
+                        <option value="admin">Admin — kelola seluruh sistem</option>
+                        <option value="guru">Guru — setujui peminjaman & monitor siswa</option>
+                        <option value="siswa">Siswa — ajukan peminjaman barang</option>
+                        @if(in_array($editRole, ['superadmin', 'super-admin'], true))
+                        <option value="{{ $editRole }}">Superadmin — akses penuh</option>
+                        @endif
+                    </select>
+                </div>
+                @error('editRole')<div class="um-error">{{ $message }}</div>@enderror
+                <div class="um-hint">Ubah peran lalu klik <strong>Simpan Perubahan</strong>. Hanya Superadmin yang dapat mengubah peran pengguna.</div>
+            </div>
+            @endif
 
             @if($sijunaMessage)
             <div class="um-alert {{ $sijunaSuccess ? 'um-alert-ok' : '' }}" style="{{ !$sijunaSuccess ? 'background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#f87171;' : '' }}margin-bottom:18px">
@@ -630,16 +661,30 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                         @endif
                     </td>
                     <td>
+                        @php
+                            // Hanya Superadmin yang boleh mengubah akun admin/superadmin.
+                            $canManageRow = $isSuperadmin
+                                || ($canManageUsers && in_array($uRole, ['siswa', 'guru'], true));
+                        @endphp
+                        @if($canManageRow)
                         <div style="display:flex;gap:7px">
                             <button wire:click="edit({{ $u->id }})" class="umt-btn umt-btn-edit">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 Edit
                             </button>
+                            @if((int) auth()->id() !== (int) $u->id)
                             <button wire:click="delete({{ $u->id }})" wire:confirm="Hapus '{{ $u->name }}'?" class="umt-btn umt-btn-del">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 Hapus
                             </button>
+                            @endif
                         </div>
+                        @else
+                        <span class="um-denied" title="Hanya Superadmin yang dapat mengubah akun admin/superadmin" style="display:inline-flex;align-items:center;gap:5px">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            Terbatas
+                        </span>
+                        @endif
                     </td>
                 </tr>
                 @endforeach

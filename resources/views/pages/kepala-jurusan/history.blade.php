@@ -87,10 +87,15 @@
         color: var(--text) !important;
         outline: none;
         min-width: 130px;
-        appearance: none;
-        -webkit-appearance: none;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
         color-scheme: light;
+        background-image: none !important;
+        position: relative;
     }
+    .form-select::-ms-expand { display: none; }
+    .form-select::-webkit-select-dropdown-icon { display: none; }
     html.dark .form-select {
         color: var(--text) !important;
         background: var(--input-bg) !important;
@@ -116,9 +121,9 @@
     }
     .reset-btn {
         padding: 8px 14px;
-        background: #fdf6f7;
-        color: #0f172a;
-        border: 1px solid #f0d5da;
+        background: var(--bg3);
+        color: var(--text);
+        border: 1px solid var(--border);
         border-radius: 8px;
         font-size: 13px;
         font-weight: 600;

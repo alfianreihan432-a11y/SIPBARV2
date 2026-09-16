@@ -39,8 +39,9 @@
                 <tr>
                     <td class="qr-details-label">Status</td>
                     <td class="qr-details-val">
-                        <span id="qr-detail-status" class="qr-status-badge">
-                            ● -
+                        <span id="qr-detail-status" class="qr-status-badge" style="display:inline-flex;align-items:center;gap:5px">
+                            <span style="width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;display:inline-block"></span>
+                            -
                         </span>
                     </td>
                 </tr>
@@ -283,7 +284,10 @@
                 
                 var statusBadge = document.getElementById('qr-detail-status');
                 statusBadge.className = 'qr-status-badge ' + (data.status || '');
-                statusBadge.textContent = '● ' + (data.status_label || data.status || '-');
+                statusBadge.style.display = 'inline-flex';
+                statusBadge.style.alignItems = 'center';
+                statusBadge.style.gap = '5px';
+                statusBadge.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;display:inline-block"></span> ' + (data.status_label || data.status || '-');
 
                 document.getElementById('qr-detail-expires').textContent = data.expires_at || 'Tidak ada batas waktu';
 

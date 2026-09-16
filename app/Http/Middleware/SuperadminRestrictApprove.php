@@ -50,11 +50,16 @@ class SuperadminRestrictApprove
                 return $next($request); // ✅ Full access to users
             }
 
-            // 4. Dashboard & Read-only routes (GET)
+            // 4. Inventory + import routes (full access to manage items)
+            if (str_contains($currentRouteName, 'inventory') ||
+                str_contains($currentRouteName, 'items.import')) {
+                return $next($request); // ✅ Full access to item management and KIBB imports
+            }
+
+            // 5. Dashboard & Read-only routes (GET)
             if ($request->isMethod('GET') && 
                 (str_contains($currentRouteName, 'dashboard') ||
                  str_contains($currentRouteName, 'qr-scanner') ||
-                 str_contains($currentRouteName, 'inventory') ||
                  str_contains($currentRouteName, 'loans') ||
                  str_contains($currentRouteName, 'returns') ||
                  str_contains($currentRouteName, 'statistics'))) {

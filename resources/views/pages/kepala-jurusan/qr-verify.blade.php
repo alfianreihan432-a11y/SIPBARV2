@@ -140,11 +140,16 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label">Barang</span>
-                <span class="detail-value">{{ $borrowingRequest->itemWithTrashed ? $borrowingRequest->itemWithTrashed->name : 'Barang tidak tersedia' }}</span>
+                <span class="detail-value">
+                    @php $items = $borrowingRequest->items->count() ? $borrowingRequest->items : collect([$borrowingRequest->item])->filter(); @endphp
+                    @foreach($items as $detail)
+                        {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia' }} ({{ $detail->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}
+                    @endforeach
+                </span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Jumlah</span>
-                <span class="detail-value">{{ $borrowingRequest->quantity }} unit</span>
+                <span class="detail-value">{{ $borrowingRequest->items->sum('quantity') ?: ($borrowingRequest->quantity ?? 0) }} unit</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Tanggal Pinjam</span>

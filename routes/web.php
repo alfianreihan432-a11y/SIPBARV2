@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminReturnController;
 use App\Http\Controllers\Admin\LaporanJurusanController;
 use App\Http\Controllers\Admin\LaporanAdminController;
 use App\Http\Controllers\Superadmin\LaporanAdminController as SuperadminLaporanAdminController;
+use App\Http\Controllers\Superadmin\LaporanJurusanController as SuperadminLaporanJurusanController;
 use App\Http\Controllers\Superadmin\SuperadminReportController;
 use App\Http\Controllers\Superadmin\SuperadminTeacherReportController;
 use App\Http\Controllers\Teacher\TeacherReportSendController;
@@ -141,7 +142,7 @@ Route::middleware(['auth'])->group(function () {
             return view('pages.superadmin.qr-scanner');
         })->name('qr-scanner');
 
-        // Inventory & barang (read-only)
+        // Inventory & barang (full access to manage items, but read-only for other non-item pages)
         Route::get('inventory', [InventoryController::class, 'index'])->name('inventory');
         Route::view('manage-items', 'pages.superadmin.manage-items')->name('manage-items');
         Route::view('categories', 'pages.superadmin.categories')->name('categories');
@@ -153,10 +154,11 @@ Route::middleware(['auth'])->group(function () {
         // Reports (System-wide statistics)
         Route::get('reports', [SuperadminReportController::class, 'index'])->name('reports');
         Route::prefix('laporan-jurusan')->group(function () {
-            Route::get('/', [LaporanJurusanController::class, 'index'])->name('laporan-jurusan');
-            Route::get('/{id}', [LaporanJurusanController::class, 'show'])->name('laporan-jurusan.show');
-            Route::post('/{id}/approve', [LaporanJurusanController::class, 'approve'])->name('laporan-jurusan.approve');
-            Route::post('/{id}/reject', [LaporanJurusanController::class, 'reject'])->name('laporan-jurusan.reject');
+            Route::get('/', [SuperadminLaporanJurusanController::class, 'index'])->name('laporan-jurusan');
+            Route::get('/{id}', [SuperadminLaporanJurusanController::class, 'show'])->name('laporan-jurusan.show');
+            Route::post('/{id}/approve', [SuperadminLaporanJurusanController::class, 'approve'])->name('laporan-jurusan.approve');
+            Route::post('/{id}/reject', [SuperadminLaporanJurusanController::class, 'reject'])->name('laporan-jurusan.reject');
+            Route::delete('/{id}', [SuperadminLaporanJurusanController::class, 'destroy'])->name('laporan-jurusan.destroy');
         });
 
         // Admin Reports (receive and approve/reject consolidation reports from admin)
@@ -176,9 +178,32 @@ Route::middleware(['auth'])->group(function () {
         });
 
         // Users & Settings
+        // Halaman Kelola Pengguna Superadmin = AKSES PENUH (tambah/edit/hapus akun & ubah role).
+        // Seluruh route di grup ini sudah dibatasi middleware role:superadmin.
         Route::view('users', 'pages.superadmin.users')->name('users');
+        Route::view('users/create', 'pages.superadmin.users')->name('users.create');
+        Route::view('users/{userId}/edit', 'pages.superadmin.users')
+            ->whereNumber('userId')
+            ->name('users.edit');
         Route::view('statistics', 'pages.superadmin.statistics')->name('statistics');
         Route::view('settings', 'pages.superadmin.settings')->name('settings');
+        
+        // Landing Page Management
+        Route::prefix('landing-page')->name('landing-page.')->group(function () {
+            Route::get('/', [App\Http\Controllers\SiteSettingController::class, 'index'])->name('index');
+            Route::post('/general', [App\Http\Controllers\SiteSettingController::class, 'updateGeneral'])->name('update-general');
+            Route::post('/hero', [App\Http\Controllers\SiteSettingController::class, 'updateHero'])->name('update-hero');
+            Route::post('/features', [App\Http\Controllers\SiteSettingController::class, 'updateFeatures'])->name('update-features');
+            Route::post('/feature-cards', [App\Http\Controllers\SiteSettingController::class, 'updateFeatureCards'])->name('update-feature-cards');
+            Route::post('/stats', [App\Http\Controllers\SiteSettingController::class, 'updateStats'])->name('update-stats');
+            Route::post('/stats-data', [App\Http\Controllers\SiteSettingController::class, 'updateStatsData'])->name('update-stats-data');
+            Route::post('/about', [App\Http\Controllers\SiteSettingController::class, 'updateAbout'])->name('update-about');
+            Route::post('/about-features', [App\Http\Controllers\SiteSettingController::class, 'updateAboutFeatures'])->name('update-about-features');
+            Route::post('/footer', [App\Http\Controllers\SiteSettingController::class, 'updateFooter'])->name('update-footer');
+            Route::post('/footer-links', [App\Http\Controllers\SiteSettingController::class, 'updateFooterLinks'])->name('update-footer-links');
+            Route::post('/contact', [App\Http\Controllers\SiteSettingController::class, 'updateContact'])->name('update-contact');
+            Route::post('/navigation', [App\Http\Controllers\SiteSettingController::class, 'updateNavigation'])->name('update-navigation');
+        });
     }); // end role:superadmin
     // ────────────────────────────────────────────────────────────────────────
 
@@ -197,6 +222,10 @@ Route::middleware(['auth'])->group(function () {
     })->name('student.catalog');
 
     Route::view('siswa/peminjaman', 'pages.siswa.loans')->name('student.loans');
+    Route::get('siswa/peminjaman/keranjang', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'cart'])->name('student.loans.cart');
+    Route::post('siswa/peminjaman/keranjang/tambah', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'addToCart'])->name('student.loans.cart.add');
+    Route::post('siswa/peminjaman/keranjang/hapus/{itemId}', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'removeFromCart'])->name('student.loans.cart.remove');
+    Route::post('siswa/peminjaman/keranjang/submit', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'submitCart'])->name('student.loans.cart.submit');
     Route::get('siswa/peminjaman/{id}/edit', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'edit'])
         ->name('student.loans.edit');
     Route::put('siswa/peminjaman/{id}/update', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'update'])
@@ -267,6 +296,10 @@ Route::middleware(['auth'])->group(function () {
 
         // Teacher own borrowing routes
         Route::get('peminjaman-guru', [PeminjamanGuruController::class, 'index'])->name('peminjaman-guru');
+        Route::get('peminjaman-guru/keranjang', [PeminjamanGuruController::class, 'cart'])->name('peminjaman-guru.cart');
+        Route::post('peminjaman-guru/keranjang/tambah', [PeminjamanGuruController::class, 'addToCart'])->name('peminjaman-guru.cart.add');
+        Route::post('peminjaman-guru/keranjang/hapus/{itemId}', [PeminjamanGuruController::class, 'removeFromCart'])->name('peminjaman-guru.cart.remove');
+        Route::post('peminjaman-guru/keranjang/submit', [PeminjamanGuruController::class, 'submitCart'])->name('peminjaman-guru.cart.submit');
         Route::get('peminjaman-guru/create', [PeminjamanGuruController::class, 'create'])->name('peminjaman-guru.create');
         Route::post('peminjaman-guru', [PeminjamanGuruController::class, 'store'])->name('peminjaman-guru.store');
         Route::get('peminjaman-guru/{id}/edit', [PeminjamanGuruController::class, 'edit'])->name('peminjaman-guru.edit');

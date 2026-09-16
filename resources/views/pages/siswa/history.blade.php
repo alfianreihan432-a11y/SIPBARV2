@@ -341,7 +341,9 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 style="margin:0;font-size:16px;font-weight:700">Detail Peminjaman</h3>
-            <button type="button" onclick="closeDetailModal()" style="background:none;border:none;font-size:20px;cursor:pointer;padding:4px;border-radius:4px">✕</button>
+            <button type="button" onclick="closeDetailModal()" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:4px;color:inherit;display:flex;align-items:center;justify-content:center">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
         </div>
         <div class="modal-body" id="modalBody">
             <!-- Content will be populated by JavaScript -->

@@ -18,6 +18,20 @@ class SipbarCoreTest extends TestCase
         $response->assertSee('SIPBAR');
     }
 
+    public function test_landing_hero_has_no_dashboard_cta_only_pelajari_lebih_lanjut(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        // Tombol CTA utama ("Dashboard") sudah dihapus (raw match, bukan escaped).
+        $response->assertDontSee('class="hero-btn-main"', false);
+        // Judul, subjudul & tombol "Pelajari Lebih Lanjut" tetap ada.
+        $response->assertSee('hero-h1');
+        $response->assertSee('hero-p');
+        $response->assertSee('Pelajari Lebih Lanjut');
+        $response->assertSee('class="hero-btn-alt"', false);
+    }
+
     public function test_inventory_page_requires_authentication(): void
     {
         $response = $this->get('/inventory');

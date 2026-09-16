@@ -44,7 +44,7 @@
                     <tr style="border-bottom: 1px solid var(--border-alt); background: {{ $report->isUnread() ? 'var(--bg-card-subtle)' : 'transparent' }};">
                         <td style="padding: 12px 16px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--blue-dark); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; flex-shrink: 0;">
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--blue-dark); color: #ffffff !important; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; flex-shrink: 0;">
                                     {{ strtoupper(substr($report->guru->name ?? 'G', 0, 1)) }}
                                 </div>
                                 <div>
@@ -66,12 +66,13 @@
                         </td>
                         <td style="padding: 12px 16px;">
                             @if($report->isUnread())
-                                <span style="padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(251, 191, 36, 0.15); color: var(--color-warning); border: 1px solid rgba(251, 191, 36, 0.3);">
-                                    ● Belum Dibaca
+                                <span style="padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(251, 191, 36, 0.15); color: var(--color-warning); border: 1px solid rgba(251, 191, 36, 0.3); display:inline-flex;align-items:center;gap:5px">
+                                    <span style="width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0"></span>Belum Dibaca
                                 </span>
                             @else
-                                <span style="padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: var(--color-success); border: 1px solid rgba(16, 185, 129, 0.3);">
-                                    ✓ Sudah Dibaca
+                                <span style="padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: var(--color-success); border: 1px solid rgba(16, 185, 129, 0.3); display:inline-flex;align-items:center;gap:5px">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                    Sudah Dibaca
                                 </span>
                             @endif
                         </td>
@@ -79,7 +80,7 @@
                             {{ $report->created_at->format('d M Y, H:i') }}
                         </td>
                         <td style="padding: 12px 16px; text-align: right;">
-                            <a href="{{ route('superadmin.laporan-guru.show', $report->id) }}" style="padding: 6px 12px; background: var(--blue-dark); color: #fff; border-radius: 6px; font-size: 12px; font-weight: 700; text-decoration: none; display: inline-block;">
+                            <a href="{{ route('superadmin.laporan-guru.show', $report->id) }}" style="padding: 6px 12px; background: var(--blue-dark); color: #ffffff !important; border-radius: 6px; font-size: 12px; font-weight: 700; text-decoration: none; display: inline-block;">
                                 Lihat Detail
                             </a>
                         </td>

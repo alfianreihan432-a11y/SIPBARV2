@@ -84,7 +84,7 @@ class KepalaJurusanController extends Controller
         $pendingApprovals = BorrowingRequest::where('tipe_peminjam', 'guru')
             ->where($scope)
             ->where('status', BorrowingRequest::STATUS_PENDING)
-            ->with(['user', 'item', 'itemWithTrashed'])
+            ->with(['user', 'item', 'itemWithTrashed', 'items.itemWithTrashed'])
             ->latest()
             ->take(5)
             ->get();
@@ -93,7 +93,7 @@ class KepalaJurusanController extends Controller
         $activeBorrowings = BorrowingRequest::where('tipe_peminjam', 'guru')
             ->where($scope)
             ->whereIn('status', [BorrowingRequest::STATUS_APPROVED, BorrowingRequest::STATUS_BORROWED])
-            ->with(['user', 'item', 'itemWithTrashed'])
+            ->with(['user', 'item', 'itemWithTrashed', 'items.itemWithTrashed'])
             ->latest()
             ->take(5)
             ->get();
@@ -113,7 +113,7 @@ class KepalaJurusanController extends Controller
         $pendingRequests = BorrowingRequest::where('tipe_peminjam', 'guru')
             ->where($this->kajurScopeQuery())
             ->where('status', BorrowingRequest::STATUS_PENDING)
-            ->with(['user', 'item', 'itemWithTrashed'])
+            ->with(['user', 'item', 'itemWithTrashed', 'items.itemWithTrashed'])
             ->latest()
             ->paginate(20);
 
@@ -203,7 +203,7 @@ class KepalaJurusanController extends Controller
     public function verifyQR(string $token): View
     {
         $qrRecord = \App\Models\QRCode::where('code', $token)
-            ->with(['borrowingRequest.user', 'borrowingRequest.itemWithTrashed'])
+            ->with(['borrowingRequest.user', 'borrowingRequest.itemWithTrashed', 'borrowingRequest.items.itemWithTrashed'])
             ->first();
 
         if (!$qrRecord) {

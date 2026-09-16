@@ -61,6 +61,16 @@ class BorrowingRequest extends Model
         return $this->belongsTo(Item::class);
     }
 
+    public function items()
+    {
+        return $this->hasMany(BorrowingRequestItem::class, 'borrowing_request_id');
+    }
+
+    public function itemDetails()
+    {
+        return $this->hasMany(BorrowingRequestItem::class, 'borrowing_request_id');
+    }
+
     /**
      * Relasi item termasuk yang sudah di-soft delete.
      * Dipakai di halaman pengumuman/history agar nama barang tetap tampil
@@ -69,6 +79,31 @@ class BorrowingRequest extends Model
     public function itemWithTrashed(): BelongsTo
     {
         return $this->belongsTo(Item::class, 'item_id')->withTrashed();
+    }
+
+    public function itemSummary(): string
+    {
+        $details = $this->items()->with('itemWithTrashed')->get();
+
+        if ($details->isNotEmpty()) {
+            return $details->map(function ($detail) {
+                $itemName = $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia';
+                return $itemName . ' (' . $detail->quantity . ')';
+            })->implode(', ');
+        }
+
+        return $this->itemWithTrashed?->name ?? $this->item?->name ?? 'Barang tidak tersedia';
+    }
+
+    public function totalQuantity(): int
+    {
+        $details = $this->items()->get();
+
+        if ($details->isNotEmpty()) {
+            return (int) $details->sum('quantity');
+        }
+
+        return (int) ($this->quantity ?? 0);
     }
 
     public function teacher(): BelongsTo

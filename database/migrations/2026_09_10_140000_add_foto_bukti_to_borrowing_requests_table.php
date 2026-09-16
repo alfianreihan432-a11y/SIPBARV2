@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('borrowing_requests')) {
+            return;
+        }
+
         Schema::table('borrowing_requests', function (Blueprint $table) {
             if (!Schema::hasColumn('borrowing_requests', 'foto_bukti')) {
                 $table->string('foto_bukti')->nullable()->after('return_notes');

@@ -6,6 +6,7 @@ use App\Models\Classroom;
 use App\Models\Extracurricular;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
@@ -25,6 +26,9 @@ class UserManager extends Component
     public $activeTab = 'siswa';
 
     public $editingId = null;
+
+    // ── Role pengguna (hanya Superadmin yang boleh mengubah) ──
+    public $editRole = '';
 
     // ── Shared ──
     public $name = '';
@@ -149,13 +153,79 @@ class UserManager extends Component
         $this->sijunaLoading = false;
     }
 
-    public function mount(): void
+    public function mount(?int $editId = null): void
     {
         $this->loadUsers();
         $this->loadRoles();
         $this->loadClassrooms();
         $this->loadClassesAndExtras();
         $this->loadSyncStatus();
+
+        // Deep-link dari route superadmin.users.edit → langsung buka form edit.
+        if ($editId) {
+            $this->edit((int) $editId);
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // OTORISASI
+    //  - Superadmin : akses penuh (tambah, edit, hapus, ubah role).
+    //  - Admin      : boleh kelola akun siswa/guru, TIDAK boleh ubah role
+    //                 pengguna lain dan tidak boleh menyentuh akun
+    //                 admin/superadmin.
+    //  - Role lain  : tidak boleh mengelola akun sama sekali.
+    // ══════════════════════════════════════════════════════════════════
+
+    protected function isSuperadmin(): bool
+    {
+        return auth()->check() && auth()->user()->hasRole('superadmin');
+    }
+
+    protected function canManageUsers(): bool
+    {
+        return auth()->check()
+            && auth()->user()->hasAnyRole(['admin', 'superadmin']);
+    }
+
+    protected function canChangeRoles(): bool
+    {
+        return $this->isSuperadmin();
+    }
+
+    protected function userRoleSlug(?User $user): string
+    {
+        return strtolower($user?->roles->first()?->name ?? '');
+    }
+
+    /**
+     * Apakah user yang login boleh mengubah/menghapus akun $user?
+     */
+    protected function canManageUserRecord(User $user): bool
+    {
+        if ($this->isSuperadmin()) {
+            return true;
+        }
+
+        if (! $this->canManageUsers()) {
+            return false;
+        }
+
+        // Admin tidak boleh mengubah akun admin/superadmin.
+        return ! in_array(
+            $this->userRoleSlug($user),
+            ['admin', 'superadmin', 'super-admin'],
+            true
+        );
+    }
+
+    /**
+     * Tab form yang boleh dipilih sesuai role user yang login.
+     */
+    protected function allowedTabs(): array
+    {
+        return $this->isSuperadmin()
+            ? ['siswa', 'guru', 'kelas', 'ekstra']
+            : ['siswa', 'guru', 'kelas', 'ekstra'];
     }
 
     public function loadUsers(): void
@@ -198,8 +268,33 @@ class UserManager extends Component
 
     public function setTab(string $tab): void
     {
+        if (! in_array($tab, $this->allowedTabs(), true)) {
+            session()->flash(
+                'error',
+                'Hanya Superadmin yang dapat menambahkan atau mengubah akun dengan peran ini.'
+            );
+
+            return;
+        }
+
         $this->activeTab = $tab;
         $this->resetForm();
+    }
+
+    /**
+     * Saat Superadmin mengganti role pada form edit, sesuaikan field yang tampil.
+     */
+    public function updatedEditRole($value): void
+    {
+        if (! $this->canChangeRoles() || ! $this->editingId) {
+            return;
+        }
+
+        $this->activeTab = match (strtolower((string) $value)) {
+            'guru' => 'guru',
+
+            default => 'siswa',
+        };
     }
 
     public function save(): void
@@ -218,7 +313,55 @@ class UserManager extends Component
             return;
         }
 
-        $role = $this->activeTab;
+        if (! $this->canManageUsers()) {
+            session()->flash('error', 'Anda tidak memiliki izin untuk mengelola akun pengguna.');
+            return;
+        }
+
+        $editingUser = $this->editingId
+            ? User::with('roles')->find($this->editingId)
+            : null;
+
+        if ($this->editingId && ! $editingUser) {
+            session()->flash('error', 'Pengguna tidak ditemukan.');
+            return;
+        }
+
+        if ($editingUser && ! $this->canManageUserRecord($editingUser)) {
+            session()->flash('error', 'Anda tidak memiliki izin untuk mengubah akun ini.');
+            return;
+        }
+
+        $existingRole = $this->userRoleSlug($editingUser);
+
+        // ── Tentukan role yang akan disimpan ──
+        if ($editingUser) {
+            if (! $this->canChangeRoles()) {
+                $attempted = strtolower((string) $this->editRole);
+
+                if ($attempted !== '' && $attempted !== $existingRole) {
+                    session()->flash('error', 'Hanya Superadmin yang dapat mengubah peran pengguna.');
+                    return;
+                }
+
+                $role = $existingRole !== '' ? $existingRole : $this->activeTab;
+            } else {
+                $role = $this->editRole !== ''
+                    ? strtolower((string) $this->editRole)
+                    : $existingRole;
+            }
+        } else {
+            $role = strtolower((string) $this->activeTab);
+
+            if (! $this->canChangeRoles() && ! in_array($role, ['siswa', 'guru'], true)) {
+                session()->flash('error', 'Hanya Superadmin yang dapat menambahkan akun dengan peran ini.');
+                return;
+            }
+        }
+
+        if (! in_array($role, ['siswa', 'guru', 'admin', 'superadmin', 'super-admin'], true)) {
+            $role = 'siswa';
+        }
 
         $rules = [
             'name' => 'required|string|min:2',
@@ -227,29 +370,41 @@ class UserManager extends Component
         if ($role === 'siswa') {
             $rules['nis'] = 'required|string|max:20';
             $rules['kelas'] = 'required|string|max:50';
-            $rules['jurusan'] = 'required|string|max:50';
+
+            if (Schema::hasColumn('users', 'jurusan')) {
+                $rules['jurusan'] = 'required|string|max:50';
+            }
         } elseif ($role === 'guru') {
             $rules['phone'] = 'required|string|min:9|max:20';
             $rules['nip'] = 'required|string|max:30';
             $rules['jabatan'] = 'required|string|max:50';
+        } elseif (! $editingUser) {
+            $rules['email'] = 'required|email|unique:users,email';
         }
 
         $this->validate($rules);
 
-        if (!$this->editingId) {
+        if (! $editingUser) {
             if ($role === 'siswa') {
                 $slug = Str::slug($this->name, '.');
                 $base = strtolower(trim($this->nis ?: $slug));
 
                 $this->email = $base . '@smkn1bangsri.sch.id';
                 $this->password = 'siswa123';
-            } else {
+            } elseif ($role === 'guru') {
                 $this->email = User::generateTeacherEmail(
                     $this->nip,
                     $this->tanggal_lahir ?? null
                 );
 
                 $this->password = 'guru123';
+            } else {
+                // Admin / Superadmin: email tetap dapat diisi manual.
+                $this->email = $this->email !== ''
+                    ? $this->email
+                    : Str::slug($this->name, '.') . '@smkn1bangsri.sch.id';
+
+                $this->password = $role === 'admin' ? 'admin123' : 'superadmin123';
             }
 
             if (User::where('email', $this->email)->exists()) {
@@ -288,7 +443,11 @@ class UserManager extends Component
         if ($role === 'siswa') {
             $data['nis'] = $this->nis;
             $data['kelas'] = $this->kelas;
-            $data['jurusan'] = $this->jurusan;
+
+            if (Schema::hasColumn('users', 'jurusan')) {
+                $data['jurusan'] = $this->jurusan;
+            }
+
             $data['classroom_id'] = $this->classroom_id ?: null;
         } elseif ($role === 'guru') {
             $data['phone'] = $this->phone;
@@ -296,9 +455,9 @@ class UserManager extends Component
             $data['jabatan'] = $this->jabatan;
         }
 
-        if ($this->editingId) {
-            $user = User::findOrFail($this->editingId);
-            $user->update($data);
+        if ($editingUser) {
+            $editingUser->update($data);
+            $user = $editingUser;
         } else {
             $data['email'] = $this->email;
             $data['password'] = Hash::make($this->password);
@@ -310,7 +469,7 @@ class UserManager extends Component
 
         $generatedEmail = $this->email;
         $generatedPassword = $this->password;
-        $wasEditing = (bool) $this->editingId;
+        $wasEditing = (bool) $editingUser;
 
         $this->resetForm();
         $this->loadUsers();
@@ -328,54 +487,133 @@ class UserManager extends Component
         }
     }
 
+    /**
+     * Buka form edit untuk baris yang diklik.
+     *
+     * PENTING: baris tabel pengguna selalu mengirim ID user. Sebelumnya ID user
+     * dipaksa ke ClassRoom::findOrFail()/Extracurricular::findOrFail() saat tab
+     * "Kelas"/"Ekstra" aktif sehingga Livewire membalas 404 (modal "404 Not Found").
+     * Sekarang: ID user dicari terlebih dahulu, lalu fallback ke kelas/ekstra.
+     */
     public function edit(int $id): void
     {
-        if ($this->activeTab === 'kelas') {
-            $kelas = ClassRoom::findOrFail($id);
-
-            $this->editingId = $kelas->id;
-            $this->nama_kelas = $kelas->name;
-            $this->ketua_kelas = $kelas->class_leader_name;
-            $this->nis_ketua = $kelas->class_leader_nis;
-            $this->wali_kelas = $kelas->homeroom_teacher;
+        if (! $this->canManageUsers()) {
+            session()->flash('error', 'Anda tidak memiliki izin untuk mengedit akun pengguna.');
 
             return;
+        }
+
+        // ── 1) Pada tab kelas / ekstra, prioritas selalu ke model yang sedang dibuka. ──
+        if ($this->activeTab === 'kelas') {
+            $kelas = ClassRoom::find($id);
+
+            if ($kelas) {
+                $this->resetForm();
+                $this->activeTab = 'kelas';
+
+                $this->editingId = $kelas->id;
+                $this->nama_kelas = $kelas->name;
+                $this->ketua_kelas = $kelas->class_leader_name;
+                $this->nis_ketua = $kelas->class_leader_nis;
+                $this->wali_kelas = $kelas->homeroom_teacher;
+
+                return;
+            }
         }
 
         if ($this->activeTab === 'ekstra') {
-            $ekstra = Extracurricular::findOrFail($id);
+            $ekstra = Extracurricular::find($id);
 
-            $this->editingId = $ekstra->id;
-            $this->nama_ekstra = $ekstra->name;
-            $this->ketua_ekstra = $ekstra->description;
-            $this->pembina_ekstra = $ekstra->pembina;
+            if ($ekstra) {
+                $this->resetForm();
+                $this->activeTab = 'ekstra';
+
+                $this->editingId = $ekstra->id;
+                $this->nama_ekstra = $ekstra->name;
+                $this->ketua_ekstra = $ekstra->description;
+                $this->pembina_ekstra = $ekstra->pembina;
+
+                return;
+            }
+        }
+
+        // ── 2) Akun pengguna (siswa / guru) ──
+        $user = User::with('roles')->find($id);
+
+        if ($user) {
+            if (! $this->canManageUserRecord($user)) {
+                session()->flash('error', 'Anda tidak memiliki izin untuk mengubah akun ini.');
+
+                return;
+            }
+
+            $this->fillUserForm($user);
 
             return;
         }
 
-        $user = User::with('roles')->findOrFail($id);
+        // ── 3) Tidak ditemukan → pesan ramah (bukan 404) ──
+        session()->flash(
+            'error',
+            'Data dengan ID ' . $id . ' tidak ditemukan pada tab "' . ucfirst($this->activeTab) . '".'
+        );
+    }
+
+    /**
+     * Isi form dengan data akun pengguna yang akan diedit.
+     */
+    protected function fillUserForm(User $user): void
+    {
+        $roleSlug = $this->userRoleSlug($user) ?: 'siswa';
 
         $this->editingId = $user->id;
         $this->name = $user->name;
         $this->phone = $user->phone ?? '';
         $this->nis = $user->nis ?? '';
         $this->kelas = $user->kelas ?? '';
-        $this->jurusan = $user->jurusan ?? '';
+        $this->jurusan = (string) ($user->getRawOriginal('jurusan') ?? '');
         $this->classroom_id = $user->classroom_id ?? '';
         $this->nip = $user->nip ?? '';
         $this->jabatan = $user->jabatan ?? '';
         $this->email = $user->email;
+        $this->editRole = $roleSlug;
 
-        $roleSlug = $user->roles->first()?->name ?? 'siswa';
-
-        $this->activeTab = in_array($roleSlug, ['guru'])
-            ? 'guru'
-            : 'siswa';
+        $this->activeTab = match ($roleSlug) {
+            'guru' => 'guru',
+            'siswa' => 'siswa',
+            default => 'siswa',
+        };
     }
 
     public function delete(int $id): void
     {
-        User::findOrFail($id)->delete();
+        if (! $this->canManageUsers()) {
+            session()->flash('error', 'Anda tidak memiliki izin untuk menghapus akun pengguna.');
+
+            return;
+        }
+
+        $user = User::with('roles')->find($id);
+
+        if (! $user) {
+            session()->flash('error', 'Pengguna tidak ditemukan.');
+
+            return;
+        }
+
+        if (! $this->canManageUserRecord($user)) {
+            session()->flash('error', 'Anda tidak memiliki izin untuk menghapus akun ini.');
+
+            return;
+        }
+
+        if ((int) auth()->id() === (int) $user->id) {
+            session()->flash('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+
+            return;
+        }
+
+        $user->delete();
 
         $this->loadUsers();
 
@@ -387,7 +625,20 @@ class UserManager extends Component
 
     public function deleteClass(int $id): void
     {
-        $class = ClassRoom::findOrFail($id);
+        if (! $this->canManageUsers()) {
+            session()->flash('error', 'Anda tidak memiliki izin untuk menghapus data kelas.');
+
+            return;
+        }
+
+        $class = ClassRoom::find($id);
+
+        if (! $class) {
+            session()->flash('error', 'Data kelas dengan ID ' . $id . ' tidak ditemukan.');
+
+            return;
+        }
+
         $class->delete();
 
         $this->loadClassesAndExtras();
@@ -400,7 +651,20 @@ class UserManager extends Component
 
     public function deleteEkstra(int $id): void
     {
-        $ekstra = Extracurricular::findOrFail($id);
+        if (! $this->canManageUsers()) {
+            session()->flash('error', 'Anda tidak memiliki izin untuk menghapus data ekstrakurikuler.');
+
+            return;
+        }
+
+        $ekstra = Extracurricular::find($id);
+
+        if (! $ekstra) {
+            session()->flash('error', 'Data ekstrakurikuler dengan ID ' . $id . ' tidak ditemukan.');
+
+            return;
+        }
+
         $ekstra->delete();
 
         $this->loadClassesAndExtras();
@@ -425,6 +689,7 @@ class UserManager extends Component
         $this->jabatan = '';
         $this->email = '';
         $this->password = '';
+        $this->editRole = '';
 
         $this->sijunaMessage = '';
         $this->sijunaSuccess = false;
@@ -679,6 +944,9 @@ class UserManager extends Component
             'gurus' => $gurus,
             'classes' => $classes,
             'extracurriculars' => $extracurriculars,
+            'canManageUsers' => $this->canManageUsers(),
+            'canChangeRoles' => $this->canChangeRoles(),
+            'isSuperadmin' => $this->isSuperadmin(),
         ]);
     }
 }

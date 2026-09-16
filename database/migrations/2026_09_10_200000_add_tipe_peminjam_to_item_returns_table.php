@@ -9,6 +9,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('item_returns') || ! Schema::hasTable('borrowing_requests')) {
+            return;
+        }
+
+        if (Schema::hasColumn('item_returns', 'tipe_peminjam')) {
+            return;
+        }
+
         Schema::table('item_returns', function (Blueprint $table) {
             // Tipe peminjam: siswa atau guru
             $table->string('tipe_peminjam', 10)->default('siswa')->after('user_id');
@@ -17,15 +25,15 @@ return new class extends Migration
             $table->foreign('kajur_id')->references('id')->on('users')->onDelete('set null');
         });
 
-        // Back-fill: setiap ItemReturn yang borrowingRequest-nya tipe_peminjam = 'guru'
-        // harus diupdate tipe_peminjam = 'guru' dan kajur_id dari approved_by_kajur_id
-        DB::statement("
-            UPDATE item_returns ir
-            INNER JOIN borrowing_requests br ON br.id = ir.borrowing_request_id
-            SET ir.tipe_peminjam = br.tipe_peminjam,
-                ir.kajur_id     = br.approved_by_kajur_id
-            WHERE br.tipe_peminjam = 'guru'
-        ");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("
+                UPDATE item_returns ir
+                INNER JOIN borrowing_requests br ON br.id = ir.borrowing_request_id
+                SET ir.tipe_peminjam = br.tipe_peminjam,
+                    ir.kajur_id     = br.approved_by_kajur_id
+                WHERE br.tipe_peminjam = 'guru'
+            ");
+        }
     }
 
     public function down(): void

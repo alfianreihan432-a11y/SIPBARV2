@@ -107,7 +107,7 @@
             </div>
             
             <div style="display: flex; gap: 12px;">
-                <button type="submit" style="padding: 10px 20px; background: var(--color-success); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
+                <button type="submit" style="padding: 10px 20px; background: var(--color-success); color: #ffffff !important; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
                     Setujui Laporan
                 </button>
                 <button type="button" onclick="document.getElementById('rejectForm').style.display='block'" style="padding: 10px 20px; background: transparent; color: var(--color-danger); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
@@ -124,7 +124,7 @@
             </div>
             
             <div style="display: flex; gap: 12px;">
-                <button type="submit" style="padding: 10px 20px; background: var(--color-danger); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
+                <button type="submit" style="padding: 10px 20px; background: var(--color-danger); color: #ffffff !important; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">
                     Konfirmasi Penolakan
                 </button>
                 <button type="button" onclick="document.getElementById('rejectForm').style.display='none'" style="padding: 10px 20px; background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-subtle); border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s;">

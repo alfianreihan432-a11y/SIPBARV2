@@ -109,10 +109,16 @@
 <div class="profile-wrapper">
 
     @if(session('success'))
-        <div class="flash flash-success">✓ {{ session('success') }}</div>
+        <div class="flash flash-success" style="display:flex;align-items:center;gap:8px">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            {{ session('success') }}
+        </div>
     @endif
     @if(session('error'))
-        <div class="flash flash-error">✗ {{ session('error') }}</div>
+        <div class="flash flash-error" style="display:flex;align-items:center;gap:8px">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            {{ session('error') }}
+        </div>
     @endif
     @if($errors->any())
         <div class="flash flash-error">
@@ -221,7 +227,10 @@
             </div>
             <div class="info-row">
                 <div class="info-lbl">Status Akun</div>
-                <div class="info-val" style="color:#10b981">✓ Aktif</div>
+                <div class="info-val" style="color:#10b981;display:flex;align-items:center;gap:6px">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    Aktif
+                </div>
             </div>
             <div class="info-row" style="position:relative">
                 <div class="info-lbl">Nomor WhatsApp</div>

@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIPBAR – Sistem Informasi Pengelolaan Barang</title>
+<title>{{ \App\Models\SiteSetting::get('site_title', 'SIPBAR – Sistem Informasi Pengelolaan Barang') }}</title>
 {{-- Anti-flash: apply theme class BEFORE any CSS renders --}}
 <script>
   (function(){
@@ -57,7 +56,7 @@ html.dark{
   --text:#f0f6ff;
   --text2:#dce9ff;
   --muted:#94a3b8;
-  --subtle:#94a3b8;
+  --subtle:#64748b;
   --nav-bg:rgba(10,17,34,.95);
   --nav-border:rgba(30,49,88,.8);
   --shadow:0 4px 16px rgba(0,0,0,.4);
@@ -74,7 +73,6 @@ html.dark{
   --dark-card-border: rgba(59, 130, 246, 0.2);
 }
 
-/* ─── NAVBAR ─── */
 /* ─── NAVBAR ─── */
 .site-header{position:sticky;top:0;z-index:100}
 .nav{
@@ -387,7 +385,7 @@ html.dark .mob-t-moon{display:none}
 </style>
 <style>
 /* ─── HERO ─── */
-.hero{position:relative;background:linear-gradient(135deg,rgba(29,78,216,0.85),rgba(37,99,235,0.80)),url('/sekolaheskasaba.jpeg');background-size:cover;background-position:center;overflow:hidden;padding:100px 24px 70px;min-height:550px;display:flex;align-items:center}
+.hero{position:relative;background:linear-gradient(135deg,rgba(29,78,216,0.85),rgba(37,99,235,0.80)),url('{{ \App\Models\SiteSetting::get('hero_background', '/sekolaheskasaba.jpeg') }}');background-size:cover;background-position:center;overflow:hidden;padding:100px 24px 70px;min-height:550px;display:flex;align-items:center}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 40%,rgba(59,130,246,.1) 0%,transparent 70%)}
 .hero-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:2}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:#1d4ed8;border:1px solid rgba(255,255,255,.3);border-radius:999px;font-size:11px;font-weight:700;color:#ffffff;margin-bottom:20px;box-shadow:0 4px 16px rgba(29,78,216,.5);letter-spacing:.02em;text-transform:uppercase}
@@ -905,7 +903,7 @@ html.dark .footer-copy { color: #64748b !important }
 html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.5) }
 html.dark .hero-badge { background:#1e40af !important; color:#ffffff !important; border-color:rgba(255,255,255,.4) !important }
 html.dark .hero-badge-pulse { background:#ffffff !important; opacity:.9 !important }
-html.dark .hero { background:linear-gradient(135deg,rgba(30,64,175,0.85),rgba(37,99,235,0.80)),url('/sekolaheskasaba.jpeg') !important }
+html.dark .hero { background:linear-gradient(135deg,rgba(30,64,175,0.85),rgba(37,99,235,0.80)),url('{{ \App\Models\SiteSetting::get('hero_background', '/sekolaheskasaba.jpeg') }}') !important }
 html.dark .hero-btn-main { background:rgba(255,255,255,.2) !important; color:#ffffff !important; border-color:rgba(255,255,255,.4) !important }
 html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; border-color:rgba(255,255,255,.6) !important }
 /* ─── MOBILE NAV LINKS ─── */
@@ -920,23 +918,23 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
 <nav class="nav">
   <div class="nav-inner">
     {{-- Brand Logo & Text --}}
-    <a href="{{ route('home') }}" class="nav-brand" aria-label="SIPBAR Homepage">
+    <a href="{{ route('home') }}" class="nav-brand" aria-label="{{ \App\Models\SiteSetting::get('site_name', 'SIPBAR') }} Homepage">
       <div class="nav-logo-wrap">
-        <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="nav-brand-img">
+        <img src="{{ \App\Models\SiteSetting::get('site_logo', '/logossmkn1.png') }}" alt="Logo {{ \App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 Bangsri') }}" class="nav-brand-img">
       </div>
       <div class="nav-brand-text">
-        <div class="nav-brand-title">SIPBAR</div>
-        <div class="nav-brand-subtitle">SMKN 1 BANGSRI</div>
+        <div class="nav-brand-title">{{ \App\Models\SiteSetting::get('site_name', 'SIPBAR') }}</div>
+        <div class="nav-brand-subtitle">{{ \App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 BANGSRI') }}</div>
       </div>
     </a>
 
     {{-- Center Navigation Links --}}
     <div class="nav-links">
-      <a href="#beranda" class="active">Beranda</a>
-      <a href="#fitur">Fitur</a>
-      <a href="#data-inventaris">Inventaris</a>
-      <a href="#tentang">Tentang</a>
-      <a href="#kontak">Bantuan</a>
+      <a href="#beranda" class="active">{{ \App\Models\SiteSetting::get('nav_link_home', 'Beranda') }}</a>
+      <a href="#fitur">{{ \App\Models\SiteSetting::get('nav_link_features', 'Fitur') }}</a>
+      <a href="#data-inventaris">{{ \App\Models\SiteSetting::get('nav_link_inventory', 'Inventaris') }}</a>
+      <a href="#tentang">{{ \App\Models\SiteSetting::get('nav_link_about', 'Tentang') }}</a>
+      <a href="#kontak">{{ \App\Models\SiteSetting::get('nav_link_help', 'Bantuan') }}</a>
     </div>
 
     {{-- Right Actions: Desktop Theme Toggle & Login CTA --}}
@@ -992,23 +990,23 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
     <div class="nav-mobile-links">
       <a href="#beranda" onclick="closeNavMob()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        <span>Beranda</span>
+        <span>{{ \App\Models\SiteSetting::get('nav_link_home', 'Beranda') }}</span>
       </a>
       <a href="#fitur" onclick="closeNavMob()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        <span>Fitur Utama</span>
+        <span>{{ \App\Models\SiteSetting::get('nav_link_features_mobile', 'Fitur Utama') }}</span>
       </a>
       <a href="#data-inventaris" onclick="closeNavMob()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-        <span>Katalog Inventaris</span>
+        <span>{{ \App\Models\SiteSetting::get('nav_link_inventory_mobile', 'Katalog Inventaris') }}</span>
       </a>
       <a href="#tentang" onclick="closeNavMob()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span>Tentang SIPBAR</span>
+        <span>{{ \App\Models\SiteSetting::get('nav_link_about_mobile', 'Tentang SIPBAR') }}</span>
       </a>
       <a href="#kontak" onclick="closeNavMob()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        <span>Bantuan & Kontak</span>
+        <span>{{ \App\Models\SiteSetting::get('nav_link_help_mobile', 'Bantuan & Kontak') }}</span>
       </a>
     </div>
 
@@ -1041,7 +1039,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
       @else
         <a href="{{ route('login') }}" class="nav-mob-login">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-          <span>Masuk ke SIPBAR</span>
+          <span>Masuk ke {{ \App\Models\SiteSetting::get('site_name', 'SIPBAR') }}</span>
         </a>
       @endauth
     </div>
@@ -1053,9 +1051,13 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
 <section class="hero" id="beranda">
   <div class="hero-inner">
     <div>
-      <div class="hero-badge"><span class="hero-badge-pulse"></span>Sistem Inventaris Modern</div>
-      <h1 class="hero-h1">Kelola Inventaris<br><em>Lebih Mudah</em> & Efisien</h1>
-      <p class="hero-p">Platform web modern untuk mengelola inventaris sekolah secara digital, transparan, dan terintegrasi.</p>
+      <div class="hero-badge"><span class="hero-badge-pulse"></span>{{ \App\Models\SiteSetting::get('hero_badge', 'Sistem Inventaris Modern') }}</div>
+      <h1 class="hero-h1">{!! \App\Models\SiteSetting::html('hero_title', 'Kelola Inventaris<br><em>Lebih Mudah</em> & Efisien') !!}</h1>
+      <p class="hero-p">{{ \App\Models\SiteSetting::get('hero_description', 'Platform web modern untuk mengelola inventaris sekolah secara digital, transparan, dan terintegrasi.') }}</p>
+      <div class="hero-btns">
+        {{-- Tombol CTA utama ("Dashboard") dihapus — hero hanya menyisakan tombol "Pelajari Lebih Lanjut". --}}
+        <a href="#fitur" class="hero-btn-alt">{{ \App\Models\SiteSetting::get('hero_cta_alt_text', 'Pelajari Lebih Lanjut') }}</a>
+      </div>
     </div>
   </div>
 </section>
@@ -1064,11 +1066,17 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
 <section class="section feat-bg" id="fitur">
   <div class="section-inner">
     <div class="section-head">
-      <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>Kapabilitas Sistem</div>
-      <h2 class="section-h2">Tata Kelola Inventaris <em>Cepat & Terintegrasi</em></h2>
-      <p class="section-lead">Mulai dari pengajuan siswa, approval guru secara instan, hingga serah-terima barang dengan QR code.</p>
+      <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>{{ \App\Models\SiteSetting::get('features_eyebrow', 'Kapabilitas Sistem') }}</div>
+      <h2 class="section-h2">{!! \App\Models\SiteSetting::html('features_title', 'Tata Kelola Inventaris <em>Cepat & Terintegrasi</em>') !!}</h2>
+      <p class="section-lead">{{ \App\Models\SiteSetting::get('features_description', 'Mulai dari pengajuan siswa, approval guru secara instan, hingga serah-terima barang dengan QR code.') }}</p>
     </div>
 
+    @php
+    $featureCards = \App\Models\SiteSetting::getJson('feature_cards', []);
+    $feat = function (int $i, string $key, string $default = '') use ($featureCards) {
+        return $featureCards[$i][$key] ?? $default;
+    };
+    @endphp
     <div class="feat-bento">
       {{-- BENTO CARD 1: Peminjaman & Validasi QR (Row 1 - Span 6) --}}
       @auth
@@ -1081,31 +1089,31 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
             <div class="feat-icon-wrap">
               <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
             </div>
-            <span class="feat-index">01</span>
+            <span class="feat-index">{{ $feat(0, 'index', '01') }}</span>
           </div>
-          <div class="feat-title">Sirkulasi Peminjaman Digital & Validasi QR Code</div>
-          <p class="feat-summary">Pengajuan mandiri & verifikasi ambil barang via QR code tanpa formulir kertas.</p>
-          
+          <div class="feat-title">{{ $feat(0, 'title', 'Sirkulasi Peminjaman Digital & Validasi QR Code') }}</div>
+          <p class="feat-summary">{{ $feat(0, 'description', 'Pengajuan mandiri & verifikasi ambil barang via QR code tanpa formulir kertas.') }}</p>
+
           {{-- Mini interactive workflow preview --}}
           <div class="feat-workflow-flow">
             <div class="feat-flow-step">
               <span class="feat-flow-dot">1</span>
-              <span>Pengajuan Siswa</span>
+              <span>{{ $featureCards[0]['workflow'][0] ?? 'Pengajuan Siswa' }}</span>
             </div>
             <svg class="feat-flow-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             <div class="feat-flow-step">
               <span class="feat-flow-dot">2</span>
-              <span>Approval Guru</span>
+              <span>{{ $featureCards[0]['workflow'][1] ?? 'Approval Guru' }}</span>
             </div>
             <svg class="feat-flow-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             <div class="feat-flow-step">
               <span class="feat-flow-dot">3</span>
-              <span>Scan QR Sarpras</span>
+              <span>{{ $featureCards[0]['workflow'][2] ?? 'Scan QR Sarpras' }}</span>
             </div>
           </div>
         </div>
         <div class="feat-action-link">
-          <span>Pelajari Alur Peminjaman</span>
+          <span>{{ $feat(0, 'link_text', 'Pelajari Alur Peminjaman') }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </div>
       </a>
@@ -1121,13 +1129,13 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
             <div class="feat-icon-wrap">
               <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             </div>
-            <span class="feat-index">02</span>
+            <span class="feat-index">{{ $feat(1, 'index', '02') }}</span>
           </div>
-          <div class="feat-title">Manajemen Stok & Tracking Aset</div>
-          <p class="feat-summary">Katalog aset lengkap dengan nomor registrasi, kondisi fisik, dan lokasi penempatan.</p>
+          <div class="feat-title">{{ $feat(1, 'title', 'Manajemen Stok & Tracking Aset') }}</div>
+          <p class="feat-summary">{{ $feat(1, 'description', 'Katalog aset lengkap dengan nomor registrasi, kondisi fisik, dan lokasi penempatan.') }}</p>
         </div>
         <div class="feat-action-link">
-          <span>Kelola Inventaris</span>
+          <span>{{ $feat(1, 'link_text', 'Kelola Inventaris') }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </div>
       </a>
@@ -1143,13 +1151,13 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
             <div class="feat-icon-wrap">
               <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-            <span class="feat-index">03</span>
+            <span class="feat-index">{{ $feat(2, 'index', '03') }}</span>
           </div>
-          <div class="feat-title">Verifikasi Pengembalian</div>
-          <p class="feat-summary">Cek kondisi fisik barang otomatis saat dikembalikan guna menjaga kualitas aset.</p>
+          <div class="feat-title">{{ $feat(2, 'title', 'Verifikasi Pengembalian') }}</div>
+          <p class="feat-summary">{{ $feat(2, 'description', 'Cek kondisi fisik barang otomatis saat dikembalikan guna menjaga kualitas aset.') }}</p>
         </div>
         <div class="feat-action-link">
-          <span>Lihat Pengembalian</span>
+          <span>{{ $feat(2, 'link_text', 'Lihat Pengembalian') }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </div>
       </a>
@@ -1165,13 +1173,13 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
             <div class="feat-icon-wrap">
               <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             </div>
-            <span class="feat-index">04</span>
+            <span class="feat-index">{{ $feat(3, 'index', '04') }}</span>
           </div>
-          <div class="feat-title">Audit & Rekapitulasi Otomatis</div>
-          <p class="feat-summary">Laporan sirkulasi & statistik pemakaian barang berkala secara instan dan akurat.</p>
+          <div class="feat-title">{{ $feat(3, 'title', 'Audit & Rekapitulasi Otomatis') }}</div>
+          <p class="feat-summary">{{ $feat(3, 'description', 'Laporan sirkulasi & statistik pemakaian barang berkala secara instan dan akurat.') }}</p>
         </div>
         <div class="feat-action-link">
-          <span>Buka Laporan</span>
+          <span>{{ $feat(3, 'link_text', 'Buka Laporan') }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </div>
       </a>
@@ -1187,13 +1195,13 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
             <div class="feat-icon-wrap">
               <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
-            <span class="feat-index">05</span>
+            <span class="feat-index">{{ $feat(4, 'index', '05') }}</span>
           </div>
-          <div class="feat-title">Kontrol Akses Multi-Peran</div>
-          <p class="feat-summary">Hak akses terstruktur untuk Siswa, Guru Pembimbing, Kepala Jurusan, dan Sarpras.</p>
+          <div class="feat-title">{{ $feat(4, 'title', 'Kontrol Akses Multi-Peran') }}</div>
+          <p class="feat-summary">{{ $feat(4, 'description', 'Hak akses terstruktur untuk Siswa, Guru Pembimbing, Kepala Jurusan, dan Sarpras.') }}</p>
         </div>
         <div class="feat-action-link">
-          <span>Atur Pengguna</span>
+          <span>{{ $feat(4, 'link_text', 'Atur Pengguna') }}</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </div>
       </a>
@@ -1213,13 +1221,13 @@ use App\Models\BorrowingRequest;
 $stats = Cache::remember('homepage_stats', 900, function () {
     $totalItems = Item::count();
     $totalCategories = Category::count();
-    
+
     // Get top category name
     $topCategory = Category::withCount('items')
         ->orderBy('items_count', 'desc')
         ->first();
     $topCategoryName = $topCategory ? $topCategory->name : 'Berbagai kategori';
-    
+
     // Count users by role
     $usersByRole = User::selectRaw('
         COUNT(*) as total,
@@ -1227,17 +1235,17 @@ $stats = Cache::remember('homepage_stats', 900, function () {
         SUM(CASE WHEN id IN (SELECT model_id FROM model_has_roles WHERE role_id = (SELECT id FROM roles WHERE name = "guru")) THEN 1 ELSE 0 END) as guru,
         SUM(CASE WHEN id IN (SELECT model_id FROM model_has_roles WHERE role_id = (SELECT id FROM roles WHERE name = "admin")) THEN 1 ELSE 0 END) as admin
     ')->first();
-    
+
     $totalUsers = $usersByRole->total ?? 0;
     $userBreakdown = sprintf('%d Siswa, %d Guru', $usersByRole->siswa ?? 0, $usersByRole->guru ?? 0);
-    
+
     // Total borrowing transactions
     $totalBorrowings = BorrowingRequest::count();
-    
+
     // Calculate completion rate
     $completedBorrowings = BorrowingRequest::where('status', BorrowingRequest::STATUS_RETURNED)->count();
     $completionRate = $totalBorrowings > 0 ? round(($completedBorrowings / $totalBorrowings) * 100, 1) : 0;
-    
+
     return [
         'total_items' => $totalItems,
         'total_categories' => $totalCategories,
@@ -1253,20 +1261,26 @@ $stats = Cache::remember('homepage_stats', 900, function () {
 <section class="section stats-bg" id="data-inventaris">
   <div class="stats-inner">
     <div class="stats-left">
+      @php
+      $statsData = \App\Models\SiteSetting::getJson('stats_data', []);
+      $stat = function (int $i, string $key, string $default = '') use ($statsData) {
+          return $statsData[$i][$key] ?? $default;
+      };
+      @endphp
       <div class="stats-eyebrow">
         <span class="stats-eyebrow-pulse"></span>
-        Data Inventaris System
+        {{ \App\Models\SiteSetting::get('stats_eyebrow', 'Data Inventaris System') }}
       </div>
-      <h2 class="stats-h2">Inventaris Sekolah<br><em>dalam Real-Time Data</em></h2>
-      <p class="stats-p">Kelola dan pantau seluruh aset fisik sekolah secara terintegrasi, transparan, dan dapat diakses dari mana saja dengan sistem inventaris modern.</p>
+      <h2 class="stats-h2">{!! \App\Models\SiteSetting::html('stats_title', 'Inventaris Sekolah<br><em>dalam Real-Time Data</em>') !!}</h2>
+      <p class="stats-p">{{ \App\Models\SiteSetting::get('stats_description', 'Kelola dan pantau seluruh aset fisik sekolah secara terintegrasi, transparan, dan dapat diakses dari mana saja dengan sistem inventaris modern.') }}</p>
       @auth
       <a href="{{ route('inventory.index') }}" class="stats-cta-btn">
-        <span>Jelajahi Data Inventaris</span>
+        <span>{{ \App\Models\SiteSetting::get('stats_cta_text', 'Jelajahi Data Inventaris') }}</span>
         <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
       </a>
       @else
       <a href="{{ route('login') }}" class="stats-cta-btn">
-        <span>Jelajahi Data Inventaris</span>
+        <span>{{ \App\Models\SiteSetting::get('stats_cta_text', 'Jelajahi Data Inventaris') }}</span>
         <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
       </a>
       @endauth
@@ -1278,11 +1292,11 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           <div class="stat-icon-b" style="background:#1d4ed8">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#ffffff" fill="none" viewBox="0 0 24 24" stroke="#ffffff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
           </div>
-          <span class="stat-trend" style="background:#dbeafe;color:#1e40af">Real-time</span>
+          <span class="stat-trend" style="background:#dbeafe;color:#1e40af">{{ $stat(0, 'trend', 'Real-time') }}</span>
         </div>
         <div class="stat-num-b">{{ number_format($stats['total_items'], 0, ',', '.') }}</div>
-        <div class="stat-lbl-b">Total Barang Terdata</div>
-        <div class="stat-sub-b">Terintegrasi seluruh unit</div>
+        <div class="stat-lbl-b">{{ $stat(0, 'label', 'Total Barang Terdata') }}</div>
+        <div class="stat-sub-b">{{ $stat(0, 'sublabel', 'Terintegrasi seluruh unit') }}</div>
       </div>
 
       {{-- Total Categories --}}
@@ -1291,11 +1305,11 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           <div class="stat-icon-b" style="background:#0891b2">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#ffffff" fill="none" viewBox="0 0 24 24" stroke="#ffffff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
           </div>
-          <span class="stat-trend" style="background:#e0f2fe;color:#0369a1">Terstruktur</span>
+          <span class="stat-trend" style="background:#e0f2fe;color:#0369a1">{{ $stat(1, 'trend', 'Terstruktur') }}</span>
         </div>
         <div class="stat-num-b">{{ number_format($stats['total_categories'], 0, ',', '.') }}</div>
-        <div class="stat-lbl-b">Kategori Aset</div>
-        <div class="stat-sub-b">{{ $stats['top_category'] }} terbanyak</div>
+        <div class="stat-lbl-b">{{ $stat(1, 'label', 'Kategori Aset') }}</div>
+        <div class="stat-sub-b">{{ $stats['top_category'] }} {{ $stat(1, 'sublabel', 'terbanyak') }}</div>
       </div>
 
       {{-- Total Users --}}
@@ -1304,11 +1318,11 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           <div class="stat-icon-b" style="background:#7c3aed">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#ffffff" fill="none" viewBox="0 0 24 24" stroke="#ffffff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           </div>
-          <span class="stat-trend" style="background:#f3e8ff;color:#6b21a8">Tersinkron</span>
+          <span class="stat-trend" style="background:#f3e8ff;color:#6b21a8">{{ $stat(2, 'trend', 'Tersinkron') }}</span>
         </div>
         <div class="stat-num-b">{{ number_format($stats['total_users'], 0, ',', '.') }}</div>
-        <div class="stat-lbl-b">Pengguna Aktif</div>
-        <div class="stat-sub-b">{{ $stats['user_breakdown'] }}</div>
+        <div class="stat-lbl-b">{{ $stat(2, 'label', 'Pengguna Aktif') }}</div>
+        <div class="stat-sub-b">{{ trim((string) $stat(2, 'sublabel')) !== '' ? $stat(2, 'sublabel') : $stats['user_breakdown'] }}</div>
       </div>
 
       {{-- Total Borrowings --}}
@@ -1317,11 +1331,11 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           <div class="stat-icon-b" style="background:#059669">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#ffffff" fill="none" viewBox="0 0 24 24" stroke="#ffffff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
           </div>
-          <span class="stat-trend" style="background:#d1fae5;color:#065f46">{{ $stats['completion_rate'] }}% Selesai</span>
+          <span class="stat-trend" style="background:#d1fae5;color:#065f46">{{ $stats['completion_rate'] }}% {{ $stat(3, 'trend', 'Selesai') }}</span>
         </div>
         <div class="stat-num-b">{{ number_format($stats['total_borrowings'], 0, ',', '.') }}</div>
-        <div class="stat-lbl-b">Sirkulasi Peminjaman</div>
-        <div class="stat-sub-b">Proses approval cepat</div>
+        <div class="stat-lbl-b">{{ $stat(3, 'label', 'Sirkulasi Peminjaman') }}</div>
+        <div class="stat-sub-b">{{ $stat(3, 'sublabel', 'Proses approval cepat') }}</div>
       </div>
     </div>
   </div>
@@ -1335,76 +1349,82 @@ $stats = Cache::remember('homepage_stats', 900, function () {
       <div class="about-content-redesigned">
         {{-- Decorative large number in background --}}
         <div class="decorative-number">04</div>
-        
+
+        @php
+        $aboutFeatures = \App\Models\SiteSetting::getJson('about_features', []);
+        $aboutFeat = function (int $i, string $key, $default = '') use ($aboutFeatures) {
+            return $aboutFeatures[$i][$key] ?? $default;
+        };
+        @endphp
         <div class="about-eyebrow-redesigned">
           <span class="eyebrow-dot"></span>
-          Tentang Platform SIPBAR
+          {{ \App\Models\SiteSetting::get('about_eyebrow', 'Tentang Platform SIPBAR') }}
         </div>
-        
+
         <h2 class="about-headline-redesigned">
-          Membangun Sistem Peminjaman Barang yang <span class="headline-accent">Terintegrasi</span>
+          {!! \App\Models\SiteSetting::html('about_title', 'Membangun Sistem Peminjaman Barang yang <span class="headline-accent">Terintegrasi</span>') !!}
         </h2>
-        
+
         <p class="about-desc-redesigned">
-          SIPBAR mentransformasi pencatatan inventaris sekolah konvensional menjadi ekosistem digital yang terintegrasi, transparan, dan dapat diakses dari mana saja.
+          {{ \App\Models\SiteSetting::get('about_description', 'SIPBAR mentransformasi pencatatan inventaris sekolah konvensional menjadi ekosistem digital yang terintegrasi, transparan, dan dapat diakses dari mana saja.') }}
         </p>
-        
+
         {{-- Feature Cards with hierarchy and icons --}}
         <div class="feature-cards-redesigned">
           {{-- Card 01 - Highlighted as primary feature --}}
-          <div class="feature-card feature-card-primary">
+          <div class="feature-card {{ $aboutFeat(0, 'primary') ? 'feature-card-primary' : '' }}">
             <div class="card-header">
               <div class="card-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
               </div>
-              <span class="card-num">01</span>
+              <span class="card-num">{{ $aboutFeat(0, 'number', '01') }}</span>
             </div>
-            <h3 class="card-title">Integrasi</h3>
-            <p class="card-desc">Persetujuan cepat tanpa kertas — guru dapat menyetujui peminjaman langsung dari smartphone.</p>
+            <h3 class="card-title">{{ $aboutFeat(0, 'title', 'Integrasi') }}</h3>
+            <p class="card-desc">{{ $aboutFeat(0, 'description', 'Persetujuan cepat tanpa kertas — guru dapat menyetujui peminjaman langsung dari smartphone.') }}</p>
           </div>
 
           {{-- Card 02 --}}
-          <div class="feature-card">
+          <div class="feature-card {{ $aboutFeat(1, 'primary') ? 'feature-card-primary' : '' }}">
             <div class="card-header">
               <div class="card-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
               </div>
-              <span class="card-num">02</span>
+              <span class="card-num">{{ $aboutFeat(1, 'number', '02') }}</span>
             </div>
-            <h3 class="card-title">Akurasi</h3>
-            <p class="card-desc">Inventaris real-time — stok aset bertambah/berkurang otomatis setiap transaksi terverifikasi.</p>
+            <h3 class="card-title">{{ $aboutFeat(1, 'title', 'Akurasi') }}</h3>
+            <p class="card-desc">{{ $aboutFeat(1, 'description', 'Inventaris real-time — stok aset bertambah/berkurang otomatis setiap transaksi terverifikasi.') }}</p>
           </div>
 
           {{-- Card 03 --}}
-          <div class="feature-card">
+          <div class="feature-card {{ $aboutFeat(2, 'primary') ? 'feature-card-primary' : '' }}">
             <div class="card-header">
               <div class="card-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                 </svg>
               </div>
-              <span class="card-num">03</span>
+              <span class="card-num">{{ $aboutFeat(2, 'number', '03') }}</span>
             </div>
-            <h3 class="card-title">Akuntabilitas</h3>
-            <p class="card-desc">Riwayat & log transparan — setiap pergerakan barang memiliki jejak audit lengkap.</p>
+            <h3 class="card-title">{{ $aboutFeat(2, 'title', 'Akuntabilitas') }}</h3>
+            <p class="card-desc">{{ $aboutFeat(2, 'description', 'Riwayat & log transparan — setiap pergerakan barang memiliki jejak audit lengkap.') }}</p>
           </div>
 
           {{-- Card 04 --}}
-          <div class="feature-card">
+          <div class="feature-card {{ $aboutFeat(3, 'primary') ? 'feature-card-primary' : '' }}">
             <div class="card-header">
               <div class="card-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                 </svg>
               </div>
-              <span class="card-num">04</span>
+              <span class="card-num">{{ $aboutFeat(3, 'number', '04') }}</span>
             </div>
-            <h3 class="card-title">Aksesibilitas</h3>
-            <p class="card-desc">Akses fleksibel multi-perangkat — responsif di PC, tablet, maupun ponsel.</p>
+            <h3 class="card-title">{{ $aboutFeat(3, 'title', 'Aksesibilitas') }}</h3>
+            <p class="card-desc">{{ $aboutFeat(3, 'description', 'Akses fleksibel multi-perangkat — responsif di PC, tablet, maupun ponsel.') }}</p>
           </div>
         </div>
       </div>
@@ -1416,13 +1436,13 @@ $stats = Cache::remember('homepage_stats', 900, function () {
       <div class="about-visual-redesigned">
         <div class="school-photo-frame-redesigned">
           <div class="photo-wrapper">
-            <img 
-              src="/sekolaheskasaba.jpeg" 
-              alt="Foto Gedung SMKN 1 Bangsri" 
+            <img
+              src="{{ \App\Models\SiteSetting::get('about_image', '/sekolaheskasaba.jpeg') }}"
+              alt="{{ \App\Models\SiteSetting::get('about_caption_label', 'Foto Gedung SMKN 1 Bangsri') }}"
               class="school-photo"
             />
             <div class="photo-gradient"></div>
-            
+
             <div class="glass-badge">
               <div class="badge-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1430,14 +1450,14 @@ $stats = Cache::remember('homepage_stats', 900, function () {
                 </svg>
               </div>
               <div class="badge-content">
-                <span class="badge-year">2026</span>
-                <span class="badge-name">SMKN 1 BANGSRI</span>
+                <span class="badge-year">{{ \App\Models\SiteSetting::get('about_badge_year', '2026') }}</span>
+                <span class="badge-name">{{ \App\Models\SiteSetting::get('about_badge_name', 'SMKN 1 BANGSRI') }}</span>
               </div>
             </div>
-            
+
             <div class="photo-caption">
-              <div class="caption-label">Gedung Utama Sekolah</div>
-              <div class="caption-sub">Pusat kegiatan belajar mengajar dan inovasi digital</div>
+              <div class="caption-label">{{ \App\Models\SiteSetting::get('about_caption_label', 'Gedung Utama Sekolah') }}</div>
+              <div class="caption-sub">{{ \App\Models\SiteSetting::get('about_caption_sub', 'Pusat kegiatan belajar mengajar dan inovasi digital') }}</div>
             </div>
           </div>
         </div>
@@ -1447,6 +1467,33 @@ $stats = Cache::remember('homepage_stats', 900, function () {
 </section>
 
 {{-- ═══════════════ FOOTER ═══════════════ --}}
+@php
+$footerLinks = \App\Models\SiteSetting::getJson('footer_links', [
+    'navigation' => [
+        ['text' => 'Beranda', 'url' => '#beranda'],
+        ['text' => 'Fitur', 'url' => '#fitur'],
+        ['text' => 'Tentang', 'url' => '#tentang'],
+    ],
+    'information' => [
+        ['text' => 'Manajemen Barang', 'url' => '#fitur'],
+        ['text' => 'Peminjaman', 'url' => '#fitur'],
+        ['text' => 'Pengembalian', 'url' => '#fitur'],
+        ['text' => 'Laporan', 'url' => '#fitur'],
+        ['text' => 'Pengguna', 'url' => '#fitur'],
+    ],
+    'legal' => [
+        ['text' => 'Panduan Penggunaan', 'url' => '#'],
+        ['text' => 'FAQ', 'url' => '#'],
+        ['text' => 'Kebijakan Privasi', 'url' => '#'],
+        ['text' => 'Syarat & Ketentuan', 'url' => '#'],
+    ],
+    'social' => [
+        ['text' => 'Instagram', 'url' => '#', 'icon' => 'instagram'],
+        ['text' => 'Facebook', 'url' => '#', 'icon' => 'facebook'],
+        ['text' => 'Twitter', 'url' => '#', 'icon' => 'twitter'],
+    ],
+]);
+@endphp
 <footer class="footer" id="kontak">
   <div class="footer-inner">
     <div class="footer-grid">
@@ -1454,46 +1501,43 @@ $stats = Cache::remember('homepage_stats', 900, function () {
       <div class="footer-brand">
         <div class="footer-logo-wrap">
           <div class="footer-logo-box">
-            <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" style="width:100%;height:100%;object-fit:contain;">
+            <img src="{{ \App\Models\SiteSetting::get('site_logo', '/logossmkn1.png') }}" alt="Logo {{ \App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 Bangsri') }}" style="width:100%;height:100%;object-fit:contain;">
           </div>
           <div>
-            <div class="footer-brand-name">SIPBAR</div>
-            <div class="footer-brand-sub">SMKN 1 BANGSRI</div>
+            <div class="footer-brand-name">{{ \App\Models\SiteSetting::get('footer_brand_name', 'SIPBAR') }}</div>
+            <div class="footer-brand-sub">{{ \App\Models\SiteSetting::get('footer_brand_subtitle', 'SMKN 1 BANGSRI') }}</div>
           </div>
         </div>
-        <p class="footer-desc">Sistem inventaris berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.</p>
+        <p class="footer-desc">{{ \App\Models\SiteSetting::get('footer_description', 'Sistem inventaris berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.') }}</p>
       </div>
 
       {{-- Menu Column --}}
       <div class="footer-col">
-        <div class="footer-heading">Menu</div>
+        <div class="footer-heading">{{ \App\Models\SiteSetting::get('footer_heading_menu', 'Menu') }}</div>
         <ul class="footer-list">
-          <li><a href="#beranda">Beranda</a></li>
-          <li><a href="#fitur">Fitur</a></li>
-          <li><a href="#tentang">Tentang</a></li>
+          @foreach(($footerLinks['navigation'] ?? []) as $flink)
+          <li><a href="{{ $flink['url'] ?? '#' }}">{{ $flink['text'] ?? '' }}</a></li>
+          @endforeach
         </ul>
       </div>
 
       {{-- Fitur Column --}}
       <div class="footer-col">
-        <div class="footer-heading">Fitur</div>
+        <div class="footer-heading">{{ \App\Models\SiteSetting::get('footer_heading_features', 'Fitur') }}</div>
         <ul class="footer-list">
-          <li><a href="#fitur">Manajemen Barang</a></li>
-          <li><a href="#fitur">Peminjaman</a></li>
-          <li><a href="#fitur">Pengembalian</a></li>
-          <li><a href="#fitur">Laporan</a></li>
-          <li><a href="#fitur">Pengguna</a></li>
+          @foreach(($footerLinks['information'] ?? []) as $flink)
+          <li><a href="{{ $flink['url'] ?? '#' }}">{{ $flink['text'] ?? '' }}</a></li>
+          @endforeach
         </ul>
       </div>
 
       {{-- Bantuan Column --}}
       <div class="footer-col">
-        <div class="footer-heading">Bantuan</div>
+        <div class="footer-heading">{{ \App\Models\SiteSetting::get('footer_heading_help', 'Bantuan') }}</div>
         <ul class="footer-list">
-          <li><a href="#">Panduan Penggunaan</a></li>
-          <li><a href="#">FAQ</a></li>
-          <li><a href="#">Kebijakan Privasi</a></li>
-          <li><a href="#">Syarat &amp; Ketentuan</a></li>
+          @foreach(($footerLinks['legal'] ?? []) as $flink)
+          <li><a href="{{ $flink['url'] ?? '#' }}">{{ $flink['text'] ?? '' }}</a></li>
+          @endforeach
         </ul>
       </div>
     </div>
@@ -1501,7 +1545,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
     <hr class="footer-divider">
 
     <div class="footer-bottom">
-      <p class="footer-copy">&copy; {{ date('Y') }} SIPBAR – Sistem Informasi Pengelolaan Barang. All rights reserved.</p>
+      <p class="footer-copy">{{ \App\Models\SiteSetting::get('footer_copyright', '© '.date('Y').' SIPBAR – Sistem Informasi Pengelolaan Barang. All rights reserved.') }}</p>
     </div>
   </div>
 </footer>

@@ -34,6 +34,26 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticated();
     }
 
+    public function test_student_outside_whitelist_can_authenticate_when_login_restriction_is_disabled(): void
+    {
+        config()->set('sipbar.login_restriction.enabled', false);
+
+        $user = User::factory()->create([
+            'email' => 'student.outside@example.com',
+        ]);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertAuthenticated();
+    }
+
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         $user = User::factory()->create();

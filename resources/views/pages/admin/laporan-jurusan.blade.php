@@ -38,20 +38,28 @@
         color: var(--text) !important;
         outline: none;
         min-width: 150px;
-        appearance: none;
-        -webkit-appearance: none;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
         color-scheme: light;
+        background-image: none !important;
+        position: relative;
     }
+    .form-select::-ms-expand { display: none !important; }
+    .form-select::-webkit-select-dropdown-icon { display: none !important; }
+    .form-select::-webkit-slider-runnable-track { display: none !important; }
     html.dark .form-select {
         color: var(--text) !important;
         background: var(--input-bg) !important;
         color-scheme: dark;
     }
+    html.dark .form-select::-ms-expand { display: none !important; }
+    html.dark .form-select::-webkit-select-dropdown-icon { display: none !important; }
     .form-select:focus { border-color: var(--blue); color: var(--text) !important; }
     .filter-btn {
         padding: 8px 16px;
         background: var(--blue);
-        color: #fff;
+        color: #ffffff !important;
         border: none;
         border-radius: 8px;
         font-size: 13px;
@@ -64,7 +72,7 @@
     .reset-btn {
         padding: 8px 16px;
         background: var(--bg3);
-        color: var(--text);
+        color: var(--text) !important;
         border: 1px solid var(--border);
         border-radius: 8px;
         font-size: 13px;

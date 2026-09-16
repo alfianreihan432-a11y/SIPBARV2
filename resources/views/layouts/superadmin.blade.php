@@ -13,25 +13,31 @@
     <script>
     (function(){
         var KEY = 'sipbar-superadmin-theme';
-        
+
         // ── Get initial theme with system preference fallback ──
         function getInitialTheme() {
             var saved = localStorage.getItem(KEY);
-            
+
             // If user explicitly set theme, use it
             if (saved === 'light' || saved === 'dark') {
                 return saved;
             }
-            
+
+            // Check if user has theme in admin layout (for consistency)
+            var adminTheme = localStorage.getItem('sipbar-dash-theme');
+            if (adminTheme === 'light' || adminTheme === 'dark') {
+                return adminTheme;
+            }
+
             // Fallback to system preference
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
                 return 'light';
             }
-            
+
             // Default to dark
             return 'dark';
         }
-        
+
         // ── Apply theme IMMEDIATELY (before CSS loads) ──
         var initialTheme = getInitialTheme();
         if (initialTheme === 'light') {
@@ -39,7 +45,7 @@
         } else {
             document.documentElement.classList.remove('light');
         }
-        
+
         // Store theme manager globally for use in toggle script
         window.__sipbarTheme = {
             current: initialTheme,
@@ -69,8 +75,8 @@
             --text-secondary: #e0e0e0;
             --text-muted: #b0b0b0;              /* Improved from #a0a0a0 → Better contrast */
             --text-subtle: #8a8a8a;              /* Improved from #707070 → Better contrast */
-            --blue: #ffffff;
-            --blue-dark: #e0e0e0;
+            --blue: #3b82f6;                     /* Fixed: Use actual blue for better contrast */
+            --blue-dark: #2563eb;               /* Fixed: Use darker blue for button backgrounds */
             --sidebar-bg: #000000;
             --topbar-bg: #000000;
             --content-bg: #050505;
@@ -110,8 +116,8 @@
             --text-secondary: #1a1a1a;
             --text-muted: #606060;
             --text-subtle: #909090;
-            --blue: #000000;
-            --blue-dark: #1a1a1a;
+            --blue: #2563eb;                     /* Fixed: Use actual blue for better contrast */
+            --blue-dark: #1d4ed8;               /* Fixed: Use darker blue for button backgrounds */
             --sidebar-bg: #ffffff;
             --topbar-bg: #ffffff;
             --content-bg: #fafafa;
@@ -279,16 +285,17 @@
             width: 100%;
             padding: 10px 14px;
             background: var(--blue-dark);
-            color: #fff;
+            color: #ffffff !important;
             font-size: 12px;
             font-weight: 700;
             border-radius: 10px;
             text-decoration: none;
-            box-shadow: 0 4px 12px rgba(255,255,255,.2);
+            box-shadow: 0 4px 12px rgba(59,130,246,.3);
             transition: all .2s;
         }
         .sidebar-cta-btn:hover {
             background: var(--blue);
+            color: #ffffff !important;
             transform: translateY(-1px);
         }
 
@@ -436,7 +443,7 @@
             -moz-appearance: none !important;
 
             /* Custom chevron down SVG arrow in var(--blue) */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
             background-repeat: no-repeat !important;
             background-position: right 12px center !important;
             background-size: 15px 15px !important;
@@ -455,11 +462,18 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
         }
 
-        /* Light mode: black arrow */
+        /* Light mode: blue arrow */
         html.light select,
         html.light .im-select,
         html.light .im-select-field {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+        }
+
+        /* Dark mode: light blue arrow */
+        html.dark select,
+        html.dark .im-select,
+        html.dark .im-select-field {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
         }
 
         /* Hover state */
@@ -467,7 +481,7 @@
         .im-select:hover,
         .im-select-field:hover {
             border-color: var(--blue) !important;
-            box-shadow: 0 0 0 2px rgba(255,255,255,0.1) !important;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.1) !important;
         }
 
         /* Focus state — glowing ring */
@@ -475,7 +489,7 @@
         .im-select:focus,
         .im-select-field:focus {
             border-color: var(--blue) !important;
-            box-shadow: 0 0 0 3.5px rgba(255,255,255,0.18) !important;
+            box-shadow: 0 0 0 3.5px rgba(59,130,246,0.18) !important;
             background-color: var(--input-bg) !important;
         }
 
@@ -537,10 +551,10 @@
     <aside class="sidebar" id="sidebar">
         <a href="{{ route('superadmin.dashboard') }}" class="sidebar-brand">
             <div class="sidebar-logo-wrap">
-                <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+                <img src="{{ $siteLogo ?? '/logossmkn1.png' }}" alt="{{ $siteName ?? 'SIPBAR' }}" class="sidebar-brand-img">
             </div>
             <div>
-                <div class="brand-name">SIPBAR</div>
+                <div class="brand-name">{{ $siteName ?? 'SIPBAR' }}</div>
                 <div class="brand-sub">SUPERADMIN</div>
             </div>
         </a>
@@ -604,7 +618,7 @@
                 Laporan
             </a>
 
-            <a href="{{ route('superadmin.laporan-jurusan') }}" class="nav-item {{ request()->routeIs('superadmin.laporan-jurusan') ? 'active' : '' }}">
+            <a href="{{ route('superadmin.laporan-jurusan') }}" class="nav-item {{ request()->routeIs('superadmin.laporan-jurusan*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                 Laporan Jurusan
             </a>
@@ -615,7 +629,11 @@
             </a>
 
             @php
-                $unreadTeacherReportCount = \App\Models\LaporanGuru::where('status', 'belum_dibaca')->count();
+                try {
+                    $unreadTeacherReportCount = \App\Models\LaporanGuru::where('status', 'belum_dibaca')->count();
+                } catch (\Exception $e) {
+                    $unreadTeacherReportCount = 0;
+                }
             @endphp
             <a href="{{ route('superadmin.laporan-guru.index') }}" class="nav-item {{ request()->routeIs('superadmin.laporan-guru*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
@@ -635,6 +653,11 @@
             <a href="{{ route('superadmin.users') }}" class="nav-item {{ request()->routeIs('superadmin.users') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 Pengguna
+            </a>
+
+            <a href="{{ route('superadmin.landing-page.index') }}" class="nav-item {{ request()->routeIs('superadmin.landing-page*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Kelola Landing Page
             </a>
 
             <a href="{{ route('superadmin.settings') }}" class="nav-item {{ request()->routeIs('superadmin.settings') ? 'active' : '' }}">
@@ -796,19 +819,20 @@
             // ── Toggle theme ──
             function toggleTheme() {
                 var newTheme = (themeManager.current === 'light') ? 'dark' : 'light';
-                
-                // Save to localStorage
+
+                // Save to both localStorage keys for consistency
                 localStorage.setItem(themeManager.key, newTheme);
-                
+                localStorage.setItem('sipbar-dash-theme', newTheme);
+
                 // Apply immediately
                 applyTheme(newTheme);
-                
+
                 // Visual feedback
                 if (btn) {
                     btn.style.transform = 'rotate(20deg) scale(.85)';
                     setTimeout(function(){ btn.style.transform = ''; }, 250);
                 }
-                
+
                 console.log('[Theme] Toggled to:', newTheme);
             }
 

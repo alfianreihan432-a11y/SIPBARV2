@@ -183,10 +183,15 @@
         background: var(--input-bg) !important;
         color: var(--text) !important;
         outline: none;
-        appearance: none;
-        -webkit-appearance: none;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
         color-scheme: light;
+        background-image: none !important;
+        position: relative;
     }
+    .form-select::-ms-expand { display: none; }
+    .form-select::-webkit-select-dropdown-icon { display: none; }
     html.dark .form-select {
         color: var(--text) !important;
         background: var(--input-bg) !important;

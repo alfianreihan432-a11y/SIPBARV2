@@ -19,7 +19,9 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     public function up(): void
-    {
+    {        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
         // Use Spatie permission tables to find admin users
         DB::statement("
             UPDATE item_returns ir

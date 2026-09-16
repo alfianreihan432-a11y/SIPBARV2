@@ -80,45 +80,6 @@ class AuthenticateUser
             return null;
         }
 
-        // 3. Pengecekan Mode Pembatasan Akses / Maintenance Login
-        if (config('sipbar.login_restriction.enabled', true)) {
-            $isAdminOrSuperAdmin = $user->hasAnyRole(['admin', 'superadmin', 'super-admin', 'super_admin']);
-            $isTeacher = $user->hasRole('guru');
-            $isKepalaJurusan = $user->hasRole('kepala_jurusan');
-
-            // Guru, Kepala Jurusan & Super Admin/Admin selalu diizinkan login
-            if (! $isAdminOrSuperAdmin && ! $isTeacher && ! $isKepalaJurusan) {
-                $whitelist = config('sipbar.login_restriction.whitelisted_students', []);
-                $userEmail = strtolower(trim($user->email));
-                $userNis = strtolower(trim($user->nis ?? ''));
-
-                $isWhitelisted = false;
-                foreach ($whitelist as $item) {
-                    $item = strtolower(trim($item));
-                    if ($item === '') {
-                        continue;
-                    }
-
-                    $itemNis = str_replace('@smkn1bangsri.sch.id', '', $item);
-                    $itemEmail = str_contains($item, '@') ? $item : "{$item}@smkn1bangsri.sch.id";
-
-                    if ($userEmail === $item || $userEmail === $itemEmail || ($userNis !== '' && ($userNis === $item || $userNis === $itemNis))) {
-                        $isWhitelisted = true;
-                        break;
-                    }
-                }
-
-                if (! $isWhitelisted) {
-                    throw ValidationException::withMessages([
-                        'email' => config(
-                            'sipbar.login_restriction.rejection_message',
-                            'Akses sementara dibatasi. Silakan hubungi admin sekolah untuk informasi lebih lanjut.'
-                        ),
-                    ]);
-                }
-            }
-        }
-
         return $user;
     }
 }

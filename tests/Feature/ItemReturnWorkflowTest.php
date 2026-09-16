@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\BorrowingRequest;
+use App\Models\BorrowingRequestItem;
 use App\Models\Item;
 use App\Models\ItemReturn;
 use App\Models\Notification;
@@ -53,6 +54,23 @@ class ItemReturnWorkflowTest extends TestCase
             'return_date' => now()->addDays(2)->toDateString(),
             'status' => BorrowingRequest::STATUS_BORROWED,
             'borrowed_at' => now()->subDays(3),
+        ]);
+    }
+
+    public function test_borrowing_request_can_store_detail_items_in_new_table(): void
+    {
+        $detail = BorrowingRequestItem::create([
+            'borrowing_request_id' => $this->borrowing->id,
+            'item_id' => $this->item->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        $this->assertDatabaseHas('borrowing_request_items', [
+            'id' => $detail->id,
+            'borrowing_request_id' => $this->borrowing->id,
+            'item_id' => $this->item->id,
+            'quantity' => 1,
         ]);
     }
 

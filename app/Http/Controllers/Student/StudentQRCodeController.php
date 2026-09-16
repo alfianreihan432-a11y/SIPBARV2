@@ -55,7 +55,7 @@ class StudentQRCodeController extends Controller
     private function getQRCodeData(int $id): array|JsonResponse
     {
         // Ambil borrowing request milik siswa yang login
-        $borrowingRequest = BorrowingRequest::with('itemWithTrashed', 'user', 'qrCode')
+        $borrowingRequest = BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed', 'user', 'qrCode'])
             ->where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
@@ -118,11 +118,15 @@ class StudentQRCodeController extends Controller
             default    => ucfirst($borrowingRequest->status),
         };
 
+        $itemNames = $borrowingRequest->items->isNotEmpty()
+            ? $borrowingRequest->items->map(fn ($detail) => ($detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia') . ' (' . ($detail->quantity ?? 1) . ')')->implode(', ')
+            : ($borrowingRequest->itemWithTrashed?->name ?? $borrowingRequest->item?->name ?? 'Barang tidak tersedia');
+
         return [
             'success'      => true,
             'qr_image'     => $result->getDataUri(),
             'token'        => $qrCodeRecord->code,
-            'item_name'    => $borrowingRequest->itemWithTrashed?->name ?? 'Barang tidak tersedia',
+            'item_name'    => $itemNames,
             'borrowing_id' => $borrowingRequest->id,
             'expires_at'   => $qrCodeRecord->expires_at?->format('d M Y, H:i'),
             'status'       => $borrowingRequest->status,

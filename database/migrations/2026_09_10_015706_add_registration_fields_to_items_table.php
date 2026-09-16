@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('items')) {
+            return;
+        }
+
         Schema::table('items', function (Blueprint $table) {
             $table->string('nomor_registrasi')->nullable()->after('nomor_reg');
             $table->enum('ukuran', ['Kecil', 'Sedang', 'Besar'])->nullable()->after('nomor_registrasi');

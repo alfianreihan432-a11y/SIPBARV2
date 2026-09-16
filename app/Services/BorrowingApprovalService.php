@@ -2,11 +2,12 @@
 
 namespace App\Services;
 
+use App\Exceptions\InsufficientStockException;
 use App\Models\BorrowingRequest;
+use App\Models\BorrowingRequestItem;
 use App\Models\Item;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Exceptions\InsufficientStockException;
 
 class BorrowingApprovalService
 {
@@ -102,25 +103,58 @@ class BorrowingApprovalService
      */
     private function validateStock(BorrowingRequest $request): void
     {
-        // Lock item row untuk prevent race condition saat ada concurrent approvals
-        $item = Item::lockForUpdate()->findOrFail($request->item_id);
+        $requestedItems = $request->items()->with('item')->get();
 
-        // Calculate reserved stock (approved or borrowed) — juga di-lock
-        $reservedStock = BorrowingRequest::whereIn('status', [
-            BorrowingRequest::STATUS_APPROVED,
-            BorrowingRequest::STATUS_BORROWED,
-        ])
-        ->where('item_id', $item->id)
-        ->where('id', '!=', $request->id) // Exclude current request
-        ->lockForUpdate()
-        ->sum('quantity');
+        if ($requestedItems->isEmpty()) {
+            if (is_null($request->item_id)) {
+                return;
+            }
 
-        $availableStock = $item->stock - $reservedStock;
+            $item = Item::lockForUpdate()->findOrFail($request->item_id);
+            $reservedStock = BorrowingRequest::whereIn('status', [
+                BorrowingRequest::STATUS_APPROVED,
+                BorrowingRequest::STATUS_BORROWED,
+            ])
+                ->where('item_id', $item->id)
+                ->where('id', '!=', $request->id)
+                ->lockForUpdate()
+                ->sum('quantity');
 
-        if ($availableStock < $request->quantity) {
-            throw new InsufficientStockException(
-                "Stok tidak mencukupi. Tersedia: {$availableStock}, Diminta: {$request->quantity}"
-            );
+            $availableStock = $item->stock - $reservedStock;
+
+            if ($availableStock < (int) ($request->quantity ?? 0)) {
+                throw new InsufficientStockException(
+                    "Stok tidak mencukupi. Tersedia: {$availableStock}, Diminta: {$request->quantity}"
+                );
+            }
+
+            return;
+        }
+
+        foreach ($requestedItems as $detail) {
+            $item = $detail->item;
+
+            if (! $item) {
+                throw new InsufficientStockException('Barang pada permohonan tidak ditemukan di inventaris.');
+            }
+
+            $reservedStock = BorrowingRequestItem::query()
+                ->join('borrowing_requests', 'borrowing_requests.id', '=', 'borrowing_request_items.borrowing_request_id')
+                ->whereIn('borrowing_requests.status', [
+                    BorrowingRequest::STATUS_APPROVED,
+                    BorrowingRequest::STATUS_BORROWED,
+                ])
+                ->where('borrowing_request_items.item_id', $item->id)
+                ->where('borrowing_request_items.borrowing_request_id', '!=', $request->id)
+                ->sum('borrowing_request_items.quantity');
+
+            $availableStock = $item->stock - (int) $reservedStock;
+
+            if ($availableStock < (int) $detail->quantity) {
+                throw new InsufficientStockException(
+                    "Stok tidak mencukupi untuk {$item->name}. Tersedia: {$availableStock}, Diminta: {$detail->quantity}"
+                );
+            }
         }
     }
     
@@ -129,13 +163,15 @@ class BorrowingApprovalService
      */
     public function getAvailableStock(Item $item): int
     {
-        $reservedStock = BorrowingRequest::whereIn('status', [
-            BorrowingRequest::STATUS_APPROVED,
-            BorrowingRequest::STATUS_BORROWED
-        ])
-        ->where('item_id', $item->id)
-        ->sum('quantity');
-        
-        return max(0, $item->stock - $reservedStock);
+        $reservedStock = BorrowingRequestItem::query()
+            ->join('borrowing_requests', 'borrowing_requests.id', '=', 'borrowing_request_items.borrowing_request_id')
+            ->whereIn('borrowing_requests.status', [
+                BorrowingRequest::STATUS_APPROVED,
+                BorrowingRequest::STATUS_BORROWED,
+            ])
+            ->where('borrowing_request_items.item_id', $item->id)
+            ->sum('borrowing_request_items.quantity');
+
+        return max(0, $item->stock - (int) $reservedStock);
     }
 }

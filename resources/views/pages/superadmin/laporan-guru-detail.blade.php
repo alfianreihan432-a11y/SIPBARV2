@@ -55,8 +55,9 @@
         <div>
             <div style="font-size: 11px; font-weight: 700; color: var(--text-subtle); text-transform: uppercase; margin-bottom: 4px;">Status Dibaca</div>
             <div>
-                <span style="padding: 4px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: var(--color-success); border: 1px solid rgba(16, 185, 129, 0.3);">
-                    ✓ Sudah Dibaca ({{ $report->read_at ? $report->read_at->format('d M Y, H:i') : 'Baru Saja' }})
+                <span style="padding: 4px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: var(--color-success); border: 1px solid rgba(16, 185, 129, 0.3); display:inline-flex;align-items:center;gap:5px">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    Sudah Dibaca ({{ $report->read_at ? $report->read_at->format('d M Y, H:i') : 'Baru Saja' }})
                 </span>
             </div>
         </div>

@@ -33,7 +33,7 @@ class TeacherApproval extends Component
 
     public function loadRequests()
     {
-        $this->pendingRequests = BorrowingRequest::with(['user', 'item'])
+        $this->pendingRequests = BorrowingRequest::with(['user', 'item', 'items.itemWithTrashed'])
             ->where('teacher_id', Auth::id())
             ->where('status', BorrowingRequest::STATUS_PENDING)
             ->latest()

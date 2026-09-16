@@ -232,7 +232,7 @@
             width: 100%;
             padding: 10px 14px;
             background: var(--blue-dark);
-            color: #fff;
+            color: #ffffff !important;
             font-size: 12px;
             font-weight: 700;
             border-radius: 10px;
@@ -242,6 +242,7 @@
         }
         .sidebar-cta-btn:hover {
             background: var(--blue);
+            color: #ffffff !important;
             transform: translateY(-1px);
         }
 
@@ -413,6 +414,13 @@
         html.light .im-select,
         html.light .im-select-field {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+        }
+
+        /* Dark mode: light blue arrow */
+        html.dark select,
+        html.dark .im-select,
+        html.dark .im-select-field {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
         }
 
         /* Hover state */

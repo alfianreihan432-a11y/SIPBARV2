@@ -193,10 +193,15 @@
             </thead>
             <tbody>
                 @foreach($pendingRequests as $request)
+                    @php $items = $request->items->count() ? $request->items : collect([$request->item])->filter(); @endphp
                     <tr>
                         <td>{{ $request->user->name }}</td>
-                        <td>{{ $request->item->name }}</td>
-                        <td>{{ $request->quantity }}</td>
+                        <td>
+                            @foreach($items as $detail)
+                                {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia' }} ({{ $detail->quantity ?? $request->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}
+                            @endforeach
+                        </td>
+                        <td>{{ $request->items->sum('quantity') ?: ($request->quantity ?? 0) }}</td>
                         <td>{{ $request->borrow_date->format('d/m/Y') }}</td>
                         <td>{{ $request->return_date->format('d/m/Y') }}</td>
                         <td>{{ Str::limit($request->purpose, 30) }}</td>

@@ -2,9 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\SiteSetting;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -24,6 +28,24 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        Gate::define('manage-site-settings', function (User $user): bool {
+            return $user->hasRole('superadmin');
+        });
+
+        View::composer('*', function ($view) {
+            static $brand = null;
+
+            if ($brand === null) {
+                $brand = [
+                    'siteLogo' => SiteSetting::get('site_logo', '/logossmkn1.png'),
+                    'siteName' => SiteSetting::get('site_name', 'SIPBAR'),
+                    'siteSubtitle' => SiteSetting::get('site_subtitle', 'SMKN 1 BANGSRI'),
+                ];
+            }
+
+            $view->with($brand);
+        });
     }
 
     /**

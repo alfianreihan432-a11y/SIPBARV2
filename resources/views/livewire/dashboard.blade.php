@@ -68,7 +68,7 @@
         /* Hero Section Styles */
         .hero-section {
             position: relative;
-            background: linear-gradient(135deg, rgba(29, 78, 216, 0.9), rgba(2, 132, 199, 0.8)),
+            background: linear-gradient(135deg, var(--blue-dark), var(--blue)),
                         url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
@@ -76,7 +76,7 @@
             padding: 40px 20px;
             margin-bottom: 24px;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(29, 78, 216, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
         .hero-overlay {
             position: absolute;
@@ -84,40 +84,44 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(29, 78, 216, 0.85), rgba(2, 132, 199, 0.75));
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.75));
             z-index: 1;
         }
         .hero-content {
             position: relative;
             z-index: 2;
             text-align: center;
-            color: white;
+            color: #ffffff;
         }
         .hero-title {
             font-size: 36px;
             font-weight: 900;
             margin-bottom: 8px;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6);
             letter-spacing: -0.5px;
+            color: #ffffff;
         }
         .hero-subtitle {
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 20px;
-            opacity: 0.95;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 0, 0, 0.5);
+            color: #ffffff;
         }
         .hero-greeting {
             font-size: 20px;
             font-weight: 700;
             margin-bottom: 8px;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 0, 0, 0.5);
+            color: #ffffff;
         }
         .hero-date {
             font-size: 14px;
             font-weight: 500;
-            opacity: 0.9;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 0, 0, 0.5);
+            color: #ffffff;
         }
         @media (max-width: 768px) {
             .hero-section { padding: 24px 16px; margin-bottom: 16px; border-radius: 14px; }

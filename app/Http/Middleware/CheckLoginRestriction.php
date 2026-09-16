@@ -16,59 +16,8 @@ class CheckLoginRestriction
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! config('sipbar.login_restriction.enabled', true)) {
-            return $next($request);
-        }
-
-        $user = $request->user();
-        if (! $user) {
-            return $next($request);
-        }
-
-        // 1. Super Admin & Admin: Selalu diizinkan
-        if ($user->hasAnyRole(['admin', 'superadmin', 'super-admin', 'super_admin'])) {
-            return $next($request);
-        }
-
-        // 2. Guru & Kepala Jurusan: Selalu diizinkan
-        if ($user->hasRole('guru') || $user->hasRole('kepala_jurusan')) {
-            return $next($request);
-        }
-
-        // 3. Siswa: Cek apakah ada di dalam whitelist
-        $whitelist = config('sipbar.login_restriction.whitelisted_students', []);
-        $userEmail = strtolower(trim($user->email));
-        $userNis = strtolower(trim($user->nis ?? ''));
-
-        $isWhitelisted = false;
-        foreach ($whitelist as $item) {
-            $item = strtolower(trim($item));
-            if ($item === '') {
-                continue;
-            }
-
-            $itemNis = str_replace('@smkn1bangsri.sch.id', '', $item);
-            $itemEmail = str_contains($item, '@') ? $item : "{$item}@smkn1bangsri.sch.id";
-
-            if ($userEmail === $item || $userEmail === $itemEmail || ($userNis !== '' && ($userNis === $item || $userNis === $itemNis))) {
-                $isWhitelisted = true;
-                break;
-            }
-        }
-
-        if (! $isWhitelisted) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return redirect()->route('login')->withErrors([
-                'email' => config(
-                    'sipbar.login_restriction.rejection_message',
-                    'Akses sementara dibatasi. Silakan hubungi admin sekolah untuk informasi lebih lanjut.'
-                ),
-            ]);
-        }
-
+        // Login is allowed whenever credentials are valid; role-based access checks are enforced by
+        // route middleware after authentication. This middleware must not reject login itself.
         return $next($request);
     }
 }

@@ -272,10 +272,15 @@
             </thead>
             <tbody>
                 @foreach($pendingApprovals as $request)
+                    @php $items = $request->items->count() ? $request->items : collect([$request->item])->filter(); @endphp
                     <tr>
                         <td>{{ $request->user->name }}</td>
-                        <td>{{ $request->item->name }}</td>
-                        <td>{{ $request->quantity }}</td>
+                        <td>
+                            @foreach($items as $detail)
+                                {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia' }} ({{ $detail->quantity ?? $request->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}
+                            @endforeach
+                        </td>
+                        <td>{{ $request->items->sum('quantity') ?: ($request->quantity ?? 0) }}</td>
                         <td>{{ $request->borrow_date->format('d/m/Y') }}</td>
                         <td>
                             <span class="status-badge status-pending">Pending</span>
@@ -315,10 +320,15 @@
             </thead>
             <tbody>
                 @foreach($activeBorrowings as $borrowing)
+                    @php $items = $borrowing->items->count() ? $borrowing->items : collect([$borrowing->item])->filter(); @endphp
                     <tr>
                         <td>{{ $borrowing->user->name }}</td>
-                        <td>{{ $borrowing->item->name }}</td>
-                        <td>{{ $borrowing->quantity }}</td>
+                        <td>
+                            @foreach($items as $detail)
+                                {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia' }} ({{ $detail->quantity ?? $borrowing->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}
+                            @endforeach
+                        </td>
+                        <td>{{ $borrowing->items->sum('quantity') ?: ($borrowing->quantity ?? 0) }}</td>
                         <td>{{ $borrowing->borrow_date->format('d/m/Y') }}</td>
                         <td>
                             @if($borrowing->status === 'approved')

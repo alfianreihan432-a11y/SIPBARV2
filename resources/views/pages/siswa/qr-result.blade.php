@@ -164,8 +164,9 @@
                             'borrowed' => 'Sedang Dipinjam'
                         ][$status] ?? ucfirst($status);
                     @endphp
-                    <span class="qr-status-badge {{ $status }}">
-                        ● {{ $statusLabel }}
+                    <span class="qr-status-badge {{ $status }}" style="display:inline-flex;align-items:center;gap:5px">
+                        <span style="width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;display:inline-block"></span>
+                        {{ $statusLabel }}
                     </span>
                 </td>
             </tr>
