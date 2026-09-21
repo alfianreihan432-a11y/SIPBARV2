@@ -79,27 +79,30 @@
         border-color: var(--accent);
     }
     .form-select {
-        padding: 8px 12px;
+        padding: 8px 36px 8px 12px !important;
         border: 1px solid var(--border);
         border-radius: 8px;
         font-size: 13px;
-        background: var(--input-bg) !important;
+        background-color: var(--input-bg) !important;
+        background-repeat: no-repeat !important;
+        background-position: right 12px center !important;
+        background-size: 15px 15px !important;
         color: var(--text) !important;
         outline: none;
         min-width: 130px;
         appearance: none !important;
         -webkit-appearance: none !important;
         -moz-appearance: none !important;
-        color-scheme: light;
-        background-image: none !important;
-        position: relative;
+        cursor: pointer;
     }
     .form-select::-ms-expand { display: none; }
     .form-select::-webkit-select-dropdown-icon { display: none; }
     html.dark .form-select {
         color: var(--text) !important;
-        background: var(--input-bg) !important;
-        color-scheme: dark;
+        background-color: var(--input-bg) !important;
+        background-repeat: no-repeat !important;
+        background-position: right 12px center !important;
+        background-size: 15px 15px !important;
     }
     .form-select:focus {
         border-color: var(--primary);
@@ -419,6 +422,11 @@
     {{-- Filter Form --}}
     <div class="filter-bar-wrap">
         <form method="GET" action="{{ route('kajur.history') }}" class="filter-form">
+            <div class="form-group" style="min-width: 200px; flex: 1;">
+                <label class="form-label">Cari Riwayat</label>
+                <input type="text" name="search" class="form-input" style="width: 100%; min-width: 180px;" value="{{ request('search') }}" placeholder="Cari nama guru atau barang...">
+            </div>
+
             <div class="form-group">
                 <label class="form-label">Status</label>
                 <select name="status" class="form-select">

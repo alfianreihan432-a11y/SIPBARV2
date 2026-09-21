@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Konfirmasi Pengajuan Peminjaman — SIPBAR</title>
+    @include('partials.favicon')
     <meta name="description" content="Halaman konfirmasi persetujuan pengajuan peminjaman barang sekolah">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -213,6 +214,68 @@
             font-size: 12px;
             color: var(--muted);
             margin-top: 2px;
+        }
+
+        /* ─── Item list in approval ─── */
+        .approval-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .approval-item-card {
+            background: #ffffff;
+            border: 1px solid var(--teal-200);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            box-shadow: 0 1px 3px rgba(11,34,32,0.03);
+        }
+        .approval-item-left {
+            flex: 1;
+            min-width: 0;
+        }
+        .approval-item-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+        .approval-badge-cat {
+            display: inline-block;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: var(--teal-100);
+            color: var(--teal-700);
+            letter-spacing: .02em;
+        }
+        .approval-item-code {
+            font-size: 11px;
+            color: var(--subtle);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .approval-item-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.35;
+        }
+        .approval-qty-badge {
+            background: var(--teal-50);
+            border: 1px solid var(--teal-200);
+            color: var(--teal-700);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .divider {
@@ -436,19 +499,37 @@
 
             <!-- Detail pengajuan -->
             <p class="section-title" style="display:flex;align-items:center;gap:6px">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:#2563eb" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:var(--teal-600)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Detail Pengajuan
             </p>
             <div class="info-grid">
                 <div class="info-item">
                     <div class="info-item-label">Nama Siswa</div>
                     <div class="info-item-value">{{ $borrowingRequest->user?->name ?? '-' }}</div>
-                    <div class="info-item-sub">{{ $borrowingRequest->user?->kelas ?? '' }}</div>
+                    <div class="info-item-sub">{{ $borrowingRequest->user?->kelas ?? 'Siswa Peminjam' }}</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-item-label">Barang</div>
-                    <div class="info-item-value">{{ $borrowingRequest->item?->name ?? '-' }}</div>
-                    <div class="info-item-sub">Jumlah: {{ $borrowingRequest->quantity }} unit</div>
+                    <div class="info-item-label">Nomor WhatsApp Siswa</div>
+                    <div class="info-item-value" style="font-family:ui-monospace,monospace;font-size:14px;color:var(--teal-700);">
+                        {{ $borrowingRequest->whatsapp_number ?? $borrowingRequest->user?->phone ?? '-' }}
+                    </div>
+                    <div class="info-item-sub">Kontak peminjam</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-label">Guru Pembimbing</div>
+                    <div class="info-item-value">{{ $borrowingRequest->teacher?->name ?? '-' }}</div>
+                    <div class="info-item-sub">Guru Penanggung Jawab</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-item-label">Jadwal Pengembalian</div>
+                    <div class="info-item-value">
+                        {{ $borrowingRequest->return_time ? \Carbon\Carbon::parse($borrowingRequest->return_time)->format('H:i') . ' WIB' : '-' }}
+                    </div>
+                    <div class="info-item-sub">
+                        {{ $borrowingRequest->borrow_date && $borrowingRequest->return_date
+                            ? $borrowingRequest->borrow_date->diffInDays($borrowingRequest->return_date) . ' hari durasi pinjam'
+                            : 'Batas jam kembali' }}
+                    </div>
                 </div>
                 <div class="info-item">
                     <div class="info-item-label">Tanggal Pinjam</div>
@@ -457,12 +538,81 @@
                 <div class="info-item">
                     <div class="info-item-label">Tanggal Kembali</div>
                     <div class="info-item-value">{{ $borrowingRequest->return_date?->format('d M Y') ?? '-' }}</div>
-                    <div class="info-item-sub">
-                        {{ $borrowingRequest->borrow_date && $borrowingRequest->return_date
-                            ? $borrowingRequest->borrow_date->diffInDays($borrowingRequest->return_date) . ' hari'
-                            : '' }}
-                    </div>
                 </div>
+
+                {{-- Daftar Barang Lengkap (Multi-Item & Single Item Fallback) --}}
+                <div class="info-item full" style="background:var(--teal-50);border-color:var(--teal-200);">
+                    @php
+                        $borrowItems = collect();
+                        if ($borrowingRequest->items && $borrowingRequest->items->isNotEmpty()) {
+                            $borrowItems = $borrowingRequest->items;
+                        } elseif ($borrowingRequest->item || $borrowingRequest->itemWithTrashed) {
+                            $borrowItems = collect([(object)[
+                                'item' => $borrowingRequest->itemWithTrashed ?? $borrowingRequest->item,
+                                'quantity' => $borrowingRequest->quantity ?? 1
+                            ]]);
+                        }
+                        $totalUnits = $borrowItems->sum('quantity');
+                    @endphp
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                        <div class="info-item-label" style="margin-bottom:0;">
+                            Daftar Barang yang Diajukan ({{ $borrowItems->count() }} Jenis, {{ $totalUnits }} Total Unit)
+                        </div>
+                    </div>
+
+                    @if($borrowItems->isEmpty())
+                        <div style="padding:14px;border-radius:8px;background:#fff;border:1px dashed var(--teal-200);text-align:center;font-size:13px;color:var(--subtle);">
+                            Tidak ada rincian barang ditemukan.
+                        </div>
+                    @else
+                        <div class="approval-items-list">
+                            @foreach($borrowItems as $entry)
+                                @php
+                                    $itemModel = $entry->item ?? null;
+                                    $rawName = $itemModel?->name ?? 'Barang tidak ditemukan';
+                                    $categoryBadge = $itemModel?->category?->name ?? '';
+                                    $cleanName = $rawName;
+
+                                    if (strpos($rawName, '.') !== false) {
+                                        $parts = explode('.', $rawName);
+                                        if (count($parts) >= 2) {
+                                            if (empty($categoryBadge)) {
+                                                $categoryBadge = trim($parts[0]);
+                                            }
+                                            $cleanName = trim($parts[count($parts) - 1]);
+                                            $cleanName = preg_replace('/\s*-\s*\[.*?\]\s*$/', '', $cleanName);
+                                            $cleanName = trim($cleanName);
+                                        }
+                                    }
+
+                                    $displayTitle = \Illuminate\Support\Str::title(mb_strtolower($cleanName));
+                                    if ($categoryBadge) {
+                                        $categoryBadge = \Illuminate\Support\Str::title(mb_strtolower($categoryBadge));
+                                    }
+                                    $itemCode = $itemModel?->kode_barang ?? $itemModel?->code ?? '-';
+                                @endphp
+                                <div class="approval-item-card">
+                                    <div class="approval-item-left">
+                                        <div class="approval-item-meta">
+                                            @if($categoryBadge)
+                                                <span class="approval-badge-cat">{{ $categoryBadge }}</span>
+                                            @endif
+                                            @if($itemCode && $itemCode !== '-')
+                                                <span class="approval-item-code">Kode: {{ $itemCode }}</span>
+                                            @endif
+                                        </div>
+                                        <div class="approval-item-name">{{ $displayTitle }}</div>
+                                    </div>
+                                    <div class="approval-qty-badge">
+                                        {{ (int)($entry->quantity ?? 1) }} unit
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
                 <div class="info-item full">
                     <div class="info-item-label">Keperluan</div>
                     <div class="info-item-value" style="font-size:14px;font-weight:500;">

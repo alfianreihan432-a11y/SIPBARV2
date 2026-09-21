@@ -84,7 +84,7 @@ class KepalaJurusanController extends Controller
         $pendingApprovals = BorrowingRequest::where('tipe_peminjam', 'guru')
             ->where($scope)
             ->where('status', BorrowingRequest::STATUS_PENDING)
-            ->with(['user', 'item', 'itemWithTrashed', 'items.itemWithTrashed'])
+            ->with(['user', 'item.category', 'itemWithTrashed.category', 'items.itemWithTrashed.category', 'items.item.category'])
             ->latest()
             ->take(5)
             ->get();
@@ -93,7 +93,7 @@ class KepalaJurusanController extends Controller
         $activeBorrowings = BorrowingRequest::where('tipe_peminjam', 'guru')
             ->where($scope)
             ->whereIn('status', [BorrowingRequest::STATUS_APPROVED, BorrowingRequest::STATUS_BORROWED])
-            ->with(['user', 'item', 'itemWithTrashed', 'items.itemWithTrashed'])
+            ->with(['user', 'item.category', 'itemWithTrashed.category', 'items.itemWithTrashed.category', 'items.item.category'])
             ->latest()
             ->take(5)
             ->get();
@@ -108,17 +108,30 @@ class KepalaJurusanController extends Controller
     /**
      * Display pending teacher borrowing requests for approval
      */
-    public function pendingApprovals(): View
+    public function pendingApprovals(Request $request): View
     {
-        $pendingRequests = BorrowingRequest::where('tipe_peminjam', 'guru')
+        $query = BorrowingRequest::where('tipe_peminjam', 'guru')
             ->where($this->kajurScopeQuery())
             ->where('status', BorrowingRequest::STATUS_PENDING)
-            ->with(['user', 'item', 'itemWithTrashed', 'items.itemWithTrashed'])
-            ->latest()
-            ->paginate(20);
+            ->with(['user', 'item.category', 'itemWithTrashed.category', 'items.itemWithTrashed.category', 'items.item.category']);
+
+        if ($search = trim((string) $request->query('search', ''))) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($uq) use ($search) {
+                    $uq->where('name', 'like', "%{$search}%")
+                       ->orWhere('nip', 'like', "%{$search}%");
+                })->orWhereHas('items.itemWithTrashed', function ($iq) use ($search) {
+                    $iq->where('name', 'like', "%{$search}%")
+                       ->orWhere('code', 'like', "%{$search}%");
+                })->orWhere('purpose', 'like', "%{$search}%");
+            });
+        }
+
+        $pendingRequests = $query->latest()->paginate(20);
 
         return view('pages.kepala-jurusan.pending-approvals', [
             'pendingRequests' => $pendingRequests,
+            'search' => $search,
         ]);
     }
 
@@ -150,8 +163,8 @@ class KepalaJurusanController extends Controller
                 app(\App\Services\QRCodeService::class)->generateForRequest($borrowing);
             }
 
-            return redirect()->route('kajur.pending-approvals')
-                ->with('success', 'Permohonan peminjaman berhasil disetujui. QR Code telah dibuat.');
+            return redirect()->back()
+                ->with('success', 'Permohonan peminjaman guru berhasil disetujui. QR Code telah diterbitkan.');
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Gagal menyetujui permohonan: ' . $e->getMessage());
@@ -181,8 +194,8 @@ class KepalaJurusanController extends Controller
             $kajurId = (int) Auth::id();
             $approvalService->reject($borrowing, $validated['rejection_reason'], $kajurId);
 
-            return redirect()->route('kajur.pending-approvals')
-                ->with('success', 'Permohonan peminjaman berhasil ditolak.');
+            return redirect()->back()
+                ->with('success', 'Permohonan peminjaman guru berhasil ditolak.');
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Gagal menolak permohonan: ' . $e->getMessage());
@@ -303,13 +316,13 @@ class KepalaJurusanController extends Controller
     /**
      * Display pending teacher returns for verification
      */
-    public function pendingReturns(): View
+    public function pendingReturns(Request $request): View
     {
         $kajurId = (int) Auth::id();
         $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
 
         // Use ItemReturn table with proper filtering for guru returns assigned to this Kajur
-        $pendingReturns = \App\Models\ItemReturn::guru()
+        $query = \App\Models\ItemReturn::guru()
             ->where(function ($query) use ($kajurId, $jurusanId) {
                 $query->where('kajur_id', $kajurId);
                 if ($jurusanId) {
@@ -324,9 +337,24 @@ class KepalaJurusanController extends Controller
                 'borrowingRequest.itemWithTrashed.category',
                 'user',
                 'kajur'
-            ])
-            ->latest()
-            ->paginate(20);
+            ]);
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($uq) use ($search) {
+                    $uq->where('name', 'like', "%{$search}%");
+                })->orWhereHas('borrowingRequest.item', function($iq) use ($search) {
+                    $iq->where('name', 'like', "%{$search}%")
+                       ->orWhere('code', 'like', "%{$search}%");
+                })->orWhereHas('borrowingRequest.itemWithTrashed', function($iq) use ($search) {
+                    $iq->where('name', 'like', "%{$search}%")
+                       ->orWhere('code', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $pendingReturns = $query->latest()->paginate(20)->withQueryString();
 
         return view('pages.kepala-jurusan.pending-returns', [
             'pendingReturns' => $pendingReturns,
@@ -437,6 +465,24 @@ class KepalaJurusanController extends Controller
             ]);
 
         // Apply filters
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($uq) use ($search) {
+                    $uq->where('name', 'like', "%{$search}%");
+                })->orWhereHas('item', function($iq) use ($search) {
+                    $iq->where('name', 'like', "%{$search}%")
+                       ->orWhere('code', 'like', "%{$search}%");
+                })->orWhereHas('itemWithTrashed', function($iq) use ($search) {
+                    $iq->where('name', 'like', "%{$search}%")
+                       ->orWhere('code', 'like', "%{$search}%");
+                })->orWhereHas('items.item', function($miq) use ($search) {
+                    $miq->where('name', 'like', "%{$search}%")
+                        ->orWhere('code', 'like', "%{$search}%");
+                });
+            });
+        }
+
         if ($request->has('status') && $request->status) {
             $query->where('status', $request->status);
         }

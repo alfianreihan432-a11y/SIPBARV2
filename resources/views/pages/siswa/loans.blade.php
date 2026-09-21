@@ -3,6 +3,7 @@
 @section('title', 'Peminjaman Saya – SIPBAR')
 
 @section('content')
+<div x-data="{ cancelRequestId: null, showCancelModal: false }" x-cloak>
 @php
     $requests = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'qrCode'])
         ->where('user_id', auth()->id())
@@ -110,6 +111,7 @@
     </div>
 
     @if($requests->count() > 0)
+        <div style="display: flex; flex-direction: column; gap: 10px;">
         @foreach($requests as $req)
         @php $st = $statusMap[$req->status] ?? $statusMap['pending']; @endphp
         <div class="s-loan-row {{ $st['row'] }}">
@@ -145,12 +147,9 @@
                         <button type="button" onclick="navigator.clipboard.writeText('{{ $approvalUrl }}'); var btn=this; btn.textContent='Tersalin!'; setTimeout(function(){ btn.textContent='Salin Link'; }, 2000);" class="s-btn s-btn--sm s-btn--ghost">
                             Salin Link
                         </button>
-                        <form method="POST" action="{{ route('student.loans.cancel', $req->id) }}" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
-                            @csrf
-                            <button type="submit" class="s-btn s-btn--sm s-btn--danger">
-                                Batalkan
-                            </button>
-                        </form>
+                        <button type="button" @click="cancelRequestId = {{ $req->id }}; showCancelModal = true" class="s-btn s-btn--sm s-btn--danger">
+                            Batalkan
+                        </button>
                                     @elseif(in_array($req->status, ['approved', 'qr_ready']))
                     <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
                         <button type="button" onclick="openQRModal({{ $req->id }})" class="s-btn s-btn--sm s-btn--primary">
@@ -171,8 +170,10 @@
                 </span>
                 <span class="s-loan-time">{{ $req->created_at->diffForHumans() }}</span>
             </div>
+            </div>
         </div>
         @endforeach
+        </div>
     @else
         <div class="s-empty">
             <div class="s-empty-icon-wrap">
@@ -186,5 +187,21 @@
             </a>
         </div>
     @endif
+
+    {{-- Cancel Confirmation Modal --}}
+    <div x-show="showCancelModal" x-cloak style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);">
+        <div style="background:var(--card);border-radius:16px;padding:28px;width:100%;max-width:480px;border:1px solid var(--border2);box-shadow:0 20px 48px rgba(0,0,0,0.18);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                <h3 style="font-size:18px;font-weight:700;color:var(--text);">Batalkan Peminjaman</h3>
+                <button type="button" @click="showCancelModal = false" style="background:none;border:none;font-size:24px;color:var(--muted);cursor:pointer;">&times;</button>
+            </div>
+            <p style="font-size:14px;color:var(--text2);margin-bottom:24px;">Apakah Anda yakin ingin membatalkan peminjaman ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <form method="POST" x-bind:action="cancelRequestId ? '{{ route('student.loans.cancel', ':id') }}'.replace(':id', cancelRequestId) : '#'" style="display:flex;gap:10px;justify-content:flex-end;">
+                @csrf
+                <button type="button" @click="showCancelModal = false" style="padding:8px 16px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Batal</button>
+                <button type="submit" style="padding:8px 16px;background:var(--s-rejected-bg);color:var(--s-rejected);border:1px solid var(--s-rejected-bdr);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Ya, Batalkan</button>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection

@@ -224,11 +224,12 @@ Route::middleware(['auth'])->group(function () {
     Route::view('siswa/peminjaman', 'pages.siswa.loans')->name('student.loans');
     Route::get('siswa/peminjaman/keranjang', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'cart'])->name('student.loans.cart');
     Route::post('siswa/peminjaman/keranjang/tambah', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'addToCart'])->name('student.loans.cart.add');
+    Route::post('siswa/peminjaman/keranjang/update/{itemId}', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'updateCartItem'])->name('student.loans.cart.update');
     Route::post('siswa/peminjaman/keranjang/hapus/{itemId}', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'removeFromCart'])->name('student.loans.cart.remove');
     Route::post('siswa/peminjaman/keranjang/submit', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'submitCart'])->name('student.loans.cart.submit');
     Route::get('siswa/peminjaman/{id}/edit', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'edit'])
         ->name('student.loans.edit');
-    Route::put('siswa/peminjaman/{id}/update', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'update'])
+    Route::put('siswa/peminjaman/{id}', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'update'])
         ->name('student.loans.update');
     Route::post('siswa/peminjaman/{id}/cancel', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'cancel'])
         ->name('student.loans.cancel');
@@ -298,6 +299,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('peminjaman-guru', [PeminjamanGuruController::class, 'index'])->name('peminjaman-guru');
         Route::get('peminjaman-guru/keranjang', [PeminjamanGuruController::class, 'cart'])->name('peminjaman-guru.cart');
         Route::post('peminjaman-guru/keranjang/tambah', [PeminjamanGuruController::class, 'addToCart'])->name('peminjaman-guru.cart.add');
+        Route::post('peminjaman-guru/keranjang/update/{itemId}', [PeminjamanGuruController::class, 'updateCartItem'])->name('peminjaman-guru.cart.update');
         Route::post('peminjaman-guru/keranjang/hapus/{itemId}', [PeminjamanGuruController::class, 'removeFromCart'])->name('peminjaman-guru.cart.remove');
         Route::post('peminjaman-guru/keranjang/submit', [PeminjamanGuruController::class, 'submitCart'])->name('peminjaman-guru.cart.submit');
         Route::get('peminjaman-guru/create', [PeminjamanGuruController::class, 'create'])->name('peminjaman-guru.create');

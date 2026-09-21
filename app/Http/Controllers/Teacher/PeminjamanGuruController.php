@@ -23,7 +23,7 @@ class PeminjamanGuruController extends Controller
 
         $cartItems = [];
         foreach ($cart as $itemId => $entry) {
-            $item = Item::find($itemId);
+            $item = Item::with('category')->find($itemId);
             if ($item) {
                 $cartItems[] = [
                     'item' => $item,
@@ -62,6 +62,30 @@ class PeminjamanGuruController extends Controller
         return redirect()->route('teacher.peminjaman-guru.cart')->with('success', 'Barang ditambahkan ke keranjang guru.');
     }
 
+    public function updateCartItem(Request $request, int $itemId): RedirectResponse
+    {
+        $item = Item::findOrFail($itemId);
+
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1|max:' . max(1, $item->stock),
+        ], [
+            'quantity.required' => 'Jumlah unit harus diisi.',
+            'quantity.min' => 'Jumlah unit minimal 1.',
+            'quantity.max' => 'Jumlah unit melebihi stok yang tersedia (' . $item->stock . ' unit).',
+        ]);
+
+        $cart = session('teacher_borrowing_cart', []);
+
+        if (isset($cart[$itemId])) {
+            $cart[$itemId]['quantity'] = (int) $validated['quantity'];
+            session(['teacher_borrowing_cart' => $cart]);
+
+            return redirect()->route('teacher.peminjaman-guru.cart')->with('success', 'Jumlah barang ' . $item->name . ' berhasil diperbarui.');
+        }
+
+        return redirect()->route('teacher.peminjaman-guru.cart')->with('error', 'Barang tidak ditemukan di keranjang.');
+    }
+
     public function removeFromCart(int $itemId): RedirectResponse
     {
         $cart = session('teacher_borrowing_cart', []);
@@ -86,6 +110,17 @@ class PeminjamanGuruController extends Controller
             'return_time' => 'required|date_format:H:i',
             'purpose' => 'required|string|min:5',
             'notes' => 'nullable|string|max:500',
+        ], [
+            'kepala_jurusan_id.required' => 'Kepala jurusan tujuan wajib dipilih.',
+            'kepala_jurusan_id.exists' => 'Kepala jurusan yang dipilih tidak valid.',
+            'borrow_date.required' => 'Tanggal pinjam wajib diisi.',
+            'borrow_date.after_or_equal' => 'Tanggal pinjam tidak boleh sebelum hari ini.',
+            'return_date.required' => 'Tanggal kembali wajib diisi.',
+            'return_date.after_or_equal' => 'Tanggal kembali tidak boleh sebelum tanggal pinjam.',
+            'return_time.required' => 'Batas jam pengembalian wajib diisi.',
+            'purpose.required' => 'Tujuan/keperluan peminjaman wajib diisi.',
+            'purpose.min' => 'Tujuan peminjaman harus minimal 5 karakter.',
+            'notes.max' => 'Catatan tambahan maksimal 500 karakter.',
         ]);
 
         $header = BorrowingRequest::create([

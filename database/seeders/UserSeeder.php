@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
             ['email' => '198505@smkn1bangsri.sch.id'],
             [
                 'name'               => 'Budi Santoso',
-                'password'           => bcrypt('guru123'),
+                'password'           => bcrypt('password'),
                 'nip'                => '198505',
                 'email_verified_at'  => now(),
             ]
@@ -47,7 +47,7 @@ class UserSeeder extends Seeder
             ['email' => '4692@smkn1bangsri.sch.id'],
             [
                 'name'               => 'Ahmad Fauzi',
-                'password'           => bcrypt('siswa123'),
+                'password'           => bcrypt('password'),
                 'nis'                => '4692',
                 'email_verified_at'  => now(),
             ]

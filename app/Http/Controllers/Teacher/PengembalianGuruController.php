@@ -143,14 +143,38 @@ class PengembalianGuruController extends Controller
     /**
      * Show return history
      */
-    public function history(): View
+    public function history(Request $request): View
     {
-        $returns = BorrowingRequest::where('user_id', Auth::id())
+        $query = BorrowingRequest::where('user_id', Auth::id())
             ->where('tipe_peminjam', 'guru')
             ->where('status', BorrowingRequest::STATUS_RETURNED)
-            ->with(['item', 'approvedByKajur'])
-            ->latest()
-            ->paginate(20);
+            ->with(['item', 'itemWithTrashed', 'approvedByKajur', 'items.item']);
+
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+            $query->where(function($q) use ($search) {
+                $q->whereHas('item', function($iq) use ($search) {
+                    $iq->where('name', 'like', "%{$search}%")
+                       ->orWhere('code', 'like', "%{$search}%");
+                })->orWhereHas('itemWithTrashed', function($iq) use ($search) {
+                    $iq->where('name', 'like', "%{$search}%")
+                       ->orWhere('code', 'like', "%{$search}%");
+                })->orWhereHas('items.item', function($miq) use ($search) {
+                    $miq->where('name', 'like', "%{$search}%")
+                        ->orWhere('code', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('returned_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('returned_at', '<=', $request->date_to);
+        }
+
+        $returns = $query->latest('returned_at')->paginate(20)->withQueryString();
 
         return view('pages.guru.pengembalian-guru-history', [
             'returns' => $returns,

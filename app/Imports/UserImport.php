@@ -68,7 +68,7 @@ class UserImport implements ToModel, WithHeadingRow, WithValidation, SkipsEmptyR
 
         // 4. Instansiasi Model User
         // Catatan: Kolom 'password' SENGAJA TIDAK diisi di sini agar event `creating` 
-        // pada User model secara otomatis men-set default password (guru123 / siswa123).
+        // pada User model secara otomatis men-set default password ('password').
         $user = new User([
             'name'              => trim((string) $row['name']),
             'email'             => $email,

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SIPBAR Superadmin')</title>
+    @include('partials.favicon')
     {{-- ══════════════════════════════════════════════════════════════
         CONSOLIDATED THEME SYSTEM - Bug #2 Fix
         Single source of truth for theme management
@@ -177,17 +178,6 @@
         .sidebar-brand-img { width: 100%; height: 100%; object-fit: cover; }
         .brand-name { font-size: 16px; font-weight: 800; color: var(--text-primary); line-height: 1.15; }
         .brand-sub { font-size: 10px; font-weight: 700; color: var(--text-muted); line-height: 1.2; letter-spacing: .08em; text-transform: uppercase; }
-        .sidebar-search {
-            margin: 14px 14px 8px;
-            display: flex; align-items: center; gap: 8px;
-            background: var(--bg-card-subtle); border: 1px solid var(--border-subtle);
-            border-radius: 8px; padding: 7px 10px;
-        }
-        .sidebar-search input {
-            background: none; border: none; outline: none;
-            font-size: 12px; color: var(--text-primary); width: 100%;
-        }
-        .sidebar-search input::placeholder { color: var(--text-muted); }
         .sidebar-nav { flex: 1; overflow-y: auto; padding: 8px 10px; }
         .sidebar-nav::-webkit-scrollbar { width: 3px; }
         .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
@@ -551,18 +541,13 @@
     <aside class="sidebar" id="sidebar">
         <a href="{{ route('superadmin.dashboard') }}" class="sidebar-brand">
             <div class="sidebar-logo-wrap">
-                <img src="{{ $siteLogo ?? '/logossmkn1.png' }}" alt="{{ $siteName ?? 'SIPBAR' }}" class="sidebar-brand-img">
+                <img src="{{ $siteLogoDashboard ?? ($siteLogo ?? '/logossmkn1.png') }}" alt="{{ $siteName ?? 'SIPBAR' }}" class="sidebar-brand-img">
             </div>
             <div>
                 <div class="brand-name">{{ $siteName ?? 'SIPBAR' }}</div>
                 <div class="brand-sub">SUPERADMIN</div>
             </div>
         </a>
-
-        <div class="sidebar-search">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <input type="text" placeholder="Cari di sini...">
-        </div>
 
         <nav class="sidebar-nav">
             <div class="nav-group-label">Menu Utama</div>
@@ -601,7 +586,7 @@
             </a>
 
             @php
-                $pendingReturnCount = \App\Models\ItemReturn::where('status', 'menunggu')->count();
+                $pendingReturnCount = \App\Models\ItemReturn::siswa()->where('status', \App\Models\ItemReturn::STATUS_MENUNGGU)->count();
             @endphp
             <a href="{{ route('superadmin.returns') }}" class="nav-item {{ request()->routeIs('superadmin.returns') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
@@ -811,9 +796,6 @@
                 
                 // Update global state
                 themeManager.current = theme;
-                
-                // Debug log (remove in production)
-                console.log('[Theme] Applied:', theme);
             }
 
             // ── Toggle theme ──
@@ -832,8 +814,6 @@
                     btn.style.transform = 'rotate(20deg) scale(.85)';
                     setTimeout(function(){ btn.style.transform = ''; }, 250);
                 }
-
-                console.log('[Theme] Toggled to:', newTheme);
             }
 
             // ── Initialize theme on page load ──
@@ -851,7 +831,6 @@
                 }
                 
                 applyTheme(initialTheme);
-                console.log('[Theme] Initialized:', initialTheme);
             }
 
             // ── Event Listeners ──
@@ -872,13 +851,11 @@
             // ── Livewire Navigation Support ──
             // Re-apply theme after Livewire navigates to new page
             document.addEventListener('livewire:navigated', function() {
-                console.log('[Theme] Livewire navigated, re-applying theme');
                 initTheme();
             });
 
             // Turbo/Turbolinks support (if used)
             document.addEventListener('turbo:load', function() {
-                console.log('[Theme] Turbo loaded, re-applying theme');
                 initTheme();
             });
 
@@ -894,7 +871,6 @@
                     // Only auto-switch if no explicit preference saved
                     if (!saved || saved === '') {
                         var newTheme = e.matches ? 'dark' : 'light';
-                        console.log('[Theme] System preference changed to:', newTheme);
                         applyTheme(newTheme);
                     }
                 });

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SIPBAR Admin')</title>
+    @include('partials.favicon')
     {{-- Anti-flash: apply theme BEFORE CSS renders --}}
     <script>
     (function(){
@@ -124,17 +125,6 @@
         .sidebar-brand-img { width: 100%; height: 100%; object-fit: cover; }
         .brand-name { font-size: 16px; font-weight: 800; color: var(--text-primary); line-height: 1.15; }
         .brand-sub { font-size: 10px; font-weight: 700; color: var(--text-muted); line-height: 1.2; letter-spacing: .08em; text-transform: uppercase; }
-        .sidebar-search {
-            margin: 14px 14px 8px;
-            display: flex; align-items: center; gap: 8px;
-            background: var(--bg-card-subtle); border: 1px solid var(--border-subtle);
-            border-radius: 8px; padding: 7px 10px;
-        }
-        .sidebar-search input {
-            background: none; border: none; outline: none;
-            font-size: 12px; color: var(--text-primary); width: 100%;
-        }
-        .sidebar-search input::placeholder { color: var(--text-muted); }
         .sidebar-nav { flex: 1; overflow-y: auto; padding: 8px 10px; }
         .sidebar-nav::-webkit-scrollbar { width: 3px; }
         .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
@@ -498,18 +488,13 @@
     <aside class="sidebar" id="sidebar">
         <a href="{{ route('dashboard') }}" class="sidebar-brand">
             <div class="sidebar-logo-wrap">
-                <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+                <img src="{{ $siteLogoDashboard ?? '/logossmkn1.png' }}" alt="{{ $siteName ?? 'SIPBAR' }}" class="sidebar-brand-img">
             </div>
             <div>
                 <div class="brand-name">SIPBAR</div>
                 <div class="brand-sub">SMKN 1 BANGSRI</div>
             </div>
         </a>
-
-        <div class="sidebar-search">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <input type="text" placeholder="Cari di sini...">
-        </div>
 
         <nav class="sidebar-nav">
             <div class="nav-group-label">Menu Utama</div>
@@ -548,7 +533,7 @@
             </a>
 
             @php
-                $pendingReturnCount = \App\Models\ItemReturn::where('status', 'menunggu')->count();
+                $pendingReturnCount = \App\Models\ItemReturn::siswa()->where('status', \App\Models\ItemReturn::STATUS_MENUNGGU)->count();
             @endphp
             <a href="{{ route('returns.index') }}" class="nav-item {{ request()->routeIs('returns.index', 'admin.returns.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>

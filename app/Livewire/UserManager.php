@@ -390,14 +390,14 @@ class UserManager extends Component
                 $base = strtolower(trim($this->nis ?: $slug));
 
                 $this->email = $base . '@smkn1bangsri.sch.id';
-                $this->password = 'siswa123';
+                $this->password = 'password';
             } elseif ($role === 'guru') {
                 $this->email = User::generateTeacherEmail(
                     $this->nip,
                     $this->tanggal_lahir ?? null
                 );
 
-                $this->password = 'guru123';
+                $this->password = 'password';
             } else {
                 // Admin / Superadmin: email tetap dapat diisi manual.
                 $this->email = $this->email !== ''

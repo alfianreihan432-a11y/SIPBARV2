@@ -26,7 +26,7 @@ class KepalaJurusanScope
 
             // Share jurusan_id with all views for scoping
             view()->share('kajur_jurusan_id', $user->jurusan_id);
-            view()->share('kajur_jurusan_nama', $user->jurusan->nama);
+            view()->share('kajur_jurusan_nama', $user->jurusan ? $user->jurusan->nama : 'Unknown');
         }
 
         return $next($request);

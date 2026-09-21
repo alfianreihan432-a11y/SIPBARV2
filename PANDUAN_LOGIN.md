@@ -27,10 +27,10 @@ Dokumen ini menjelaskan cara login ke sistem SIPBAR (Sistem Peminjaman Barang) u
 Jika login pertama kali atau password belum diubah:
 
 #### Guru:
-- Password default: `guru123`
+- Password default: `password`
 
 #### Siswa:
-- Password default: `siswa123`
+- Password default: `password`
 
 > ⚠️ **Penting**: Segera ganti password default setelah login pertama untuk keamanan akun.
 

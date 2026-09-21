@@ -52,7 +52,12 @@ class SuperadminTeacherReportController extends Controller
             ]);
         }
 
-        return view('pages.superadmin.laporan-guru-detail', compact('report'));
+        $studentRequests = $report->studentBorrowingRequests()
+            ->with(['user.jurusan', 'itemWithTrashed.category', 'teacher'])
+            ->latest()
+            ->get();
+
+        return view('pages.superadmin.laporan-guru-detail', compact('report', 'studentRequests'));
     }
 
     /**

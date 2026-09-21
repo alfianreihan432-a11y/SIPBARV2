@@ -77,9 +77,10 @@ class TeacherDashboard extends Component
             ->get();
         
         // NEW: My students count (students with same jurusan as teacher)
-        if ($user && $user->jurusan) {
+        $teacherJurusanId = $user ? $user->jurusan_id : null;
+        if ($teacherJurusanId) {
             $this->myStudentsCount = User::role('siswa')
-                ->where('jurusan', $user->jurusan)
+                ->where('jurusan_id', $teacherJurusanId)
                 ->count();
         } else {
             $this->myStudentsCount = 0;

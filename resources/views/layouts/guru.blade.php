@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SIPBAR Guru')</title>
+    @include('partials.favicon')
     <script>
     (function(){
         var s=localStorage.getItem('sipbar-guru-theme');
@@ -53,8 +54,8 @@
         .user-card{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.1);cursor:pointer;text-decoration:none;color:inherit;transition:background .15s}
         .user-card:hover{background:rgba(255,255,255,.16)}
         .user-avatar{width:34px;height:34px;border-radius:50%;background:#10b981;border:1.5px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#ffffff;flex-shrink:0}
-        .user-name{font-size:12.5px;font-weight:700;color:#ffffff;line-height:1.2}
-        .user-role{font-size:10.5px;color:rgba(255,255,255,.75)}
+        .sidebar .user-name{font-size:12.5px;font-weight:700;color:#ffffff !important;line-height:1.2}
+        .sidebar .user-role{font-size:10.5px;color:rgba(255,255,255,.75) !important}
         .logout-btn{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;margin-top:8px;font-size:13px;font-weight:600;color:rgba(255,255,255,.75);cursor:pointer;text-decoration:none;transition:all .15s;background:none;border:none;width:100%}
         .logout-btn:hover{background:rgba(239,68,68,.25);color:#fca5a5}
         .main{margin-left:220px;flex:1;height:100vh;display:flex;flex-direction:column;overflow:hidden}
@@ -169,7 +170,7 @@
     <aside class="sidebar" id="sidebar">
         <a href="{{ route('teacher.dashboard') }}" class="sidebar-brand">
             <div class="sidebar-logo-wrap">
-                <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+                <img src="{{ $siteLogoDashboard ?? '/logossmkn1.png' }}" alt="{{ $siteName ?? 'SIPBAR' }}" class="sidebar-brand-img">
             </div>
             <div>
                 <div class="brand-name">SIPBAR</div>
@@ -225,8 +226,9 @@
                     <div class="user-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
                 @endif
                 <div>
-                    <div class="user-name">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
-                    <div class="user-role">Guru Pembimbing</div>
+                    {{-- Explicit inline color #ffffff !important prevents CSS bleeding/FOUC from child page styles (e.g. table .user-name in loans/returns) --}}
+                    <div class="user-name" style="color:#ffffff !important;">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
+                    <div class="user-role" style="color:rgba(255,255,255,.75) !important;">Guru Pembimbing</div>
                 </div>
             </a>
             <form method="POST" action="{{ route('logout') }}">
@@ -244,10 +246,6 @@
             <button type="button" id="hamburgerBtn" class="hamburger-btn" title="Buka Menu" aria-label="Toggle Menu">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
-            <div class="topbar-search">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:var(--subtle);flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input type="text" placeholder="Cari siswa atau permohonan...">
-            </div>
             <div class="topbar-right">
                 <a href="{{ route('home') }}" class="topbar-icon" title="Beranda" style="text-decoration:none">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>

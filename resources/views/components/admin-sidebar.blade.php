@@ -1,18 +1,13 @@
 <aside class="sidebar" id="sidebar">
     <a href="{{ route('dashboard') }}" class="sidebar-brand">
         <div class="sidebar-logo-wrap">
-            <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+            <img src="{{ $siteLogoDashboard ?? '/logossmkn1.png' }}" alt="{{ $siteName ?? 'SIPBAR' }}" class="sidebar-brand-img">
         </div>
         <div>
             <div class="brand-name">SIPBAR</div>
             <div class="brand-sub">SMKN 1 BANGSRI</div>
         </div>
     </a>
-
-    <div class="sidebar-search">
-        <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px;color:#475569;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input type="text" placeholder="Cari di sini...">
-    </div>
 
     <nav class="sidebar-nav">
         <div class="nav-group-label">Menu Utama</div>

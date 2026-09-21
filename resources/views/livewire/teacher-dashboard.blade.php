@@ -29,9 +29,12 @@
             --emerald-border: rgba(16,185,129,.3);
         }
 
-        .db-greeting-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
-        .db-greeting-title { font-size: 24px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; letter-spacing: -.02em; }
+        .db-greeting-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; gap: 16px; flex-wrap: wrap; }
+        .db-greeting-title { font-size: 24px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; letter-spacing: -.02em; word-break: break-word; line-height: 1.25; }
         .db-greeting-sub   { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        @media (max-width: 640px) {
+            .db-greeting-title { font-size: 20px; }
+        }
 
         /* Section Header */
         .db-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
@@ -198,7 +201,7 @@
                     $hour = now()->hour;
                     $greet = $hour < 12 ? 'Selamat Pagi' : ($hour < 17 ? 'Selamat Siang' : 'Selamat Malam');
                 @endphp
-                {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Guru' }}
+                {{ $greet }}, {{ auth()->check() ? auth()->user()->name : 'Guru' }}
             </div>
             <div class="db-greeting-sub">{{ now()->translatedFormat('l, d F Y') }} • Portal Pengelolaan Inventaris Guru Pembimbing</div>
         </div>
@@ -276,13 +279,13 @@
                 <div class="db-menu-desc">Rekapitulasi sirkulasi dan catatan log peminjaman</div>
             </a>
 
-            {{-- Kelola Inventaris --}}
-            <a href="{{ route('inventory.index') }}" class="db-menu-card">
+            {{-- Katalog Barang --}}
+            <a href="{{ route('teacher.barang') }}" class="db-menu-card">
                 <div class="db-menu-icon" style="background:rgba(14,116,144,.12);color:#0e7490">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
-                <div class="db-menu-title">Kelola Inventaris</div>
-                <div class="db-menu-desc">Katalogisasi aset dan data sarana prasarana sekolah</div>
+                <div class="db-menu-title">Katalog Barang</div>
+                <div class="db-menu-desc">Daftar barang inventaris dan ketersediaan stok</div>
             </a>
         </div>
     </div>

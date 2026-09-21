@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Persetujuan Peminjaman Guru — SIPBAR</title>
+    @include('partials.favicon')
     <meta name="description" content="Halaman konfirmasi persetujuan pengajuan peminjaman barang guru oleh Kepala Jurusan">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -232,6 +233,68 @@
             font-size: 12px;
             color: var(--muted);
             margin-top: 3px;
+        }
+
+        /* ─── Item list in approval ─── */
+        .approval-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .approval-item-card {
+            background: #ffffff;
+            border: 1px solid var(--red-200);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            box-shadow: 0 1px 3px rgba(185,28,28,0.03);
+        }
+        .approval-item-left {
+            flex: 1;
+            min-width: 0;
+        }
+        .approval-item-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            flex-wrap: wrap;
+        }
+        .approval-badge-cat {
+            display: inline-block;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: var(--red-100);
+            color: var(--red-700);
+            letter-spacing: .02em;
+        }
+        .approval-item-code {
+            font-size: 11px;
+            color: var(--subtle);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .approval-item-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.35;
+        }
+        .approval-qty-badge {
+            background: var(--red-50);
+            border: 1px solid var(--red-200);
+            color: var(--red-700);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12.5px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .divider {
@@ -496,23 +559,77 @@
                 Detail Barang & Waktu Peminjaman
             </div>
             <div class="info-grid">
-                <div class="info-item full">
-                    <div class="info-item-label">Barang yang Diajukan</div>
-                    <div class="info-item-value" style="font-size:16px;">
-                        {{ $item?->name ?? 'Barang Inventaris' }}
+                {{-- Daftar Barang Lengkap (Multi-Item & Single Item Fallback) --}}
+                <div class="info-item full" style="background:#fdf2f2;border-color:var(--red-200);">
+                    @php
+                        $borrowItems = collect();
+                        if ($borrowingRequest->items && $borrowingRequest->items->isNotEmpty()) {
+                            $borrowItems = $borrowingRequest->items;
+                        } elseif ($borrowingRequest->item || $borrowingRequest->itemWithTrashed) {
+                            $borrowItems = collect([(object)[
+                                'item' => $borrowingRequest->itemWithTrashed ?? $borrowingRequest->item,
+                                'quantity' => $borrowingRequest->quantity ?? 1
+                            ]]);
+                        }
+                        $totalUnits = $borrowItems->sum('quantity');
+                    @endphp
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                        <div class="info-item-label" style="margin-bottom:0;">
+                            Daftar Barang yang Diajukan ({{ $borrowItems->count() }} Jenis, {{ $totalUnits }} Total Unit)
+                        </div>
                     </div>
-                    <div class="info-item-sub" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;">
-                        <span>Jumlah: <strong>{{ $borrowingRequest->quantity }} unit</strong></span>
-                        @if($item?->category)
-                            <span>· Kategori: <strong>{{ $item->category->name }}</strong></span>
-                        @endif
-                        @if($item?->location)
-                            <span>· Lokasi: <strong>{{ $item->location->name }}</strong></span>
-                        @endif
-                        @if(isset($item->stock))
-                            <span>· Sisa Stok: <strong>{{ $item->stock }}</strong></span>
-                        @endif
-                    </div>
+
+                    @if($borrowItems->isEmpty())
+                        <div style="padding:14px;border-radius:8px;background:#fff;border:1px dashed var(--red-200);text-align:center;font-size:13px;color:var(--subtle);">
+                            Tidak ada rincian barang ditemukan.
+                        </div>
+                    @else
+                        <div class="approval-items-list">
+                            @foreach($borrowItems as $entry)
+                                @php
+                                    $itemModel = $entry->item ?? null;
+                                    $rawName = $itemModel?->name ?? 'Barang tidak ditemukan';
+                                    $categoryBadge = $itemModel?->category?->name ?? '';
+                                    $cleanName = $rawName;
+
+                                    if (strpos($rawName, '.') !== false) {
+                                        $parts = explode('.', $rawName);
+                                        if (count($parts) >= 2) {
+                                            if (empty($categoryBadge)) {
+                                                $categoryBadge = trim($parts[0]);
+                                            }
+                                            $cleanName = trim($parts[count($parts) - 1]);
+                                            $cleanName = preg_replace('/\s*-\s*\[.*?\]\s*$/', '', $cleanName);
+                                            $cleanName = trim($cleanName);
+                                        }
+                                    }
+
+                                    $displayTitle = \Illuminate\Support\Str::title(mb_strtolower($cleanName));
+                                    if ($categoryBadge) {
+                                        $categoryBadge = \Illuminate\Support\Str::title(mb_strtolower($categoryBadge));
+                                    }
+                                    $itemCode = $itemModel?->kode_barang ?? $itemModel?->code ?? '-';
+                                @endphp
+                                <div class="approval-item-card">
+                                    <div class="approval-item-left">
+                                        <div class="approval-item-meta">
+                                            @if($categoryBadge)
+                                                <span class="approval-badge-cat">{{ $categoryBadge }}</span>
+                                            @endif
+                                            @if($itemCode && $itemCode !== '-')
+                                                <span class="approval-item-code">Kode: {{ $itemCode }}</span>
+                                            @endif
+                                        </div>
+                                        <div class="approval-item-name">{{ $displayTitle }}</div>
+                                    </div>
+                                    <div class="approval-qty-badge">
+                                        {{ (int)($entry->quantity ?? 1) }} unit
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
 
                 <div class="info-item">

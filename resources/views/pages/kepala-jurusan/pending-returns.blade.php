@@ -176,26 +176,29 @@
     }
     .form-select {
         width: 100%;
-        padding: 10px 12px;
+        padding: 10px 36px 10px 12px !important;
         border: 1px solid var(--border);
         border-radius: 8px;
         font-size: 13px;
-        background: var(--input-bg) !important;
+        background-color: var(--input-bg) !important;
+        background-repeat: no-repeat !important;
+        background-position: right 12px center !important;
+        background-size: 15px 15px !important;
         color: var(--text) !important;
         outline: none;
         appearance: none !important;
         -webkit-appearance: none !important;
         -moz-appearance: none !important;
-        color-scheme: light;
-        background-image: none !important;
-        position: relative;
+        cursor: pointer;
     }
     .form-select::-ms-expand { display: none; }
     .form-select::-webkit-select-dropdown-icon { display: none; }
     html.dark .form-select {
         color: var(--text) !important;
-        background: var(--input-bg) !important;
-        color-scheme: dark;
+        background-color: var(--input-bg) !important;
+        background-repeat: no-repeat !important;
+        background-position: right 12px center !important;
+        background-size: 15px 15px !important;
     }
     .form-select:focus {
         border-color: var(--accent);
@@ -216,6 +219,20 @@
             {{ $pendingReturns->total() }} pengembalian
         </span>
     </div>
+
+    {{-- Filter Search Bar --}}
+    <form method="GET" action="{{ route('kajur.pending-returns') }}" style="display: flex; gap: 10px; align-items: center; margin-bottom: 18px; flex-wrap: wrap;">
+        <div style="position: relative; flex: 1; min-width: 220px;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama guru atau barang..." style="width: 100%; padding: 8px 12px 8px 34px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: var(--input-bg, #ffffff); color: var(--text); outline: none;">
+        </div>
+        <button type="submit" style="padding: 8px 16px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">Cari</button>
+        @if(request('search'))
+            <a href="{{ route('kajur.pending-returns') }}" style="padding: 8px 14px; background: var(--bg3); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none;">Reset</a>
+        @endif
+    </form>
     
     @if($pendingReturns->count() > 0)
         <table class="table">

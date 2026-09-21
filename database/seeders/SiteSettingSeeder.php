@@ -11,7 +11,10 @@ class SiteSettingSeeder extends Seeder
     {
         $this->put('site_name', 'SIPBAR', 'text', 'general', 'Nama Sistem');
         $this->put('site_subtitle', 'SMKN 1 BANGSRI', 'text', 'general', 'Subjudul Sistem');
-        $this->put('site_logo', '/logossmkn1.png', 'image', 'general', 'Logo');
+        $this->put('site_logo', '/logossmkn1.png', 'image', 'general', 'Logo Utama');
+        $this->put('site_logo_landing', '/logossmkn1.png', 'image', 'general', 'Logo Landing Page');
+        $this->put('site_logo_login', '/logossmkn1.png', 'image', 'general', 'Logo Halaman Login');
+        $this->put('site_logo_dashboard', '/logossmkn1.png', 'image', 'general', 'Logo Dashboard');
         $this->put('site_title', 'SIPBAR – Sistem Informasi Pengelolaan Barang', 'text', 'general', 'Judul Halaman (SEO)');
 
         $this->put('hero_badge', 'Sistem Inventaris Modern', 'text', 'hero', 'Badge Hero');

@@ -5,8 +5,10 @@ namespace App\Livewire;
 use App\Models\User;
 use App\Models\Classroom;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('layouts.app')]
 class AddStudent extends Component
 {
     public $nis;
@@ -41,23 +43,32 @@ class AddStudent extends Component
         $this->validate();
 
         try {
+            $jurusanId = null;
+            if (!empty($this->jurusan)) {
+                $j = \App\Models\Jurusan::where('nama', $this->jurusan)->orWhere('kode', $this->jurusan)->first();
+                if (!$j) {
+                    $j = \App\Models\Jurusan::create(['nama' => $this->jurusan, 'kode' => strtoupper(substr($this->jurusan, 0, 4))]);
+                }
+                $jurusanId = $j->id;
+            }
+
             $user = User::create([
                 'name' => $this->name,
                 'nis' => $this->nis,
                 'kelas' => $this->kelas,
-                'jurusan' => $this->jurusan,
+                'jurusan_id' => $jurusanId,
                 'tanggal_lahir' => $this->tanggal_lahir,
                 'phone' => $this->phone,
                 'alamat' => $this->alamat,
                 'classroom_id' => $this->classroom_id,
-                'password' => Hash::make('siswa' . $this->nis),
+                'password' => Hash::make('password'),
                 'email' => $this->nis . '@smkn1bangsri.sch.id',
                 'email_verified_at' => now(),
             ]);
 
             $user->assignRole('siswa');
 
-            session()->flash('success', 'Siswa berhasil ditambahkan. Password default: siswa' . $this->nis);
+            session()->flash('success', 'Siswa berhasil ditambahkan. Password default: password');
 
             $this->reset(['nis', 'name', 'kelas', 'jurusan', 'tanggal_lahir', 'phone', 'alamat', 'classroom_id']);
         } catch (\Exception $e) {

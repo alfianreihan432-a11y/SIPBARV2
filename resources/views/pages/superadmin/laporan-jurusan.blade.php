@@ -30,32 +30,33 @@
         letter-spacing: 0.05em;
     }
     .form-select {
-        padding: 8px 12px;
-        border: 1px solid var(--border-alt);
-        border-radius: 8px;
-        font-size: 13px;
-        background: var(--bg-card-subtle) !important;
+        padding: 9px 36px 9px 13px !important;
+        border: 1px solid var(--border-alt) !important;
+        border-radius: 8px !important;
+        font-size: 13px !important;
+        font-weight: 500;
+        background-color: var(--bg-card-subtle) !important;
+        background-repeat: no-repeat !important;
+        background-position: right 12px center !important;
+        background-size: 15px 15px !important;
         color: var(--text-primary) !important;
         outline: none;
         min-width: 150px;
         appearance: none !important;
         -webkit-appearance: none !important;
         -moz-appearance: none !important;
-        color-scheme: light;
-        background-image: none !important;
-        position: relative;
+        cursor: pointer;
     }
     .form-select::-ms-expand { display: none !important; }
     .form-select::-webkit-select-dropdown-icon { display: none !important; }
-    .form-select::-webkit-slider-runnable-track { display: none !important; }
     html.dark .form-select {
         color: var(--text-primary) !important;
-        background: var(--bg-card-subtle) !important;
-        color-scheme: dark;
+        background-color: var(--bg-card-subtle) !important;
+        background-repeat: no-repeat !important;
+        background-position: right 12px center !important;
+        background-size: 15px 15px !important;
     }
-    html.dark .form-select::-ms-expand { display: none !important; }
-    html.dark .form-select::-webkit-select-dropdown-icon { display: none !important; }
-    .form-select:focus { border-color: var(--blue); color: var(--text-primary) !important; }
+    .form-select:focus { border-color: var(--blue) !important; color: var(--text-primary) !important; box-shadow: 0 0 0 3px rgba(37,99,235,0.15) !important; }
     .filter-btn {
         padding: 8px 16px;
         background: var(--blue-dark);

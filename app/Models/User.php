@@ -56,9 +56,9 @@ class User extends Authenticatable implements PasskeyUser
         static::creating(function (User $user) {
             if (empty($user->password)) {
                 if (!empty($user->nip)) {
-                    $user->password = Hash::make('guru123');
+                    $user->password = Hash::make('password');
                 } elseif (!empty($user->nis)) {
-                    $user->password = Hash::make('siswa123');
+                    $user->password = Hash::make('password');
                 }
             }
         });

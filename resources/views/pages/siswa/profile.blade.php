@@ -1,166 +1,259 @@
 @extends('layouts.siswa')
 
 @section('title', 'Profil Saya – SIPBAR')
+@section('page-heading', 'Profil Saya')
 
 @section('content')
 @php
     $user = auth()->user();
     $totalLoans    = \App\Models\BorrowingRequest::where('user_id', auth()->id())->count();
-    $activeLoans   = \App\Models\BorrowingRequest::where('user_id', auth()->id())->whereIn('status', ['borrowed', 'approved'])->count();
-    $returnedLoans = \App\Models\BorrowingRequest::where('user_id', auth()->id())->where('status', 'returned')->count();
+    $pendingLoans  = \App\Models\BorrowingRequest::where('user_id', auth()->id())->where('status', \App\Models\BorrowingRequest::STATUS_PENDING)->count();
+    $activeLoans   = \App\Models\BorrowingRequest::where('user_id', auth()->id())->whereIn('status', [\App\Models\BorrowingRequest::STATUS_APPROVED, 'qr_ready', \App\Models\BorrowingRequest::STATUS_BORROWED])->count();
+    $returnedLoans = \App\Models\BorrowingRequest::where('user_id', auth()->id())->where('status', \App\Models\BorrowingRequest::STATUS_RETURNED)->count();
 @endphp
 
-{{-- Page Header --}}
-<div class="page-header">
-    <div class="page-header-left">
-        <div class="page-title">Profil Saya</div>
-        <div class="page-subtitle">Informasi akun dan ringkasan aktivitas peminjaman kamu</div>
-    </div>
-</div>
-
-{{-- Profile Card Banner --}}
-<div class="s-card" style="margin-bottom:20px;padding:24px 28px">
-    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-        <div style="position:relative;flex-shrink:0">
-            @if($user && $user->hasProfilePhoto())
-                <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" style="width:72px;height:72px;border-radius:50%;border:3px solid var(--border2);object-fit:cover;box-shadow:0 4px 12px rgba(37,99,235,.2)">
-            @else
-                <div style="width:72px;height:72px;border-radius:50%;background:var(--primary-dark);border:3px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:24px;font-weight:800;color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.2)">
-                    {{ $user ? strtoupper(substr($user->name, 0, 2)) : 'SI' }}
-                </div>
-            @endif
-            <label for="foto_profil" style="position:absolute;bottom:0;right:0;width:28px;height:28px;background:var(--primary);border:2px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:all .2s" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:#fff" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </label>
-            <input type="file" id="foto_profil" name="foto_profil" accept="image/jpeg,image/jpg,image/png" style="display:none" onchange="previewAndUpload(this)">
-        </div>
-        <div style="flex:1;min-width:200px">
-            <div style="font-family:var(--font-head);font-size:20px;font-weight:800;color:var(--text);line-height:1.2">
-                {{ $user ? $user->name : 'Siswa' }}
-            </div>
-            <div style="font-size:13px;color:var(--muted);margin-top:4px">
-                {{ $user ? $user->email : '-' }}
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
-                <span class="s-badge s-badge--approved">
-                    <span class="s-badge-dot" style="background:var(--s-approved)"></span>
-                    Peminjam Barang
-                </span>
-                <span style="font-size:11.5px;color:var(--subtle);background:var(--bg3);border:1px solid var(--border2);padding:3px 10px;border-radius:6px">
-                    NIS/Role: Siswa
-                </span>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Statistics Row --}}
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px" class="profile-stat-grid">
-    <div class="s-stat">
-        <div class="s-stat-icon" style="background:rgba(37,99,235,.1)">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--primary)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-        </div>
-        <div class="s-stat-body">
-            <div class="s-stat-num">{{ $totalLoans }}</div>
-            <div class="s-stat-label">Total Pengajuan</div>
-        </div>
-    </div>
-    <div class="s-stat">
-        <div class="s-stat-icon" style="background:rgba(8,145,178,.1)">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#0891b2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-        </div>
-        <div class="s-stat-body">
-            <div class="s-stat-num">{{ $activeLoans }}</div>
-            <div class="s-stat-label">Sedang Dipinjam</div>
-        </div>
-    </div>
-    <div class="s-stat">
-        <div class="s-stat-icon" style="background:rgba(5,150,105,.1)">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:#059669" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        </div>
-        <div class="s-stat-body">
-            <div class="s-stat-num">{{ $returnedLoans }}</div>
-            <div class="s-stat-label">Selesai Dikembalikan</div>
-        </div>
-    </div>
-</div>
 <style>
-    @media(max-width:768px){.profile-stat-grid{grid-template-columns:1fr!important}}
+    .profile-wrapper { max-width: 860px; margin: 0 auto; }
+
+    .profile-hero {
+        background: var(--card); border: 1px solid var(--border2);
+        border-radius: 16px; padding: 28px; margin-bottom: 20px;
+        position: relative; overflow: hidden;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05), 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .profile-hero::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0;
+        height: 3px; background: var(--primary); border-radius: 16px 16px 0 0;
+    }
+    .profile-hero-inner { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+    .avatar-wrap { position: relative; flex-shrink: 0; }
+    .profile-avatar {
+        width: 88px; height: 88px; border-radius: 50%;
+        background: var(--primary); display: flex; align-items: center; justify-content: center;
+        font-family: var(--font-head); font-size: 30px; font-weight: 800; color: #fff;
+        border: 2px solid var(--border2); overflow: hidden;
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-meta h1 { font-family: var(--font-head); font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 3px; }
+    .profile-meta .email { font-size: 13.5px; color: var(--muted); margin-bottom: 10px; font-weight: 500; }
+    .role-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 14px; background: var(--primary-light);
+        border: 1px solid var(--primary-muted); border-radius: 999px;
+        font-size: 12px; font-weight: 700; color: var(--primary-dark);
+    }
+    .jurusan-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 14px; background: var(--bg3); border: 1px solid var(--border2);
+        border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--text); margin-left: 8px;
+    }
+
+    .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+    @media (max-width: 680px) { .stat-row { grid-template-columns: repeat(2, 1fr); } }
+    .stat-box {
+        background: var(--card); border: 1px solid var(--border2);
+        border-radius: 12px; padding: 18px 16px; text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+    .stat-num { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--text); line-height: 1; }
+    .stat-lbl { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-top: 6px; }
+
+    .info-card {
+        background: var(--card); border: 1px solid var(--border2);
+        border-radius: 14px; padding: 22px 24px; margin-bottom: 18px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+    .info-card-title {
+        font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 16px;
+        padding-bottom: 12px; border-bottom: 1px solid var(--border2);
+        display: flex; align-items: center; gap: 8px;
+    }
+    .info-card-title::before {
+        content: '';
+        width: 3.5px;
+        height: 16px;
+        background: var(--primary);
+        border-radius: 2px;
+        display: inline-block;
+    }
+    .info-card-title svg { width: 16px; height: 16px; color: var(--primary); }
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    @media (max-width: 560px) { .info-grid { grid-template-columns: 1fr; } }
+    .info-row {
+        background: var(--card2); border: 1px solid var(--border2);
+        border-radius: 10px; padding: 14px 16px;
+    }
+    .info-lbl {
+        font-size: 11px; font-weight: 800; color: var(--primary);
+        text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px;
+    }
+    .info-val { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    .action-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-action {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 10px 18px; border-radius: 9px; font-size: 13px;
+        font-weight: 600; cursor: pointer; text-decoration: none;
+        transition: all .18s; border: none;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); color: #fff; }
+    .btn-outline { background: var(--bg3); color: var(--text); border: 1px solid var(--border2); }
+    .btn-outline:hover { background: var(--border2); color: var(--text); }
+
+    .flash { padding: 12px 16px; border-radius: 10px; margin-bottom: 18px; font-size: 13.5px; font-weight: 500; }
+    .flash-success { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25); color: #059669; }
+    .flash-error   { background: #fee2e2; border: 1px solid #fca5a5; color: #b91c1c; }
 </style>
 
-{{-- Info Grid --}}
-<div class="s-card" style="margin-bottom:20px">
-    <div class="s-card-header">
-        <div>
-            <div class="s-card-title">Informasi Akun</div>
-            <div class="s-card-sub">Data identitas yang terdaftar pada sistem SIPBAR</div>
-        </div>
-    </div>
-    <div class="s-info-grid">
-        <div class="s-info-item">
-            <div class="s-info-label">Nama Lengkap</div>
-            <div class="s-info-value">{{ $user ? $user->name : '-' }}</div>
-        </div>
-        <div class="s-info-item">
-            <div class="s-info-label">Alamat Email</div>
-            <div class="s-info-value">{{ $user ? $user->email : '-' }}</div>
-        </div>
-        <div class="s-info-item">
-            <div class="s-info-label">Hak Akses</div>
-            <div class="s-info-value">Siswa / Peminjam Inventaris</div>
-        </div>
-        <div class="s-info-item">
-            <div class="s-info-label">Terdaftar Sejak</div>
-            <div class="s-info-value">
-                {{ $user && $user->created_at ? \Carbon\Carbon::parse($user->created_at)->translatedFormat('d F Y') : '-' }}
-            </div>
-        </div>
-        <div class="s-info-item" style="position:relative">
-            <div class="s-info-label">Nomor WhatsApp</div>
-            <div class="s-info-value" id="phoneDisplay">{{ $user && $user->phone ? $user->phone : 'Belum diisi' }}</div>
-            <button onclick="togglePhoneEdit()" style="position:absolute;top:12px;right:12px;background:var(--primary);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                Edit
-            </button>
-            <div id="phoneEditForm" style="display:none;margin-top:10px">
-                <form onsubmit="updatePhone(event)">
-                    <div style="display:flex;gap:6px;align-items:flex-start">
-                        <input type="tel" id="phoneInput" name="phone" value="{{ $user ? $user->phone : '' }}" placeholder="08xx-xxxx-xxxx" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:7px;font-size:13px;background:#fff;color:var(--text);outline:none" pattern="[0-9]{10,13}" title="10-13 digit">
-                        <button type="submit" style="padding:8px 12px;background:var(--primary);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">Simpan</button>
-                        <button type="button" onclick="togglePhoneEdit()" style="padding:8px 12px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">Batal</button>
-                    </div>
-                    <small style="display:block;margin-top:4px;font-size:10px;color:var(--muted)">Format: 08xxxxxxxxxx</small>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="profile-wrapper">
 
-{{-- Quick Actions --}}
-<div class="s-card">
-    <div class="s-card-header">
-        <div>
-            <div class="s-card-title">Aksi & Navigasi Cepat</div>
-            <div class="s-card-sub">Pintas menuju fitur inventaris yang sering digunakan</div>
+    @if(session('success'))
+        <div class="flash flash-success" style="display:flex;align-items:center;gap:8px">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            {{ session('success') }}
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="flash flash-error" style="display:flex;align-items:center;gap:8px">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            {{ session('error') }}
+        </div>
+    @endif
+    @if($errors->any())
+        <div class="flash flash-error">
+            @foreach($errors->all() as $e) {{ $e }}<br> @endforeach
+        </div>
+    @endif
+
+    {{-- Hero Card --}}
+    <div class="profile-hero">
+        <div class="profile-hero-inner">
+            <div class="avatar-wrap">
+                @if($user && $user->hasProfilePhoto())
+                    <div class="profile-avatar">
+                        <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}">
+                    </div>
+                @else
+                    <div class="profile-avatar">{{ $user ? strtoupper(substr($user->name, 0, 2)) : 'SI' }}</div>
+                @endif
+            </div>
+
+            <div class="profile-meta">
+                <h1>{{ $user ? $user->name : 'Siswa' }}</h1>
+                <p class="email">{{ $user ? $user->email : '-' }}</p>
+                <span class="role-badge">Peminjam Barang</span>
+                @if($user && $user->kelas)
+                    <span class="jurusan-badge">{{ $user->kelas }}</span>
+                @elseif($user && $user->jurusan)
+                    <span class="jurusan-badge">{{ $user->jurusan->nama }}</span>
+                @endif
+            </div>
         </div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <a href="{{ route('student.catalog') }}" class="s-btn s-btn--primary">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            Katalog Barang
-        </a>
-        <a href="{{ route('student.loans') }}" class="s-btn s-btn--secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-            Peminjaman Saya
-        </a>
-        <a href="{{ route('student.history') }}" class="s-btn s-btn--secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-            Riwayat Transaksi
-        </a>
-        <a href="{{ route('student.announcements') }}" class="s-btn s-btn--secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-            Pengumuman
-        </a>
+
+    {{-- 4 Stat Cards --}}
+    <div class="stat-row">
+        <div class="stat-box">
+            <div class="stat-num">{{ $totalLoans }}</div>
+            <div class="stat-lbl">Total Peminjaman</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num">{{ $pendingLoans }}</div>
+            <div class="stat-lbl">Menunggu Persetujuan</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num">{{ $activeLoans }}</div>
+            <div class="stat-lbl">Sedang Dipinjam</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-num">{{ $returnedLoans }}</div>
+            <div class="stat-lbl">Selesai / Dikembalikan</div>
+        </div>
     </div>
+
+    {{-- Informasi Akun --}}
+    <div class="info-card">
+        <div class="info-card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            Informasi Akun
+        </div>
+        <div class="info-grid">
+            <div class="info-row">
+                <div class="info-lbl">Nama Lengkap</div>
+                <div class="info-val">{{ $user ? $user->name : '-' }}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-lbl">Alamat Email</div>
+                <div class="info-val">{{ $user ? $user->email : '-' }}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-lbl">Kelas / Jurusan</div>
+                <div class="info-val">{{ $user ? ($user->kelas ?? ($user->jurusan?->nama ?? '—')) : '—' }}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-lbl">Peran</div>
+                <div class="info-val">Siswa / Peminjam Inventaris</div>
+            </div>
+            <div class="info-row">
+                <div class="info-lbl">Terdaftar Sejak</div>
+                <div class="info-val">{{ $user && $user->created_at ? \Carbon\Carbon::parse($user->created_at)->translatedFormat('d F Y') : '-' }}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-lbl">Status Akun</div>
+                <div class="info-val" style="color:#10b981;display:flex;align-items:center;gap:6px">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    Aktif
+                </div>
+            </div>
+            <div class="info-row" style="position:relative">
+                <div class="info-lbl">Nomor WhatsApp</div>
+                <div class="info-val" id="phoneDisplay">{{ $user && $user->phone ? $user->phone : 'Belum diisi' }}</div>
+                <button onclick="togglePhoneEdit()" style="position:absolute;top:14px;right:14px;background:var(--primary);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                    Edit
+                </button>
+                <div id="phoneEditForm" style="display:none;margin-top:10px">
+                    <form onsubmit="updatePhone(event)">
+                        <div style="display:flex;gap:6px;align-items:flex-start">
+                            <input type="tel" id="phoneInput" name="phone" value="{{ $user ? $user->phone : '' }}" placeholder="08xx-xxxx-xxxx" style="flex:1;padding:8px 10px;border:1px solid var(--border2);border-radius:7px;font-size:13px;background:var(--card);color:var(--text);outline:none" pattern="[0-9]{10,13}" title="10-13 digit">
+                            <button type="submit" style="padding:8px 12px;background:var(--primary);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">Simpan</button>
+                            <button type="button" onclick="togglePhoneEdit()" style="padding:8px 12px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">Batal</button>
+                        </div>
+                        <small style="display:block;margin-top:4px;font-size:10px;color:var(--muted)">Format: 08xxxxxxxxxx</small>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Quick Actions --}}
+    <div class="info-card">
+        <div class="info-card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Aksi Cepat
+        </div>
+        <div class="action-row">
+            <a href="{{ route('student.dashboard') }}" class="btn-action btn-primary">
+                Dashboard
+            </a>
+            <a href="{{ route('student.catalog') }}" class="btn-action btn-outline">
+                Katalog Barang
+            </a>
+            <a href="{{ route('student.loans') }}" class="btn-action btn-outline">
+                Peminjaman Saya
+            </a>
+            <a href="{{ route('student.history') }}" class="btn-action btn-outline">
+                Riwayat Transaksi
+            </a>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -218,73 +311,5 @@ function updatePhone(event) {
         btn.disabled = false;
     });
 }
-
-function previewAndUpload(input) {
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        
-        // Validate file size (max 2MB)
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran file maksimal 2MB');
-            input.value = '';
-            return;
-        }
-        
-        // Validate file type
-        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-        if (!validTypes.includes(file.type)) {
-            alert('Format file harus JPG, JPEG, atau PNG');
-            input.value = '';
-            return;
-        }
-        
-        // Get CSRF token from meta tag
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        if (!csrfToken) {
-            alert('CSRF token tidak ditemukan. Silakan refresh halaman.');
-            return;
-        }
-        
-        // Create FormData
-        const formData = new FormData();
-        formData.append('foto_profil', file);
-        formData.append('_token', csrfToken);
-        
-        // Upload via AJAX
-        fetch('{{ route("student.profile.photo.update") }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            console.log('Response status:', response.status);
-            if (response.status === 419) {
-                throw new Error('CSRF token expired. Silakan refresh halaman.');
-            }
-            return response.json().catch(e => {
-                console.error('JSON parse error:', e);
-                return { success: false, message: 'Invalid response from server' };
-            });
-        })
-        .then(data => {
-            console.log('Response data:', data);
-            if (data.success) {
-                // Reload page to show new photo
-                window.location.reload();
-            } else {
-                alert(data.message || 'Gagal mengupload foto');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert(error.message || 'Terjadi kesalahan saat mengupload foto');
-        });
-    }
-}
 </script>
-=======
->>>>>>> origin/frondtend
 @endsection

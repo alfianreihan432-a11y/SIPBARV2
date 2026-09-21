@@ -85,22 +85,57 @@ class WhatsAppNotificationService
         );
     }
 
+    public function getTimeGreeting(?\Carbon\CarbonInterface $time = null): string
+    {
+        $dt = ($time ? $time->copy() : now())->timezone('Asia/Jakarta');
+        $hour = (int) $dt->format('H');
+
+        if ($hour >= 4 && $hour < 11) {
+            return 'Selamat Pagi';
+        } elseif ($hour >= 11 && $hour < 15) {
+            return 'Selamat Siang';
+        } elseif ($hour >= 15 && $hour < 18) {
+            return 'Selamat Sore';
+        } else {
+            return 'Selamat Malam';
+        }
+    }
+
     public function getDirectWaLink(BorrowingRequest $request): string
     {
         $teacherPhone = trim((string) ($request->teacher?->phone ?? ''));
         $approvalUrl = $this->getApprovalUrl($request);
 
         $studentName = $request->user?->name ?? 'Siswa';
-        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
 
-        $message = urlencode(
-            "Halo, ada pengajuan peminjaman baru.\n" .
-            "Siswa: {$studentName}\n" .
-            "Barang: {$itemName}\n" .
-            "Jumlah: {$request->quantity}\n" .
-            "Keperluan: {$request->purpose}\n\n" .
-            "Klik link berikut untuk meninjau dan memutuskan:\n{$approvalUrl}"
-        );
+        if ($request->items && $request->items->isNotEmpty()) {
+            $itemName = $request->items->map(fn($it) => $it->item?->name ?? ($it->itemWithTrashed?->name ?? 'Barang'))->join(', ');
+            $quantity = $request->items->sum('quantity');
+        } else {
+            $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+            $quantity = $request->quantity ?? 1;
+        }
+
+        $submitTime = ($request->created_at ? $request->created_at->copy() : now())->timezone('Asia/Jakarta');
+        $greeting = $this->getTimeGreeting($submitTime);
+        $tanggalPengajuan = $submitTime->translatedFormat('d F Y') . ', ' . $submitTime->format('H:i') . ' WIB';
+        $keperluan = $request->purpose ?: '-';
+
+        $text = "Assalamu'alaikum Wr. Wb. / {$greeting}, Bapak/Ibu Guru 🙏\n\n" .
+            "Terdapat pengajuan peminjaman barang baru yang perlu Bapak/Ibu tinjau melalui SIPBAR.\n\n" .
+            "📋 *Detail Pengajuan*\n" .
+            "Nama Siswa   : {$studentName}\n" .
+            "Barang       : {$itemName}\n" .
+            "Jumlah       : {$quantity} unit\n" .
+            "Keperluan    : {$keperluan}\n" .
+            "Tanggal Ajukan: {$tanggalPengajuan}\n\n" .
+            "Mohon kesediaan Bapak/Ibu untuk meninjau dan memutuskan pengajuan ini melalui link berikut:\n" .
+            "{$approvalUrl}\n\n" .
+            "Terima kasih atas perhatian dan kerja samanya.\n\n" .
+            "Hormat kami,\n" .
+            "Sistem SIPBAR — SMKN 1 Bangsri";
+
+        $message = urlencode($text);
 
         if ($teacherPhone !== '') {
             $waPhone = $this->normalizePhone($teacherPhone);
@@ -118,22 +153,36 @@ class WhatsAppNotificationService
 
         $teacherName = $request->user?->name ?? 'Guru';
         $jurusanName = $request->user?->jurusan?->nama ?? ($request->approvedByKajur?->jurusan?->nama ?? '');
-        $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
-        $borrowDate = $request->borrow_date ? $request->borrow_date->format('d/m/Y') : '-';
-        $returnDate = $request->return_date ? $request->return_date->format('d/m/Y') : '-';
-        $returnTime = $request->return_time ?? '';
 
-        $message = urlencode(
-            "Halo Bapak/Ibu Kepala Jurusan, ada pengajuan peminjaman barang baru dari Guru.\n\n" .
-            "• Guru: {$teacherName}\n" .
-            ($jurusanName ? "• Jurusan: {$jurusanName}\n" : "") .
-            "• Barang: {$itemName}\n" .
-            "• Jumlah: {$request->quantity} unit\n" .
-            "• Tgl Pinjam: {$borrowDate}\n" .
-            "• Tgl Kembali: {$returnDate} {$returnTime}\n" .
-            "• Keperluan: {$request->purpose}\n\n" .
-            "Silakan klik link berikut untuk meninjau dan menyetujui permohonan ini:\n{$approvalUrl}"
-        );
+        if ($request->items && $request->items->isNotEmpty()) {
+            $itemName = $request->items->map(fn($it) => $it->item?->name ?? ($it->itemWithTrashed?->name ?? 'Barang'))->join(', ');
+            $quantity = $request->items->sum('quantity');
+        } else {
+            $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+            $quantity = $request->quantity ?? 1;
+        }
+
+        $submitTime = ($request->created_at ? $request->created_at->copy() : now())->timezone('Asia/Jakarta');
+        $greeting = $this->getTimeGreeting($submitTime);
+        $tanggalPengajuan = $submitTime->translatedFormat('d F Y') . ', ' . $submitTime->format('H:i') . ' WIB';
+        $keperluan = $request->purpose ?: '-';
+
+        $text = "Assalamu'alaikum Wr. Wb. / {$greeting}, Bapak/Ibu Kepala Jurusan 🙏\n\n" .
+            "Terdapat pengajuan peminjaman barang baru yang perlu Bapak/Ibu tinjau melalui SIPBAR.\n\n" .
+            "📋 *Detail Pengajuan*\n" .
+            "Nama Guru    : {$teacherName}\n" .
+            ($jurusanName ? "Jurusan      : {$jurusanName}\n" : "") .
+            "Barang       : {$itemName}\n" .
+            "Jumlah       : {$quantity} unit\n" .
+            "Keperluan    : {$keperluan}\n" .
+            "Tanggal Ajukan: {$tanggalPengajuan}\n\n" .
+            "Mohon kesediaan Bapak/Ibu untuk meninjau dan memutuskan pengajuan ini melalui link berikut:\n" .
+            "{$approvalUrl}\n\n" .
+            "Terima kasih atas perhatian dan kerja samanya.\n\n" .
+            "Hormat kami,\n" .
+            "Sistem SIPBAR — SMKN 1 Bangsri";
+
+        $message = urlencode($text);
 
         if ($kajurPhone !== '') {
             $waPhone = $this->normalizePhone($kajurPhone);

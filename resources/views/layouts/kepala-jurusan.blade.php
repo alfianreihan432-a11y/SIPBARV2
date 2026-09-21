@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'SIPBAR Kepala Jurusan')</title>
+    @include('partials.favicon')
     <script>
     (function(){
         var s=localStorage.getItem('sipbar-kajur-theme');
@@ -235,7 +236,7 @@
     <aside class="sidebar" id="sidebar">
         <a href="{{ route('kajur.dashboard') }}" class="sidebar-brand">
             <div class="sidebar-logo-wrap">
-                <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="sidebar-brand-img">
+                <img src="{{ $siteLogoDashboard ?? '/logossmkn1.png' }}" alt="{{ $siteName ?? 'SIPBAR' }}" class="sidebar-brand-img">
             </div>
             <div>
                 <div class="brand-name">SIPBAR</div>
@@ -252,13 +253,16 @@
                     ->where('status', \App\Models\BorrowingRequest::STATUS_PENDING)
                     ->count()
                 : 0;
-            $pendingReturnsCount = $kajurJurusanId
-                ? \App\Models\BorrowingRequest::where('tipe_peminjam', 'guru')
-                    ->whereHas('user', fn($q) => $q->where('jurusan_id', $kajurJurusanId))
-                    ->where('status', \App\Models\BorrowingRequest::STATUS_RETURNED)
-                    ->whereNull('checkin_by')
-                    ->count()
-                : 0;
+            $kajurAuthId = auth()->id();
+            $pendingReturnsCount = \App\Models\ItemReturn::guru()
+                ->where(function ($query) use ($kajurAuthId, $kajurJurusanId) {
+                    $query->where('kajur_id', $kajurAuthId);
+                    if ($kajurJurusanId) {
+                        $query->orWhereHas('user', fn($uq) => $uq->where('jurusan_id', $kajurJurusanId));
+                    }
+                })
+                ->where('status', \App\Models\ItemReturn::STATUS_MENUNGGU)
+                ->count();
 
             $menus = [
                 ['Dashboard', 'kajur.dashboard', 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', null],
@@ -303,10 +307,6 @@
             <button type="button" id="hamburgerBtn" class="hamburger-btn" title="Buka Menu" aria-label="Toggle Menu">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
-            <div class="topbar-search">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:var(--subtle);flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input type="text" placeholder="Cari peminjaman atau laporan...">
-            </div>
             <div class="topbar-right">
                 <a href="{{ route('home') }}" class="topbar-icon" title="Beranda" style="text-decoration:none">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>

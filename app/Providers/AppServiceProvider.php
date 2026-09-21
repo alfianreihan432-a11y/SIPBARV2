@@ -37,10 +37,16 @@ class AppServiceProvider extends ServiceProvider
             static $brand = null;
 
             if ($brand === null) {
+                $legacyLogo = SiteSetting::get('site_logo', '/logossmkn1.png');
+
                 $brand = [
-                    'siteLogo' => SiteSetting::get('site_logo', '/logossmkn1.png'),
-                    'siteName' => SiteSetting::get('site_name', 'SIPBAR'),
-                    'siteSubtitle' => SiteSetting::get('site_subtitle', 'SMKN 1 BANGSRI'),
+                    'siteLogo'         => $legacyLogo,
+                    'siteName'         => SiteSetting::get('site_name', 'SIPBAR'),
+                    'siteSubtitle'     => SiteSetting::get('site_subtitle', 'SMKN 1 BANGSRI'),
+                    // 3 logo terpisah — fallback ke legacy logo jika belum diset
+                    'siteLogoLanding'  => SiteSetting::get('site_logo_landing') ?: $legacyLogo,
+                    'siteLogoLogin'    => SiteSetting::get('site_logo_login') ?: $legacyLogo,
+                    'siteLogoDashboard'=> SiteSetting::get('site_logo_dashboard') ?: $legacyLogo,
                 ];
             }
 

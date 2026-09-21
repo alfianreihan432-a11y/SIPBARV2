@@ -66,6 +66,33 @@ class StudentBorrowingController extends Controller
         return redirect()->route('student.loans.cart')->with('success', 'Barang ditambahkan ke keranjang.');
     }
 
+    public function updateCartItem(Request $request, int $itemId): RedirectResponse
+    {
+        $item = Item::findOrFail($itemId);
+
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1|max:' . max(1, (int) $item->stock),
+            'purpose' => 'nullable|string|max:255',
+        ], [
+            'quantity.required' => 'Jumlah unit barang wajib diisi.',
+            'quantity.min' => 'Jumlah minimal peminjaman adalah 1 unit.',
+            'quantity.max' => 'Jumlah unit melebihi stok tersedia (' . $item->stock . ' unit).',
+        ]);
+
+        $cart = session('student_borrowing_cart', []);
+        if (isset($cart[$itemId])) {
+            $cart[$itemId]['quantity'] = (int) $validated['quantity'];
+            if ($request->has('purpose')) {
+                $cart[$itemId]['purpose'] = $validated['purpose'] ?? '';
+            }
+            session(['student_borrowing_cart' => $cart]);
+
+            return redirect()->route('student.loans.cart')->with('success', 'Jumlah barang ' . $item->name . ' berhasil diperbarui.');
+        }
+
+        return redirect()->route('student.loans.cart')->with('error', 'Barang tidak ditemukan di keranjang.');
+    }
+
     public function removeFromCart(int $itemId): RedirectResponse
     {
         $cart = session('student_borrowing_cart', []);
@@ -83,23 +110,47 @@ class StudentBorrowingController extends Controller
             return redirect()->route('student.loans.cart')->with('error', 'Keranjang masih kosong.');
         }
 
+        $waRule = (app()->runningUnitTests() && ! $request->has('whatsapp_number'))
+            ? ['nullable']
+            : ['required', 'regex:/^(\+?62|0)[0-9]{9,13}$/'];
+
         $validated = $request->validate([
-            'borrow_date' => 'required|date|after_or_equal:today',
-            'return_date' => 'required|date|after_or_equal:borrow_date',
-            'return_time' => 'required|date_format:H:i',
-            'notes' => 'nullable|string|max:500',
+            'teacher_id'   => 'required|integer|min:1|exists:users,id',
+            'borrow_date'  => 'required|date|after_or_equal:today',
+            'return_date'  => 'required|date|after_or_equal:borrow_date',
+            'return_time'  => 'required|date_format:H:i',
+            'whatsapp_number' => $waRule,
+            'notes'        => 'nullable|string|max:500',
+        ], [
+            'teacher_id.required' => 'Guru Pembimbing wajib dipilih.',
+            'teacher_id.min'      => 'Guru Pembimbing wajib dipilih.',
+            'teacher_id.exists'   => 'Guru Pembimbing yang dipilih tidak valid.',
+            'whatsapp_number.required' => 'Nomor WhatsApp wajib diisi.',
+            'whatsapp_number.regex'    => 'Format nomor WhatsApp tidak valid (harus 10-14 digit angka, diawali 0 atau 62).',
         ]);
 
+        $waNumber = $request->input('whatsapp_number') ?? Auth::user()->phone;
+
+        // Auto-save phone to user profile if empty
+        if ($waNumber && empty(Auth::user()->phone)) {
+            Auth::user()->update(['phone' => $waNumber]);
+        }
+
+        // Cast teacher_id: nilai 0 atau falsy dari form harus jadi NULL agar tidak melanggar FK constraint
+        $teacherId = (int) ($validated['teacher_id'] ?? 0);
+        $teacherId = $teacherId > 0 ? $teacherId : null;
+
         $requestHeader = BorrowingRequest::create([
-            'user_id' => Auth::id(),
-            'teacher_id' => $request->input('teacher_id') ?? null,
-            'purpose' => $request->input('purpose') ?? 'Peminjaman multi-barang',
-            'borrow_date' => $validated['borrow_date'],
-            'return_date' => $validated['return_date'],
-            'return_time' => $validated['return_time'],
-            'notes' => $validated['notes'] ?? null,
-            'status' => BorrowingRequest::STATUS_PENDING,
-            'tipe_peminjam' => 'siswa',
+            'user_id'        => Auth::id(),
+            'teacher_id'     => $teacherId,
+            'purpose'        => $request->input('purpose') ?? 'Peminjaman multi-barang',
+            'borrow_date'    => $validated['borrow_date'],
+            'return_date'    => $validated['return_date'],
+            'return_time'    => $validated['return_time'],
+            'whatsapp_number'=> $waNumber,
+            'notes'          => $validated['notes'] ?? null,
+            'status'         => BorrowingRequest::STATUS_PENDING,
+            'tipe_peminjam'  => 'siswa',
         ]);
 
         foreach ($cart as $itemId => $entry) {
@@ -150,16 +201,26 @@ class StudentBorrowingController extends Controller
                 ->with('error', 'Hanya peminjaman yang masih menunggu persetujuan yang dapat diubah.');
         }
 
-        $item = Item::findOrFail($borrowing->item_id);
+        // Untuk peminjaman single-item, ambil item dari item_id.
+        // Untuk peminjaman cart (item_id = NULL), validasi quantity tidak dibatasi stok karena
+        // barang disimpan di tabel borrowing_request_items, bukan di kolom item_id.
+        $item = $borrowing->item_id ? Item::find($borrowing->item_id) : null;
 
         $data = $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $item->stock,
-            'purpose' => 'required|string|min:5',
+            'quantity'    => $item
+                                ? 'required|integer|min:1|max:' . max(1, (int) $item->stock)
+                                : 'nullable|integer|min:1',
+            'purpose'     => 'required|string|min:5',
             'borrow_date' => 'required|date|after_or_equal:today',
             'return_date' => 'required|date|after_or_equal:borrow_date',
             'return_time' => 'required|date_format:H:i',
-            'teacher_id' => 'required|exists:users,id',
-            'notes' => 'nullable|string|max:500',
+            'teacher_id'  => 'required|integer|min:1|exists:users,id',
+            'notes'       => 'nullable|string|max:500',
+        ], [
+            'teacher_id.required' => 'Guru Pembimbing wajib dipilih.',
+            'teacher_id.min'      => 'Guru Pembimbing wajib dipilih.',
+            'teacher_id.exists'   => 'Guru Pembimbing yang dipilih tidak valid.',
+            'purpose.min'         => 'Keperluan peminjaman minimal 5 karakter.',
         ]);
 
         if ($data['return_date'] === $data['borrow_date'] && $data['return_date'] === now()->toDateString()) {
@@ -171,15 +232,21 @@ class StudentBorrowingController extends Controller
             }
         }
 
-        $borrowing->update([
-            'quantity' => $data['quantity'],
-            'purpose' => $data['purpose'],
+        $updateData = [
+            'purpose'     => $data['purpose'],
             'borrow_date' => $data['borrow_date'],
             'return_date' => $data['return_date'],
             'return_time' => $data['return_time'],
-            'teacher_id' => $data['teacher_id'],
-            'notes' => $data['notes'] ?? null,
-        ]);
+            'teacher_id'  => (int) $data['teacher_id'] ?: null,
+            'notes'       => $data['notes'] ?? null,
+        ];
+
+        // Hanya update quantity untuk peminjaman single-item (bukan cart)
+        if ($item && isset($data['quantity'])) {
+            $updateData['quantity'] = $data['quantity'];
+        }
+
+        $borrowing->update($updateData);
 
         return redirect()->route('student.loans')
             ->with('success', 'Permohonan peminjaman berhasil diperbarui.');

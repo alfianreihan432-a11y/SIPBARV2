@@ -70,6 +70,7 @@ class AdminReturnController extends Controller
 
     /**
      * Detail Pengajuan Pengembalian (AJAX / modal support)
+     * Endpoint ini hanya dipanggil via fetch/AJAX — tidak punya halaman HTML penuh.
      */
     public function show($id)
     {
@@ -87,7 +88,9 @@ class AdminReturnController extends Controller
             ]);
         }
 
-        return view('pages.admin.returns-detail', compact('return'));
+        // Endpoint ini dirancang untuk AJAX saja.
+        // Akses langsung via browser tidak didukung.
+        abort(404);
     }
 
     /**

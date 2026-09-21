@@ -100,6 +100,79 @@
         margin-bottom: 12px;
         opacity: 0.5;
     }
+    .filter-bar-wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 18px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border);
+    }
+    .filter-form {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        flex: 1;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .form-label {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+    .form-input {
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13px;
+        background: var(--input-bg, #ffffff);
+        color: var(--text);
+        outline: none;
+        min-width: 130px;
+        transition: border-color 0.2s;
+    }
+    .form-input:focus {
+        border-color: var(--accent);
+    }
+    .filter-btn {
+        padding: 8px 16px;
+        background: var(--accent);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .filter-btn:hover {
+        background: var(--accent-hover, #047857);
+    }
+    .reset-btn {
+        padding: 8px 14px;
+        background: var(--bg3);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .reset-btn:hover {
+        background: var(--border);
+    }
 </style>
 
 <div class="section-card">
@@ -111,6 +184,33 @@
             </svg>
             Kembali
         </a>
+    </div>
+
+    {{-- Filter Form --}}
+    <div class="filter-bar-wrap">
+        <form method="GET" action="{{ route('teacher.pengembalian-guru.history') }}" class="filter-form">
+            <div class="form-group" style="min-width: 200px; flex: 1;">
+                <label class="form-label">Cari Barang</label>
+                <input type="text" name="search" class="form-input" style="width: 100%; min-width: 180px;" value="{{ request('search') }}" placeholder="Cari nama barang atau kode...">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tanggal Dari</label>
+                <input type="date" name="date_from" class="form-input" value="{{ request('date_from') }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tanggal Sampai</label>
+                <input type="date" name="date_to" class="form-input" value="{{ request('date_to') }}">
+            </div>
+
+            <button type="submit" class="filter-btn">Filter</button>
+            <a href="{{ route('teacher.pengembalian-guru.history') }}" class="reset-btn">Reset</a>
+        </form>
+
+        <div style="font-size: 12.5px; color: var(--muted);">
+            Total: <strong>{{ $returns->total() }}</strong> Pengembalian
+        </div>
     </div>
     
     @if($returns->count() > 0)

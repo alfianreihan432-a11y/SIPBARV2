@@ -21,6 +21,22 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 /auth.json
+/dev-scripts
+
+# Test output files (specific patterns)
+test-output.txt
+test_stage3.txt
+test_stage3b.txt
+cartflow_current.txt
+catalogfail.txt
+final_stage3.txt
+final_stage3_green.txt
+gabungan.txt
+suitecheck.txt
+testlog.txt
+stage3.xml
+stage3_catalog.xml
+stage3_final.xml
 
 # IDE
 /.fleet

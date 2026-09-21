@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk – SIPBAR</title>
+    @include('partials.favicon')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -228,7 +229,7 @@
     <div class="login-card">
         {{-- Logo container at top-center --}}
         <div class="logo-container">
-            <img src="/logossmkn1.png" alt="Logo SMKN 1 Bangsri" class="logo-img">
+            <img src="{{ $siteLogoLogin ?? '/logossmkn1.png' }}" alt="Logo SMKN 1 Bangsri" class="logo-img">
             <a href="{{ route('home') }}" class="back-link">
                 Kembali ke Beranda
             </a>

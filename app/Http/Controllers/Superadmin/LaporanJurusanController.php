@@ -41,7 +41,9 @@ class LaporanJurusanController extends Controller
             ->findOrFail($id);
 
         $statistics = $report->statistics;
-        $borrowingRequests = $report->borrowing_requests;
+        $borrowingRequests = $report->borrowing_requests()
+            ->with(['user.jurusan', 'itemWithTrashed.category', 'teacher'])
+            ->get();
         $histories = $report->histories()->with(['pengirim', 'jurusan'])->get();
 
         return view('pages.superadmin.laporan-jurusan-detail', [

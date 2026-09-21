@@ -83,7 +83,15 @@ class MagicApprovalController extends Controller
      */
     public function show(BorrowingRequest $borrowingRequest)
     {
-        $borrowingRequest->load(['user', 'item', 'teacher', 'approvedByKajur']);
+        $borrowingRequest->load([
+            'user',
+            'item.category',
+            'itemWithTrashed.category',
+            'items.item.category',
+            'items.itemWithTrashed.category',
+            'teacher',
+            'approvedByKajur',
+        ]);
 
         if ($authRedirect = $this->authorizeStudentApproval($borrowingRequest)) {
             return $authRedirect;
@@ -101,7 +109,16 @@ class MagicApprovalController extends Controller
      */
     public function approve(Request $request, BorrowingRequest $borrowingRequest)
     {
-        $borrowingRequest->load(['user', 'item', 'teacher', 'approvedByKajur', 'qrCode']);
+        $borrowingRequest->load([
+            'user',
+            'item.category',
+            'itemWithTrashed.category',
+            'items.item.category',
+            'items.itemWithTrashed.category',
+            'teacher',
+            'approvedByKajur',
+            'qrCode',
+        ]);
 
         if ($authRedirect = $this->authorizeStudentApproval($borrowingRequest)) {
             return $authRedirect;
@@ -175,7 +192,14 @@ class MagicApprovalController extends Controller
             'rejection_reason.max'      => 'Alasan penolakan maksimal 500 karakter.',
         ]);
 
-        $borrowingRequest->load(['user', 'item', 'teacher']);
+        $borrowingRequest->load([
+            'user',
+            'item.category',
+            'itemWithTrashed.category',
+            'items.item.category',
+            'items.itemWithTrashed.category',
+            'teacher',
+        ]);
 
         if ($authRedirect = $this->authorizeStudentApproval($borrowingRequest)) {
             return $authRedirect;
@@ -235,6 +259,9 @@ class MagicApprovalController extends Controller
             'item.category',
             'item.location',
             'itemWithTrashed',
+            'items.item.category',
+            'items.item.location',
+            'items.itemWithTrashed.category',
             'approvedByKajur.jurusan',
             'qrCode',
         ]);
@@ -255,7 +282,7 @@ class MagicApprovalController extends Controller
      */
     public function approveGuru(Request $request, BorrowingRequest $borrowingRequest)
     {
-        $borrowingRequest->load(['user', 'item', 'approvedByKajur', 'qrCode']);
+        $borrowingRequest->load(['user', 'item', 'items.item.category', 'approvedByKajur', 'qrCode']);
 
         if ($authRedirect = $this->authorizeGuruApproval($borrowingRequest)) {
             return $authRedirect;

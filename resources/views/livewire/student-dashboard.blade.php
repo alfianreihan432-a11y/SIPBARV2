@@ -1,4 +1,4 @@
-<div>
+<div x-data="{ cancelRequestId: null, showCancelModal: false }">
     {{-- ══ Greeting Row ══ --}}
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap">
         <div>
@@ -7,7 +7,7 @@
                 $greet = $hour < 12 ? 'Selamat Pagi' : ($hour < 17 ? 'Selamat Siang' : 'Selamat Malam');
             @endphp
             <div style="font-family:var(--font-head);font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.02em;line-height:1.2">
-                {{ $greet }}, {{ auth()->check() ? explode(' ', auth()->user()->name)[0] : 'Siswa' }}
+                {{ $greet }}, {{ auth()->check() ? auth()->user()->name : 'Siswa' }}
             </div>
             <div style="font-size:13px;color:var(--muted);margin-top:5px">
                 {{ now()->translatedFormat('l, d F Y') }}
@@ -134,12 +134,11 @@
                             <button type="button" onclick="navigator.clipboard.writeText('{{ $approvalUrl }}'); var btn=this; btn.textContent='Tersalin!'; setTimeout(function(){ btn.textContent='Salin Link'; }, 2000);" class="s-btn s-btn--sm s-btn--ghost">
                                 Salin Link
                             </button>
-                            <form method="POST" action="{{ route('student.loans.cancel', $request->id) }}" onsubmit="return confirm('Yakin ingin membatalkan peminjaman ini?')" style="display:inline;">
-                                @csrf
-                                <button type="submit" class="s-btn s-btn--sm s-btn--danger">
-                                    Batalkan
-                                </button>
-                            </form>
+                            <button type="button"
+                                @click="cancelRequestId = {{ $request->id }}; showCancelModal = true"
+                                class="s-btn s-btn--sm s-btn--danger">
+                                Batalkan
+                            </button>
                         </div>
                     @endif
                 </div>
@@ -207,4 +206,33 @@
         <span>{{ session('error') }}</span>
     </div>
     @endsession
+    {{-- Cancel Confirmation Modal --}}
+    <div x-show="showCancelModal" x-cloak
+         style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);">
+        <div style="background:var(--card);border-radius:16px;padding:28px;width:100%;max-width:460px;margin:16px;border:1px solid var(--border2);box-shadow:0 20px 48px rgba(0,0,0,0.18);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:36px;height:36px;border-radius:10px;background:rgba(239,68,68,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:#ef4444" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 style="font-size:16px;font-weight:700;color:var(--text);">Batalkan Peminjaman?</h3>
+                </div>
+                <button type="button" @click="showCancelModal = false"
+                    style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;line-height:1;padding:4px;">&times;</button>
+            </div>
+            <p style="font-size:13.5px;color:var(--text2);margin-bottom:22px;line-height:1.6;">
+                Apakah kamu yakin ingin membatalkan peminjaman ini?<br>
+                <span style="color:var(--s-rejected);font-weight:600;">Tindakan ini tidak dapat dibatalkan.</span>
+            </p>
+            <form method="POST"
+                  x-bind:action="cancelRequestId ? '{{ url('siswa/peminjaman') }}/' + cancelRequestId + '/cancel' : '#'"
+                  style="display:flex;gap:10px;justify-content:flex-end;">
+                @csrf
+                <button type="button" @click="showCancelModal = false"
+                    style="padding:9px 20px;background:var(--bg3);color:var(--text);border:1px solid var(--border2);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Tidak, Kembali</button>
+                <button type="submit"
+                    style="padding:9px 20px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Ya, Batalkan</button>
+            </form>
+        </div>
+    </div>
 </div>

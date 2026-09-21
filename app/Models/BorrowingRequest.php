@@ -17,6 +17,7 @@ class BorrowingRequest extends Model
         'return_date',
         'return_time',
         'notes',
+        'whatsapp_number',
         'status',
         'rejection_reason',
         'qr_token',

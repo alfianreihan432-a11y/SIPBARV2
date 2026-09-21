@@ -118,7 +118,7 @@
     .user-info {
         flex: 1;
     }
-    .user-name {
+    .user-cell .user-name {
         font-size: 14px;
         font-weight: 600;
         color: var(--text);

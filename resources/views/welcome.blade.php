@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ \App\Models\SiteSetting::get('site_title', 'SIPBAR – Sistem Informasi Pengelolaan Barang') }}</title>
+@include('partials.favicon')
 {{-- Anti-flash: apply theme class BEFORE any CSS renders --}}
 <script>
   (function(){
@@ -903,7 +904,7 @@ html.dark .footer-copy { color: #64748b !important }
 html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.5) }
 html.dark .hero-badge { background:#1e40af !important; color:#ffffff !important; border-color:rgba(255,255,255,.4) !important }
 html.dark .hero-badge-pulse { background:#ffffff !important; opacity:.9 !important }
-html.dark .hero { background:linear-gradient(135deg,rgba(30,64,175,0.85),rgba(37,99,235,0.80)),url('{{ \App\Models\SiteSetting::get('hero_background', '/sekolaheskasaba.jpeg') }}') !important }
+html.dark .hero { background-image:linear-gradient(135deg,rgba(30,64,175,0.85),rgba(37,99,235,0.80)),url('{{ \App\Models\SiteSetting::get('hero_background', '/sekolaheskasaba.jpeg') }}') !important }
 html.dark .hero-btn-main { background:rgba(255,255,255,.2) !important; color:#ffffff !important; border-color:rgba(255,255,255,.4) !important }
 html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; border-color:rgba(255,255,255,.6) !important }
 /* ─── MOBILE NAV LINKS ─── */
@@ -920,7 +921,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
     {{-- Brand Logo & Text --}}
     <a href="{{ route('home') }}" class="nav-brand" aria-label="{{ \App\Models\SiteSetting::get('site_name', 'SIPBAR') }} Homepage">
       <div class="nav-logo-wrap">
-        <img src="{{ \App\Models\SiteSetting::get('site_logo', '/logossmkn1.png') }}" alt="Logo {{ \App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 Bangsri') }}" class="nav-brand-img">
+        <img src="{{ $siteLogoLanding ?? (\App\Models\SiteSetting::get('site_logo_landing') ?: \App\Models\SiteSetting::get('site_logo', '/logossmkn1.png')) }}" alt="Logo {{ \App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 Bangsri') }}" class="nav-brand-img">
       </div>
       <div class="nav-brand-text">
         <div class="nav-brand-title">{{ \App\Models\SiteSetting::get('site_name', 'SIPBAR') }}</div>
@@ -1501,7 +1502,7 @@ $footerLinks = \App\Models\SiteSetting::getJson('footer_links', [
       <div class="footer-brand">
         <div class="footer-logo-wrap">
           <div class="footer-logo-box">
-            <img src="{{ \App\Models\SiteSetting::get('site_logo', '/logossmkn1.png') }}" alt="Logo {{ \App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 Bangsri') }}" style="width:100%;height:100%;object-fit:contain;">
+            <img src="{{ $siteLogoLanding ?? (\App\Models\SiteSetting::get('site_logo_landing') ?: \App\Models\SiteSetting::get('site_logo', '/logossmkn1.png')) }}" alt="Logo {{ \App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 Bangsri') }}" style="width:100%;height:100%;object-fit:contain;">
           </div>
           <div>
             <div class="footer-brand-name">{{ \App\Models\SiteSetting::get('footer_brand_name', 'SIPBAR') }}</div>

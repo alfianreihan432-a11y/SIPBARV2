@@ -137,17 +137,6 @@
                 @else
                     <div class="profile-avatar">{{ strtoupper(substr($user->name, 0, 2)) }}</div>
                 @endif
-                <label for="foto_profil" class="avatar-upload-btn" title="Ganti Foto Profil">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;color:#fff"
-                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                </label>
-                <input type="file" id="foto_profil" accept="image/jpeg,image/jpg,image/png"
-                       style="display:none" onchange="uploadAvatar(this)">
             </div>
 
             <div class="profile-meta">
@@ -333,43 +322,6 @@ function updatePhone(event) {
         btn.textContent = orig;
         btn.disabled = false;
     });
-}
-
-function uploadAvatar(input) {
-    if (!input.files || !input.files[0]) return;
-    const file = input.files[0];
-    if (file.size > 2 * 1024 * 1024) {
-        alert('Ukuran file maksimal 2MB');
-        input.value = '';
-        return;
-    }
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    if (!validTypes.includes(file.type)) {
-        alert('Format file harus JPG, JPEG, atau PNG');
-        input.value = '';
-        return;
-    }
-    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    if (!csrf) { alert('CSRF token tidak ditemukan. Silakan refresh halaman.'); return; }
-
-    const fd = new FormData();
-    fd.append('foto_profil', file);
-    fd.append('_token', csrf);
-
-    fetch('{{ route("kajur.profile.photo.update") }}', {
-        method: 'POST',
-        body: fd,
-        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
-    })
-    .then(r => {
-        if (r.status === 419) throw new Error('CSRF expired. Silakan refresh halaman.');
-        return r.json();
-    })
-    .then(data => {
-        if (data.success) window.location.reload();
-        else alert(data.message || 'Gagal mengupload foto');
-    })
-    .catch(err => alert(err.message || 'Terjadi kesalahan saat upload'));
 }
 </script>
 @endsection

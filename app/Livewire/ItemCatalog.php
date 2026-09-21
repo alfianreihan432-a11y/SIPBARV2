@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Item;
 use App\Models\Category;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,14 +13,22 @@ class ItemCatalog extends Component
 {
     use WithPagination;
 
+    #[Url(keep: true)]
     public $search = '';
+    
+    #[Url(keep: true)]
     public $categoryFilter = '';
 
     protected $paginationTheme = 'tailwind';
 
     public function mount()
     {
-        $this->categoryFilter = '';
+        if (request()->has('search') && empty($this->search)) {
+            $this->search = (string) request('search');
+        }
+        if (request()->has('category') && empty($this->categoryFilter)) {
+            $this->categoryFilter = (string) request('category');
+        }
     }
 
     public function updatedSearch()
@@ -55,7 +64,7 @@ class ItemCatalog extends Component
 
         session(['student_borrowing_cart' => $cart]);
 
-        $this->redirect(route('student.loans.cart'), navigate: true);
+        $this->redirect(route('student.loans.cart'));
     }
 
     public function getItemsProperty()

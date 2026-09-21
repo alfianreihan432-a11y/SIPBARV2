@@ -125,4 +125,141 @@
         </div>
     </div>
 </div>
+
+{{-- Daftar Pengajuan Siswa Bimbingan --}}
+@if($studentRequests && $studentRequests->count() > 0)
+<div class="panel" style="margin-top: 20px;">
+    <div style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 18px;">
+        Daftar Pengajuan Siswa Bimbingan ({{ $studentRequests->count() }})
+    </div>
+    <div class="table-responsive">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--bg-card-subtle);">
+                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-subtle);">ID</th>
+                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-subtle);">Siswa</th>
+                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-subtle);">Barang</th>
+                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-subtle);">Jumlah</th>
+                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-subtle);">Status</th>
+                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-subtle);">Tanggal</th>
+                    <th style="padding: 12px 16px; text-align: right; font-size: 12px; font-weight: 700; color: var(--text-subtle);">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($studentRequests as $req)
+                <tr style="border-bottom: 1px solid var(--border-alt);">
+                    <td style="padding: 12px 16px;">#{{ $req->id }}</td>
+                    <td style="padding: 12px 16px;">{{ $req->user->name ?? '-' }}</td>
+                    <td style="padding: 12px 16px;">{{ $req->itemWithTrashed?->name ?? $req->item?->name ?? '-' }}</td>
+                    <td style="padding: 12px 16px;">{{ $req->quantity ?? 1 }}</td>
+                    <td style="padding: 12px 16px;">{{ ucfirst($req->status) }}</td>
+                    <td style="padding: 12px 16px;">{{ $req->created_at->format('d/m/Y') }}</td>
+                    <td style="padding: 12px 16px; text-align: right;">
+                        <button type="button" onclick="showStudentDetailModal({{ $req->id }})" style="padding: 6px 12px; background: var(--blue); color: #ffffff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                            Detail
+                        </button>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
+
+{{-- Detail Modal for Student Requests --}}
+<div id="studentDetailModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(3px);">
+    <div style="background:var(--bg-card);border-radius:16px;padding:28px;width:100%;max-width:600px;border:1px solid var(--border-alt);box-shadow:0 20px 48px rgba(0,0,0,0.18);max-height:90vh;overflow-y:auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h3 style="font-size:18px;font-weight:700;color:var(--text-primary);">Detail Peminjaman Siswa</h3>
+            <button type="button" onclick="hideStudentDetailModal()" style="background:none;border:none;font-size:24px;color:var(--text-muted);cursor:pointer;">&times;</button>
+        </div>
+        <div id="studentDetailContent"></div>
+    </div>
+</div>
+
+<script>
+const studentRequestsData = @json($studentRequests ?? []);
+
+function showStudentDetailModal(requestId) {
+    const req = studentRequestsData.find(r => r.id === requestId);
+    if (!req) return;
+
+    let content = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">';
+    content += '<div>';
+    content += '<div style="font-size:11px;font-weight:700;color:var(--text-subtle);text-transform:uppercase;margin-bottom:4px;">Data Peminjam</div>';
+    content += '<div style="font-size:14px;font-weight:600;color:var(--text-primary);">' + (req.user?.name || '-') + '</div>';
+    content += '<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">' + (req.user?.jurusan?.nama || '-') + (req.user?.kelas ? ' (' + req.user.kelas + ')' : '') + '</div>';
+    content += '<div style="font-size:12px;color:var(--text-muted);margin-top:2px;">WA: ' + (req.user?.whatsapp_number || '-') + '</div>';
+    content += '</div>';
+    content += '<div>';
+    content += '<div style="font-size:11px;font-weight:700;color:var(--text-subtle);text-transform:uppercase;margin-bottom:4px;">Guru Penanggung Jawab</div>';
+    content += '<div style="font-size:14px;font-weight:600;color:var(--text-primary);">' + (req.teacher?.name || '-') + '</div>';
+    content += '</div>';
+    content += '</div>';
+
+    content += '<div style="margin-bottom:20px;">';
+    content += '<div style="font-size:11px;font-weight:700;color:var(--text-subtle);text-transform:uppercase;margin-bottom:8px;">Data Pengisian Form</div>';
+    content += '<div style="background:var(--bg-card-subtle);border:1px solid var(--border-subtle);border-radius:10px;padding:14px;">';
+    content += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-subtle);">';
+    content += '<span style="font-size:12px;color:var(--text-muted);">Keperluan</span>';
+    content += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">' + (req.purpose || '-') + '</span>';
+    content += '</div>';
+    content += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-subtle);">';
+    content += '<span style="font-size:12px;color:var(--text-muted);">Tanggal Pinjam</span>';
+    content += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">' + (req.borrow_date || '-') + '</span>';
+    content += '</div>';
+    content += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-subtle);">';
+    content += '<span style="font-size:12px;color:var(--text-muted);">Tanggal Kembali</span>';
+    content += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">' + (req.return_date || '-') + '</span>';
+    content += '</div>';
+    content += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-subtle);">';
+    content += '<span style="font-size:12px;color:var(--text-muted);">Jam Kembali</span>';
+    content += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">' + (req.return_time || '-') + '</span>';
+    content += '</div>';
+    if (req.notes) {
+        content += '<div style="display:flex;justify-content:space-between;padding:6px 0;">';
+        content += '<span style="font-size:12px;color:var(--text-muted);">Catatan</span>';
+        content += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">' + (req.notes || '-') + '</span>';
+        content += '</div>';
+    }
+    content += '</div>';
+    content += '</div>';
+
+    content += '<div>';
+    content += '<div style="font-size:11px;font-weight:700;color:var(--text-subtle);text-transform:uppercase;margin-bottom:8px;">Data Barang Dipinjam</div>';
+    content += '<div style="background:var(--bg-card-subtle);border:1px solid var(--border-subtle);border-radius:10px;padding:14px;">';
+    content += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-subtle);">';
+    content += '<span style="font-size:12px;color:var(--text-muted);">Nama Barang</span>';
+    content += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">' + (req.itemWithTrashed?.name || req.item?.name || '-') + '</span>';
+    content += '</div>';
+    content += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-subtle);">';
+    content += '<span style="font-size:12px;color:var(--text-muted);">Kode Barang</span>';
+    content += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">' + (req.itemWithTrashed?.code || req.item?.code || '-') + '</span>';
+    content += '</div>';
+    content += '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-subtle);">';
+    content += '<span style="font-size:12px;color:var(--text-muted);">Jumlah</span>';
+    content += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">' + (req.quantity || 1) + ' unit</span>';
+    content += '</div>';
+    content += '<div style="display:flex;justify-content:space-between;padding:6px 0;">';
+    content += '<span style="font-size:12px;color:var(--text-muted);">Kategori</span>';
+    content += '<span style="font-size:12px;font-weight:600;color:var(--text-primary);">' + (req.itemWithTrashed?.category?.name || req.item?.category?.name || '-') + '</span>';
+    content += '</div>';
+    content += '</div>';
+    content += '</div>';
+
+    document.getElementById('studentDetailContent').innerHTML = content;
+    document.getElementById('studentDetailModal').style.display = 'flex';
+}
+
+function hideStudentDetailModal() {
+    document.getElementById('studentDetailModal').style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        hideStudentDetailModal();
+    }
+});
+</script>
 @endsection

@@ -284,7 +284,8 @@
                 <h4>Kontak</h4>
                 <ul>
                     <li><a href="mailto:sipbar@smkn1bangsri.sch.id">sipbar@smkn1bangsri.sch.id</a></li>
-                    <li><a href="tel:+62xxx">+62 xxx xxx xxx</a></li>
+                    <!-- TODO: Ganti dengan nomor telepon sekolah sebelum go-live -->
+                    <li><a href="tel:">[NOMOR TELEPON SEKOLAH - ISI SEBELUM GO-LIVE]</a></li>
                     <li><a href="#">SMKN 1 Bangsri</a></li>
                 </ul>
             </div>

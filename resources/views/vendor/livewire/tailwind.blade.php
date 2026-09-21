@@ -5,121 +5,218 @@ if (! isset($scrollTo)) {
 
 $scrollIntoViewJsSnippet = ($scrollTo !== false)
     ? <<<JS
-       (\$el.closest('{$scrollTo}') || document.querySelector('{$scrollTo}')).scrollIntoView()
+       (\$el.closest('{$scrollTo}') || document.querySelector('{$scrollTo}')).scrollIntoView({ behavior: 'smooth' })
     JS
     : '';
 @endphp
 
-<div>
-    @if ($paginator->hasPages())
-        <nav role="navigation" aria-label="Pagination Navigation" class="flex items-center justify-between">
-            <div class="flex justify-between flex-1 sm:hidden">
-                <span>
-                    @if ($paginator->onFirstPage())
-                        <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">
-                            {!! __('pagination.previous') !!}
-                        </span>
-                    @else
-                        <button type="button" wire:click="previousPage('{{ $paginator->getPageName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" wire:loading.attr="disabled" dusk="previousPage{{ $paginator->getPageName() == 'page' ? '' : '.' . $paginator->getPageName() }}.before" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-blue-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">
-                            {!! __('pagination.previous') !!}
-                        </button>
-                    @endif
-                </span>
+<div class="sipbar-pagination-wrapper">
+    <style>
+        .sipbar-pagination-wrapper {
+            width: 100%;
+            margin-top: 16px;
+        }
+        .sipbar-pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 14px 20px;
+            background: var(--card, #ffffff);
+            border: 1px solid var(--border, #e2e8f0);
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-sizing: border-box;
+        }
+        .sipbar-pagination-info {
+            font-size: 0.875rem;
+            color: var(--muted, #64748b);
+            margin: 0;
+            line-height: 1.5;
+        }
+        .sipbar-pagination-info strong,
+        .sipbar-pagination-info .sipbar-highlight {
+            color: var(--text, #1e293b);
+            font-weight: 600;
+        }
+        .sipbar-pagination-controls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .sipbar-page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1;
+            border-radius: 10px;
+            border: 1px solid var(--border, #e2e8f0);
+            background: var(--card, #ffffff);
+            color: var(--text, #334155);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.18s ease-in-out;
+            user-select: none;
+            box-sizing: border-box;
+        }
+        .sipbar-page-btn:hover:not(:disabled):not(.active):not(.disabled) {
+            border-color: var(--primary, #2563eb);
+            color: var(--primary, #2563eb);
+            background: var(--primary-light, #eff6ff);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.12);
+        }
+        .sipbar-page-btn.active {
+            background: var(--primary, #2563eb) !important;
+            border-color: var(--primary, #2563eb) !important;
+            color: #ffffff !important;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            cursor: default;
+        }
+        .sipbar-page-btn.disabled,
+        .sipbar-page-btn:disabled {
+            opacity: 0.45;
+            background: var(--bg2, #f8fafc);
+            border-color: var(--border, #e2e8f0);
+            color: var(--subtle, #94a3b8);
+            cursor: not-allowed;
+            pointer-events: none;
+            box-shadow: none;
+            transform: none;
+        }
+        .sipbar-page-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2.2;
+            transition: transform 0.15s ease;
+        }
+        .sipbar-page-btn:hover:not(:disabled):not(.disabled) .sipbar-icon-prev {
+            transform: translateX(-2px);
+        }
+        .sipbar-page-btn:hover:not(:disabled):not(.disabled) .sipbar-icon-next {
+            transform: translateX(2px);
+        }
+        .sipbar-page-dots {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            height: 40px;
+            color: var(--muted, #94a3b8);
+            font-weight: 600;
+            font-size: 0.875rem;
+            user-select: none;
+        }
+        @media (max-width: 640px) {
+            .sipbar-pagination-container {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 14px;
+                gap: 12px;
+            }
+            .sipbar-pagination-controls {
+                justify-content: center;
+                width: 100%;
+                gap: 6px;
+            }
+            .sipbar-page-btn {
+                min-width: 38px;
+                height: 38px;
+                padding: 0 8px;
+                font-size: 0.8125rem;
+            }
+        }
+    </style>
 
-                <span>
-                    @if ($paginator->hasMorePages())
-                        <button type="button" wire:click="nextPage('{{ $paginator->getPageName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" wire:loading.attr="disabled" dusk="nextPage{{ $paginator->getPageName() == 'page' ? '' : '.' . $paginator->getPageName() }}.before" class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-blue-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300">
-                            {!! __('pagination.next') !!}
-                        </button>
-                    @else
-                        <span class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md dark:text-gray-600 dark:bg-gray-800 dark:border-gray-600">
-                            {!! __('pagination.next') !!}
-                        </span>
-                    @endif
-                </span>
+    @if ($paginator->hasPages())
+        <nav role="navigation" aria-label="Pagination Navigation" class="sipbar-pagination-container">
+            <div class="sipbar-pagination-info">
+                <span>Showing</span>
+                <span class="sipbar-highlight">{{ $paginator->firstItem() }}</span>
+                <span>to</span>
+                <span class="sipbar-highlight">{{ $paginator->lastItem() }}</span>
+                <span>of</span>
+                <span class="sipbar-highlight">{{ $paginator->total() }}</span>
+                <span>results</span>
             </div>
 
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-sm text-gray-700 leading-5 dark:text-gray-400">
-                        <span>{!! __('Showing') !!}</span>
-                        <span class="font-medium">{{ $paginator->firstItem() }}</span>
-                        <span>{!! __('to') !!}</span>
-                        <span class="font-medium">{{ $paginator->lastItem() }}</span>
-                        <span>{!! __('of') !!}</span>
-                        <span class="font-medium">{{ $paginator->total() }}</span>
-                        <span>{!! __('results') !!}</span>
-                    </p>
-                </div>
-
-                <div>
-                    <span class="relative z-0 inline-flex rtl:flex-row-reverse rounded-md shadow-sm">
-                        <span>
-                            {{-- Previous Page Link --}}
-                            @if ($paginator->onFirstPage())
-                                <span aria-disabled="true" aria-label="{{ __('pagination.previous') }}">
-                                    <span class="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default rounded-l-md leading-5 dark:bg-gray-800 dark:border-gray-600" aria-hidden="true">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                        </svg>
-                                    </span>
-                                </span>
-                            @else
-                                <button type="button" wire:click="previousPage('{{ $paginator->getPageName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" dusk="previousPage{{ $paginator->getPageName() == 'page' ? '' : '.' . $paginator->getPageName() }}.after" class="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md leading-5 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring ring-blue-300 active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:active:bg-gray-700 dark:focus:border-blue-800" aria-label="{{ __('pagination.previous') }}">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            @endif
-                        </span>
-
-                        {{-- Pagination Elements --}}
-                        @foreach ($elements as $element)
-                            {{-- "Three Dots" Separator --}}
-                            @if (is_string($element))
-                                <span aria-disabled="true">
-                                    <span class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-700 bg-white border border-gray-300 cursor-default leading-5 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300">{{ $element }}</span>
-                                </span>
-                            @endif
-
-                            {{-- Array Of Links --}}
-                            @if (is_array($element))
-                                @foreach ($element as $page => $url)
-                                    <span wire:key="paginator-{{ $paginator->getPageName() }}-page{{ $page }}">
-                                        @if ($page == $paginator->currentPage())
-                                            <span aria-current="page">
-                                                <span class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 dark:bg-gray-800 dark:border-gray-600">{{ $page }}</span>
-                                            </span>
-                                        @else
-                                            <button type="button" wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" class="relative inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 hover:text-gray-500 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring ring-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-300 dark:active:bg-gray-700 dark:focus:border-blue-800" aria-label="{{ __('Go to page :page', ['page' => $page]) }}">
-                                                {{ $page }}
-                                            </button>
-                                        @endif
-                                    </span>
-                                @endforeach
-                            @endif
-                        @endforeach
-
-                        <span>
-                            {{-- Next Page Link --}}
-                            @if ($paginator->hasMorePages())
-                                <button type="button" wire:click="nextPage('{{ $paginator->getPageName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" dusk="nextPage{{ $paginator->getPageName() == 'page' ? '' : '.' . $paginator->getPageName() }}.after" class="relative inline-flex items-center px-2 py-2 -ml-px text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md leading-5 hover:text-gray-400 focus:z-10 focus:outline-none focus:border-blue-300 focus:ring ring-blue-300 active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:active:bg-gray-700 dark:focus:border-blue-800" aria-label="{{ __('pagination.next') }}">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            @else
-                                <span aria-disabled="true" aria-label="{{ __('pagination.next') }}">
-                                    <span class="relative inline-flex items-center px-2 py-2 -ml-px text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default rounded-r-md leading-5 dark:bg-gray-800 dark:border-gray-600" aria-hidden="true">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                        </svg>
-                                    </span>
-                                </span>
-                            @endif
-                        </span>
+            <div class="sipbar-pagination-controls">
+                {{-- Previous Page Link --}}
+                @if ($paginator->onFirstPage())
+                    <span class="sipbar-page-btn disabled" aria-disabled="true" aria-label="{{ __('pagination.previous') }}">
+                        <svg class="sipbar-icon-prev" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
                     </span>
-                </div>
+                @else
+                    <button type="button"
+                            wire:click="previousPage('{{ $paginator->getPageName() }}')"
+                            x-on:click="{{ $scrollIntoViewJsSnippet }}"
+                            wire:loading.attr="disabled"
+                            class="sipbar-page-btn"
+                            aria-label="{{ __('pagination.previous') }}">
+                        <svg class="sipbar-icon-prev" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                @endif
+
+                {{-- Pagination Elements --}}
+                @foreach ($elements as $element)
+                    {{-- "Three Dots" Separator --}}
+                    @if (is_string($element))
+                        <span class="sipbar-page-dots" aria-disabled="true">{{ $element }}</span>
+                    @endif
+
+                    {{-- Array Of Links --}}
+                    @if (is_array($element))
+                        @foreach ($element as $page => $url)
+                            <span wire:key="paginator-{{ $paginator->getPageName() }}-page{{ $page }}">
+                                @if ($page == $paginator->currentPage())
+                                    <span class="sipbar-page-btn active" aria-current="page">{{ $page }}</span>
+                                @else
+                                    <button type="button"
+                                            wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')"
+                                            x-on:click="{{ $scrollIntoViewJsSnippet }}"
+                                            wire:loading.attr="disabled"
+                                            class="sipbar-page-btn"
+                                            aria-label="{{ __('Go to page :page', ['page' => $page]) }}">
+                                        {{ $page }}
+                                    </button>
+                                @endif
+                            </span>
+                        @endforeach
+                    @endif
+                @endforeach
+
+                {{-- Next Page Link --}}
+                @if ($paginator->hasMorePages())
+                    <button type="button"
+                            wire:click="nextPage('{{ $paginator->getPageName() }}')"
+                            x-on:click="{{ $scrollIntoViewJsSnippet }}"
+                            wire:loading.attr="disabled"
+                            class="sipbar-page-btn"
+                            aria-label="{{ __('pagination.next') }}">
+                        <svg class="sipbar-icon-next" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                @else
+                    <span class="sipbar-page-btn disabled" aria-disabled="true" aria-label="{{ __('pagination.next') }}">
+                        <svg class="sipbar-icon-next" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </span>
+                @endif
             </div>
         </nav>
     @endif

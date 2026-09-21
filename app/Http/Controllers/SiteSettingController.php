@@ -42,20 +42,37 @@ class SiteSettingController extends Controller
         $this->authorize('manage-site-settings');
 
         $validator = Validator::make($request->all(), [
-            'site_name' => 'required|string|max:100',
-            'site_subtitle' => 'required|string|max:100',
-            'site_title' => 'required|string|max:200',
-            'site_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:2048',
+            'site_name'           => 'required|string|max:100',
+            'site_subtitle'       => 'required|string|max:100',
+            'site_title'          => 'required|string|max:200',
+            'site_logo_landing'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:2048',
+            'site_logo_login'     => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:2048',
+            'site_logo_dashboard' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:2048',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        if ($request->hasFile('site_logo')) {
-            SiteSetting::deleteUploadedFile(SiteSetting::get('site_logo'));
-            $logoPath = $request->file('site_logo')->store('site-logos', 'public');
-            SiteSetting::set('site_logo', '/storage/'.$logoPath, 'image', 'general');
+        // Logo Landing Page
+        if ($request->hasFile('site_logo_landing')) {
+            SiteSetting::deleteUploadedFile(SiteSetting::get('site_logo_landing'));
+            $path = $request->file('site_logo_landing')->store('site-logos', 'public');
+            SiteSetting::set('site_logo_landing', '/storage/'.$path, 'image', 'general');
+        }
+
+        // Logo Halaman Login
+        if ($request->hasFile('site_logo_login')) {
+            SiteSetting::deleteUploadedFile(SiteSetting::get('site_logo_login'));
+            $path = $request->file('site_logo_login')->store('site-logos', 'public');
+            SiteSetting::set('site_logo_login', '/storage/'.$path, 'image', 'general');
+        }
+
+        // Logo Dashboard (semua role)
+        if ($request->hasFile('site_logo_dashboard')) {
+            SiteSetting::deleteUploadedFile(SiteSetting::get('site_logo_dashboard'));
+            $path = $request->file('site_logo_dashboard')->store('site-logos', 'public');
+            SiteSetting::set('site_logo_dashboard', '/storage/'.$path, 'image', 'general');
         }
 
         SiteSetting::set('site_name', $request->site_name, 'text', 'general');
