@@ -142,7 +142,7 @@
             <div class="profile-meta">
                 <h1>{{ $user ? $user->name : 'Guru' }}</h1>
                 <p class="email">{{ $user ? $user->email : '-' }}</p>
-                <span class="role-badge">Guru Pembimbing</span>
+                <span class="role-badge">Guru Penanggung Jawab</span>
                 @if($user && $user->jurusan)
                     <span class="jurusan-badge">{{ $user->jurusan->nama }}</span>
                 @elseif($user && $user->nip)
@@ -192,11 +192,11 @@
             </div>
             <div class="info-row">
                 <div class="info-lbl">Jurusan / Unit</div>
-                <div class="info-val">{{ $user ? ($user->jurusan?->nama ?? ($user->nip ? 'NIP: '.$user->nip : 'Guru Pembimbing')) : '—' }}</div>
+                <div class="info-val">{{ $user ? ($user->jurusan?->nama ?? ($user->nip ? 'NIP: '.$user->nip : 'Guru Penanggung Jawab')) : '—' }}</div>
             </div>
             <div class="info-row">
                 <div class="info-lbl">Peran</div>
-                <div class="info-val">Guru Pembimbing</div>
+                <div class="info-val">Guru Penanggung Jawab</div>
             </div>
             <div class="info-row">
                 <div class="info-lbl">Terdaftar Sejak</div>

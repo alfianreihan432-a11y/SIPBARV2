@@ -258,6 +258,21 @@
         color: #1d4ed8 !important;
         background: rgba(37, 99, 235, 0.08);
     }
+    /* Dark mode overrides for detail links */
+    html.dark .btn-detail-link.is-not-returned {
+        color: #94a3b8 !important;
+    }
+    html.dark .btn-detail-link.is-not-returned:hover {
+        color: #cbd5e1 !important;
+        background: #1e293b;
+    }
+    html.dark .btn-detail-link.is-returned {
+        color: #60a5fa !important;
+    }
+    html.dark .btn-detail-link.is-returned:hover {
+        color: #93c5fd !important;
+        background: #1e3a8a;
+    }
 
     .empty-state {
         text-align: center;

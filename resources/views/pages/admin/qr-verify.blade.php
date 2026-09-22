@@ -78,9 +78,9 @@
         font-size: 12px;
         font-weight: 700;
     }
-    .qrv-badge-approved { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-    .qrv-badge-borrowed { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-    .qrv-badge-rejected { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .qrv-badge-approved { background: var(--s-returned, #059669); color: #fff; }
+    .qrv-badge-borrowed { background: var(--s-approved, #2563eb); color: #fff; }
+    .qrv-badge-rejected { background: var(--s-rejected, #dc2626); color: #fff; }
 
     .qrv-actions {
         display: flex;
@@ -364,7 +364,7 @@
                 </tr>
                 @if($br->teacher)
                 <tr>
-                    <td>Guru Pembimbing</td>
+                    <td>Guru Penanggung Jawab</td>
                     <td>{{ $br->teacher->name }}</td>
                 </tr>
                 @endif

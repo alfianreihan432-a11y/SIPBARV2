@@ -1199,7 +1199,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
             <span class="feat-index">{{ $feat(4, 'index', '05') }}</span>
           </div>
           <div class="feat-title">{{ $feat(4, 'title', 'Kontrol Akses Multi-Peran') }}</div>
-          <p class="feat-summary">{{ $feat(4, 'description', 'Hak akses terstruktur untuk Siswa, Guru Pembimbing, Kepala Jurusan, dan Sarpras.') }}</p>
+          <p class="feat-summary">{{ $feat(4, 'description', 'Hak akses terstruktur untuk Siswa, Guru Penanggung Jawab, Kepala Jurusan, dan Sarpras.') }}</p>
         </div>
         <div class="feat-action-link">
           <span>{{ $feat(4, 'link_text', 'Atur Pengguna') }}</span>

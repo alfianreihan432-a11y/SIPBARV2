@@ -48,10 +48,25 @@ class SiteSettingController extends Controller
             'site_logo_landing'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:2048',
             'site_logo_login'     => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:2048',
             'site_logo_dashboard' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:2048',
+            'site_favicon'        => 'nullable|image|mimes:ico,png,jpeg,jpg,svg|max:1024',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
+        }
+
+        // Custom validation for favicon aspect ratio (must be square)
+        if ($request->hasFile('site_favicon')) {
+            $favicon = $request->file('site_favicon');
+            $imageInfo = getimagesize($favicon->getPathname());
+            if ($imageInfo) {
+                [$width, $height] = $imageInfo;
+                if ($width !== $height) {
+                    return back()->withErrors([
+                        'site_favicon' => 'Logo favicon harus berbentuk persegi (contoh: 512x512px, 256x256px).'
+                    ])->withInput();
+                }
+            }
         }
 
         // Logo Landing Page
@@ -73,6 +88,13 @@ class SiteSettingController extends Controller
             SiteSetting::deleteUploadedFile(SiteSetting::get('site_logo_dashboard'));
             $path = $request->file('site_logo_dashboard')->store('site-logos', 'public');
             SiteSetting::set('site_logo_dashboard', '/storage/'.$path, 'image', 'general');
+        }
+
+        // Favicon (Logo Tab Browser)
+        if ($request->hasFile('site_favicon')) {
+            SiteSetting::deleteUploadedFile(SiteSetting::get('site_favicon'));
+            $path = $request->file('site_favicon')->store('favicons', 'public');
+            SiteSetting::set('site_favicon', '/storage/'.$path, 'image', 'general');
         }
 
         SiteSetting::set('site_name', $request->site_name, 'text', 'general');

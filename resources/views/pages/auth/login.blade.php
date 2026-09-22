@@ -267,7 +267,7 @@
                     </span>
                     <input type="email" id="email" name="email"
                         class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}"
-                        placeholder="nama@smkn1bangsri.sch.id"
+                        placeholder="nama/nip/nis@smkn1bangsri.sch.id"
                         value="{{ old('email') }}"
                         autocomplete="email">
                 </div>

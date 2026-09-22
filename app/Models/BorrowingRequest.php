@@ -34,6 +34,36 @@ class BorrowingRequest extends Model
         'approved_by_kajur_id',
     ];
 
+    protected $appends = ['display_status'];
+
+    /**
+     * Accessor for display_status (real-time overdue check)
+     */
+    public function getDisplayStatusAttribute(): string
+    {
+        // If already overdue in database, return it
+        if ($this->status === self::STATUS_OVERDUE) {
+            return 'overdue';
+        }
+
+        // Real-time check for borrowed loans
+        if ($this->status === self::STATUS_BORROWED) {
+            $nowJakarta = now()->timezone('Asia/Jakarta');
+
+            if ($this->return_date->lt($nowJakarta->toDateString())) {
+                return 'overdue';
+            }
+
+            if ($this->return_date->toDateString() === $nowJakarta->toDateString() && $this->return_time) {
+                if ($this->return_time < $nowJakarta->toTimeString()) {
+                    return 'overdue';
+                }
+            }
+        }
+
+        return $this->status;
+    }
+
     protected $casts = [
         'borrow_date' => 'date',
         'return_date' => 'date',
@@ -156,8 +186,26 @@ class BorrowingRequest extends Model
      */
     public function isOverdue(): bool
     {
-        return $this->status === self::STATUS_BORROWED 
-            && $this->return_date->isPast();
+        if ($this->status !== self::STATUS_BORROWED) {
+            return false;
+        }
+
+        // Use Asia/Jakarta timezone for accurate comparison
+        $nowJakarta = now()->timezone('Asia/Jakarta');
+
+        // Check if return date has passed
+        if ($this->return_date->lt($nowJakarta->toDateString())) {
+            return true;
+        }
+
+        // If return date is today, check if return time has passed
+        if ($this->return_date->toDateString() === $nowJakarta->toDateString() && $this->return_time) {
+            if ($this->return_time < $nowJakarta->toTimeString()) {
+                return true;
+            }
+        }
+
+        return false;
     }
     
     /**
@@ -217,6 +265,7 @@ class BorrowingRequest extends Model
             self::STATUS_REJECTED => 'red',
             self::STATUS_BORROWED => 'blue',
             self::STATUS_RETURNED => 'gray',
+            self::STATUS_OVERDUE => 'red',
         ];
         
         $color = $colors[$this->status] ?? 'gray';
@@ -234,6 +283,7 @@ class BorrowingRequest extends Model
             'rejected' => 'Ditolak',
             'borrowed' => 'Dipinjam',
             'returned' => 'Dikembalikan',
+            'overdue' => 'Terlambat',
             default => ucfirst($this->status),
         };
     }
@@ -247,6 +297,7 @@ class BorrowingRequest extends Model
             'rejected' => 'danger',
             'borrowed' => 'primary',
             'returned' => 'secondary',
+            'overdue' => 'danger',
             default => 'secondary',
         };
     }
@@ -260,8 +311,17 @@ class BorrowingRequest extends Model
      */
     public function scopeOverdue($query)
     {
+        $nowJakarta = now()->timezone('Asia/Jakarta');
+
         return $query->where('status', self::STATUS_BORROWED)
-            ->whereDate('return_date', '<', now());
+            ->where(function($q) use ($nowJakarta) {
+                $q->whereDate('return_date', '<', $nowJakarta)
+                  ->orWhere(function($subQ) use ($nowJakarta) {
+                      $subQ->whereDate('return_date', '=', $nowJakarta)
+                        ->whereNotNull('return_time')
+                        ->whereTime('return_time', '<', $nowJakarta);
+                  });
+            });
     }
     
     /**

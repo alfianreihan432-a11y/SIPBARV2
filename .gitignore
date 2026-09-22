@@ -47,3 +47,7 @@ stage3_final.xml
 
 # Laravel
 /storage/framework/views/*
+
+# Production database dumps (sensitive data)
+sipbarv2_production.sql
+sipbarv2_production_utf8.sql

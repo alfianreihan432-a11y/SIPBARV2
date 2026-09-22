@@ -12,24 +12,24 @@
 .lm-filters-wrapper{display:flex;flex-direction:column;gap:10px;padding:14px 22px;border-bottom:1px solid var(--border-subtle);background:var(--bg-card-subtle)}
 .lm-filter-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .lm-filter-label{font-size:11px;color:var(--text-subtle);font-weight:700;text-transform:uppercase;letter-spacing:.06em;min-width:55px}
-.lm-filter-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);transition:all .15s}
+.lm-filter-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border-subtle);background:var(--bg-card);color:var(--text-muted);transition:all .15s}
 .lm-filter-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
-.lm-filter-btn.act{background:var(--blue-dark);color:#fff;border-color:var(--blue-dark);box-shadow:0 2px 6px rgba(255,255,255,.2)}
-.lm-filter-btn.act-guru{background:var(--color-success);color:#fff;border-color:var(--color-success);box-shadow:0 2px 6px rgba(16,185,129,.3)}
-.lm-filter-btn.act-siswa{background:var(--color-info);color:#fff;border-color:var(--color-info);box-shadow:0 2px 6px rgba(96,165,250,.3)}
+.lm-filter-btn.act{background:var(--blue-dark);color:#fff;border:none;box-shadow:0 2px 6px rgba(37,99,235,.3)}
+.lm-filter-btn.act-guru{background:var(--color-success);color:#fff;border:none;box-shadow:0 2px 6px rgba(16,185,129,.3)}
+.lm-filter-btn.act-siswa{background:var(--color-info);color:#fff;border:none;box-shadow:0 2px 6px rgba(96,165,250,.3)}
 
-/* Badges - Bug #3 Fix: Using CSS variables for better dark mode contrast */
-.lm-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;white-space:nowrap}
-.badge-pending{background:rgba(251,191,36,.12);color:var(--color-pending);border:1px solid rgba(251,191,36,.2)}
-.badge-approved{background:rgba(96,165,250,.12);color:var(--color-approved);border:1px solid rgba(96,165,250,.2)}
-.badge-borrowed{background:rgba(234,179,8,.12);color:var(--color-borrowed);border:1px solid rgba(234,179,8,.2)}
-.badge-returned{background:rgba(16,185,129,.12);color:var(--color-returned);border:1px solid rgba(16,185,129,.2)}
-.badge-rejected{background:rgba(248,113,113,.12);color:var(--color-rejected);border:1px solid rgba(248,113,113,.2)}
-.badge-overdue{background:rgba(239,68,68,.15);color:var(--color-overdue);border:1px solid rgba(239,68,68,.25)}
+/* Badges - Solid filled style for better visibility */
+.lm-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;white-space:nowrap}
+.badge-pending{background:var(--s-pending, #d97706);color:#fff;border:none}
+.badge-approved{background:var(--s-approved, #2563eb);color:#fff;border:none}
+.badge-borrowed{background:var(--s-borrowed, #0891b2);color:#fff;border:none}
+.badge-returned{background:var(--s-returned, #059669);color:#fff;border:none}
+.badge-rejected{background:var(--s-rejected, #dc2626);color:#fff;border:none}
+.badge-overdue{background:var(--s-overdue, #dc2626);color:#fff;border:none;font-weight:800;box-shadow:0 2px 4px rgba(220,38,38,.3)}
 
-/* Type Badges - Bug #3 Fix: Using CSS variables for better dark mode contrast */
-.badge-type-siswa{background:rgba(96,165,250,.12);color:var(--color-info);border:1px solid rgba(96,165,250,.25);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
-.badge-type-guru{background:rgba(16,185,129,.12);color:var(--color-success);border:1px solid rgba(16,185,129,.25);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
+/* Type Badges - Solid filled style for consistency */
+.badge-type-siswa{background:var(--s-approved, #2563eb);color:#fff;border:none;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
+.badge-type-guru{background:var(--s-returned, #059669);color:#fff;border:none;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
 
 /* Table */
 table.lmt{width:100%;border-collapse:collapse}
@@ -53,18 +53,32 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
 .lmt-due.warn{color:var(--color-warning)}
 .lmt-due.over{color:var(--color-danger);font-weight:700}
 
-/* Action Buttons - Using CSS Variables */
-.lm-act-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
-.btn-approve{background:rgba(16,185,129,.12);color:var(--color-success);border:1px solid rgba(16,185,129,.2)}
-.btn-approve:hover{background:var(--color-success);color:#fff}
-.btn-borrowed{background:rgba(234,179,8,.12);color:var(--color-borrowed);border:1px solid rgba(234,179,8,.2)}
-.btn-borrowed:hover{background:var(--color-borrowed);color:#fff}
-.btn-return{background:rgba(96,165,250,.12);color:var(--color-info);border:1px solid rgba(96,165,250,.2)}
-.btn-return:hover{background:var(--color-info);color:#fff}
-.btn-reject{background:rgba(248,113,113,.08);color:var(--color-danger);border:1px solid rgba(248,113,113,.2)}
-.btn-reject:hover{background:var(--color-danger);color:#fff}
-.btn-detail{background:rgba(148,163,184,.12);color:var(--text-secondary);border:1px solid var(--border-subtle)}
-.btn-detail:hover{background:var(--bg-hover);color:var(--text-primary)}
+/* Action Buttons - Solid filled style for better CTA visibility */
+.lm-act-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.btn-approve{background:var(--s-returned, #059669);color:#fff;border:none}
+.btn-approve:hover{background:var(--s-returned, #059669);opacity:.9}
+.btn-borrowed{background:var(--s-borrowed, #0891b2);color:#fff;border:none}
+.btn-borrowed:hover{background:var(--s-borrowed, #0891b2);opacity:.9}
+.btn-return{background:var(--s-approved, #2563eb);color:#fff;border:none}
+.btn-return:hover{background:var(--s-approved, #2563eb);opacity:.9}
+.btn-reject{background:var(--s-rejected, #dc2626);color:#fff;border:none}
+.btn-reject:hover{background:var(--s-rejected, #dc2626);opacity:.9}
+.btn-warning{background:var(--s-warning, #ea580c);color:#fff;border:none;font-weight:800;box-shadow:0 2px 4px rgba(234,88,12,.3)}
+.btn-warning:hover{background:var(--s-warning, #ea580c);opacity:.9}
+.btn-detail{background:var(--text-secondary, #64748b);color:#fff;border:none}
+.btn-detail:hover{background:var(--text-primary, #0f172a);color:#fff}
+
+/* Dark mode override for detail button to ensure better contrast - HIGHEST SPECIFICITY */
+html.dark .lm-act-btn.btn-detail, html:not(.light) .lm-act-btn.btn-detail,
+html.dark button.btn-detail, html:not(.light) button.btn-detail,
+html.dark div button.lm-act-btn.btn-detail, html:not(.light) div button.lm-act-btn.btn-detail{background:#475569 !important;color:#ffffff !important}
+html.dark .lm-act-btn.btn-detail:hover, html:not(.light) .lm-act-btn.btn-detail:hover,
+html.dark button.btn-detail:hover, html:not(.light) button.btn-detail:hover,
+html.dark div button.lm-act-btn.btn-detail:hover, html:not(.light) div button.lm-act-btn.btn-detail:hover{background:#64748b !important;color:#ffffff !important}
+
+/* Dark mode override for detail button to ensure better contrast */
+html.dark .btn-detail, html:not(.light) .btn-detail{background:#475569;color:#fff !important}
+html.dark .btn-detail:hover, html:not(.light) .btn-detail:hover{background:#64748b;color:#fff !important}
 
 /* Kajur Notice Badge - Using CSS Variables */
 .lm-kajur-notice{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(251,191,36,.1);color:var(--color-warning);border:1px dashed rgba(251,191,36,.3);cursor:default}
@@ -86,6 +100,15 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
 @keyframes lmFadeIn{from{opacity:0}to{opacity:1}}
 @keyframes lmScaleIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
 </style>
+
+<div>
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('openWhatsApp', (url) => {
+            window.open(url, '_blank');
+        });
+    });
+</script>
 
 @if(session()->has('message'))
 <div class="lm-alert-success">
@@ -295,9 +318,9 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
 
                     {{-- 7. Status --}}
                     <td>
-                        <span class="lm-badge {{ $badgeMap[$b->status] ?? 'badge-pending' }}">
+                        <span class="lm-badge {{ $badgeMap[$b->display_status] ?? 'badge-pending' }}">
                             <span style="width:5px;height:5px;border-radius:50%;background:currentColor"></span>
-                            {{ $labelMap[$b->status] ?? ucfirst($b->status) }}
+                            {{ $labelMap[$b->display_status] ?? ucfirst($b->display_status) }}
                         </span>
                     </td>
 
@@ -310,7 +333,7 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
                                     <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                     Read-Only
                                 </span>
-                                <button wire:click="openDetail({{ $b->id }})" class="lm-act-btn btn-detail">
+                                <button wire:click="openDetail({{ $b->id }})" class="lm-act-btn btn-detail" style="background-color: #475569; color: #ffffff;">
                                     <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     Lihat Detail
                                 </button>
@@ -327,7 +350,7 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
                                     Disetujui Kajur
                                 </span>
                                 @endif
-                                <button wire:click="openDetail({{ $b->id }})" class="lm-act-btn btn-detail">
+                                <button wire:click="openDetail({{ $b->id }})" class="lm-act-btn btn-detail" style="background-color: #475569; color: #ffffff;">
                                     <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     Lihat Detail
                                 </button>
@@ -358,7 +381,14 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
                                 </button>
                                 @endif
 
-                                <button wire:click="openDetail({{ $b->id }})" class="lm-act-btn btn-detail">
+                                @if($b->display_status === 'overdue')
+                                <button wire:click="sendWhatsAppWarning({{ $b->id }})" class="lm-act-btn btn-warning" title="Kirim Warning WhatsApp">
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    Kirim Warning
+                                </button>
+                                @endif
+
+                                <button wire:click="openDetail({{ $b->id }})" class="lm-act-btn btn-detail" style="background-color: #475569; color: #ffffff;">
                                     <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     Detail
                                 </button>
@@ -466,7 +496,7 @@ table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);
             @else
             @if($selectedBorrowing->teacher)
             <div class="lm-modal-row">
-                <div class="lm-modal-lbl">Guru Pembimbing</div>
+                <div class="lm-modal-lbl">Guru Penanggung Jawab</div>
                 <div class="lm-modal-val">
                     {{ $selectedBorrowing->teacher->name }}
                 </div>

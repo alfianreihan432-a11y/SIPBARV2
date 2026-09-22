@@ -228,7 +228,7 @@
                 <div>
                     {{-- Explicit inline color #ffffff !important prevents CSS bleeding/FOUC from child page styles (e.g. table .user-name in loans/returns) --}}
                     <div class="user-name" style="color:#ffffff !important;">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
-                    <div class="user-role" style="color:rgba(255,255,255,.75) !important;">Guru Pembimbing</div>
+                    <div class="user-role" style="color:rgba(255,255,255,.75) !important;">Guru Penanggung Jawab</div>
                 </div>
             </a>
             <form method="POST" action="{{ route('logout') }}">
@@ -275,7 +275,7 @@
                             @endif
                             <div class="pdm-info">
                                 <div class="pdm-name">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
-                                <div class="pdm-role">Guru Pembimbing</div>
+                                <div class="pdm-role">Guru Penanggung Jawab</div>
                             </div>
                         </div>
                         <div class="pdm-divider"></div>

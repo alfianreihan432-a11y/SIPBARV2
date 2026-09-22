@@ -178,11 +178,11 @@
         .db-txn-meta { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: var(--text-subtle); padding-top: 6px; border-top: 1px dashed var(--border-subtle); }
 
         .db-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 8px; font-size: 10.5px; font-weight: 800; letter-spacing: .02em; }
-        .db-badge-pending { background: rgba(245,158,11,.12); color: #d97706; border: 1px solid rgba(245,158,11,.25); }
-        .db-badge-approved { background: rgba(16,185,129,.12); color: #059669; border: 1px solid rgba(16,185,129,.25); }
-        .db-badge-borrowed { background: rgba(37,99,235,.12); color: #1d4ed8; border: 1px solid rgba(37,99,235,.25); }
-        .db-badge-returned { background: rgba(16,185,129,.12); color: #059669; border: 1px solid rgba(16,185,129,.25); }
-        .db-badge-rejected { background: rgba(239,68,68,.12); color: #dc2626; border: 1px solid rgba(239,68,68,.25); }
+        .db-badge-pending { background: var(--s-pending, #d97706); color: #fff; border: none; }
+        .db-badge-approved { background: var(--s-returned, #059669); color: #fff; border: none; }
+        .db-badge-borrowed { background: var(--s-approved, #2563eb); color: #fff; border: none; }
+        .db-badge-returned { background: var(--s-returned, #059669); color: #fff; border: none; }
+        .db-badge-rejected { background: var(--s-rejected, #dc2626); color: #fff; border: none; }
         
         .db-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); }
         .db-empty-icon { width: 44px; height: 44px; margin: 0 auto 10px; color: var(--text-subtle); opacity: .7; }
@@ -203,7 +203,7 @@
                 @endphp
                 {{ $greet }}, {{ auth()->check() ? auth()->user()->name : 'Guru' }}
             </div>
-            <div class="db-greeting-sub">{{ now()->translatedFormat('l, d F Y') }} • Portal Pengelolaan Inventaris Guru Pembimbing</div>
+            <div class="db-greeting-sub">{{ now()->translatedFormat('l, d F Y') }} • Portal Pengelolaan Inventaris Guru Penanggung Jawab</div>
         </div>
     </div>
 

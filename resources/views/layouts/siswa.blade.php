@@ -75,22 +75,22 @@
             --input-bg:        #ffffff;
             --scrollbar:       #c8d3e0;
 
-            /* ── Semantic Status Colors ── */
+            /* ── Semantic Status Colors - Improved Contrast ── */
             --s-pending:       #d97706;
-            --s-pending-bg:    #fffbeb;
-            --s-pending-bdr:   #fde68a;
+            --s-pending-bg:    #fef3c7;
+            --s-pending-bdr:   #f59e0b;
             --s-approved:      #2563eb;
-            --s-approved-bg:   #eff6ff;
-            --s-approved-bdr:  #bfdbfe;
+            --s-approved-bg:   #dbeafe;
+            --s-approved-bdr:  #3b82f6;
             --s-borrowed:      #0891b2;
-            --s-borrowed-bg:   #ecfeff;
-            --s-borrowed-bdr:  #a5f3fc;
+            --s-borrowed-bg:   #cffafe;
+            --s-borrowed-bdr:  #06b6d4;
             --s-returned:      #059669;
-            --s-returned-bg:   #ecfdf5;
-            --s-returned-bdr:  #a7f3d0;
+            --s-returned-bg:   #d1fae5;
+            --s-returned-bdr:  #10b981;
             --s-rejected:      #dc2626;
-            --s-rejected-bg:   #fef2f2;
-            --s-rejected-bdr:  #fecaca;
+            --s-rejected-bg:   #fee2e2;
+            --s-rejected-bdr:  #ef4444;
         }
 
         /* ══ DARK MODE TOKENS ══ */
@@ -124,22 +124,22 @@
             --input-bg:        #111827;
             --scrollbar:       #243349;
 
-            /* Status dark */
-            --s-pending:       #f59e0b;
-            --s-pending-bg:    rgba(245,158,11,.12);
-            --s-pending-bdr:   rgba(245,158,11,.25);
+            /* Status dark - Improved Contrast */
+            --s-pending:       #fbbf24;
+            --s-pending-bg:    rgba(251,191,36,.15);
+            --s-pending-bdr:   rgba(251,191,36,.35);
             --s-approved:      #60a5fa;
-            --s-approved-bg:   rgba(96,165,250,.12);
-            --s-approved-bdr:  rgba(96,165,250,.25);
+            --s-approved-bg:   rgba(96,165,250,.15);
+            --s-approved-bdr:  rgba(96,165,250,.35);
             --s-borrowed:      #22d3ee;
-            --s-borrowed-bg:   rgba(34,211,238,.10);
-            --s-borrowed-bdr:  rgba(34,211,238,.22);
+            --s-borrowed-bg:   rgba(34,211,238,.15);
+            --s-borrowed-bdr:  rgba(34,211,238,.35);
             --s-returned:      #34d399;
-            --s-returned-bg:   rgba(52,211,153,.10);
-            --s-returned-bdr:  rgba(52,211,153,.22);
+            --s-returned-bg:   rgba(52,211,153,.15);
+            --s-returned-bdr:  rgba(52,211,153,.35);
             --s-rejected:      #f87171;
-            --s-rejected-bg:   rgba(248,113,113,.10);
-            --s-rejected-bdr:  rgba(248,113,113,.22);
+            --s-rejected-bg:   rgba(248,113,113,.15);
+            --s-rejected-bdr:  rgba(248,113,113,.35);
         }
 
         body { display: flex; background: var(--content-bg); color: var(--text); overflow: hidden; transition: background .25s, color .25s; }
@@ -439,16 +439,16 @@
         /* Status Badges */
         .s-badge {
             display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 10px; border-radius: 7px;
+            padding: 5px 10px; border-radius: 8px;
             font-size: 11px; font-weight: 700; letter-spacing: .02em;
             white-space: nowrap;
         }
         .s-badge-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-        .s-badge--pending  { background: var(--s-pending-bg);  color: var(--s-pending);  border: 1px solid var(--s-pending-bdr); }
-        .s-badge--approved { background: var(--s-approved-bg); color: var(--s-approved); border: 1px solid var(--s-approved-bdr); }
-        .s-badge--borrowed { background: var(--s-borrowed-bg); color: var(--s-borrowed); border: 1px solid var(--s-borrowed-bdr); }
-        .s-badge--returned { background: var(--s-returned-bg); color: var(--s-returned); border: 1px solid var(--s-returned-bdr); }
-        .s-badge--rejected { background: var(--s-rejected-bg); color: var(--s-rejected); border: 1px solid var(--s-rejected-bdr); }
+        .s-badge--pending  { background: var(--s-pending, #d97706);  color: #fff;  border: none; }
+        .s-badge--approved { background: var(--s-approved, #2563eb); color: #fff; border: none; }
+        .s-badge--borrowed { background: var(--s-borrowed, #0891b2); color: #fff; border: none; }
+        .s-badge--returned { background: var(--s-returned, #059669); color: #fff; border: none; }
+        .s-badge--rejected { background: var(--s-rejected, #dc2626); color: #fff; border: none; }
 
         /* Loan Row (dengan left-border accent) */
         .s-loan-row {
@@ -504,8 +504,8 @@
         .s-btn--secondary:hover { background: var(--border2); color: var(--text); }
         .s-btn--ghost { background: transparent; color: var(--primary); border: 1px solid var(--primary-muted); }
         .s-btn--ghost:hover { background: var(--primary-light); }
-        .s-btn--danger { background: rgba(220,38,38,.1); color: #dc2626; border: 1px solid rgba(220,38,38,.2); }
-        .s-btn--danger:hover { background: rgba(220,38,38,.18); }
+        .s-btn--danger { background: var(--s-rejected); color: #fff; border: none; }
+        .s-btn--danger:hover { background: var(--s-rejected); opacity: .9; }
         .s-btn--sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
         .s-btn--icon { padding: 8px; border-radius: 9px; }
 

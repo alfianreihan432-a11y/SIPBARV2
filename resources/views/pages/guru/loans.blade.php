@@ -148,22 +148,31 @@
     }
     .status-badge {
         display: inline-block;
-        padding: 4px 12px;
-        border-radius: 10px;
+        padding: 5px 12px;
+        border-radius: 8px;
         font-size: 11px;
         font-weight: 700;
     }
     .status-approved {
-        background: #d1fae5;
-        color: #065f46;
+        background: var(--s-approved, #2563eb);
+        color: #fff;
+        border: none;
     }
     .status-borrowed {
-        background: #dbeafe;
-        color: #1e40af;
+        background: var(--s-borrowed, #0891b2);
+        color: #fff;
+        border: none;
+    }
+    .status-overdue {
+        background: var(--s-overdue, #dc2626);
+        color: #fff;
+        border: none;
+        font-weight: 800;
+        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
     }
     .btn {
         padding: 8px 16px;
-        background: var(--accent);
+        background: var(--s-approved);
         color: #fff;
         border: none;
         border-radius: 8px;
@@ -287,8 +296,13 @@
                             </p>
                         </td>
                         <td>
-                            <span class="status-badge {{ $loan->status === 'approved' ? 'status-approved' : 'status-borrowed' }}">
-                                {{ $loan->status === 'approved' ? 'Disetujui' : 'Dipinjam' }}
+                            @php
+                                $isOverdue = $loan->return_date < now();
+                                $statusClass = $isOverdue ? 'status-overdue' : ($loan->status === 'approved' ? 'status-approved' : 'status-borrowed');
+                                $statusLabel = $isOverdue ? 'Terlambat' : ($loan->status === 'approved' ? 'Disetujui' : 'Dipinjam');
+                            @endphp
+                            <span class="status-badge {{ $statusClass }}">
+                                {{ $statusLabel }}
                             </span>
                         </td>
                         <td>

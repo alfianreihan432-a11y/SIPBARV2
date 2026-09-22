@@ -358,6 +358,22 @@
                         <input type="file" id="site_logo_dashboard" name="site_logo_dashboard" accept="image/*" class="form-control" onchange="previewImage(this, 'preview-logo-dashboard')">
                         <p class="form-helper">Format: JPG, PNG, GIF, WEBP, SVG. Maks 2MB.</p>
                     </div>
+
+                    {{-- Logo 4: Favicon (Tab Browser) --}}
+                    <div class="form-group">
+                        <label for="site_favicon" class="form-label">4. Favicon (Logo Tab Browser)</label>
+                        <div class="logo-preview-card">
+                            <div class="logo-preview-img-wrap" style="width:32px;height:32px;">
+                                <img id="preview-favicon" src="{{ $settings['general']['site_favicon'] ?? '/favicon.ico' }}" alt="Favicon saat ini" class="logo-preview-img">
+                            </div>
+                            <div>
+                                <div style="font-size:13px;font-weight:600;color:var(--text-primary);">Logo Ikon Tab Browser</div>
+                                <div class="form-helper">Digunakan sebagai ikon di tab browser (favicon) untuk seluruh halaman aplikasi.</div>
+                            </div>
+                        </div>
+                        <input type="file" id="site_favicon" name="site_favicon" accept=".ico,.png,.jpg,.jpeg,.svg" class="form-control" onchange="previewImage(this, 'preview-favicon')">
+                        <p class="form-helper">Format: ICO, PNG, JPG, SVG. Maks 1MB. Harus berbentuk persegi (contoh: 512x512px, 256x256px).</p>
+                    </div>
                 </div>
                 
                 <button type="submit" class="btn-submit">

@@ -17,6 +17,9 @@ class LoanManager extends Component
     // ── READONLY MODE for Superadmin ──
     public bool $readonly = false;
 
+    // ── WhatsApp Link Property ──
+    public string $waLink = '';
+
     public function mount(bool $readonly = false): void
     {
         $this->readonly = $readonly;
@@ -263,5 +266,80 @@ class LoanManager extends Component
 
         $this->loadBorrowings();
         session()->flash('message', 'Peminjaman Siswa #BR-' . str_pad($borrowing->id, 4, '0', STR_PAD_LEFT) . ' telah ditolak.');
+    }
+
+    /**
+     * Generate WhatsApp warning link for overdue loans
+     */
+    public function sendWhatsAppWarning(int $id): void
+    {
+        $borrowing = BorrowingRequest::with(['user', 'itemWithTrashed'])->findOrFail($id);
+
+        // Normalize WhatsApp number
+        $phoneNumber = $this->normalizeWhatsAppNumber($borrowing->whatsapp_number);
+
+        if (!$phoneNumber) {
+            session()->flash('error', 'Nomor WhatsApp tidak tersedia untuk peminjaman ini.');
+            return;
+        }
+
+        // Generate warning message
+        $message = $this->generateWarningMessage($borrowing);
+
+        // Create wa.me link
+        $waLink = "https://wa.me/{$phoneNumber}?text=" . urlencode($message);
+
+        // Dispatch event to open WhatsApp link
+        $this->dispatch('openWhatsApp', $waLink);
+    }
+
+    /**
+     * Normalize WhatsApp number to international format
+     */
+    private function normalizeWhatsAppNumber(?string $number): ?string
+    {
+        if (!$number) {
+            return null;
+        }
+
+        // Remove all non-numeric characters
+        $number = preg_replace('/[^0-9]/', '', $number);
+
+        // If starts with 0, replace with 62
+        if (str_starts_with($number, '0')) {
+            $number = '62' . substr($number, 1);
+        }
+
+        // If already starts with 62, keep as is
+        // If starts with other prefix (like +62), remove + and ensure 62
+        if (str_starts_with($number, '+62')) {
+            $number = '62' . substr($number, 3);
+        }
+
+        return $number;
+    }
+
+    /**
+     * Generate warning message template
+     */
+    private function generateWarningMessage(BorrowingRequest $borrowing): string
+    {
+        $studentName = $borrowing->user->name ?? 'Siswa';
+        $itemName = $borrowing->itemWithTrashed?->name ?? $borrowing->item?->name ?? 'Barang';
+        $borrowingNumber = 'BR-' . str_pad($borrowing->id, 4, '0', STR_PAD_LEFT);
+        
+        $returnDate = $borrowing->return_date->format('d F Y');
+        $returnTime = $borrowing->return_time ?? '-';
+        $returnDateTime = $returnTime !== '-' ? "{$returnDate} · {$returnTime}" : $returnDate;
+
+        $message = "Assalamu'alaikum/Halo {$studentName},
+
+Kami informasikan bahwa peminjaman barang {$itemName} dengan nomor peminjaman {$borrowingNumber} telah melewati batas waktu pengembalian yang dijadwalkan pada {$returnDateTime}.
+
+Mohon kesediaannya untuk segera mengembalikan barang tersebut ke petugas inventaris SIPBAR SMKN 1 Bangsri. Jika ada kendala, silakan hubungi kami.
+
+Terima kasih atas perhatian dan kerja samanya.";
+
+        return $message;
     }
 }

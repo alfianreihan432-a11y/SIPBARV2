@@ -640,7 +640,7 @@
                         </div>
                     </div>
 
-                    {{-- Row 2: Jam Kembali & Guru Pembimbing (2 Kolom) --}}
+                    {{-- Row 2: Jam Kembali & Guru Penanggung Jawab (2 Kolom) --}}
                     <div class="cart-form-grid">
                         <div class="cart-field-group">
                             <label for="return_time" class="cart-label">
@@ -686,7 +686,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="svg-icon-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                 </svg>
-                                <span>Guru Pembimbing</span>
+                                <span>Guru Penanggung Jawab</span>
                                 <span style="color:var(--s-rejected);font-weight:700;">*</span>
                             </label>
 
@@ -777,7 +777,7 @@
                     </div>
 
                     {{-- FITUR 2: INPUT NOMOR WHATSAPP SISWA --}}
-                    {{-- Diletakkan setelah field Guru Pembimbing dan sebelum Tujuan Peminjaman --}}
+                    {{-- Diletakkan setelah field Guru Penanggung Jawab dan sebelum Tujuan Peminjaman --}}
                     <div class="cart-field-group">
                         <label for="whatsapp_number" class="cart-label">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="svg-icon-16" fill="currentColor" viewBox="0 0 24 24" style="color:#25D366;flex-shrink:0;">

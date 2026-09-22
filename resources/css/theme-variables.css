@@ -54,23 +54,41 @@ html.light {
     --orange:          #f97316;
     --yellow:          #d97706;
     --purple:          #7c3aed;
+
+    /* Status Color Aliases for Components */
+    --color-pending:   #d97706;
+    --color-approved:  #2563eb;
+    --color-borrowed:  #0891b2;
+    --color-returned:  #059669;
+    --color-rejected:  #dc2626;
+    --color-overdue:   #dc2626;
+    --color-warning:   #ea580c;
+    --color-success:   #059669;
+    --color-info:      #2563eb;
+    --color-danger:    #dc2626;
     
-    /* Semantic Status - Light */
+    /* Semantic Status - Light - Improved Contrast for WCAG AA */
     --s-pending:       #d97706;
-    --s-pending-bg:    #fffbeb;
-    --s-pending-bdr:   #fde68a;
+    --s-pending-bg:    #fef3c7;
+    --s-pending-bdr:   #f59e0b;
     --s-approved:      #2563eb;
-    --s-approved-bg:   #eff6ff;
-    --s-approved-bdr:  #bfdbfe;
+    --s-approved-bg:   #dbeafe;
+    --s-approved-bdr:  #3b82f6;
     --s-borrowed:      #0891b2;
-    --s-borrowed-bg:   #ecfeff;
-    --s-borrowed-bdr:  #a5f3fc;
+    --s-borrowed-bg:   #cffafe;
+    --s-borrowed-bdr:  #06b6d4;
     --s-returned:      #059669;
-    --s-returned-bg:   #ecfdf5;
-    --s-returned-bdr:  #a7f3d0;
+    --s-returned-bg:   #d1fae5;
+    --s-returned-bdr:  #10b981;
     --s-rejected:      #dc2626;
-    --s-rejected-bg:   #fef2f2;
-    --s-rejected-bdr:  #fecaca;
+    --s-rejected-bg:   #fee2e2;
+    --s-rejected-bdr:  #ef4444;
+    --s-overdue:       #dc2626;
+    --s-overdue-bg:    #fecaca;
+    --s-overdue-bdr:   #ef4444;
+    --s-warning:       #ea580c;
+    --s-warning-bg:    #ffedd5;
+    --s-warning-bdr:   #f97316;
 
     /* Layout Specific */
     --sidebar-bg:      #1e3a8a;
@@ -138,23 +156,41 @@ html.dark {
     --orange:          #fb923c;
     --yellow:          #f59e0b;
     --purple:          #a78bfa;
+
+    /* Status Color Aliases for Components */
+    --color-pending:   #f59e0b;
+    --color-approved:  #60a5fa;
+    --color-borrowed:  #22d3ee;
+    --color-returned:  #34d399;
+    --color-rejected:  #f87171;
+    --color-overdue:   #f87171;
+    --color-warning:   #fb923c;
+    --color-success:   #34d399;
+    --color-info:      #60a5fa;
+    --color-danger:    #f87171;
     
-    /* Semantic Status - Dark */
-    --s-pending:       #f59e0b;
-    --s-pending-bg:    rgba(245,158,11,.12);
-    --s-pending-bdr:   rgba(245,158,11,.25);
+    /* Semantic Status - Dark - Improved Contrast for WCAG AA */
+    --s-pending:       #fbbf24;
+    --s-pending-bg:    rgba(251,191,36,.15);
+    --s-pending-bdr:   rgba(251,191,36,.35);
     --s-approved:      #60a5fa;
-    --s-approved-bg:   rgba(96,165,250,.12);
-    --s-approved-bdr:  rgba(96,165,250,.25);
+    --s-approved-bg:   rgba(96,165,250,.15);
+    --s-approved-bdr:  rgba(96,165,250,.35);
     --s-borrowed:      #22d3ee;
-    --s-borrowed-bg:   rgba(34,211,238,.10);
-    --s-borrowed-bdr:  rgba(34,211,238,.22);
+    --s-borrowed-bg:   rgba(34,211,238,.15);
+    --s-borrowed-bdr:  rgba(34,211,238,.35);
     --s-returned:      #34d399;
-    --s-returned-bg:   rgba(52,211,153,.10);
-    --s-returned-bdr:  rgba(52,211,153,.22);
+    --s-returned-bg:   rgba(52,211,153,.15);
+    --s-returned-bdr:  rgba(52,211,153,.35);
     --s-rejected:      #f87171;
-    --s-rejected-bg:   rgba(248,113,113,.10);
-    --s-rejected-bdr:  rgba(248,113,113,.22);
+    --s-rejected-bg:   rgba(248,113,113,.15);
+    --s-rejected-bdr:  rgba(248,113,113,.35);
+    --s-overdue:       #f87171;
+    --s-overdue-bg:    rgba(248,113,113,.18);
+    --s-overdue-bdr:   rgba(248,113,113,.45);
+    --s-warning:       #fb923c;
+    --s-warning-bg:    rgba(251,146,60,.18);
+    --s-warning-bdr:   rgba(251,146,60,.40);
 
     /* Layout Specific */
     --sidebar-bg:      #0f1e3c;

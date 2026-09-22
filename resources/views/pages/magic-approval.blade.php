@@ -516,7 +516,7 @@
                     <div class="info-item-sub">Kontak peminjam</div>
                 </div>
                 <div class="info-item">
-                    <div class="info-item-label">Guru Pembimbing</div>
+                    <div class="info-item-label">Guru Penanggung Jawab</div>
                     <div class="info-item-value">{{ $borrowingRequest->teacher?->name ?? '-' }}</div>
                     <div class="info-item-sub">Guru Penanggung Jawab</div>
                 </div>

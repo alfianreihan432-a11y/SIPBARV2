@@ -15,6 +15,13 @@ Schedule::command('borrowing:send-reminders')
     ->withoutOverlapping()
     ->onOneServer();
 
+// Schedule mark overdue loans to run every 15 minutes
+Schedule::command('loans:mark-overdue')
+    ->everyFifteenMinutes()
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping()
+    ->onOneServer();
+
 // Schedule SiPintu user sync to run daily at 01:00 AM
 Schedule::command('sipintu:sync-users')
     ->dailyAt('01:00')

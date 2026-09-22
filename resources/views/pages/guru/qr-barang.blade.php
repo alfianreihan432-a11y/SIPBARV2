@@ -175,8 +175,8 @@
         letter-spacing: 0.03em;
         white-space: nowrap;
     }
-    .qr-badge-approved { background: rgba(16,185,129,0.12); color: #059669; }
-    .qr-badge-borrowed { background: rgba(59,130,246,0.12); color: #2563eb; }
+    .qr-badge-approved { background: var(--s-returned, #059669); color: #fff; }
+    .qr-badge-borrowed { background: var(--s-approved, #2563eb); color: #fff; }
 
     .qr-item-meta {
         background: var(--card);

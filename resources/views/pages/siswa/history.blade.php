@@ -34,6 +34,21 @@
         color: #1d4ed8 !important;
         background: #eff6ff;
     }
+    /* Dark mode overrides for detail links */
+    html.dark .btn-detail-link.is-not-returned {
+        color: #94a3b8 !important;
+    }
+    html.dark .btn-detail-link.is-not-returned:hover {
+        color: #cbd5e1 !important;
+        background: #1e293b;
+    }
+    html.dark .btn-detail-link.is-returned {
+        color: #60a5fa !important;
+    }
+    html.dark .btn-detail-link.is-returned:hover {
+        color: #93c5fd !important;
+        background: #1e3a8a;
+    }
     
     .modal-backdrop {
         position: fixed;
@@ -437,7 +452,7 @@ function openDetailModal(data) {
             <span class="modal-value">${data.notes}</span>
         </div>
         <div class="modal-row">
-            <span class="modal-label">Guru Pembimbing</span>
+            <span class="modal-label">Guru Penanggung Jawab</span>
             <span class="modal-value">${data.teacher_name}</span>
         </div>
         <div class="modal-row">

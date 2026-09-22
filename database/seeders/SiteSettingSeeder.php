@@ -15,6 +15,7 @@ class SiteSettingSeeder extends Seeder
         $this->put('site_logo_landing', '/logossmkn1.png', 'image', 'general', 'Logo Landing Page');
         $this->put('site_logo_login', '/logossmkn1.png', 'image', 'general', 'Logo Halaman Login');
         $this->put('site_logo_dashboard', '/logossmkn1.png', 'image', 'general', 'Logo Dashboard');
+        $this->put('site_favicon', '/favicon.ico', 'image', 'general', 'Favicon (Logo Tab Browser)');
         $this->put('site_title', 'SIPBAR – Sistem Informasi Pengelolaan Barang', 'text', 'general', 'Judul Halaman (SEO)');
 
         $this->put('hero_badge', 'Sistem Inventaris Modern', 'text', 'hero', 'Badge Hero');
@@ -68,7 +69,7 @@ class SiteSettingSeeder extends Seeder
             [
                 'index' => '05',
                 'title' => 'Kontrol Akses Multi-Peran',
-                'description' => 'Hak akses terstruktur untuk Siswa, Guru Pembimbing, Kepala Jurusan, dan Sarpras.',
+                'description' => 'Hak akses terstruktur untuk Siswa, Guru Penanggung Jawab, Kepala Jurusan, dan Sarpras.',
                 'icon' => 'users',
                 'workflow' => [],
                 'link_text' => 'Atur Pengguna',

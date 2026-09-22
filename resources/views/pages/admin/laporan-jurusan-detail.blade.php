@@ -272,11 +272,11 @@
         font-size: 11px;
         font-weight: 700;
     }
-    .badge-pending { background: #fee2e2; color: #991b1b; }
-    .badge-approved { background: rgba(16, 185, 129, 0.12); color: #059669; }
-    .badge-borrowed { background: #dbeafe; color: #1d4ed8; }
-    .badge-returned { background: #f1f5f9; color: #475569; }
-    .badge-rejected { background: #fee2e2; color: #dc2626; }
+    .badge-pending { background: var(--s-pending); color: #fff; }
+    .badge-approved { background: var(--s-returned); color: #fff; }
+    .badge-borrowed { background: var(--s-approved); color: #fff; }
+    .badge-returned { background: var(--s-returned); color: #fff; }
+    .badge-rejected { background: var(--s-rejected); color: #fff; }
 
     .condition-tag {
         display: inline-block;
@@ -285,9 +285,9 @@
         font-size: 11px;
         font-weight: 600;
     }
-    .condition-baik { background: rgba(16, 185, 129, 0.12); color: #059669; }
-    .condition-rusak-ringan { background: rgba(245, 158, 11, 0.12); color: #d97706; }
-    .condition-rusak-berat { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
+    .condition-baik { background: var(--s-returned); color: #fff; }
+    .condition-rusak-ringan { background: var(--s-pending); color: #fff; }
+    .condition-rusak-berat { background: var(--s-rejected); color: #fff; }
 
     .btn-view-item {
         display: inline-flex;
@@ -304,8 +304,19 @@
         transition: all 0.15s ease;
     }
     .btn-view-item:hover {
-        background: #2563eb;
-        color: #ffffff;
+        background: rgba(59, 130, 246, 0.2);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+    /* Dark mode override for view item button */
+    html.dark .btn-view-item, html:not(.light) .btn-view-item {
+        background: #475569 !important;
+        color: #ffffff !important;
+        border-color: #64748b !important;
+    }
+    html.dark .btn-view-item:hover, html:not(.light) .btn-view-item:hover {
+        background: #64748b !important;
+        color: #ffffff !important;
+        border-color: #94a3b8 !important;
     }
 
     .note-box {

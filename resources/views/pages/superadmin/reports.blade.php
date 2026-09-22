@@ -286,11 +286,11 @@
         font-weight: 700;
         white-space: nowrap;
     }
-    .sa-badge-pending  { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .sa-badge-approved { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-    .sa-badge-borrowed { background: rgba(8, 145, 178, 0.15); color: #22d3ee; border: 1px solid rgba(8, 145, 178, 0.3); }
-    .sa-badge-returned { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .sa-badge-rejected { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .sa-badge-pending  { background: var(--s-pending, #d97706); color: #fff; border: none; }
+    .sa-badge-approved { background: var(--s-approved, #2563eb); color: #fff; border: none; }
+    .sa-badge-borrowed { background: var(--s-borrowed, #0891b2); color: #fff; border: none; }
+    .sa-badge-returned { background: var(--s-returned, #059669); color: #fff; border: none; }
+    .sa-badge-rejected { background: var(--s-rejected, #dc2626); color: #fff; border: none; }
 </style>
 
 <div>
@@ -495,7 +495,7 @@
                     <tr>
                         <th>Peminjam</th>
                         <th>Nama Barang</th>
-                        <th>Guru Pembimbing</th>
+                        <th>Guru Penanggung Jawab</th>
                         <th>Status</th>
                         <th>Waktu Pengajuan</th>
                     </tr>
