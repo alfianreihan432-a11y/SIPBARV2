@@ -138,7 +138,7 @@ class AdminReturnController extends Controller
                 ]);
 
                 // 3. Update status Item di inventaris
-                $item = $borrowing->item;
+                $item = $borrowing->item ? $borrowing->item : null;
                 if ($item) {
                     if ($return->kondisi_barang === 'rusak_berat') {
                         $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
@@ -147,13 +147,19 @@ class AdminReturnController extends Controller
                     } else {
                         $item->recalculateStatus();
                     }
+                } else {
+                    Log::warning('Item not found for borrowing request during return approval', [
+                        'borrowing_request_id' => $borrowing->id,
+                        'item_return_id' => $return->id
+                    ]);
                 }
 
                 // 4. Notifikasi in-app untuk Siswa
+                $itemName = $borrowing->item ? $borrowing->item->name : 'Barang tidak ditemukan';
                 Notification::sendToUser(
                     $return->user_id,
                     'pengembalian_disetujui',
-                    "Pengajuan pengembalian barang '{$borrowing->item->name}' telah DISETUJUI oleh Admin. Terima kasih telah mengembalikan barang!",
+                    "Pengajuan pengembalian barang '{$itemName}' telah DISETUJUI oleh Admin. Terima kasih telah mengembalikan barang!",
                     ['item_return_id' => $return->id]
                 );
 
@@ -219,10 +225,11 @@ class AdminReturnController extends Controller
                 // Siswa diberi info penolakan
 
                 // 3. Notifikasi in-app untuk Siswa
+                $itemName = $return->borrowingRequest->item ? $return->borrowingRequest->item->name : 'Barang tidak ditemukan';
                 Notification::sendToUser(
                     $return->user_id,
                     'pengembalian_ditolak',
-                    "Pengajuan pengembalian barang '{$return->borrowingRequest->item->name}' DITOLAK. Alasan: {$request->alasan_ditolak}. Silakan ajukan ulang dengan data yang sesuai.",
+                    "Pengajuan pengembalian barang '{$itemName}' DITOLAK. Alasan: {$request->alasan_ditolak}. Silakan ajukan ulang dengan data yang sesuai.",
                     ['item_return_id' => $return->id, 'alasan' => $request->alasan_ditolak]
                 );
             });

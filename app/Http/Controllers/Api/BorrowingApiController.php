@@ -40,7 +40,7 @@ class BorrowingApiController extends Controller
             'data' => $borrowings->map(function ($borrowing) {
                 return [
                     'id' => $borrowing->id,
-                    'item_name' => $borrowing->item->name,
+                    'item_name' => $borrowing->item ? $borrowing->item->name : 'Barang tidak ditemukan',
                     'quantity' => $borrowing->quantity,
                     'status' => $borrowing->status,
                     'status_label' => $borrowing->status_label,
@@ -144,11 +144,11 @@ class BorrowingApiController extends Controller
             'data' => [
                 'borrowing_id' => $borrowing->id,
                 'student' => [
-                    'name' => $borrowing->user->name,
-                    'class' => $borrowing->user->kelas ?? '-',
+                    'name' => $borrowing->user ? $borrowing->user->name : 'Siswa tidak ditemukan',
+                    'class' => $borrowing->user ? ($borrowing->user->kelas ?? '-') : '-',
                 ],
                 'item' => [
-                    'name' => $borrowing->item->name,
+                    'name' => $borrowing->item ? $borrowing->item->name : 'Barang tidak ditemukan',
                     'quantity' => $borrowing->quantity,
                 ],
                 'dates' => [

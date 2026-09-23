@@ -131,9 +131,11 @@ class StudentReturnController extends Controller
 
         // Kirim notifikasi sistem ke para Admin
         try {
+            $itemName = $borrowing->item ? $borrowing->item->name : 'Barang tidak ditemukan';
+            $userName = $borrowing->user ? $borrowing->user->name : 'Siswa tidak ditemukan';
             Notification::sendToAdmins(
                 'pengembalian_baru',
-                "Pengajuan pengembalian baru dari {$borrowing->user->name} untuk barang '{$borrowing->item->name}'.",
+                "Pengajuan pengembalian baru dari {$userName} untuk barang '{$itemName}'.",
                 ['item_return_id' => $returnRecord->id]
             );
         } catch (\Exception $e) {
