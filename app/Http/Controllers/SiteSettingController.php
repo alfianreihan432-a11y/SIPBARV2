@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class SiteSettingController extends Controller
@@ -48,25 +49,12 @@ class SiteSettingController extends Controller
             'site_logo_landing'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:2048',
             'site_logo_login'     => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:2048',
             'site_logo_dashboard' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,svg|max:2048',
-            'site_favicon'        => 'nullable|image|mimes:ico,png,jpeg,jpg,svg|max:1024',
+            // Favicon: accept persegi/portrait, akan di-crop otomatis jadi lingkaran
+            'site_favicon'        => 'nullable|image|mimes:png,jpeg,jpg,gif,webp|max:2048',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
-        }
-
-        // Custom validation for favicon aspect ratio (must be square)
-        if ($request->hasFile('site_favicon')) {
-            $favicon = $request->file('site_favicon');
-            $imageInfo = getimagesize($favicon->getPathname());
-            if ($imageInfo) {
-                [$width, $height] = $imageInfo;
-                if ($width !== $height) {
-                    return back()->withErrors([
-                        'site_favicon' => 'Logo favicon harus berbentuk persegi (contoh: 512x512px, 256x256px).'
-                    ])->withInput();
-                }
-            }
         }
 
         // Logo Landing Page
@@ -90,11 +78,54 @@ class SiteSettingController extends Controller
             SiteSetting::set('site_logo_dashboard', '/storage/'.$path, 'image', 'general');
         }
 
-        // Favicon (Logo Tab Browser)
+        // Favicon (Logo Tab Browser) — circular crop via PHP GD, multi-size PNG
         if ($request->hasFile('site_favicon')) {
-            SiteSetting::deleteUploadedFile(SiteSetting::get('site_favicon'));
-            $path = $request->file('site_favicon')->store('favicons', 'public');
-            SiteSetting::set('site_favicon', '/storage/'.$path, 'image', 'general');
+            // Hapus file favicon lama (semua ukuran)
+            $oldFavicon = SiteSetting::get('site_favicon');
+            if ($oldFavicon && str_starts_with($oldFavicon, '/storage/')) {
+                $oldDir = dirname(ltrim($oldFavicon, '/storage/'));
+                // Hapus semua file di direktori favicon lama jika ada
+                SiteSetting::deleteUploadedFile($oldFavicon);
+            }
+
+            $sourcePath = $request->file('site_favicon')->getPathname();
+
+            // Generate versi 180x180 (primary — digunakan untuk semua link favicon)
+            $circularPng = $this->makeCircularFaviconPng($sourcePath, 180);
+            if ($circularPng === null) {
+                return back()->withErrors(['site_favicon' => 'Gagal memproses gambar favicon. Pastikan file gambar valid.'])->withInput();
+            }
+
+            // Buat folder favicons jika belum ada
+            $faviconDir = storage_path('app/public/favicons');
+            if (!is_dir($faviconDir)) {
+                mkdir($faviconDir, 0755, true);
+            }
+
+            // Simpan timestamp untuk versioning (cache busting)
+            $version = time();
+
+            // Simpan file primary 180px
+            $filename180 = 'favicon_' . $version . '_180.png';
+            imagepng($circularPng, $faviconDir . '/' . $filename180);
+            imagedestroy($circularPng);
+
+            // Generate & simpan ukuran 48x48, 32x32, 16x16
+            foreach ([48, 32, 16] as $size) {
+                $resized = $this->makeCircularFaviconPng($sourcePath, $size);
+                if ($resized) {
+                    imagepng($resized, $faviconDir . '/favicon_' . $version . '_' . $size . '.png');
+                    imagedestroy($resized);
+                }
+            }
+
+            // Simpan path 180px sebagai favicon utama di settings
+            // (favicon.blade.php akan menambahkan ?v=timestamp untuk cache busting)
+            SiteSetting::set('site_favicon', '/storage/favicons/' . $filename180, 'image', 'general');
+            SiteSetting::set('site_favicon_version', (string) $version, 'text', 'general');
+            SiteSetting::set('site_favicon_48', '/storage/favicons/favicon_' . $version . '_48.png', 'image', 'general');
+            SiteSetting::set('site_favicon_32', '/storage/favicons/favicon_' . $version . '_32.png', 'image', 'general');
+            SiteSetting::set('site_favicon_16', '/storage/favicons/favicon_' . $version . '_16.png', 'image', 'general');
         }
 
         SiteSetting::set('site_name', $request->site_name, 'text', 'general');
@@ -437,5 +468,91 @@ class SiteSettingController extends Controller
         SiteSetting::set('nav_link_help_mobile', $request->nav_link_help_mobile, 'text', 'navigation');
 
         return back()->with('success', 'Navigasi berhasil diperbarui.');
+    }
+
+    /**
+     * Membuat PNG lingkaran (circular mask) dari file gambar sumber menggunakan PHP GD.
+     * Area di luar lingkaran menjadi transparan.
+     *
+     * @param  string  $sourcePath  Path absolut file gambar sumber
+     * @param  int     $size        Ukuran output persegi (px), lingkaran akan memenuhi kotak ini
+     * @return \GdImage|null        GdImage resource atau null jika gagal
+     */
+    private function makeCircularFaviconPng(string $sourcePath, int $size): ?\GdImage
+    {
+        // Deteksi tipe gambar
+        $imageInfo = @getimagesize($sourcePath);
+        if (!$imageInfo) {
+            return null;
+        }
+
+        $mime = $imageInfo['mime'];
+
+        // Load gambar sumber sesuai tipe
+        $source = match ($mime) {
+            'image/png'  => @imagecreatefrompng($sourcePath),
+            'image/jpeg' => @imagecreatefromjpeg($sourcePath),
+            'image/gif'  => @imagecreatefromgif($sourcePath),
+            'image/webp' => @imagecreatefromwebp($sourcePath),
+            default      => null,
+        };
+
+        if (!$source) {
+            return null;
+        }
+
+        $srcW = imagesx($source);
+        $srcH = imagesy($source);
+
+        // Resize sumber ke kanvas persegi (ambil sisi terpendek sebagai center crop)
+        $minSide = min($srcW, $srcH);
+        $cropX   = (int) (($srcW - $minSide) / 2);
+        $cropY   = (int) (($srcH - $minSide) / 2);
+
+        // Buat canvas output dengan transparansi
+        $output = imagecreatetruecolor($size, $size);
+        imagealphablending($output, false);
+        imagesavealpha($output, true);
+        $transparent = imagecolorallocatealpha($output, 0, 0, 0, 127);
+        imagefill($output, 0, 0, $transparent);
+
+        // Resampling dari sumber (dengan center crop) ke output
+        $temp = imagecreatetruecolor($size, $size);
+        imagealphablending($temp, false);
+        imagesavealpha($temp, true);
+        imagefill($temp, 0, 0, $transparent);
+        imagecopyresampled($temp, $source, 0, 0, $cropX, $cropY, $size, $size, $minSide, $minSide);
+        imagedestroy($source);
+
+        // Buat circular mask: hanya piksel dalam lingkaran yang di-copy
+        $cx = $size / 2;
+        $cy = $size / 2;
+        $r  = $size / 2;
+
+        for ($x = 0; $x < $size; $x++) {
+            for ($y = 0; $y < $size; $y++) {
+                // Jarak piksel ke pusat lingkaran
+                $dx = $x - $cx;
+                $dy = $y - $cy;
+                if (($dx * $dx + $dy * $dy) <= ($r * $r)) {
+                    // Dalam lingkaran — copy piksel dari temp
+                    $color = imagecolorat($temp, $x, $y);
+                    $a = ($color >> 24) & 0x7F;
+                    $r2 = ($color >> 16) & 0xFF;
+                    $g  = ($color >> 8) & 0xFF;
+                    $b  = $color & 0xFF;
+                    $c  = imagecolorallocatealpha($output, $r2, $g, $b, $a);
+                    imagesetpixel($output, $x, $y, $c);
+                }
+                // Di luar lingkaran — tetap transparan (sudah diisi saat imagefill)
+            }
+        }
+
+        imagedestroy($temp);
+
+        imagealphablending($output, false);
+        imagesavealpha($output, true);
+
+        return $output;
     }
 }

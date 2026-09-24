@@ -363,16 +363,16 @@
                     <div class="form-group">
                         <label for="site_favicon" class="form-label">4. Favicon (Logo Tab Browser)</label>
                         <div class="logo-preview-card">
-                            <div class="logo-preview-img-wrap" style="width:32px;height:32px;">
-                                <img id="preview-favicon" src="{{ $settings['general']['site_favicon'] ?? '/favicon.ico' }}" alt="Favicon saat ini" class="logo-preview-img">
+                            <div class="logo-preview-img-wrap" style="width:32px;height:32px;border-radius:50%;overflow:hidden;">
+                                <img id="preview-favicon" src="{{ $settings['general']['site_favicon'] ?? '/favicon.ico' }}" alt="Favicon saat ini" class="logo-preview-img" style="border-radius:50%;">
                             </div>
                             <div>
-                                <div style="font-size:13px;font-weight:600;color:var(--text-primary);">Logo Ikon Tab Browser</div>
+                                <div style="font-size:13px;font-weight:600;color:var(--text-primary);">Logo Ikon Tab Browser <span style="font-size:11px;font-weight:500;color:#22c55e;background:rgba(34,197,94,0.12);padding:2px 8px;border-radius:99px;margin-left:6px;">● Otomatis bulat</span></div>
                                 <div class="form-helper">Digunakan sebagai ikon di tab browser (favicon) untuk seluruh halaman aplikasi.</div>
                             </div>
                         </div>
-                        <input type="file" id="site_favicon" name="site_favicon" accept=".ico,.png,.jpg,.jpeg,.svg" class="form-control" onchange="previewImage(this, 'preview-favicon')">
-                        <p class="form-helper">Format: ICO, PNG, JPG, SVG. Maks 1MB. Harus berbentuk persegi (contoh: 512x512px, 256x256px).</p>
+                        <input type="file" id="site_favicon" name="site_favicon" accept=".png,.jpg,.jpeg,.gif,.webp" class="form-control" onchange="previewImage(this, 'preview-favicon')">
+                        <p class="form-helper">Format: PNG, JPG, GIF, WEBP. Maks 2MB. Upload gambar persegi — otomatis di-crop <strong>bulat/lingkaran</strong> untuk favicon (16×16, 32×32, 48×48, 180×180px).</p>
                     </div>
                 </div>
                 
