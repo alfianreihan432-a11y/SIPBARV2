@@ -22,19 +22,31 @@ class TeacherReportSendController extends Controller
         $teacher = auth()->user();
         $teacherId = $teacher->id;
 
-        // Ambil snapshot data statistik guru saat ini
-        $totalRequests     = BorrowingRequest::where('teacher_id', $teacherId)->count();
-        $pendingRequests   = BorrowingRequest::where('teacher_id', $teacherId)->where('status', 'pending')->count();
-        $approvedRequests  = BorrowingRequest::where('teacher_id', $teacherId)->whereIn('status', ['approved', 'borrowed', 'qr_ready'])->count();
-        $completedRequests = BorrowingRequest::where('teacher_id', $teacherId)->where('status', 'returned')->count();
-        $rejectedRequests  = BorrowingRequest::where('teacher_id', $teacherId)->where('status', 'rejected')->count();
+        // Ambil snapshot data statistik guru saat ini (hanya siswa)
+        $totalRequests     = BorrowingRequest::where('teacher_id', $teacherId)
+            ->where('tipe_peminjam', 'siswa')
+            ->count();
+        $pendingRequests   = BorrowingRequest::where('teacher_id', $teacherId)
+            ->where('tipe_peminjam', 'siswa')
+            ->where('status', 'pending')->count();
+        $approvedRequests  = BorrowingRequest::where('teacher_id', $teacherId)
+            ->where('tipe_peminjam', 'siswa')
+            ->whereIn('status', ['approved', 'borrowed', 'qr_ready'])->count();
+        $completedRequests = BorrowingRequest::where('teacher_id', $teacherId)
+            ->where('tipe_peminjam', 'siswa')
+            ->where('status', 'returned')->count();
+        $rejectedRequests  = BorrowingRequest::where('teacher_id', $teacherId)
+            ->where('tipe_peminjam', 'siswa')
+            ->where('status', 'rejected')->count();
 
         $thisMonthRequests = BorrowingRequest::where('teacher_id', $teacherId)
+            ->where('tipe_peminjam', 'siswa')
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
 
         $activeStudents = BorrowingRequest::where('teacher_id', $teacherId)
+            ->where('tipe_peminjam', 'siswa')
             ->distinct('user_id')
             ->count('user_id');
 

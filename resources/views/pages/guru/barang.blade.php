@@ -180,57 +180,75 @@
         font-weight: 600;
     }
     
+    /* ── Dynamic Status Badges ── */
     .status-badge {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
         padding: 4px 10px;
-        border-radius: 6px;
+        border-radius: 20px;
         font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.02em;
+        font-weight: 700;
+        letter-spacing: 0.03em;
     }
-    .status-tersedia {
-        background: rgba(16, 185, 129, 0.12);
+    .status-badge-tersedia {
+        background: rgba(16, 185, 129, 0.15);
         color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.3);
     }
-    
-    .stock-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 600;
-        background: var(--accent);
-        color: #ffffff;
+    .status-badge-menunggu {
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .status-badge-dipinjam {
+        background: rgba(234, 88, 12, 0.15);
+        color: #ea580c;
+        border: 1px solid rgba(234, 88, 12, 0.3);
     }
 
+    /* ── Borrow Button Variants ── */
+    /* Primary (tersedia) — emerald, tema guru */
     .borrow-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
         padding: 10px 20px;
-        background: var(--accent);
-        color: #ffffff;
         border: none;
         border-radius: 10px;
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: background 0.2s, opacity 0.2s;
         text-decoration: none;
         width: 100%;
         margin-top: 12px;
+        color: #ffffff;
     }
-    .borrow-btn:hover {
+    .borrow-btn-primary {
+        background: var(--accent); /* emerald – tema guru */
+    }
+    .borrow-btn-primary:hover {
         background: #059669;
     }
-    .borrow-btn:disabled {
-        opacity: 0.5;
+    /* Gray – menunggu persetujuan */
+    .borrow-btn-gray {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        color: var(--muted);
         cursor: not-allowed;
-        background: var(--muted);
+        opacity: 0.75;
     }
-    
+    /* Orange – dipinjam / stok habis */
+    .borrow-btn-orange {
+        background: rgba(234, 88, 12, 0.18);
+        color: #ea580c;
+        border: 1px solid rgba(234, 88, 12, 0.3);
+        cursor: not-allowed;
+        opacity: 0.85;
+    }
+
     .empty-state {
         text-align: center;
         padding: 48px 20px;
@@ -287,9 +305,9 @@
 {{-- ═══ SECTION GRID KATALOG ═══ --}}
 <div class="section-card">
     <div class="section-header">
-        <h2 class="section-title">Katalog Barang Tersedia</h2>
+        <h2 class="section-title">Katalog Barang</h2>
         <span id="itemsCountDisplay" style="font-size: 13px; color: var(--muted); font-weight: 600;">
-            {{ $items->count() }} barang tersedia
+            {{ $items->count() }} barang
         </span>
     </div>
     
@@ -336,29 +354,57 @@
                             </div>
                         </div>
                         
-                        <div style="display: flex; gap: 8px; align-items: center; margin-top: 12px;">
-                            <span class="status-badge status-tersedia">Tersedia</span>
-                            <span class="stock-badge">{{ $item->stock }} Unit</span>
+                        {{-- ── Dynamic Status Badge + Borrow Button (reuses getCatalogStatusInfo()) ── --}}
+                        @php $statusInfo = $item->getCatalogStatusInfo(); @endphp
+
+                        <div style="display: flex; gap: 8px; align-items: center; margin-top: 12px; flex-wrap: wrap;">
+                            {{-- Badge Semantik: Tersedia / Menunggu / Dipinjam --}}
+                            <span class="status-badge status-badge-{{ $statusInfo['status'] }}">
+                                @if($statusInfo['status'] === 'tersedia')
+                                    {{-- dot hijau --}}
+                                    <span style="width:7px;height:7px;border-radius:50%;background:#10b981;display:inline-block;"></span>
+                                @elseif($statusInfo['status'] === 'menunggu')
+                                    {{-- ikon jam --}}
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                @else
+                                    {{-- ikon orang --}}
+                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                @endif
+                                {{ $statusInfo['badge_label'] }}
+                            </span>
+
+                            {{-- Info stok total --}}
+                            <span style="font-size:11px;color:var(--muted);font-weight:600;">
+                                {{ $item->stock }} unit
+                            </span>
                         </div>
 
-                        @if($item->stock > 0)
+                        {{-- Tombol aksi sesuai status --}}
+                        @if(!$statusInfo['button_disabled'])
                             <form method="POST" action="{{ route('teacher.peminjaman-guru.cart.add') }}">
                                 @csrf
                                 <input type="hidden" name="item_id" value="{{ $item->id }}">
                                 <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="borrow-btn">
+                                <button type="submit" class="borrow-btn borrow-btn-primary">
                                     <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                     </svg>
                                     Pinjam Barang
                                 </button>
                             </form>
-                        @else
-                            <button disabled class="borrow-btn">
+                        @elseif($statusInfo['status'] === 'menunggu')
+                            <button disabled class="borrow-btn borrow-btn-gray">
                                 <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                Stok Habis
+                                Menunggu Persetujuan
+                            </button>
+                        @else
+                            <button disabled class="borrow-btn borrow-btn-orange">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                                {{ $statusInfo['button_label'] }}
                             </button>
                         @endif
                     </div>

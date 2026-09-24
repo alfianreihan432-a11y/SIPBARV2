@@ -224,9 +224,11 @@
             <div class="stats-container">
                 @php
                     $activeLoans = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
+                        ->where('tipe_peminjam', 'siswa')
                         ->whereIn('status', ['approved', 'borrowed'])
                         ->count();
                     $overdue = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
+                        ->where('tipe_peminjam', 'siswa')
                         ->whereIn('status', ['approved', 'borrowed'])
                         ->where('return_date', '<', now())
                         ->count();
@@ -247,6 +249,7 @@
     @php
         $activeLoansList = \App\Models\BorrowingRequest::with(['user', 'item'])
             ->where('teacher_id', auth()->id())
+            ->where('tipe_peminjam', 'siswa')
             ->whereIn('status', ['approved', 'borrowed'])
             ->latest()
             ->get();

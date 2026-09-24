@@ -126,7 +126,7 @@ class PeminjamanGuruController extends Controller
         $header = BorrowingRequest::create([
             'user_id' => Auth::id(),
             'item_id' => null,
-            'teacher_id' => Auth::id(),
+            'teacher_id' => null, // Fixed: teacher_id should be null for guru own borrowing
             'quantity' => null,
             'purpose' => $validated['purpose'],
             'borrow_date' => $validated['borrow_date'],
@@ -266,6 +266,7 @@ class PeminjamanGuruController extends Controller
             'notes' => $validated['notes'] ?? null,
             'status' => BorrowingRequest::STATUS_PENDING,
             'tipe_peminjam' => 'guru',
+            'teacher_id' => null, // Fixed: teacher_id should be null for guru own borrowing
             'approved_by_kajur_id' => $validated['kepala_jurusan_id'],
         ]);
 
@@ -356,6 +357,7 @@ class PeminjamanGuruController extends Controller
             'return_date' => $validated['return_date'],
             'return_time' => $validated['return_time'],
             'notes' => $validated['notes'] ?? null,
+            'teacher_id' => null, // Fixed: ensure teacher_id remains null for guru own borrowing
             'approved_by_kajur_id' => $validated['kepala_jurusan_id'],
         ]);
 

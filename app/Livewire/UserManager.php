@@ -58,6 +58,7 @@ class UserManager extends Component
     public $nama_ekstra = '';
     public $ketua_ekstra = '';
     public $pembina_ekstra = '';
+    public $kelas_ekstra = '';
 
     public $alamat = '';
 
@@ -370,10 +371,6 @@ class UserManager extends Component
         if ($role === 'siswa') {
             $rules['nis'] = 'required|string|max:20';
             $rules['kelas'] = 'required|string|max:50';
-
-            if (Schema::hasColumn('users', 'jurusan')) {
-                $rules['jurusan'] = 'required|string|max:50';
-            }
         } elseif ($role === 'guru') {
             $rules['phone'] = 'required|string|min:9|max:20';
             $rules['nip'] = 'required|string|max:30';
@@ -443,11 +440,6 @@ class UserManager extends Component
         if ($role === 'siswa') {
             $data['nis'] = $this->nis;
             $data['kelas'] = $this->kelas;
-
-            if (Schema::hasColumn('users', 'jurusan')) {
-                $data['jurusan'] = $this->jurusan;
-            }
-
             $data['classroom_id'] = $this->classroom_id ?: null;
         } elseif ($role === 'guru') {
             $data['phone'] = $this->phone;
@@ -532,6 +524,12 @@ class UserManager extends Component
                 $this->nama_ekstra = $ekstra->name;
                 $this->ketua_ekstra = $ekstra->description;
                 $this->pembina_ekstra = $ekstra->pembina;
+
+                // Load kelas from associated user
+                $user = User::where('email', strtolower(str_replace(' ', '-', $ekstra->name)) . '@smkn1bangsri.sch.id')->first();
+                if ($user) {
+                    $this->kelas_ekstra = $user->kelas ?? '';
+                }
 
                 return;
             }
@@ -703,6 +701,7 @@ class UserManager extends Component
         $this->nama_ekstra = '';
         $this->ketua_ekstra = '';
         $this->pembina_ekstra = '';
+        $this->kelas_ekstra = '';
     }
 
     // ── SiPintu Sync ──
@@ -835,6 +834,7 @@ class UserManager extends Component
             'nama_ekstra' => $this->nama_ekstra,
             'ketua_ekstra' => $this->ketua_ekstra,
             'pembina_ekstra' => $this->pembina_ekstra,
+            'kelas_ekstra' => $this->kelas_ekstra,
             'editingId' => $this->editingId,
         ]);
 
@@ -845,6 +845,7 @@ class UserManager extends Component
 
             'ketua_ekstra' => 'nullable|string|max:100',
             'pembina_ekstra' => 'nullable|string|max:100',
+            'kelas_ekstra' => 'nullable|string|max:50',
         ]);
 
         $wasEditing = (bool) $this->editingId;
@@ -857,6 +858,12 @@ class UserManager extends Component
                 'description' => $this->ketua_ekstra,
                 'pembina' => $this->pembina_ekstra,
             ]);
+
+            // Update the associated user's kelas field
+            $user = User::where('email', strtolower(str_replace(' ', '-', $this->nama_ekstra)) . '@smkn1bangsri.sch.id')->first();
+            if ($user) {
+                $user->update(['kelas' => $this->kelas_ekstra]);
+            }
 
             \Log::info(
                 'Extracurricular updated',
@@ -885,6 +892,7 @@ class UserManager extends Component
                 'name' => $this->nama_ekstra,
                 'email' => $ekstraSlug . '@smkn1bangsri.sch.id',
                 'password' => bcrypt($ekstraSlug . '123'),
+                'kelas' => $this->kelas_ekstra,
             ]);
 
             $user->assignRole('siswa');
@@ -893,7 +901,8 @@ class UserManager extends Component
                 'User created for extracurricular',
                 [
                     'user_id' => $user->id,
-                    'email' => $user->email
+                    'email' => $user->email,
+                    'kelas' => $user->kelas
                 ]
             );
         }

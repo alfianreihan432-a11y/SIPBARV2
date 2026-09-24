@@ -118,38 +118,64 @@ class SyncSipintuUsersJob implements ShouldQueue
 
                     $nis = $student['nis'];
 
-                    // Get classroom_id from classroom data
+                    // Get classroom_id and kelas from classroom data
                     $classroomId = null;
-                    if (isset($student['classroom']) && is_array($student['classroom'])) {
-                        $className = $student['classroom']['name'] ?? null;
-                        if ($className) {
-                            $classroom = Classroom::where('name', $className)->first();
-                            if ($classroom) {
-                                $classroomId = $classroom->id;
+                    $kelasName = null;
+                    
+                    // Check if student is graduated/alumni - if so, clear kelas & classroom_id
+                    // SIJUNA marks alumni with graduated = true or status = 2
+                    // Note: Do NOT use tahun_lulus <= currentYear because active students also have graduation years recorded in SIJUNA (e.g. 2026).
+                    $graduated = filter_var($student['graduated'] ?? false, FILTER_VALIDATE_BOOLEAN);
+                    $status = (int) ($student['status'] ?? 0);
+                    $isGraduated = $graduated || ($status === 2);
+                    
+                    // Log graduated students for debugging
+                    if ($isGraduated) {
+                        Log::info('SiPintu graduated student detected', [
+                            'nis' => $nis,
+                            'nama' => $student['nama'] ?? $student['name'] ?? 'Unknown',
+                            'status' => $status,
+                            'graduated' => $graduated,
+                        ]);
+                    }
+                    
+                    // Only set classroom if student is NOT graduated
+                    if (!$isGraduated) {
+                        if (isset($student['classroom']) && is_array($student['classroom'])) {
+                            $className = $student['classroom']['name'] ?? null;
+                            if ($className) {
+                                $kelasName = $className; // Use classroom name for kelas field
+                                $classroom = Classroom::where('name', $className)->first();
+                                if ($classroom) {
+                                    $classroomId = $classroom->id;
+                                }
                             }
                         }
                     }
 
                     DB::beginTransaction();
 
-                    $existingUser = User::where('nis', $nis)->first();
+                    $existingUsers = User::where('nis', $nis)->get();
 
-                    if ($existingUser) {
-                        // Update existing user (don't change password)
-                        $existingUser->update([
-                            'name' => $student['nama'] ?? $student['name'] ?? $existingUser->name,
-                            'kelas' => $student['kelas'] ?? $student['rombel'] ?? $existingUser->kelas,
-                            'alamat' => $student['alamat'] ?? $existingUser->alamat,
-                            'tanggal_lahir' => !empty($student['tanggal_lahir']) ? $student['tanggal_lahir'] : $existingUser->tanggal_lahir,
-                            'jurusan' => $student['jurusan'] ?? $existingUser->jurusan,
-                            'classroom_id' => $classroomId ?? $existingUser->classroom_id,
-                            'data_source' => 'sipintu',
-                            'sipintu_synced_at' => now(),
-                        ]);
-                        $stats['students']['updated']++;
+                    if ($existingUsers->isNotEmpty()) {
+                        foreach ($existingUsers as $existingUser) {
+                            // Update existing user (don't change password)
+                            $updateData = [
+                                'name' => $student['nama'] ?? $student['name'] ?? $existingUser->name,
+                                'kelas' => $kelasName, // String for active, null for alumni
+                                'alamat' => $student['alamat'] ?? $existingUser->alamat,
+                                'tanggal_lahir' => !empty($student['tanggal_lahir']) ? $student['tanggal_lahir'] : $existingUser->tanggal_lahir,
+                                'classroom_id' => $classroomId, // Int for active, null for alumni
+                                'data_source' => 'sipintu',
+                                'sipintu_synced_at' => now(),
+                            ];
+                            
+                            $existingUser->update($updateData);
+                            $stats['students']['updated']++;
 
-                        if (!$existingUser->hasRole('Siswa')) {
-                            $existingUser->assignRole('Siswa');
+                            if (!$existingUser->hasRole('Siswa')) {
+                                $existingUser->assignRole('Siswa');
+                            }
                         }
                     } else {
                         // Create new user
@@ -158,10 +184,9 @@ class SyncSipintuUsersJob implements ShouldQueue
                             'email' => $nis . '@smkn1bangsri.sch.id',
                             'password' => Hash::make('password'),
                             'nis' => $nis,
-                            'kelas' => $student['kelas'] ?? $student['rombel'] ?? null,
+                            'kelas' => $kelasName,
                             'alamat' => $student['alamat'] ?? null,
                             'tanggal_lahir' => !empty($student['tanggal_lahir']) ? $student['tanggal_lahir'] : null,
-                            'jurusan' => $student['jurusan'] ?? null,
                             'classroom_id' => $classroomId,
                             'data_source' => 'sipintu',
                             'sipintu_synced_at' => now(),

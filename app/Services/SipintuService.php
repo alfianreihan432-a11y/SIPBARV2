@@ -42,8 +42,8 @@ class SipintuService
      */
     private function gatewayClient(): \Illuminate\Http\Client\PendingRequest
     {
-        return Http::timeout($this->timeout)
-            ->connectTimeout(5) // 5 seconds connection timeout
+        return Http::timeout($this->timeout ?: 60)
+            ->connectTimeout(30)
             ->withoutVerifying() // Bypass SSL verification for testing
             ->withHeaders([
                 'X-Client-ID'     => $this->clientId,

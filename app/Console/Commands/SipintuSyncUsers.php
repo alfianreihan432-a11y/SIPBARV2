@@ -166,14 +166,37 @@ class SipintuSyncUsers extends Command
                 $nis = $student['nis'];
                 $nisList[] = $nis;
 
-                // Get classroom_id from classroom data
+                // Get classroom_id and kelas from classroom data
                 $classroomId = null;
-                if (isset($student['classroom']) && is_array($student['classroom'])) {
-                    $className = $student['classroom']['name'] ?? null;
-                    if ($className) {
-                        $classroom = Classroom::where('name', $className)->first();
-                        if ($classroom) {
-                            $classroomId = $classroom->id;
+                $kelasName = null;
+                
+                // Check if student is graduated/alumni - if so, clear kelas & classroom_id
+                // SIJUNA marks alumni with graduated = true or status = 2
+                // Note: Do NOT use tahun_lulus <= currentYear because active students also have graduation years recorded in SIJUNA (e.g. 2026).
+                $graduated = filter_var($student['graduated'] ?? false, FILTER_VALIDATE_BOOLEAN);
+                $status = (int) ($student['status'] ?? 0);
+                $isGraduated = $graduated || ($status === 2);
+                
+                // Log graduated students for debugging
+                if ($isGraduated) {
+                    Log::info('SiPintu graduated student detected', [
+                        'nis' => $nis,
+                        'nama' => $student['nama'] ?? $student['name'] ?? 'Unknown',
+                        'status' => $status,
+                        'graduated' => $graduated,
+                    ]);
+                }
+                
+                // Only set classroom if student is NOT graduated
+                if (!$isGraduated) {
+                    if (isset($student['classroom']) && is_array($student['classroom'])) {
+                        $className = $student['classroom']['name'] ?? null;
+                        if ($className) {
+                            $kelasName = $className; // Use classroom name for kelas field
+                            $classroom = Classroom::where('name', $className)->first();
+                            if ($classroom) {
+                                $classroomId = $classroom->id;
+                            }
                         }
                     }
                 }
@@ -183,11 +206,10 @@ class SipintuSyncUsers extends Command
                     'name' => $student['nama'] ?? $student['name'] ?? 'Siswa',
                     'email' => $nis . '@smkn1bangsri.sch.id',
                     'nis' => $nis,
-                    'kelas' => $student['kelas'] ?? $student['rombel'] ?? null,
+                    'kelas' => $kelasName, // Will be string for active students, null for alumni
                     'alamat' => $student['alamat'] ?? null,
                     'tanggal_lahir' => !empty($student['tanggal_lahir']) ? $student['tanggal_lahir'] : null,
-                    'jurusan' => $student['jurusan'] ?? null,
-                    'classroom_id' => $classroomId,
+                    'classroom_id' => $classroomId, // Will be int for active students, null for alumni
                     'data_source' => 'sipintu',
                     'sipintu_synced_at' => now(),
                     'updated_at' => now(),
@@ -223,16 +245,25 @@ class SipintuSyncUsers extends Command
                     unset($userData['nis']); // Remove NIS from upsert data
 
                     // Check if user exists
-                    $existingUser = User::where('nis', $nis)->first();
+                    $existingUsers = User::where('nis', $nis)->get();
 
-                    if ($existingUser) {
-                        // Update existing user (don't change password)
-                        $existingUser->update($userData);
-                        $stats['students']['updated']++;
+                    if ($existingUsers->isNotEmpty()) {
+                        foreach ($existingUsers as $existingUser) {
+                            // Update existing user (don't change password or email)
+                            // Remove email from update data to preserve existing email
+                            $updateData = $userData;
+                            unset($updateData['email']);
+                            
+                            // Ensure data_source is updated to sipintu
+                            $updateData['data_source'] = 'sipintu';
+                            
+                            $existingUser->update($updateData);
+                            $stats['students']['updated']++;
 
-                        // Assign student role if not already assigned
-                        if (!$existingUser->hasRole('Siswa')) {
-                            $existingUser->assignRole('Siswa');
+                            // Assign student role if not already assigned
+                            if (!$existingUser->hasRole('Siswa')) {
+                                $existingUser->assignRole('Siswa');
+                            }
                         }
                     } else {
                         // Create new user with default password

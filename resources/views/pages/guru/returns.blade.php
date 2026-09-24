@@ -217,10 +217,12 @@
             <div class="stats-container">
                 @php
                     $returnedToday = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
+                        ->where('tipe_peminjam', 'siswa')
                         ->where('status', 'returned')
                         ->whereDate('updated_at', today())
                         ->count();
                     $totalReturned = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
+                        ->where('tipe_peminjam', 'siswa')
                         ->where('status', 'returned')
                         ->count();
                 @endphp
@@ -240,6 +242,7 @@
     @php
         $readyForReturn = \App\Models\BorrowingRequest::with(['user', 'item'])
             ->where('teacher_id', auth()->id())
+            ->where('tipe_peminjam', 'siswa')
             ->whereIn('status', ['borrowed'])
             ->latest()
             ->get();

@@ -11,12 +11,16 @@ use Illuminate\View\View;
 class BarangController extends Controller
 {
     /**
-     * Display catalog of available items for teachers
+     * Display catalog of available items for teachers.
+     *
+     * Semua barang ditampilkan (tidak di-filter hanya stock > 0) agar status
+     * dinamis "Menunggu" dan "Dipinjam" juga terlihat. Status dihitung via
+     * Item::getCatalogStatusInfo() yang bersifat GLOBAL (mencakup semua
+     * peminjaman dari siswa maupun guru lain).
      */
     public function index(Request $request): View
     {
         $query = Item::where('status', 'Tersedia')
-            ->where('stock', '>', 0)
             ->with(['category', 'location']);
 
         $search = trim((string) $request->query('search', ''));
@@ -37,9 +41,9 @@ class BarangController extends Controller
         $categories = Category::orderBy('name')->get();
 
         return view('pages.guru.barang', [
-            'items' => $items,
-            'categories' => $categories,
-            'search' => $search,
+            'items'          => $items,
+            'categories'     => $categories,
+            'search'         => $search,
             'categoryFilter' => (string) $categoryFilter,
         ]);
     }

@@ -279,9 +279,11 @@ Route::middleware(['auth'])->group(function () {
 
             return response()->json([
                 'pending_requests' => \App\Models\BorrowingRequest::where('teacher_id', $teacherId)
+                    ->where('tipe_peminjam', 'siswa')
                     ->where('status', \App\Models\BorrowingRequest::STATUS_PENDING)
                     ->count(),
                 'active_loans' => \App\Models\BorrowingRequest::where('teacher_id', $teacherId)
+                    ->where('tipe_peminjam', 'siswa')
                     ->whereIn('status', [
                         \App\Models\BorrowingRequest::STATUS_APPROVED,
                         \App\Models\BorrowingRequest::STATUS_BORROWED,

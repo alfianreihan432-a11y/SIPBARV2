@@ -466,7 +466,7 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
 
             @else
             {{-- ══ EKSTRA FIELDS ══ --}}
-            <div class="um-grid um-grid-3">
+            <div class="um-grid um-grid-2">
                 {{-- Nama Ekstra --}}
                 <div class="um-field">
                     <label class="um-label">
@@ -478,6 +478,20 @@ table.umt tbody td{padding:13px 18px;font-size:13px;color:var(--text-secondary);
                         <input wire:model="nama_ekstra" type="text" class="um-input" placeholder="Contoh: Pramuka, PMR" autocomplete="off">
                     </div>
                     @error('nama_ekstra')<div class="um-error">{{ $message }}</div>@enderror
+                </div>
+
+                {{-- Kelas --}}
+                <div class="um-field">
+                    <label class="um-label">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="width:11px;height:11px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        Kelas
+                    </label>
+                    <div class="um-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        <input wire:model="kelas_ekstra" type="text" class="um-input" placeholder="Contoh: XII RPL 1" autocomplete="off">
+                    </div>
+                    @error('kelas_ekstra')<div class="um-error">{{ $message }}</div>@enderror
+                    <div class="um-hint">Kelas ketua ekstrakurikuler (opsional)</div>
                 </div>
 
                 {{-- Ketua Ekstra --}}

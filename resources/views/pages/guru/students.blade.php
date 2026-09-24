@@ -262,9 +262,11 @@
             <div class="stats-container">
                 @php
                     $totalStudents = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
+                        ->where('tipe_peminjam', 'siswa')
                         ->distinct('user_id')
                         ->count('user_id');
                     $activeToday = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
+                        ->where('tipe_peminjam', 'siswa')
                         ->whereDate('created_at', today())
                         ->distinct('user_id')
                         ->count('user_id');
@@ -305,15 +307,16 @@
     @php
         $studentsQuery = \App\Models\BorrowingRequest::with(['user'])
             ->where('teacher_id', auth()->id())
+            ->where('tipe_peminjam', 'siswa')
             ->select('user_id', \DB::raw('COUNT(*) as total_requests'), \DB::raw('MAX(created_at) as last_activity'))
             ->groupBy('user_id');
-        
+
         if (request('search')) {
             $studentsQuery->whereHas('user', function($q) {
                 $q->where('name', 'like', '%' . request('search') . '%');
             });
         }
-        
+
         $students = $studentsQuery->paginate(12);
     @endphp
 
@@ -328,14 +331,17 @@
                 $pending = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
                     ->where('user_id', $student->id)
                     ->where('status', 'pending')
+                    ->where('tipe_peminjam', 'siswa')
                     ->count();
                 $active = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
                     ->where('user_id', $student->id)
                     ->whereIn('status', ['approved', 'borrowed'])
+                    ->where('tipe_peminjam', 'siswa')
                     ->count();
                 $completed = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
                     ->where('user_id', $student->id)
                     ->where('status', 'returned')
+                    ->where('tipe_peminjam', 'siswa')
                     ->count();
             @endphp
             

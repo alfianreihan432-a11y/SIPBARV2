@@ -83,26 +83,156 @@ class Item extends Model
             ]);
     }
 
-    // ==========================================
-    // Accessors
-    // ==========================================
-
     /**
      * Hitung stok tersedia secara dinamis dari database.
-     * Stok tersedia = stok_total - jumlah yang sedang disetujui/dipinjam.
+     * Stok tersedia = stok_total - jumlah yang sedang diajukan/disetujui/dipinjam.
      *
      * Tidak disimpan di DB untuk mencegah desync; selalu fresh dari transaksi aktif.
      */
     public function getAvailableStockAttribute(): int
     {
-        $reserved = BorrowingRequest::where('item_id', $this->id)
-            ->whereIn('status', [
+        $reserved = (int) \Illuminate\Support\Facades\DB::table('borrowing_request_items')
+            ->join('borrowing_requests', 'borrowing_requests.id', '=', 'borrowing_request_items.borrowing_request_id')
+            ->where('borrowing_request_items.item_id', $this->id)
+            ->whereIn('borrowing_requests.status', [
+                BorrowingRequest::STATUS_PENDING,
                 BorrowingRequest::STATUS_APPROVED,
                 BorrowingRequest::STATUS_BORROWED,
+                BorrowingRequest::STATUS_OVERDUE,
             ])
-            ->sum('quantity');
+            ->sum('borrowing_request_items.quantity');
 
-        return max(0, $this->stock - (int) $reserved);
+        return max(0, (int) $this->stock - $reserved);
+    }
+
+    /**
+     * Hitung status dinamis katalog secara real-time berdasarkan transaksi peminjaman aktif.
+     * 
+     * @return array{
+     *   status: string,
+     *   badge_label: string,
+     *   badge_bg: string,
+     *   badge_color: string,
+     *   button_disabled: bool,
+     *   button_variant: string,
+     *   button_label: string,
+     *   available_stock: int,
+     *   total_stock: int,
+     *   borrowed_stock: int,
+     *   pending_stock: int
+     * }
+     */
+    public function getCatalogStatusInfo(): array
+    {
+        $totalStock = max(0, (int) $this->stock);
+
+        // Jumlah unit yang sedang disetujui / dipinjam / terlambat (active approved loans)
+        $borrowedStock = (int) \Illuminate\Support\Facades\DB::table('borrowing_request_items')
+            ->join('borrowing_requests', 'borrowing_requests.id', '=', 'borrowing_request_items.borrowing_request_id')
+            ->where('borrowing_request_items.item_id', $this->id)
+            ->whereIn('borrowing_requests.status', [
+                BorrowingRequest::STATUS_APPROVED,
+                BorrowingRequest::STATUS_BORROWED,
+                BorrowingRequest::STATUS_OVERDUE,
+            ])
+            ->sum('borrowing_request_items.quantity');
+
+        // Jumlah unit yang sedang diajukan dan menunggu persetujuan (pending)
+        $pendingStock = (int) \Illuminate\Support\Facades\DB::table('borrowing_request_items')
+            ->join('borrowing_requests', 'borrowing_requests.id', '=', 'borrowing_request_items.borrowing_request_id')
+            ->where('borrowing_request_items.item_id', $this->id)
+            ->where('borrowing_requests.status', BorrowingRequest::STATUS_PENDING)
+            ->sum('borrowing_request_items.quantity');
+
+        // Sisa unit yang benar-benar siap dipinjam saat ini
+        $availableStock = max(0, $totalStock - $borrowedStock - $pendingStock);
+
+        // 1. TERSEDIA: Jika masih ada minimal 1 unit tersedia
+        if ($availableStock > 0) {
+            return [
+                'status'          => 'tersedia',
+                'badge_label'     => $totalStock > 1 ? 'Tersedia: ' . $availableStock : 'Tersedia',
+                'badge_bg'        => '#10b981', // Hijau
+                'badge_color'     => '#ffffff',
+                'button_disabled' => false,
+                'button_variant'  => 'primary', // Biru aktif
+                'button_label'    => 'Pinjam Barang',
+                'available_stock' => $availableStock,
+                'total_stock'     => $totalStock,
+                'borrowed_stock'  => $borrowedStock,
+                'pending_stock'   => $pendingStock,
+            ];
+        }
+
+        // 2. MENUNGGU: Jika semua unit pending persetujuan (belum ada yang disetujui)
+        if ($pendingStock > 0 && $borrowedStock == 0) {
+            return [
+                'status'          => 'menunggu',
+                'badge_label'     => 'Menunggu',
+                'badge_bg'        => '#f59e0b', // Kuning/Amber/Orange Muda
+                'badge_color'     => '#ffffff',
+                'button_disabled' => true,
+                'button_variant'  => 'gray', // Abu-abu disabled
+                'button_label'    => 'Menunggu',
+                'available_stock' => 0,
+                'total_stock'     => $totalStock,
+                'borrowed_stock'  => $borrowedStock,
+                'pending_stock'   => $pendingStock,
+            ];
+        }
+
+        // 3. DIPINJAM: Jika unit sedang dipinjam aktif (approved / borrowed / overdue)
+        if ($borrowedStock > 0) {
+            return [
+                'status'          => 'dipinjam',
+                'badge_label'     => 'Dipinjam',
+                'badge_bg'        => '#ea580c', // Orange solid
+                'badge_color'     => '#ffffff',
+                'button_disabled' => true,
+                'button_variant'  => 'orange', // Orange disabled
+                'button_label'    => 'Dipinjam',
+                'available_stock' => 0,
+                'total_stock'     => $totalStock,
+                'borrowed_stock'  => $borrowedStock,
+                'pending_stock'   => $pendingStock,
+            ];
+        }
+
+        if ($pendingStock > 0) {
+            return [
+                'status'          => 'menunggu',
+                'badge_label'     => 'Menunggu',
+                'badge_bg'        => '#f59e0b',
+                'badge_color'     => '#ffffff',
+                'button_disabled' => true,
+                'button_variant'  => 'gray',
+                'button_label'    => 'Menunggu',
+                'available_stock' => 0,
+                'total_stock'     => $totalStock,
+                'borrowed_stock'  => 0,
+                'pending_stock'   => $pendingStock,
+            ];
+        }
+
+        // Default habis / stok 0
+        return [
+            'status'          => 'dipinjam',
+            'badge_label'     => 'Habis',
+            'badge_bg'        => '#ea580c',
+            'badge_color'     => '#ffffff',
+            'button_disabled' => true,
+            'button_variant'  => 'orange',
+            'button_label'    => 'Stok Habis',
+            'available_stock' => 0,
+            'total_stock'     => $totalStock,
+            'borrowed_stock'  => 0,
+            'pending_stock'   => 0,
+        ];
+    }
+
+    public function getCatalogStatusInfoAttribute(): array
+    {
+        return $this->getCatalogStatusInfo();
     }
 
     // ==========================================
@@ -116,10 +246,11 @@ class Item extends Model
     public function scopeHasAvailableStock($query)
     {
         return $query->whereRaw('stock > (
-            SELECT COALESCE(SUM(br.quantity), 0)
-            FROM borrowing_requests br
-            WHERE br.item_id = items.id
-              AND br.status IN ("approved", "borrowed")
+            SELECT COALESCE(SUM(bri.quantity), 0)
+            FROM borrowing_request_items bri
+            JOIN borrowing_requests br ON br.id = bri.borrowing_request_id
+            WHERE bri.item_id = items.id
+              AND br.status IN ("pending", "approved", "borrowed", "overdue")
         )');
     }
 

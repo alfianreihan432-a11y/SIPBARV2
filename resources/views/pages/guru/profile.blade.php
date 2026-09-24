@@ -6,10 +6,18 @@
 @section('content')
 @php
     $user = auth()->user();
-    $totalRequests = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())->count();
-    $pendingRequests = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())->where('status', \App\Models\BorrowingRequest::STATUS_PENDING)->count();
-    $activeRequests = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())->whereIn('status', [\App\Models\BorrowingRequest::STATUS_APPROVED, 'qr_ready', \App\Models\BorrowingRequest::STATUS_BORROWED])->count();
-    $returnedRequests = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())->where('status', \App\Models\BorrowingRequest::STATUS_RETURNED)->count();
+    $totalRequests = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
+        ->where('tipe_peminjam', 'siswa')
+        ->count();
+    $pendingRequests = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
+        ->where('tipe_peminjam', 'siswa')
+        ->where('status', \App\Models\BorrowingRequest::STATUS_PENDING)->count();
+    $activeRequests = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
+        ->where('tipe_peminjam', 'siswa')
+        ->whereIn('status', [\App\Models\BorrowingRequest::STATUS_APPROVED, 'qr_ready', \App\Models\BorrowingRequest::STATUS_BORROWED])->count();
+    $returnedRequests = \App\Models\BorrowingRequest::where('teacher_id', auth()->id())
+        ->where('tipe_peminjam', 'siswa')
+        ->where('status', \App\Models\BorrowingRequest::STATUS_RETURNED)->count();
 @endphp
 
 <style>

@@ -22,10 +22,11 @@ class TeacherApprovalController extends Controller
     {
         $pendingRequests = BorrowingRequest::where('teacher_id', Auth::id())
             ->where('status', BorrowingRequest::STATUS_PENDING)
+            ->where('tipe_peminjam', 'siswa')
             ->with(['user', 'item', 'items.itemWithTrashed'])
             ->latest()
             ->get();
-        
+
         return view('pages.guru.requests', [
             'pendingRequests' => $pendingRequests
         ]);

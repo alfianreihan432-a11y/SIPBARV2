@@ -44,9 +44,10 @@ class ItemCatalog extends Component
     public function addToCart(int $itemId): void
     {
         $item = Item::findOrFail($itemId);
+        $statusInfo = $item->getCatalogStatusInfo();
 
-        if ($item->available_stock <= 0) {
-            session()->flash('error', 'Barang tidak tersedia saat ini.');
+        if ($statusInfo['button_disabled'] || $statusInfo['available_stock'] <= 0) {
+            session()->flash('error', 'Barang sedang ' . strtolower($statusInfo['badge_label']) . ' dan tidak dapat dipinjam saat ini.');
             return;
         }
 
@@ -69,10 +70,7 @@ class ItemCatalog extends Component
 
     public function getItemsProperty()
     {
-        $query = Item::with('category', 'teacher')
-            ->where('status', 'Tersedia')
-            ->where('condition', 'Baik')
-            ->hasAvailableStock();
+        $query = Item::with('category', 'teacher');
 
         if ($this->search) {
             $query->where(function($q) {
