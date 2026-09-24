@@ -29,7 +29,7 @@ class StudentDashboard extends Component
     {
         $userId = Auth::id();
         
-        $this->myRequests = BorrowingRequest::with(['item', 'itemWithTrashed', 'teacher', 'qrCode'])
+        $this->myRequests = BorrowingRequest::with(['item', 'itemWithTrashed', 'items.itemWithTrashed', 'teacher', 'qrCode'])
             ->where('user_id', $userId)
             ->latest()
             ->take(5)

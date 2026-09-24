@@ -4,26 +4,26 @@
 
 @section('content')
 @php
-    $overdueBorrowings = \App\Models\BorrowingRequest::with('itemWithTrashed')
+    $overdueBorrowings = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed'])
         ->where('user_id', auth()->id())
         ->where('status', 'borrowed')
         ->whereDate('return_date', '<', now())
         ->get();
 
-    $dueSoonBorrowings = \App\Models\BorrowingRequest::with('itemWithTrashed')
+    $dueSoonBorrowings = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed'])
         ->where('user_id', auth()->id())
         ->where('status', 'borrowed')
         ->whereDate('return_date', '>=', now())
         ->whereDate('return_date', '<=', now()->addDays(2))
         ->get();
 
-    $recentApprovals = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'qrCode'])
+    $recentApprovals = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed', 'qrCode'])
         ->where('user_id', auth()->id())
         ->whereIn('status', ['approved', 'qr_ready'])
         ->latest('updated_at')
         ->get();
 
-    $recentRejections = \App\Models\BorrowingRequest::with('itemWithTrashed')
+    $recentRejections = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed'])
         ->where('user_id', auth()->id())
         ->where('status', 'rejected')
         ->latest('updated_at')
@@ -70,7 +70,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--s-rejected)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         </div>
         <div class="s-loan-content">
-            <div class="s-loan-name">{{ $overdue->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
+            <div class="s-loan-name">{{ $overdue->item_display_name }}</div>
             <div class="s-loan-meta">
                 <span>Seharusnya kembali: {{ \Carbon\Carbon::parse($overdue->return_date)->format('d M Y') }}</span>
             </div>
@@ -105,7 +105,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--s-pending)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         </div>
         <div class="s-loan-content">
-            <div class="s-loan-name">{{ $dueSoon->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
+            <div class="s-loan-name">{{ $dueSoon->item_display_name }}</div>
             <div class="s-loan-meta">
                 <span>Harus kembali: {{ \Carbon\Carbon::parse($dueSoon->return_date)->format('d M Y') }}</span>
             </div>
@@ -138,7 +138,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--s-approved)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <div class="s-loan-content">
-            <div class="s-loan-name">{{ $approval->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
+            <div class="s-loan-name">{{ $approval->item_display_name }}</div>
             <div class="s-loan-meta">
                 <span>Disetujui {{ $approval->approved_at ? $approval->approved_at->diffForHumans() : 'baru saja' }}</span>
             </div>
@@ -175,7 +175,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--s-rejected)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         </div>
         <div class="s-loan-content">
-            <div class="s-loan-name">{{ $rejection->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
+            <div class="s-loan-name">{{ $rejection->item_display_name }}</div>
             @if($rejection->rejection_reason)
             <div style="margin-top:8px;padding:8px 12px;background:var(--s-rejected-bg);border:1px solid var(--s-rejected-bdr);border-radius:8px;font-size:12px;color:var(--s-rejected)">
                 <strong>Alasan:</strong> {{ $rejection->rejection_reason }}

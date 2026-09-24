@@ -114,7 +114,7 @@ class BorrowingRequest extends Model
 
     public function itemSummary(): string
     {
-        $details = $this->items()->with('itemWithTrashed')->get();
+        $details = $this->relationLoaded('items') ? $this->items : $this->items()->with('itemWithTrashed')->get();
 
         if ($details->isNotEmpty()) {
             return $details->map(function ($detail) {
@@ -126,9 +126,33 @@ class BorrowingRequest extends Model
         return $this->itemWithTrashed?->name ?? $this->item?->name ?? 'Barang tidak tersedia';
     }
 
+    /**
+     * Nama barang display untuk kartu atau baris peminjaman:
+     * - Menangani peminjaman multi-item (keranjang)
+     * - Menangani peminjaman single item (legacy)
+     * - Tetap menampilkan nama asli jika barang sudah di-soft-delete
+     * - Fallback "Barang tidak tersedia" HANYA jika data barang benar-benar corrupt/null
+     */
+    public function getItemDisplayNameAttribute(): string
+    {
+        $details = $this->relationLoaded('items') ? $this->items : $this->items()->with('itemWithTrashed')->get();
+
+        if ($details->isNotEmpty()) {
+            if ($details->count() === 1) {
+                $detail = $details->first();
+                return $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia';
+            }
+            $first = $details->first();
+            $firstName = $first->itemWithTrashed?->name ?? $first->item?->name ?? 'Barang';
+            return $firstName . ' (+' . ($details->count() - 1) . ' lainnya)';
+        }
+
+        return $this->itemWithTrashed?->name ?? $this->item?->name ?? 'Barang tidak tersedia';
+    }
+
     public function totalQuantity(): int
     {
-        $details = $this->items()->get();
+        $details = $this->relationLoaded('items') ? $this->items : $this->items()->get();
 
         if ($details->isNotEmpty()) {
             return (int) $details->sum('quantity');
