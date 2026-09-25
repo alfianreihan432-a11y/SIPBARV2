@@ -37,6 +37,47 @@
         </div>
     </div>
 
+    {{-- ═══ TOP PAGINATION (compact, mobile-friendly) ═══ --}}
+    @if($items->total() > 0)
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px;padding:10px 14px;background:var(--card);border:1px solid var(--border2);border-radius:12px">
+        {{-- Info teks kiri --}}
+        <span style="font-size:12.5px;color:var(--muted);white-space:nowrap;flex-shrink:0">
+            @if($items->lastPage() > 1)
+                Halaman <strong style="color:var(--text)">{{ $items->currentPage() }}</strong> dari <strong style="color:var(--text)">{{ $items->lastPage() }}</strong>
+                &nbsp;&middot;&nbsp; <span style="color:var(--subtle)">{{ $items->total() }} barang</span>
+            @else
+                Menampilkan <strong style="color:var(--text)">{{ $items->total() }}</strong> barang
+            @endif
+        </span>
+        {{-- Tombol prev / next (tampil hanya jika ada lebih dari 1 halaman) --}}
+        @if($items->lastPage() > 1)
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+            @if($items->onFirstPage())
+                <span aria-disabled="true" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--subtle);opacity:.4;cursor:not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </span>
+            @else
+                <button wire:click="previousPage" aria-label="Halaman sebelumnya" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1px solid var(--border2);background:var(--card);color:var(--text);cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='var(--card)'">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+            @endif
+            <span style="display:inline-flex;align-items:center;justify-content:center;min-width:58px;height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);font-size:12px;font-weight:700;color:var(--text);white-space:nowrap">
+                {{ $items->currentPage() }} / {{ $items->lastPage() }}
+            </span>
+            @if($items->hasMorePages())
+                <button wire:click="nextPage" aria-label="Halaman berikutnya" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1px solid var(--border2);background:var(--card);color:var(--text);cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='var(--card)'">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
+            @else
+                <span aria-disabled="true" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--subtle);opacity:.4;cursor:not-allowed">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </span>
+            @endif
+        </div>
+        @endif
+    </div>
+    @endif
+
     {{-- Items Grid --}}
     @if($items->count() > 0)
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:24px">
@@ -134,8 +175,6 @@
             </div>
             @endforeach
         </div>
-        {{-- Pagination --}}
-        <div style="margin-top:8px">{{ $items->links() }}</div>
     @else
         <div class="s-card">
             <div class="s-empty">
