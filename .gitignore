@@ -51,3 +51,6 @@ stage3_final.xml
 # Production database dumps (sensitive data)
 sipbarv2_production.sql
 sipbarv2_production_utf8.sql
+screenshots/
+scripts/
+RESPONSIVE_FIX_REPORT.md

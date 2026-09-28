@@ -230,8 +230,13 @@
         color: var(--text-muted);
         margin-top: 2px;
     }
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
     .activity-table {
         width: 100%;
+        min-width: 650px;
         border-collapse: collapse;
         text-align: left;
     }
@@ -515,8 +520,8 @@
                             </div>
                         </td>
                         <td>
-                            <div style="font-weight:700">{{ $act->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
-                            <div style="font-size:11px;color:var(--text-muted)">Qty: {{ $act->quantity }} unit</div>
+                            <div style="font-weight:700">{{ $act->item_display_name }}</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Qty: {{ $act->totalQuantity() ?? 1 }} unit</div>
                         </td>
                         <td>
                             <div style="font-size:12.5px;font-weight:600;color:var(--text-secondary)">

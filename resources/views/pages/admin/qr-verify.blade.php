@@ -280,7 +280,7 @@
                             @foreach($br->items as $index => $detail)
                                 <div style="margin-bottom: {{ $index < $br->items->count() - 1 ? '8px' : '0' }};">
                                     <div style="font-weight: 600;">{{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia' }}</div>
-                                    <div style="font-size: 12px; color: var(--text-muted);">Qty: {{ $detail->quantity }} unit</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">Qty: {{ $detail->quantity ?? 1 }} unit</div>
                                 </div>
                             @endforeach
                         </td>

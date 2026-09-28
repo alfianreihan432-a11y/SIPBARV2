@@ -15,6 +15,17 @@
     @media (max-width: 1024px) { .admin-stats-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 640px) { .admin-stats-grid { grid-template-columns: 1fr; } }
 
+    /* Mobile responsive table fixes */
+    @media (max-width: 768px) {
+        .returns-table { min-width: 600px; font-size: 12px; }
+        .returns-table th { padding: 10px 12px; font-size: 10px; }
+        .returns-table td { padding: 10px 12px; font-size: 12px; }
+        .table-panel { border-radius: 12px; }
+        .search-row { flex-direction: column; gap: 10px; }
+        .search-input-wrap { width: 100%; }
+        .search-input-wrap input { width: 100%; }
+    }
+
     .stat-card-admin {
         background: var(--bg-card);
         border: 1px solid var(--border-alt);
@@ -127,9 +138,11 @@
     }
     .table-responsive {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     .returns-table {
         width: 100%;
+        min-width: 680px;
         border-collapse: separate;
         border-spacing: 0;
         font-size: 13px;
@@ -150,6 +163,8 @@
         border-bottom: 1px solid var(--border-alt);
         color: var(--text-primary);
         vertical-align: middle;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     .returns-table tr:hover td {
         background: var(--table-hover);
@@ -425,109 +440,176 @@
     {{-- Main Returns Table Panel --}}
     <div class="table-panel">
         @if($returns->count() > 0)
-            <div class="table-responsive">
-                <table class="returns-table">
-                    <thead>
-                        <tr>
-                            <th>Siswa Peminjam</th>
-                            <th>Barang</th>
-                            <th>Kondisi & Bukti</th>
-                            <th>Tanggal Diajukan</th>
-                            <th>Status</th>
-                            <th style="text-align: right;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($returns as $ret)
-                            @php
-                                $borrowing = $ret->borrowingRequest;
-                                $item = $borrowing?->item;
-                                $user = $ret->user;
-                            @endphp
+            {{-- Desktop Table View --}}
+            <div class="desktop-table-view">
+                <div class="table-responsive">
+                    <table class="returns-table">
+                        <thead>
                             <tr>
-                                <td>
-                                    <div style="font-weight: 700; color: var(--text-primary);">
-                                        {{ $user?->name ?? 'Siswa' }}
-                                    </div>
-                                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
-                                        NIS: {{ $user?->nis ?? '-' }} &bull; Kelas: {{ $user?->kelas ?? '-' }}
-                                    </div>
-                                </td>
+                                <th>Siswa Peminjam</th>
+                                <th>Barang</th>
+                                <th>Kondisi & Bukti</th>
+                                <th>Tanggal Diajukan</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($returns as $ret)
+                                @php
+                                    $borrowing = $ret->borrowingRequest;
+                                    $item = $borrowing?->item;
+                                    $user = $ret->user;
+                                    $itemName = $borrowing?->item_display_name ?? ($item?->name ?? 'Barang #' . $ret->borrowing_request_id);
+                                @endphp
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--text-primary);">
+                                            {{ $user?->name ?? 'Siswa' }}
+                                        </div>
+                                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                                            NIS: {{ $user?->nis ?? '-' }} &bull; Kelas: {{ $user?->kelas ?? '-' }}
+                                        </div>
+                                    </td>
 
-                                <td>
-                                    <div style="font-weight: 700; color: var(--text-primary);">
-                                        {{ $item?->name ?? 'Barang #' . $ret->borrowing_request_id }}
-                                    </div>
-                                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
-                                        Kode: {{ $item?->code ?? '-' }} &bull; ID Pinjam: #{{ $ret->borrowing_request_id }}
-                                    </div>
-                                </td>
-
-                                <td>
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        @if($ret->foto_bukti)
-                                            <img src="{{ asset('storage/' . $ret->foto_bukti) }}" alt="Bukti" class="photo-thumb" onclick="openPhotoModal('{{ asset('storage/' . $ret->foto_bukti) }}')">
-                                        @endif
-                                        <div>
-                                            <span class="badge-kondisi">
-                                                {{ $ret->kondisi_label }}
-                                            </span>
-                                            @if($ret->catatan)
-                                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $ret->catatan }}">
-                                                    "{{ $ret->catatan }}"
-                                                </div>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--text-primary);">
+                                            {{ $itemName }}
+                                        </div>
+                                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                                            @if($item?->code) Kode: {{ $item->code }} &bull; @endif ID Pinjam: #{{ $ret->borrowing_request_id }}
+                                            @if($borrowing && $borrowing->totalQuantity() > 0)
+                                                &bull; {{ $borrowing->totalQuantity() }} unit
                                             @endif
                                         </div>
-                                    </div>
-                                </td>
+                                    </td>
 
-                                <td>
-                                    <div style="font-weight: 600; color: var(--text-primary);">
-                                        {{ $ret->created_at->format('d M Y') }}
-                                    </div>
-                                    <div style="font-size: 11px; color: var(--text-muted);">
-                                        {{ $ret->created_at->format('H:i') }} WIB
-                                    </div>
-                                </td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            @if($ret->foto_bukti)
+                                                <img src="{{ asset('storage/' . $ret->foto_bukti) }}" alt="Bukti" class="photo-thumb" onclick="openPhotoModal('{{ asset('storage/' . $ret->foto_bukti) }}')">
+                                            @endif
+                                            <div>
+                                                <span class="badge-kondisi">
+                                                    {{ $ret->kondisi_label }}
+                                                </span>
+                                                @if($ret->catatan)
+                                                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $ret->catatan }}">
+                                                        "{{ $ret->catatan }}"
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </td>
 
-                                <td>
-                                    @if($ret->status === 'menunggu')
-                                        <span class="badge-status badge-menunggu">
-                                            <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            Menunggu
-                                        </span>
-                                    @elseif($ret->status === 'disetujui')
-                                        <span class="badge-status badge-disetujui">
-                                            <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                            </svg>
-                                            Disetujui
-                                        </span>
-                                    @elseif($ret->status === 'ditolak')
-                                        <span class="badge-status badge-ditolak">
-                                            <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                            </svg>
-                                            Ditolak
-                                        </span>
-                                    @endif
-                                </td>
+                                    <td>
+                                        <div style="font-weight: 600; color: var(--text-primary);">
+                                            {{ $ret->created_at->format('d M Y') }}
+                                        </div>
+                                        <div style="font-size: 11px; color: var(--text-muted);">
+                                            {{ $ret->created_at->format('H:i') }} WIB
+                                        </div>
+                                    </td>
 
-                                <td style="text-align: right;">
-                                    {{-- Read-only badge for superadmin --}}
-                                    <span class="readonly-badge">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                        </svg>
-                                        Read Only
-                                    </span>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                    <td>
+                                        @if($ret->status === 'menunggu')
+                                            <span class="badge-status badge-menunggu">
+                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                Menunggu
+                                            </span>
+                                        @elseif($ret->status === 'disetujui')
+                                            <span class="badge-status badge-disetujui">
+                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                                Disetujui
+                                            </span>
+                                        @elseif($ret->status === 'ditolak')
+                                            <span class="badge-status badge-ditolak">
+                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                </svg>
+                                                Ditolak
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <td style="text-align: right;">
+                                        {{-- Read-only badge for superadmin --}}
+                                        <span class="readonly-badge">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                            </svg>
+                                            Read Only
+                                        </span>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {{-- Mobile Cards View --}}
+            <div class="mobile-cards-view">
+                @foreach($returns as $ret)
+                    @php
+                        $borrowing = $ret->borrowingRequest;
+                        $item = $borrowing?->item;
+                        $user = $ret->user;
+                        $itemName = $borrowing?->item_display_name ?? ($item?->name ?? 'Barang #' . $ret->borrowing_request_id);
+                        $itemQty = $borrowing ? $borrowing->totalQuantity() : 1;
+                        $statusKey = $ret->status === 'menunggu' ? 'pending' : ($ret->status === 'disetujui' ? 'returned' : ($ret->status === 'ditolak' ? 'rejected' : 'pending'));
+                        $statusLabel = $ret->status === 'menunggu' ? 'Menunggu' : ($ret->status === 'disetujui' ? 'Disetujui' : ($ret->status === 'ditolak' ? 'Ditolak' : ucfirst($ret->status)));
+                        $cardStatusClass = 'mc-card--' . $statusKey;
+                        $badgeClass = 'mc-badge--' . $statusKey;
+                    @endphp
+                    <div class="mc-card {{ $cardStatusClass }}">
+                        <div class="mc-card-header">
+                            <div>
+                                <div class="mc-card-user">{{ $user?->name ?? 'Siswa' }}</div>
+                                <div class="mc-card-user-sub">NIS: {{ $user?->nis ?? '-' }} &bull; Kelas: {{ $user?->kelas ?? '-' }}</div>
+                            </div>
+                            <span class="mc-badge {{ $badgeClass }}">
+                                <span class="mc-badge-dot"></span>
+                                {{ $statusLabel }}
+                            </span>
+                        </div>
+
+                        <div class="mc-card-details">
+                            <div class="mc-card-row">
+                                <span class="mc-card-label">Barang:</span>
+                                <span class="mc-card-val">{{ $itemName }}</span>
+                            </div>
+                            <div class="mc-card-row">
+                                <span class="mc-card-label">Jumlah:</span>
+                                <span class="mc-card-val">{{ $itemQty }} unit</span>
+                            </div>
+                            <div class="mc-card-row">
+                                <span class="mc-card-label">Kondisi:</span>
+                                <span class="mc-card-val">{{ $ret->kondisi_label }}</span>
+                            </div>
+                            <div class="mc-card-row">
+                                <span class="mc-card-label">Tgl Diajukan:</span>
+                                <span class="mc-card-val">{{ $ret->created_at->format('d/m/Y H:i') }} WIB</span>
+                            </div>
+                            @if($ret->catatan)
+                            <div class="mc-card-row">
+                                <span class="mc-card-label">Catatan:</span>
+                                <span class="mc-card-val">"{{ $ret->catatan }}"</span>
+                            </div>
+                            @endif
+                            @if($ret->foto_bukti)
+                            <div class="mc-card-row" style="margin-top: 4px; padding-top: 6px; border-top: 1px dashed var(--border-alt);">
+                                <span class="mc-card-label">Foto Bukti:</span>
+                                <span class="mc-card-val" style="cursor: pointer; color: var(--color-primary, #851e2a);" onclick="openPhotoModal('{{ asset('storage/' . $ret->foto_bukti) }}')">Lihat Foto</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
             </div>
         @else
             <div style="padding: 40px; text-align: center; color: var(--text-muted);">

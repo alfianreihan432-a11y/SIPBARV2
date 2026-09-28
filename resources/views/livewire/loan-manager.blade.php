@@ -32,12 +32,12 @@
 .badge-type-guru{background:var(--s-returned, #059669);color:#fff;border:none;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
 
 /* Table */
-table.lmt{width:100%;border-collapse:collapse}
+table.lmt{width:100%;border-collapse:collapse;min-width:800px}
 table.lmt thead th{padding:12px 16px;font-size:10px;font-weight:700;color:var(--text-subtle);letter-spacing:.08em;text-transform:uppercase;background:var(--table-head-bg);text-align:left;border-bottom:1px solid var(--border-subtle);white-space:nowrap}
 table.lmt tbody tr{border-bottom:1px solid var(--border-subtle);transition:background .15s}
 table.lmt tbody tr:last-child{border-bottom:none}
 table.lmt tbody tr:hover{background:var(--table-hover)}
-table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);vertical-align:middle}
+table.lmt tbody td{padding:12px 16px;font-size:13px;color:var(--text-secondary);vertical-align:middle;word-wrap:break-word;overflow-wrap:break-word}
 
 .lmt-num{font-size:12px;font-weight:700;color:var(--text-primary);font-family:monospace}
 .lmt-student{display:flex;align-items:center;gap:9px}
@@ -98,7 +98,63 @@ html.dark .btn-detail:hover, html:not(.light) .btn-detail:hover{background:#6474
 .lm-modal-lbl{color:var(--text-muted);font-weight:600;flex-shrink:0;width:140px}
 .lm-modal-val{color:var(--text-primary);font-weight:600;text-align:right}
 @keyframes lmFadeIn{from{opacity:0}to{opacity:1}}
-@keyframes lmScaleIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
+@keyframes lmScaleIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}
+
+/* Desktop/Mobile View Switching */
+.desktop-table-view {
+    display: block;
+}
+.mobile-cards-view {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .desktop-table-view {
+        display: none !important;
+    }
+    .mobile-cards-view {
+        display: flex !important;
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+/* Mobile card overdue text styling */
+.mc-card-val-overdue {
+    color: #dc2626;
+}
+html.dark .mc-card-val-overdue {
+    color: #f87171;
+}
+
+/* Mobile responsive table fixes */
+@media(max-width:768px){
+    table.lmt{min-width:900px;font-size:13px} /* Increased min-width for readability */
+    table.lmt thead th{padding:12px 14px;font-size:11px}
+    table.lmt tbody td{padding:12px 14px;font-size:13px}
+    .lm-header{flex-direction:column;align-items:flex-start;gap:12px}
+    .lm-search{width:100%}
+    .lm-search input{width:100%}
+    /* Ensure proper scrolling on mobile with indicators */
+    div[style*="overflow-x:auto"]{
+        overflow-x:auto!important;
+        -webkit-overflow-scrolling:touch!important;
+        position:relative
+    }
+    div[style*="overflow-x:auto"]::after{
+        content:'';
+        position:absolute;
+        top:0;right:0;bottom:0;
+        width:20px;
+        background:linear-gradient(to right,transparent,var(--bg3));
+        pointer-events:none;
+        opacity:0;
+        transition:opacity 0.3s
+    }
+    div[style*="overflow-x:auto"].scrolled::after{
+        opacity:1
+    }
+}
 </style>
 
 <div>
@@ -200,7 +256,16 @@ html.dark .btn-detail:hover, html:not(.light) .btn-detail:hover{background:#6474
         <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Coba ubah opsi filter tipe atau status di atas.</div>
     </div>
     @else
-    <div style="overflow-x:auto">
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch" onscroll="handleLoanTableScroll(this)">
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:40px;height:40px;margin:0 auto 12px;color:var(--text-muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+        </svg>
+        <div style="font-size:14px;color:var(--text-primary);font-weight:600">Tidak ada data peminjaman yang sesuai filter.</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Coba ubah opsi filter tipe atau status di atas.</div>
+    </div>
+    @else
+    {{-- Desktop Table View --}}
+    <div class="desktop-table-view" style="overflow-x:auto;-webkit-overflow-scrolling:touch">
         <table class="lmt" id="lmTable">
             <thead>
                 <tr>
@@ -400,6 +465,79 @@ html.dark .btn-detail:hover, html:not(.light) .btn-detail:hover{background:#6474
             </tbody>
         </table>
     </div>
+    </div>
+
+    {{-- Mobile Cards View --}}
+    <div class="mobile-cards-view">
+        @foreach($borrowings as $b)
+        @php
+            $isGuru = ($b->tipe_peminjam === 'guru');
+            $nomorPinjam = 'BR-' . str_pad($b->id, 4, '0', STR_PAD_LEFT);
+            $dueDate  = $b->return_date ? \Carbon\Carbon::parse($b->return_date) : null;
+            $dueClass = 'ok';
+            $dueText  = $dueDate ? $dueDate->format('d M Y') : '—';
+            if ($b->return_time) {
+                $dueText .= ' · ' . substr($b->return_time, 0, 5);
+            }
+            if ($dueDate) {
+                if ($dueDate->isPast() && !in_array($b->status, ['returned', 'rejected', 'cancelled'])) {
+                    $dueClass = 'over';
+                } elseif ($dueDate->diffInDays(now()) <= 2 && !in_array($b->status, ['returned', 'rejected', 'cancelled'])) {
+                    $dueClass = 'warn';
+                }
+            }
+            $borrowedAt = $b->borrowed_at ?? $b->borrow_date;
+            $cardStatusClass = 'mc-card--' . ($b->display_status ?? 'pending');
+            $badgeClass = 'mc-badge--' . ($b->display_status ?? 'pending');
+            $labelMap = [
+                'pending'   => 'Menunggu',
+                'approved'  => 'Disetujui',
+                'borrowed'  => 'Dipinjam',
+                'returned'  => 'Dikembalikan',
+                'rejected'  => 'Ditolak',
+                'overdue'   => 'Terlambat',
+            ];
+            $badgeLabel = $labelMap[$b->display_status] ?? ucfirst($b->display_status);
+        @endphp
+        <div class="mc-card {{ $cardStatusClass }}">
+            <div class="mc-card-header">
+                <div>
+                    <div class="mc-card-user">{{ $b->user->name ?? 'Peminjam' }}</div>
+                    <div class="mc-card-user-sub">{{ $isGuru ? 'Guru' : 'Siswa' }} · {{ $nomorPinjam }}</div>
+                </div>
+                <span class="mc-badge {{ $badgeClass }}">
+                    <span class="mc-badge-dot"></span>
+                    {{ $badgeLabel }}
+                </span>
+            </div>
+
+            <div class="mc-card-details">
+                <div class="mc-card-row">
+                    <span class="mc-card-label">Barang:</span>
+                    <span class="mc-card-val">{{ $b->item_display_name }}</span>
+                </div>
+                <div class="mc-card-row">
+                    <span class="mc-card-label">Jumlah:</span>
+                    <span class="mc-card-val">{{ $b->totalQuantity() }} unit</span>
+                </div>
+                <div class="mc-card-row">
+                    <span class="mc-card-label">Tgl Pinjam:</span>
+                    <span class="mc-card-val">{{ $borrowedAt ? \Carbon\Carbon::parse($borrowedAt)->format('d/m/Y') : '—' }}</span>
+                </div>
+                <div class="mc-card-row">
+                    <span class="mc-card-label">Jatuh Tempo:</span>
+                    <span class="mc-card-val {{ $dueClass === 'over' ? 'mc-card-val-overdue' : '' }}">{{ $dueText }}</span>
+                </div>
+            </div>
+
+            <div class="mc-card-actions">
+                <button wire:click="openDetail({{ $b->id }})" class="mc-card-btn mc-card-btn-primary">
+                    Detail
+                </button>
+            </div>
+        </div>
+        @endforeach
+    </div>
     @endif
 </div>
 
@@ -536,6 +674,14 @@ function lmFilter(q) {
     document.querySelectorAll('#lmTable tbody tr').forEach(function(r){
         r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
     });
+}
+
+function handleLoanTableScroll(element) {
+    if (element.scrollLeft > 10) {
+        element.classList.add('scrolled');
+    } else {
+        element.classList.remove('scrolled');
+    }
 }
 </script>
 </div>
