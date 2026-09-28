@@ -142,7 +142,7 @@
             --s-rejected-bdr:  rgba(248,113,113,.35);
         }
 
-        body { display: flex; background: var(--content-bg); color: var(--text); overflow: hidden; transition: background .25s, color .25s; }
+        body { display: flex; background: var(--content-bg); color: var(--text); overflow: hidden; height: 100vh; transition: background .25s, color .25s; }
 
         /* ═══════════════════════════════
            SIDEBAR
@@ -155,7 +155,6 @@
             transition: background .25s, transform .3s;
             box-shadow: 2px 0 20px rgba(0,0,0,.18);
         }
-        .sidebar.closed { transform: translateX(-100%); }
         .sidebar-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,.55);
             z-index: 35; display: none; backdrop-filter: blur(2px);
@@ -561,7 +560,10 @@
             .s-info-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
+            .sidebar { 
+                transform: translateX(-100%);
+                transition: transform .3s ease;
+            }
             .sidebar.open { transform: translateX(0); }
             .main { margin-left: 0; }
             .hamburger-btn { display: flex; }
@@ -572,6 +574,13 @@
         @media (max-width: 480px) {
             .s-filter-grid { flex-direction: column; }
             .s-filter-item { min-width: auto; }
+            .content { padding: 12px; }
+        }
+
+        /* Mobile specific fixes for scrolling */
+        @media (max-width: 768px) {
+            body { overflow: auto !important; height: auto !important; }
+            .main { overflow: visible !important; height: auto !important; }
         }
     </style>
 </head>

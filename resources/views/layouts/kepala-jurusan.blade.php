@@ -63,7 +63,7 @@
             --accent-light: #fee2e2;
             --accent-text: #991b1b;
         }
-        body{display:flex;background:var(--content-bg);color:var(--text);overflow:hidden;transition:background .25s,color .25s}
+        body{display:flex;background:var(--content-bg);color:var(--text);overflow:hidden;height:100vh;transition:background .25s,color .25s}
         .sidebar{width:220px;flex-shrink:0;background:var(--sidebar-bg);display:flex;flex-direction:column;height:100vh;position:fixed;left:0;top:0;z-index:40;transition:background .25s,transform .3s;box-shadow:2px 0 16px rgba(0,0,0,.08)}
         .sidebar-brand{display:flex;align-items:center;gap:14px;padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.12);text-decoration:none}
         .sidebar-logo-wrap{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.95);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.3),0 0 0 1.5px rgba(255,255,255,.15);transition:transform .2s ease,box-shadow .2s ease}
@@ -228,6 +228,12 @@
             .topbar { padding: 0 16px; gap: 8px; }
             .topbar-search { display: none; }
             .content { padding: 16px 14px; }
+        }
+
+        /* Mobile specific fixes for scrolling */
+        @media (max-width: 768px) {
+            body { overflow: auto !important; height: auto !important; }
+            .main { overflow: visible !important; height: auto !important; }
         }
     </style>
 </head>

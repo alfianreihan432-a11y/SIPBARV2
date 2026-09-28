@@ -419,6 +419,12 @@
             .content { padding: 14px 12px; }
         }
 
+        /* Mobile specific fixes for scrolling */
+        @media(max-width: 768px) {
+            body { overflow: auto !important; height: auto !important; }
+            .main { overflow: visible !important; height: auto !important; max-height: none !important; }
+        }
+
         /* ══════════════════════════════════════════════════════════════
            GLOBAL PREMIUM SELECT / DROPDOWN UPGRADE — SUPERADMIN PANEL
            Applies to: .im-select, .im-select-field, select (generic)
