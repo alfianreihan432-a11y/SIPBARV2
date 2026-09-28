@@ -295,7 +295,8 @@
         <div class="qr-list-grid">
             @foreach($activeQrLoans as $loan)
                 @php
-                    $itemName = $loan->itemWithTrashed?->name ?? $loan->item?->name ?? 'Barang Inventaris';
+                    $itemName = $loan->item_display_name;
+                    $totalQty = $loan->totalQuantity();
                     $isApproved = in_array($loan->status, ['approved', 'qr_ready']);
                 @endphp
                 <div class="qr-item-box">
@@ -303,12 +304,21 @@
                         <div class="qr-item-head">
                             <div>
                                 <div class="qr-item-name">{{ $itemName }}</div>
-                                <div class="qr-item-code">ID Transaksi: #{{ $loan->id }} · {{ $loan->quantity }} Unit</div>
+                                <div class="qr-item-code">ID Transaksi: #{{ $loan->id }} · {{ $totalQty }} Unit</div>
                             </div>
                             <span class="qr-badge {{ $isApproved ? 'qr-badge-approved' : 'qr-badge-borrowed' }}">
                                 {{ $isApproved ? 'Siap Ambil' : 'Dipinjam' }}
                             </span>
                         </div>
+
+                        @if($loan->items->isNotEmpty() && $loan->items->count() > 1)
+                        <div style="font-size: 11.5px; color: var(--muted); margin-bottom: 10px; background: var(--card); border: 1px solid var(--border); padding: 6px 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-weight: 700; color: var(--text);">Daftar Barang:</span>
+                            @foreach($loan->items as $detail)
+                                <span>• {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }} unit)</span>
+                            @endforeach
+                        </div>
+                        @endif
 
                         <div class="qr-item-meta">
                             <div class="qr-meta-row">

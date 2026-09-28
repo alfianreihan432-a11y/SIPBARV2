@@ -142,6 +142,8 @@
     </div>
 
     @if($borrowings->count() > 0)
+        {{-- Desktop Table View --}}
+        <div class="desktop-table-view">
         @foreach($borrowings as $req)
         @php $st = $statusMap[$req->status] ?? $statusMap['pending']; @endphp
         <div class="g-loan-row {{ $req->status === 'pending' ? 'g-loan-row--pending' : ($req->status === 'rejected' || $req->status === 'cancelled' ? 'g-loan-row--rejected' : ($req->status === 'borrowed' ? 'g-loan-row--borrowed' : 'g-loan-row--approved')) }}">
@@ -149,12 +151,20 @@
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             </div>
             <div class="g-loan-content">
-                <div class="g-loan-name">{{ $req->itemWithTrashed?->name ?? $req->item?->name ?? 'Barang tidak tersedia' }}</div>
-                <div class="g-loan-code">ID: #{{ $req->id }} · Qty: {{ $req->quantity }} unit
+                <div class="g-loan-name">{{ $req->item_display_name }}</div>
+                <div class="g-loan-code">ID: #{{ $req->id }} · Qty: {{ $req->totalQuantity() ?? 1 }} unit
                     @if($req->approvedByKajur)
                     · <span style="color:var(--muted)">Kajur: {{ $req->approvedByKajur->name }}</span>
                     @endif
                 </div>
+                @if($req->items->isNotEmpty() && $req->items->count() > 1)
+                <div style="font-size: 11.5px; color: var(--muted); margin-bottom: 6px; background: var(--bg3); padding: 5px 10px; border-radius: 6px; display: inline-flex; flex-wrap: wrap; gap: 6px;">
+                    <span style="font-weight: 700;">Rincian:</span>
+                    @foreach($req->items as $detail)
+                        <span>{{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }}){{ !$loop->last ? ' •' : '' }}</span>
+                    @endforeach
+                </div>
+                @endif
                 <div class="g-loan-meta">
                     <div class="g-loan-meta-item">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -201,14 +211,14 @@
                     </div>
                 @elseif(in_array($req->status, ['approved', 'qr_ready']))
                     <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-                        <button type="button" onclick="openQRModal({{ $req->id }}, '{{ addslashes($req->itemWithTrashed?->name ?? $req->item?->name ?? 'Barang') }}')" class="g-btn g-btn--sm g-btn--primary">
+                        <button type="button" onclick="openQRModal({{ $req->id }}, '{{ addslashes($req->item_display_name) }}')" class="g-btn g-btn--sm g-btn--primary">
                             <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
                             Lihat QR Code
                         </button>
                     </div>
                 @elseif($req->status === 'borrowed')
                     <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-                        <button type="button" onclick="openQRModal({{ $req->id }}, '{{ addslashes($req->itemWithTrashed?->name ?? $req->item?->name ?? 'Barang') }}')" class="g-btn g-btn--sm g-btn--ghost">
+                        <button type="button" onclick="openQRModal({{ $req->id }}, '{{ addslashes($req->item_display_name) }}')" class="g-btn g-btn--sm g-btn--ghost">
                             <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
                             Lihat QR
                         </button>
@@ -232,6 +242,97 @@
             </div>
         </div>
         @endforeach
+        </div>
+
+        {{-- Mobile Cards View --}}
+        <div class="mobile-cards-view">
+            @foreach($borrowings as $req)
+            @php $st = $statusMap[$req->status] ?? $statusMap['pending']; @endphp
+            @php
+                $cardStatusClass = 'mc-card--' . ($req->status ?? 'pending');
+                $badgeClass = 'mc-badge--' . ($req->status ?? 'pending');
+                $badgeLabel = $st['label'];
+            @endphp
+            <div class="mc-card {{ $cardStatusClass }}">
+                <div class="mc-card-header">
+                    <div>
+                        <div class="mc-card-user">{{ auth()->user()->name ?? 'Guru' }}</div>
+                        <div class="mc-card-user-sub">NIP: {{ auth()->user()->nip ?? '-' }}</div>
+                    </div>
+                    <span class="mc-badge {{ $badgeClass }}">
+                        <span class="mc-badge-dot"></span>
+                        {{ $badgeLabel }}
+                    </span>
+                </div>
+
+                <div class="mc-card-details">
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Barang:</span>
+                        <span class="mc-card-val">{{ $req->item_display_name }}</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Jumlah:</span>
+                        <span class="mc-card-val">{{ $req->totalQuantity() ?? 1 }} unit</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Tgl Pinjam:</span>
+                        <span class="mc-card-val">{{ $req->borrow_date->format('d/m/Y') }}</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Tgl Kembali:</span>
+                        <span class="mc-card-val">{{ $req->return_date->format('d/m/Y') }}</span>
+                    </div>
+                    @if($req->return_time)
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Jam:</span>
+                        <span class="mc-card-val">{{ $req->return_time }}</span>
+                    </div>
+                    @endif
+                </div>
+
+                @if($req->items->isNotEmpty() && $req->items->count() > 1)
+                <div class="mc-card-item">
+                    <div class="mc-card-item-name">Rincian Barang ({{ $req->items->count() }}):</div>
+                    @foreach($req->items as $detail)
+                    <div class="mc-card-item-detail">
+                        • {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }})
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+
+                <div class="mc-card-actions">
+                    @if($req->status === 'pending')
+                        @php
+                            $waLink = $waService->getDirectWaLinkForKajur($req);
+                            $approvalUrl = $waService->getApprovalUrlForKajur($req);
+                        @endphp
+                        <a href="{{ route('teacher.peminjaman-guru.edit', $req->id) }}" class="mc-card-btn mc-card-btn-secondary">
+                            Edit
+                        </a>
+                        <a href="{{ $waLink }}" target="_blank" rel="noopener" class="mc-card-btn mc-card-btn-primary">
+                            Kirim WA
+                        </a>
+                    @elseif(in_array($req->status, ['approved', 'qr_ready']))
+                        <button type="button" onclick="openQRModal({{ $req->id }}, '{{ addslashes($req->item_display_name) }}')" class="mc-card-btn mc-card-btn-primary">
+                            Lihat QR
+                        </button>
+                    @elseif($req->status === 'borrowed')
+                        <button type="button" onclick="openQRModal({{ $req->id }}, '{{ addslashes($req->item_display_name) }}')" class="mc-card-btn mc-card-btn-secondary">
+                            Lihat QR
+                        </button>
+                        <a href="{{ route('teacher.pengembalian-guru.create', $req->id) }}" class="mc-card-btn mc-card-btn-primary">
+                            Kembalikan
+                        </a>
+                    @else
+                        <button type="button" class="mc-card-btn mc-card-btn-secondary" disabled>
+                            Detail
+                        </button>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
     @else
         <div class="g-empty">
             <div class="g-empty-icon-wrap">
@@ -248,6 +349,25 @@
 </div>
 
 <style>
+/* Desktop/Mobile View Switching */
+.desktop-table-view {
+    display: block;
+}
+.mobile-cards-view {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .desktop-table-view {
+        display: none !important;
+    }
+    .mobile-cards-view {
+        display: flex !important;
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
 /* ── Page Header ── */
 .g-page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap}
 .g-page-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.02em;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -312,6 +432,15 @@
 .g-empty-icon-wrap{width:64px;height:64px;border-radius:16px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--muted)}
 .g-empty-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px}
 .g-empty-sub{font-size:13px;color:var(--muted);max-width:320px;margin:0 auto;line-height:1.5}
+
+/* ── Mobile Responsive Fixes ── */
+@media(max-width:767px){
+    .g-loan-row{flex-direction:column;gap:12px;padding:14px 16px}
+    .g-loan-icon{width:36px;height:36px}
+    .g-loan-right{align-items:flex-start;width:100%;margin-top:8px}
+    .g-loan-meta{flex-direction:column;gap:6px}
+    .g-loan-content{width:100%;min-width:0}
+}
 </style>
 @endsection
 

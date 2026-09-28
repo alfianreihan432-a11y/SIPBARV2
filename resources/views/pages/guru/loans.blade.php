@@ -67,10 +67,12 @@
     }
     .table-wrapper {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 680px;
     }
     thead {
         background: var(--bg3);
@@ -96,6 +98,8 @@
     }
     td {
         padding: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     .user-cell {
         display: flex;
@@ -209,6 +213,17 @@
         font-size: 14px;
         color: var(--muted);
     }
+
+    /* Mobile responsive table fixes */
+    @media (max-width: 768px) {
+        table { min-width: 600px; font-size: 12px; }
+        th { padding: 10px 12px; font-size: 10px; }
+        td { padding: 10px 12px; font-size: 12px; }
+        .page-header { padding: 16px; }
+        .stats-container { flex-wrap: wrap; }
+        .stat-box { min-width: 70px; padding: 10px 12px; }
+        .user-cell { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
 </style>
 
 <div>
@@ -247,7 +262,7 @@
 
     {{-- Active Loans List --}}
     @php
-        $activeLoansList = \App\Models\BorrowingRequest::with(['user', 'item'])
+        $activeLoansList = \App\Models\BorrowingRequest::with(['user', 'item', 'itemWithTrashed', 'items.itemWithTrashed', 'items.item'])
             ->where('teacher_id', auth()->id())
             ->where('tipe_peminjam', 'siswa')
             ->whereIn('status', ['approved', 'borrowed'])
@@ -256,68 +271,130 @@
     @endphp
 
     @if($activeLoansList->isNotEmpty())
-    <div class="table-container">
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Siswa</th>
-                        <th>Barang</th>
-                        <th>Jumlah</th>
-                        <th>Tanggal Pinjam</th>
-                        <th>Tanggal Kembali</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($activeLoansList as $loan)
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar-small">
-                                    {{ strtoupper(substr($loan->user->name ?? 'N/A', 0, 2)) }}
+    {{-- Desktop Table View --}}
+    <div class="desktop-table-view">
+        <div class="table-container">
+            <div class="table-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table style="min-width: 680px;">
+                    <thead>
+                        <tr>
+                            <th>Siswa</th>
+                            <th>Barang</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal Pinjam</th>
+                            <th>Tanggal Kembali</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($activeLoansList as $loan)
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar-small">
+                                        {{ strtoupper(substr($loan->user->name ?? 'N/A', 0, 2)) }}
+                                    </div>
+                                    <div class="user-info">
+                                        <p class="user-name">{{ $loan->user->name ?? 'N/A' }}</p>
+                                        <p class="user-email">{{ $loan->user->email ?? '-' }}</p>
+                                    </div>
                                 </div>
-                                <div class="user-info">
-                                    <p class="user-name">{{ $loan->user->name ?? 'N/A' }}</p>
-                                    <p class="user-email">{{ $loan->user->email ?? '-' }}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <p class="item-name">{{ $loan->item->name ?? 'N/A' }}</p>
-                        </td>
-                        <td>
-                            <p class="quantity">{{ $loan->quantity }} unit</p>
-                        </td>
-                        <td>
-                            <p class="date-text">{{ \Carbon\Carbon::parse($loan->borrow_date)->format('d M Y') }}</p>
-                        </td>
-                        <td>
-                            <p class="date-text {{ $loan->return_date < now() ? 'overdue' : '' }}">
-                                {{ \Carbon\Carbon::parse($loan->return_date)->format('d M Y') }} @if($loan->return_time) · {{ $loan->return_time }}@endif
-                            </p>
-                        </td>
-                        <td>
-                            @php
-                                $isOverdue = $loan->return_date < now();
-                                $statusClass = $isOverdue ? 'status-overdue' : ($loan->status === 'approved' ? 'status-approved' : 'status-borrowed');
-                                $statusLabel = $isOverdue ? 'Terlambat' : ($loan->status === 'approved' ? 'Disetujui' : 'Dipinjam');
-                            @endphp
-                            <span class="status-badge {{ $statusClass }}">
-                                {{ $statusLabel }}
-                            </span>
-                        </td>
-                        <td>
-                            <a href="{{ route('teacher.returns') }}" class="btn">
-                                Proses Kembali
-                            </a>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                            </td>
+                            <td>
+                                <p class="item-name">{{ $loan->item_display_name }}</p>
+                                @if($loan->items->isNotEmpty() && $loan->items->count() > 1)
+                                    <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+                                        @foreach($loan->items as $detail)
+                                            <span>• {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}</span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </td>
+                            <td>
+                                <p class="quantity">{{ $loan->totalQuantity() }} unit</p>
+                            </td>
+                            <td>
+                                <p class="date-text">{{ \Carbon\Carbon::parse($loan->borrow_date)->format('d M Y') }}</p>
+                            </td>
+                            <td>
+                                <p class="date-text {{ $loan->return_date < now() ? 'overdue' : '' }}">
+                                    {{ \Carbon\Carbon::parse($loan->return_date)->format('d M Y') }} @if($loan->return_time) · {{ $loan->return_time }}@endif
+                                </p>
+                            </td>
+                            <td>
+                                @php
+                                    $isOverdue = $loan->return_date < now();
+                                    $statusClass = $isOverdue ? 'status-overdue' : ($loan->status === 'approved' ? 'status-approved' : 'status-borrowed');
+                                    $statusLabel = $isOverdue ? 'Terlambat' : ($loan->status === 'approved' ? 'Disetujui' : 'Dipinjam');
+                                @endphp
+                                <span class="status-badge {{ $statusClass }}">
+                                    {{ $statusLabel }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ route('teacher.returns') }}" class="btn">
+                                    Proses Kembali
+                                </a>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
+    </div>
+
+    {{-- Mobile Cards View --}}
+    <div class="mobile-cards-view">
+        @foreach($activeLoansList as $loan)
+            @php
+                $isOverdue = $loan->return_date < now();
+                $statusKey = $isOverdue ? 'overdue' : ($loan->status === 'approved' ? 'approved' : 'borrowed');
+                $statusLabel = $isOverdue ? 'Terlambat' : ($loan->status === 'approved' ? 'Disetujui' : 'Dipinjam');
+                $cardStatusClass = 'mc-card--' . $statusKey;
+                $badgeClass = 'mc-badge--' . $statusKey;
+            @endphp
+            <div class="mc-card {{ $cardStatusClass }}">
+                <div class="mc-card-header">
+                    <div>
+                        <div class="mc-card-user">{{ $loan->user->name ?? 'Siswa' }}</div>
+                        <div class="mc-card-user-sub">NIS/Email: {{ $loan->user->nis ?? $loan->user->email ?? '-' }}</div>
+                    </div>
+                    <span class="mc-badge {{ $badgeClass }}">
+                        <span class="mc-badge-dot"></span>
+                        {{ $statusLabel }}
+                    </span>
+                </div>
+
+                <div class="mc-card-details">
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Barang:</span>
+                        <span class="mc-card-val">{{ $loan->item_display_name }}</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Jumlah:</span>
+                        <span class="mc-card-val">{{ $loan->totalQuantity() }} unit</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Tgl Pinjam:</span>
+                        <span class="mc-card-val">{{ \Carbon\Carbon::parse($loan->borrow_date)->format('d/m/Y') }}</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Tgl Kembali:</span>
+                        <span class="mc-card-val {{ $isOverdue ? 'mc-card-val-overdue' : '' }}">
+                            {{ \Carbon\Carbon::parse($loan->return_date)->format('d/m/Y') }} @if($loan->return_time) · {{ $loan->return_time }}@endif
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mc-card-actions">
+                    <a href="{{ route('teacher.returns') }}" class="mc-card-btn mc-card-btn-primary">
+                        Proses Kembali
+                    </a>
+                </div>
+            </div>
+        @endforeach
     </div>
     @else
     <div class="empty-state">

@@ -67,9 +67,11 @@
     }
     .table-wrapper {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     table {
         width: 100%;
+        min-width: 620px;
         border-collapse: collapse;
     }
     thead {
@@ -96,6 +98,8 @@
     }
     td {
         padding: 16px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     .user-cell {
         display: flex;
@@ -202,6 +206,17 @@
         font-size: 14px;
         color: var(--muted);
     }
+
+    /* Mobile responsive table fixes */
+    @media (max-width: 768px) {
+        table { min-width: 600px; font-size: 12px; }
+        th { padding: 10px 12px; font-size: 10px; }
+        td { padding: 10px 12px; font-size: 12px; }
+        .page-header { padding: 16px; }
+        .stats-container { flex-wrap: wrap; }
+        .stat-box { min-width: 70px; padding: 10px 12px; }
+        .user-cell { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
 </style>
 
 <div>
@@ -240,7 +255,7 @@
 
     {{-- Ready for Return List --}}
     @php
-        $readyForReturn = \App\Models\BorrowingRequest::with(['user', 'item'])
+        $readyForReturn = \App\Models\BorrowingRequest::with(['user', 'itemWithTrashed', 'item', 'items.itemWithTrashed', 'items.item'])
             ->where('teacher_id', auth()->id())
             ->where('tipe_peminjam', 'siswa')
             ->whereIn('status', ['borrowed'])
@@ -249,66 +264,131 @@
     @endphp
 
     @if($readyForReturn->isNotEmpty())
-    <div class="table-container">
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Siswa</th>
-                        <th>Barang</th>
-                        <th>Jumlah</th>
-                        <th>Tanggal Pinjam</th>
-                        <th>Jatuh Tempo</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($readyForReturn as $item)
-                    <tr>
-                        <td>
-                            <div class="user-cell">
-                                <div class="user-avatar-small">
-                                    {{ strtoupper(substr($item->user->name ?? 'N/A', 0, 2)) }}
+    {{-- Desktop Table View --}}
+    <div class="desktop-table-view">
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Siswa</th>
+                            <th>Barang</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal Pinjam</th>
+                            <th>Jatuh Tempo</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($readyForReturn as $item)
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar-small">
+                                        {{ strtoupper(substr($item->user->name ?? 'N/A', 0, 2)) }}
+                                    </div>
+                                    <div class="user-info">
+                                        <p class="user-name">{{ $item->user->name ?? 'N/A' }}</p>
+                                        <p class="user-email">{{ $item->user->email ?? '-' }}</p>
+                                    </div>
                                 </div>
-                                <div class="user-info">
-                                    <p class="user-name">{{ $item->user->name ?? 'N/A' }}</p>
-                                    <p class="user-email">{{ $item->user->email ?? '-' }}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <p class="item-name">{{ $item->item->name ?? 'N/A' }}</p>
-                        </td>
-                        <td>
-                            <p class="quantity">{{ $item->quantity }} unit</p>
-                        </td>
-                        <td>
-                            <p class="date-text">{{ \Carbon\Carbon::parse($item->borrow_date)->format('d M Y') }}</p>
-                        </td>
-                        <td>
-                            <p class="date-text {{ $item->return_date < now() ? 'overdue' : '' }}">
-                                {{ \Carbon\Carbon::parse($item->return_date)->format('d M Y') }} @if($item->return_time) · {{ $item->return_time }}@endif
-                            </p>
-                        </td>
-                        <td>
-                            <span class="status-badge status-borrowed">
-                                Dipinjam
-                            </span>
-                        </td>
-                        <td>
-                            <form action="{{ route('teacher.returns.process', $item->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                <button type="submit" class="btn btn-success">
-                                    Proses Kembali
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                            </td>
+                            <td>
+                                <p class="item-name">{{ $item->item_display_name }}</p>
+                                @if($item->items && $item->items->count() > 1)
+                                    <div style="font-size:11px; color:var(--muted); margin-top:2px;">
+                                        @foreach($item->items as $sub)
+                                            <span>• {{ $sub->itemWithTrashed->name ?? $sub->item->name ?? 'Item' }} ({{ $sub->quantity }})</span>{{ !$loop->last ? ' ' : '' }}
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </td>
+                            <td>
+                                <p class="quantity">{{ $item->totalQuantity() }} unit</p>
+                            </td>
+                            <td>
+                                <p class="date-text">{{ \Carbon\Carbon::parse($item->borrow_date)->format('d M Y') }}</p>
+                            </td>
+                            <td>
+                                <p class="date-text {{ $item->return_date < now() ? 'overdue' : '' }}">
+                                    {{ \Carbon\Carbon::parse($item->return_date)->format('d M Y') }} @if($item->return_time) · {{ $item->return_time }}@endif
+                                </p>
+                            </td>
+                            <td>
+                                <span class="status-badge status-borrowed">
+                                    Dipinjam
+                                </span>
+                            </td>
+                            <td>
+                                <form action="{{ route('teacher.returns.process', $item->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success">
+                                        Proses Kembali
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
+    </div>
+
+    {{-- Mobile Cards View --}}
+    <div class="mobile-cards-view">
+        @foreach($readyForReturn as $item)
+            @php
+                $isOverdue = $item->return_date < now();
+                $statusKey = $isOverdue ? 'overdue' : 'borrowed';
+                $statusLabel = $isOverdue ? 'Terlambat' : 'Dipinjam';
+                $cardStatusClass = 'mc-card--' . $statusKey;
+                $badgeClass = 'mc-badge--' . $statusKey;
+            @endphp
+            <div class="mc-card {{ $cardStatusClass }}">
+                <div class="mc-card-header">
+                    <div>
+                        <div class="mc-card-user">{{ $item->user->name ?? 'Siswa' }}</div>
+                        <div class="mc-card-user-sub">NIS/Email: {{ $item->user->nis ?? $item->user->email ?? '-' }}</div>
+                    </div>
+                    <span class="mc-badge {{ $badgeClass }}">
+                        <span class="mc-badge-dot"></span>
+                        {{ $statusLabel }}
+                    </span>
+                </div>
+
+                <div class="mc-card-details">
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Barang:</span>
+                        <span class="mc-card-val">{{ $item->item_display_name }}</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Jumlah:</span>
+                        <span class="mc-card-val">{{ $item->totalQuantity() }} unit</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Tgl Pinjam:</span>
+                        <span class="mc-card-val">{{ \Carbon\Carbon::parse($item->borrow_date)->format('d/m/Y') }}</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Jatuh Tempo:</span>
+                        <span class="mc-card-val {{ $isOverdue ? 'mc-card-val-overdue' : '' }}">
+                            {{ \Carbon\Carbon::parse($item->return_date)->format('d/m/Y') }} @if($item->return_time) · {{ $item->return_time }}@endif
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mc-card-actions">
+                    <form action="{{ route('teacher.returns.process', $item->id) }}" method="POST" style="width: 100%;">
+                        @csrf
+                        <button type="submit" class="mc-card-btn mc-card-btn-primary" style="width: 100%;">
+                            Proses Kembali
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endforeach
     </div>
     @else
     <div class="empty-state">

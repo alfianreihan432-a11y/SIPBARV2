@@ -173,6 +173,25 @@
     .reset-btn:hover {
         background: var(--border);
     }
+
+    /* Desktop/Mobile View Switching */
+    .desktop-table-view {
+        display: block;
+    }
+    .mobile-cards-view {
+        display: none;
+    }
+
+    @media (max-width: 767px) {
+        .desktop-table-view {
+            display: none !important;
+        }
+        .mobile-cards-view {
+            display: flex !important;
+            flex-direction: column;
+            gap: 12px;
+        }
+    }
 </style>
 
 <div class="section-card">
@@ -214,48 +233,132 @@
     </div>
     
     @if($returns->count() > 0)
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Barang</th>
-                    <th>Jumlah</th>
-                    <th>Tanggal Pinjam</th>
-                    <th>Tanggal Kembali</th>
-                    <th>Kondisi Barang</th>
-                    <th>Catatan</th>
-                    <th>Status Verifikasi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($returns as $return)
+        {{-- Desktop Table View --}}
+        <div class="desktop-table-view">
+        <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px;">
+            <table class="table" style="min-width: 650px;">
+                <thead>
                     <tr>
-                        <td>{{ $return->item->name }}</td>
-                        <td>{{ $return->quantity }}</td>
-                        <td>{{ $return->borrow_date->format('d/m/Y') }}</td>
-                        <td>{{ $return->returned_at->format('d/m/Y H:i') }}</td>
-                        <td>
-                            @if($return->return_condition === 'Baik')
-                                <span class="condition-badge condition-baik">Baik</span>
-                            @elseif($return->return_condition === 'Rusak Ringan')
-                                <span class="condition-badge condition-rusak-ringan">Rusak Ringan</span>
-                            @elseif($return->return_condition === 'Rusak Berat')
-                                <span class="condition-badge condition-rusak-berat">Rusak Berat</span>
-                            @else
-                                <span class="condition-badge">{{ $return->return_condition }}</span>
-                            @endif
-                        </td>
-                        <td>{{ Str::limit($return->return_notes ?? '-', 20) }}</td>
-                        <td>
-                            @if($return->checkin_by)
-                                <span class="verification-badge verification-verified">Terverifikasi</span>
-                            @else
-                                <span class="verification-badge verification-pending">Menunggu Verifikasi</span>
-                            @endif
-                        </td>
+                        <th>Barang</th>
+                        <th>Jumlah</th>
+                        <th>Tanggal Pinjam</th>
+                        <th>Tanggal Kembali</th>
+                        <th>Kondisi Barang</th>
+                        <th>Catatan</th>
+                        <th>Status Verifikasi</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach($returns as $return)
+                        <tr>
+                            <td>
+                                <div style="font-weight: 700; color: var(--text);">{{ $return->item_display_name }}</div>
+                                @if($return->items->isNotEmpty() && $return->items->count() > 1)
+                                <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+                                    @foreach($return->items as $detail)
+                                        <span>• {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}</span>
+                                    @endforeach
+                                </div>
+                                @endif
+                            </td>
+                            <td><strong>{{ $return->totalQuantity() }}</strong> unit</td>
+                            <td>{{ $return->borrow_date ? $return->borrow_date->format('d/m/Y') : '-' }}</td>
+                            <td>{{ $return->returned_at ? $return->returned_at->format('d/m/Y H:i') : '-' }}</td>
+                            <td>
+                                @if($return->return_condition === 'Baik')
+                                    <span class="condition-badge condition-baik">Baik</span>
+                                @elseif($return->return_condition === 'Rusak Ringan')
+                                    <span class="condition-badge condition-rusak-ringan">Rusak Ringan</span>
+                                @elseif($return->return_condition === 'Rusak Berat')
+                                    <span class="condition-badge condition-rusak-berat">Rusak Berat</span>
+                                @else
+                                    <span class="condition-badge">{{ $return->return_condition ?? '-' }}</span>
+                                @endif
+                            </td>
+                            <td>{{ Str::limit($return->return_notes ?? '-', 30) }}</td>
+                            <td>
+                                @if($return->checkin_by)
+                                    <span class="verification-badge verification-verified">Terverifikasi</span>
+                                @else
+                                    <span class="verification-badge verification-pending">Menunggu Verifikasi</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        </div>
+
+        {{-- Mobile Cards View --}}
+        <div class="mobile-cards-view">
+            @foreach($returns as $return)
+            @php
+                $conditionClass = 'mc-card--returned';
+                if($return->return_condition === 'Baik') {
+                    $conditionClass = 'mc-card--returned';
+                } elseif($return->return_condition === 'Rusak Ringan') {
+                    $conditionClass = 'mc-card--pending';
+                } elseif($return->return_condition === 'Rusak Berat') {
+                    $conditionClass = 'mc-card--rejected';
+                }
+                $verifiedBadge = $return->checkin_by ? 'Terverifikasi' : 'Menunggu';
+                $verifiedClass = $return->checkin_by ? 'mc-badge--returned' : 'mc-badge--pending';
+            @endphp
+            <div class="mc-card {{ $conditionClass }}">
+                <div class="mc-card-header">
+                    <div>
+                        <div class="mc-card-user">{{ auth()->user()->name ?? 'Guru' }}</div>
+                        <div class="mc-card-user-sub">NIP: {{ auth()->user()->nip ?? '-' }}</div>
+                    </div>
+                    <span class="mc-badge {{ $verifiedClass }}">
+                        <span class="mc-badge-dot"></span>
+                        {{ $verifiedBadge }}
+                    </span>
+                </div>
+
+                <div class="mc-card-details">
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Barang:</span>
+                        <span class="mc-card-val">{{ $return->item_display_name }}</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Jumlah:</span>
+                        <span class="mc-card-val">{{ $return->totalQuantity() }} unit</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Tgl Pinjam:</span>
+                        <span class="mc-card-val">{{ $return->borrow_date ? $return->borrow_date->format('d/m/Y') : '-' }}</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Tgl Kembali:</span>
+                        <span class="mc-card-val">{{ $return->returned_at ? $return->returned_at->format('d/m/Y H:i') : '-' }}</span>
+                    </div>
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Kondisi:</span>
+                        <span class="mc-card-val">{{ $return->return_condition ?? '-' }}</span>
+                    </div>
+                </div>
+
+                @if($return->items->isNotEmpty() && $return->items->count() > 1)
+                <div class="mc-card-item">
+                    <div class="mc-card-item-name">Rincian Barang ({{ $return->items->count() }}):</div>
+                    @foreach($return->items as $detail)
+                    <div class="mc-card-item-detail">
+                        • {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }})
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+
+                <div class="mc-card-actions">
+                    <button type="button" class="mc-card-btn mc-card-btn-primary">
+                        Detail
+                    </button>
+                </div>
+            </div>
+            @endforeach
+        </div>
         
         @if($returns->hasPages())
             <div style="margin-top: 20px; display: flex; justify-content: center; gap: 8px;">

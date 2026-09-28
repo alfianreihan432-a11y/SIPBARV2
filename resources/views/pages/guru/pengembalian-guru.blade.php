@@ -81,12 +81,20 @@
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             </div>
             <div class="g-loan-content">
-                <div class="g-loan-name">{{ $b->item?->name ?? $b->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
-                <div class="g-loan-code">ID: #{{ $b->id }} · Qty: {{ $b->quantity }} unit
+                <div class="g-loan-name">{{ $b->item_display_name }}</div>
+                <div class="g-loan-code">ID: #{{ $b->id }} · Qty: {{ $b->totalQuantity() ?? 1 }} unit
                     @if($b->approvedByKajur)
                     · <span>Disetujui oleh {{ $b->approvedByKajur->name }}</span>
                     @endif
                 </div>
+                @if($b->items->isNotEmpty() && $b->items->count() > 1)
+                <div style="font-size: 11.5px; color: var(--muted); margin-bottom: 6px; background: var(--bg3); padding: 5px 10px; border-radius: 6px; display: inline-flex; flex-wrap: wrap; gap: 6px;">
+                    <span style="font-weight: 700;">Rincian:</span>
+                    @foreach($b->items as $detail)
+                        <span>{{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }}){{ !$loop->last ? ' •' : '' }}</span>
+                    @endforeach
+                </div>
+                @endif
                 <div class="g-loan-meta">
                     <div class="g-loan-meta-item">
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -165,8 +173,16 @@
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
             </div>
             <div class="g-loan-content">
-                <div class="g-loan-name">{{ $ret->item?->name ?? $ret->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
-                <div class="g-loan-code">ID: #{{ $ret->id }} · Qty: {{ $ret->quantity }} unit</div>
+                <div class="g-loan-name">{{ $ret->item_display_name }}</div>
+                <div class="g-loan-code">ID: #{{ $ret->id }} · Qty: {{ $ret->totalQuantity() ?? 1 }} unit</div>
+                @if($ret->items->isNotEmpty() && $ret->items->count() > 1)
+                <div style="font-size: 11.5px; color: var(--muted); margin-bottom: 6px; background: var(--bg3); padding: 5px 10px; border-radius: 6px; display: inline-flex; flex-wrap: wrap; gap: 6px;">
+                    <span style="font-weight: 700;">Rincian:</span>
+                    @foreach($ret->items as $detail)
+                        <span>{{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }}){{ !$loop->last ? ' •' : '' }}</span>
+                    @endforeach
+                </div>
+                @endif
                 <div class="g-loan-meta">
                     @if($ret->returned_at)
                     <div class="g-loan-meta-item">
@@ -221,7 +237,7 @@
     @else
         <div class="g-empty" style="padding:32px 24px">
             <div class="g-empty-icon-wrap">
-                <svg xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
             <div class="g-empty-title">Belum ada riwayat pengembalian</div>
             <div class="g-empty-sub">Pengembalian barang yang sudah kamu ajukan akan muncul di sini</div>

@@ -305,7 +305,7 @@
 {{-- ═══ SECTION GRID KATALOG ═══ --}}
 <div class="section-card">
     <div class="section-header">
-        <h2 class="section-title">Katalog Barang</h2>
+        <h2 class="section-title">Katalog Barang Tersedia</h2>
         <span id="itemsCountDisplay" style="font-size: 13px; color: var(--muted); font-weight: 600;">
             {{ $items->count() }} barang
         </span>

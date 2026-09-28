@@ -30,14 +30,25 @@
             </div>
         </div>
 
-        {{-- Ringkasan Barang yang Dipinjam (Card Box versi Siswa) --}}
+        {{-- Ringkasan Barang yang Dipinjam --}}
         <div class="item-summary-box">
             <div>
                 <div class="summary-label">Barang yang Dipinjam</div>
-                <div class="summary-name">{{ $borrowing->item?->name ?? 'Barang #' . $borrowing->item_id }}</div>
+                <div class="summary-name">{{ $borrowing->item_display_name }}</div>
                 <div class="summary-meta">
-                    Kode: <strong style="color: var(--text)">{{ $borrowing->item?->code ?? '-' }}</strong> &bull; Qty: <strong style="color: var(--text)">{{ $borrowing->quantity }} Unit</strong>
+                    @if($borrowing->item)
+                        Kode: <strong style="color: var(--text)">{{ $borrowing->item->code ?? '-' }}</strong> &bull; 
+                    @endif
+                    Total Qty: <strong style="color: var(--text)">{{ $borrowing->totalQuantity() ?? 1 }} Unit</strong>
                 </div>
+                @if($borrowing->items->isNotEmpty() && $borrowing->items->count() > 1)
+                <div style="font-size: 11.5px; color: var(--muted); margin-top: 6px; display: flex; flex-direction: column; gap: 3px;">
+                    <span style="font-weight: 700; color: var(--text);">Rincian Barang:</span>
+                    @foreach($borrowing->items as $detail)
+                        <span>• {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }} unit)</span>
+                    @endforeach
+                </div>
+                @endif
             </div>
             <div class="summary-due">
                 <div class="due-label">Jatuh Tempo:</div>
