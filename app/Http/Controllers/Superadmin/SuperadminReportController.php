@@ -46,7 +46,7 @@ class SuperadminReportController extends Controller
         $rejectionRate  = $totalRequests > 0 ? round(($rejectedRequests / $totalRequests) * 100) : 0;
 
         // ─── 10 Recent Activities Across System ───
-        $recentActivities = BorrowingRequest::with(['user', 'itemWithTrashed', 'teacher'])
+        $recentActivities = BorrowingRequest::with(['user', 'itemWithTrashed', 'teacher', 'items.itemWithTrashed', 'items.item'])
             ->latest()
             ->take(10)
             ->get();

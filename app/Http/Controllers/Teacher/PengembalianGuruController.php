@@ -20,14 +20,14 @@ class PengembalianGuruController extends Controller
         $activeBorrowings = BorrowingRequest::where('user_id', Auth::id())
             ->where('tipe_peminjam', 'guru')
             ->whereIn('status', [BorrowingRequest::STATUS_BORROWED, BorrowingRequest::STATUS_APPROVED])
-            ->with(['item', 'approvedByKajur'])
+            ->with(['item', 'itemWithTrashed', 'items.itemWithTrashed', 'items.item', 'approvedByKajur'])
             ->latest()
             ->get();
 
         $completedReturns = BorrowingRequest::where('user_id', Auth::id())
             ->where('tipe_peminjam', 'guru')
             ->where('status', BorrowingRequest::STATUS_RETURNED)
-            ->with(['item', 'approvedByKajur'])
+            ->with(['item', 'itemWithTrashed', 'items.itemWithTrashed', 'items.item', 'approvedByKajur'])
             ->latest()
             ->get();
 
@@ -45,7 +45,7 @@ class PengembalianGuruController extends Controller
         $borrowing = BorrowingRequest::where('user_id', Auth::id())
             ->where('tipe_peminjam', 'guru')
             ->whereIn('status', [BorrowingRequest::STATUS_BORROWED, BorrowingRequest::STATUS_APPROVED])
-            ->with(['item.category'])
+            ->with(['item.category', 'itemWithTrashed.category', 'items.itemWithTrashed.category', 'items.item.category'])
             ->findOrFail($id);
 
         return view('pages.guru.pengembalian-guru-create', [

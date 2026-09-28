@@ -164,7 +164,7 @@ class PeminjamanGuruController extends Controller
     {
         $borrowings = BorrowingRequest::where('user_id', Auth::id())
             ->where('tipe_peminjam', 'guru')
-            ->with(['itemWithTrashed', 'item', 'approvedByKajur', 'qrCode'])
+            ->with(['itemWithTrashed', 'item', 'items.itemWithTrashed', 'items.item', 'approvedByKajur', 'qrCode'])
             ->latest()
             ->get();
 
@@ -185,7 +185,7 @@ class PeminjamanGuruController extends Controller
                 'qr_ready',
                 BorrowingRequest::STATUS_BORROWED,
             ])
-            ->with(['itemWithTrashed', 'item', 'approvedByKajur', 'qrCode'])
+            ->with(['itemWithTrashed', 'item', 'items.itemWithTrashed', 'items.item', 'approvedByKajur', 'qrCode'])
             ->latest()
             ->get();
 

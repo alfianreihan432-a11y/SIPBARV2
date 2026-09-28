@@ -114,16 +114,28 @@ class BorrowingRequest extends Model
 
     public function itemSummary(): string
     {
-        $details = $this->relationLoaded('items') ? $this->items : $this->items()->with('itemWithTrashed')->get();
+        $itemsRel = $this->relationLoaded('items') ? $this->getRelation('items') : $this->items()->with(['itemWithTrashed', 'item'])->get();
+        $details = $itemsRel instanceof \Illuminate\Support\Collection ? $itemsRel : collect($itemsRel);
 
         if ($details->isNotEmpty()) {
             return $details->map(function ($detail) {
-                $itemName = $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia';
-                return $itemName . ' (' . $detail->quantity . ')';
+                if (is_array($detail)) {
+                    $item = isset($detail['item_id']) ? Item::withTrashed()->find($detail['item_id']) : null;
+                    $itemName = $item?->name ?? 'Barang #' . ($detail['item_id'] ?? '-');
+                    return $itemName . ' (' . ($detail['quantity'] ?? 1) . ')';
+                }
+                $item = $detail->relationLoaded('itemWithTrashed') ? $detail->itemWithTrashed : ($detail->itemWithTrashed ?? $detail->item);
+                $itemName = $item?->name ?? 'Barang #' . ($detail->item_id ?? '-');
+                return $itemName . ' (' . ($detail->quantity ?? 1) . ')';
             })->implode(', ');
         }
 
-        return $this->itemWithTrashed?->name ?? $this->item?->name ?? 'Barang tidak tersedia';
+        $singleItem = $this->relationLoaded('itemWithTrashed') ? $this->itemWithTrashed : ($this->itemWithTrashed ?? $this->item);
+        if ($singleItem) {
+            return $singleItem->name;
+        }
+
+        return $this->item_id ? ('Barang #' . $this->item_id) : 'Barang tidak tersedia';
     }
 
     /**
@@ -135,30 +147,50 @@ class BorrowingRequest extends Model
      */
     public function getItemDisplayNameAttribute(): string
     {
-        $details = $this->relationLoaded('items') ? $this->items : $this->items()->with('itemWithTrashed')->get();
+        $itemsRel = $this->relationLoaded('items') ? $this->getRelation('items') : $this->items()->with(['itemWithTrashed', 'item'])->get();
+        $details = $itemsRel instanceof \Illuminate\Support\Collection ? $itemsRel : collect($itemsRel);
 
         if ($details->isNotEmpty()) {
             if ($details->count() === 1) {
                 $detail = $details->first();
-                return $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia';
+                if (is_array($detail)) {
+                    $item = isset($detail['item_id']) ? Item::withTrashed()->find($detail['item_id']) : null;
+                    return $item?->name ?? (isset($detail['item_id']) ? ('Barang #' . $detail['item_id']) : 'Barang tidak tersedia');
+                }
+                $item = $detail->relationLoaded('itemWithTrashed') ? $detail->itemWithTrashed : ($detail->itemWithTrashed ?? $detail->item);
+                return $item?->name ?? ($detail->item_id ? ('Barang #' . $detail->item_id) : 'Barang tidak tersedia');
             }
             $first = $details->first();
-            $firstName = $first->itemWithTrashed?->name ?? $first->item?->name ?? 'Barang';
+            if (is_array($first)) {
+                $item = isset($first['item_id']) ? Item::withTrashed()->find($first['item_id']) : null;
+                $firstName = $item?->name ?? 'Barang';
+                return $firstName . ' (+' . ($details->count() - 1) . ' lainnya)';
+            }
+            $item = $first->relationLoaded('itemWithTrashed') ? $first->itemWithTrashed : ($first->itemWithTrashed ?? $first->item);
+            $firstName = $item?->name ?? 'Barang';
             return $firstName . ' (+' . ($details->count() - 1) . ' lainnya)';
         }
 
-        return $this->itemWithTrashed?->name ?? $this->item?->name ?? 'Barang tidak tersedia';
+        $singleItem = $this->relationLoaded('itemWithTrashed') ? $this->itemWithTrashed : ($this->itemWithTrashed ?? $this->item);
+        if ($singleItem) {
+            return $singleItem->name;
+        }
+
+        return $this->item_id ? ('Barang #' . $this->item_id) : 'Barang tidak tersedia';
     }
 
     public function totalQuantity(): int
     {
-        $details = $this->relationLoaded('items') ? $this->items : $this->items()->get();
+        $itemsRel = $this->relationLoaded('items') ? $this->getRelation('items') : $this->items()->get();
+        $details = $itemsRel instanceof \Illuminate\Support\Collection ? $itemsRel : collect($itemsRel);
 
         if ($details->isNotEmpty()) {
-            return (int) $details->sum('quantity');
+            return (int) $details->sum(function ($detail) {
+                return is_array($detail) ? ($detail['quantity'] ?? 1) : ($detail->quantity ?? 1);
+            });
         }
 
-        return (int) ($this->quantity ?? 0);
+        return (int) ($this->quantity ?? 1);
     }
 
     public function teacher(): BelongsTo
