@@ -7,7 +7,7 @@
 <style>
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 16px;
         margin-bottom: 24px;
     }
@@ -63,6 +63,8 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 8px;
     }
     .section-title {
         font-size: 15px;
@@ -95,9 +97,37 @@
         color: var(--accent-hover);
     }
     
+    /* Table & Scroll Wrapper */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        position: relative;
+    }
+    /* Add scroll indicator for mobile */
+    .table-responsive::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 20px;
+        background: linear-gradient(to right, transparent, var(--bg3));
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .table-responsive.scrolled::after {
+        opacity: 1;
+    }
     .table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 800px; /* Increased for better readability */
+    }
+    .table th, .table td {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     .table th {
         text-align: left;
@@ -108,6 +138,7 @@
         border-bottom: 1px solid var(--border);
         text-transform: uppercase;
         letter-spacing: 0.02em;
+        white-space: nowrap;
     }
     .table td {
         padding: 12px;
@@ -118,6 +149,15 @@
     .table tr:last-child td {
         border-bottom: none;
     }
+
+    /* Mobile Card Stack View */
+    .desktop-table-view {
+        display: block;
+    }
+    .mobile-cards-view {
+        display: none;
+    }
+
     .status-badge {
         display: inline-block;
         padding: 4px 10px;
@@ -126,6 +166,7 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.02em;
+        white-space: nowrap;
     }
     .status-pending { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
     .status-approved { background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); }
@@ -135,13 +176,13 @@
     
     .empty-state {
         text-align: center;
-        padding: 40px 20px;
+        padding: 36px 20px;
         color: var(--muted);
     }
     .empty-state svg {
-        width: 48px;
-        height: 48px;
-        margin-bottom: 12px;
+        width: 44px;
+        height: 44px;
+        margin-bottom: 10px;
         opacity: 0.4;
     }
     .welcome-banner {
@@ -185,6 +226,76 @@
         background: #fdf2f4;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 768px) {
+        .desktop-table-view {
+            display: none !important;
+        }
+        .mobile-cards-view {
+            display: flex !important;
+            flex-direction: column;
+            gap: 12px;
+        }
+        /* Ensure table wrapper scrolls properly on mobile */
+        .table-responsive {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        .table {
+            min-width: 640px !important;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .stat-card {
+            padding: 14px;
+            gap: 12px;
+        }
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+        }
+        .stat-info h3 {
+            font-size: 22px;
+        }
+        .stat-info p {
+            font-size: 11px;
+        }
+        .section-card {
+            padding: 16px 14px;
+        }
+        .welcome-banner {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 18px;
+            gap: 14px;
+        }
+        .welcome-cta {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 8px;
+        }
+        .stat-card {
+            padding: 12px 10px;
+            gap: 10px;
+        }
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+        }
+        .stat-info h3 {
+            font-size: 20px;
+        }
     }
 </style>
 
@@ -265,6 +376,7 @@
     </div>
 </div>
 
+{{-- SECTION: Permohonan Peminjaman Terbaru --}}
 <div class="section-card">
     <div class="section-header">
         <h2 class="section-title">Permohonan Peminjaman Terbaru</h2>
@@ -274,77 +386,171 @@
     </div>
     
     @if($pendingApprovals->count() > 0)
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Guru</th>
-                    <th>Barang</th>
-                    <th>Jumlah</th>
-                    <th>Tanggal Pinjam</th>
-                    <th>Status</th>
-                    <th style="text-align: right;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($pendingApprovals as $request)
-                    @php 
-                        $items = $request->items->count() ? $request->items : collect([$request->item])->filter();
-                        $itemsData = $items->map(function($d) use ($request) {
-                            $it = ($d instanceof \App\Models\Item) ? $d : ($d->itemWithTrashed ?? $d->item ?? null);
-                            return [
-                                'name' => $it ? $it->name : 'Barang tidak tersedia',
-                                'code' => $it ? ($it->code ?? '-') : '-',
-                                'category' => $it && $it->category ? $it->category->name : '-',
-                                'quantity' => ($d instanceof \App\Models\Item) ? ($request->quantity ?? 1) : ($d->quantity ?? $request->quantity ?? 1),
-                            ];
-                        });
-                        $modalData = [
-                            'id' => $request->id,
-                            'guru_name' => $request->user ? $request->user->name : '-',
-                            'guru_nip' => $request->user ? ($request->user->nip ?? '-') : '-',
-                            'guru_phone' => $request->user ? ($request->user->phone ?? '-') : '-',
-                            'borrow_date' => $request->borrow_date ? $request->borrow_date->format('d/m/Y') : '-',
-                            'return_date' => $request->return_date ? $request->return_date->format('d/m/Y') : '-',
-                            'purpose' => $request->purpose ?? '-',
-                            'notes' => $request->notes ?? '',
-                            'items' => $itemsData,
-                            'total_units' => $request->items->sum('quantity') ?: ($request->quantity ?? 0),
-                            'approve_url' => route('kajur.approve-request', $request->id),
-                            'reject_url' => route('kajur.reject-request', $request->id),
+        {{-- 1. Desktop Table View (>= 769px) --}}
+        <div class="desktop-table-view">
+            <div class="table-responsive" onscroll="handleTableScroll(this)">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Guru</th>
+                            <th>Barang</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal Pinjam</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pendingApprovals as $request)
+                            @php 
+                                $items = $request->items->count() ? $request->items : collect([$request->item])->filter();
+                                $itemsData = $items->map(function($d) use ($request) {
+                                    $it = ($d instanceof \App\Models\Item) ? $d : ($d->itemWithTrashed ?? $d->item ?? null);
+                                    return [
+                                        'name' => $it ? $it->name : 'Barang tidak tersedia',
+                                        'code' => $it ? ($it->code ?? '-') : '-',
+                                        'category' => $it && $it->category ? $it->category->name : '-',
+                                        'quantity' => ($d instanceof \App\Models\Item) ? ($request->quantity ?? 1) : ($d->quantity ?? $request->quantity ?? 1),
+                                    ];
+                                });
+                                $totalQty = $request->totalQuantity();
+                                $modalData = [
+                                    'id' => $request->id,
+                                    'guru_name' => $request->user ? $request->user->name : '-',
+                                    'guru_nip' => $request->user ? ($request->user->nip ?? '-') : '-',
+                                    'guru_phone' => $request->user ? ($request->user->phone ?? '-') : '-',
+                                    'borrow_date' => $request->borrow_date ? $request->borrow_date->format('d/m/Y') : '-',
+                                    'return_date' => $request->return_date ? $request->return_date->format('d/m/Y') : '-',
+                                    'purpose' => $request->purpose ?? '-',
+                                    'notes' => $request->notes ?? '',
+                                    'items' => $itemsData,
+                                    'total_units' => $totalQty,
+                                    'approve_url' => route('kajur.approve-request', $request->id),
+                                    'reject_url' => route('kajur.reject-request', $request->id),
+                                ];
+                            @endphp
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 700; color: var(--text);">{{ $request->user->name ?? 'Guru' }}</div>
+                                    <div style="font-size: 11px; color: var(--muted);">NIP: {{ $request->user->nip ?? '-' }}</div>
+                                </td>
+                                <td>
+                                    @foreach($items as $detail)
+                                        @php
+                                            $detailName = ($detail instanceof \App\Models\Item) ? $detail->name : ($detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia');
+                                            $detailQty = ($detail instanceof \App\Models\Item) ? ($request->quantity ?? 1) : ($detail->quantity ?? $request->quantity ?? 1);
+                                        @endphp
+                                        <div>
+                                            {{ $detailName }}
+                                            @if($items->count() > 1)
+                                                <span style="font-weight:600; color:var(--muted); font-size:12px;">({{ $detailQty }} unit)</span>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </td>
+                                <td><strong>{{ $totalQty }}</strong> unit</td>
+                                <td>{{ $request->borrow_date ? $request->borrow_date->format('d/m/Y') : '-' }}</td>
+                                <td>
+                                    <span class="status-badge status-pending">Menunggu</span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="button" 
+                                            onclick='openApprovalModal(@json($modalData))'
+                                            class="view-all-btn" 
+                                            style="background: rgba(133, 30, 42, 0.08); border: 1px solid rgba(133, 30, 42, 0.2); cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        Review & Proses
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- 2. Mobile Card Stack View (<= 768px) --}}
+        <div class="mobile-cards-view">
+            @foreach($pendingApprovals as $request)
+                @php 
+                    $items = $request->items->count() ? $request->items : collect([$request->item])->filter();
+                    $itemsData = $items->map(function($d) use ($request) {
+                        $it = ($d instanceof \App\Models\Item) ? $d : ($d->itemWithTrashed ?? $d->item ?? null);
+                        return [
+                            'name' => $it ? $it->name : 'Barang tidak tersedia',
+                            'code' => $it ? ($it->code ?? '-') : '-',
+                            'category' => $it && $it->category ? $it->category->name : '-',
+                            'quantity' => ($d instanceof \App\Models\Item) ? ($request->quantity ?? 1) : ($d->quantity ?? $request->quantity ?? 1),
                         ];
-                    @endphp
-                    <tr>
-                        <td>
-                            <div style="font-weight: 700; color: var(--text);">{{ $request->user->name }}</div>
-                            <div style="font-size: 11px; color: var(--muted);">NIP: {{ $request->user->nip ?? '-' }}</div>
-                        </td>
-                        <td>
-                            @foreach($items as $detail)
-                                @php
-                                    $detailName = ($detail instanceof \App\Models\Item) ? $detail->name : ($detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia');
-                                    $detailQty = ($detail instanceof \App\Models\Item) ? ($request->quantity ?? 1) : ($detail->quantity ?? $request->quantity ?? 1);
-                                @endphp
-                                <div>{{ $detailName }} <span style="font-weight:700; color:var(--accent);">({{ $detailQty }} unit)</span></div>
-                            @endforeach
-                        </td>
-                        <td><strong>{{ $request->items->sum('quantity') ?: ($request->quantity ?? 0) }}</strong> unit</td>
-                        <td>{{ $request->borrow_date ? $request->borrow_date->format('d/m/Y') : '-' }}</td>
-                        <td>
-                            <span class="status-badge status-pending">Menunggu</span>
-                        </td>
-                        <td style="text-align: right;">
-                            <button type="button" 
-                                    onclick='openApprovalModal(@json($modalData))'
-                                    class="view-all-btn" 
-                                    style="background: rgba(133, 30, 42, 0.08); border: 1px solid rgba(133, 30, 42, 0.2); cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                Review & Proses
-                            </button>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                    });
+                    $totalQty = $request->totalQuantity();
+                    $modalData = [
+                        'id' => $request->id,
+                        'guru_name' => $request->user ? $request->user->name : '-',
+                        'guru_nip' => $request->user ? ($request->user->nip ?? '-') : '-',
+                        'guru_phone' => $request->user ? ($request->user->phone ?? '-') : '-',
+                        'borrow_date' => $request->borrow_date ? $request->borrow_date->format('d/m/Y') : '-',
+                        'return_date' => $request->return_date ? $request->return_date->format('d/m/Y') : '-',
+                        'purpose' => $request->purpose ?? '-',
+                        'notes' => $request->notes ?? '',
+                        'items' => $itemsData,
+                        'total_units' => $totalQty,
+                        'approve_url' => route('kajur.approve-request', $request->id),
+                        'reject_url' => route('kajur.reject-request', $request->id),
+                    ];
+                @endphp
+                <div class="mc-card mc-card--pending">
+                    <div class="mc-card-header">
+                        <div>
+                            <div class="mc-card-user">{{ $request->user->name ?? 'Guru' }}</div>
+                            <div class="mc-card-user-sub">NIP: {{ $request->user->nip ?? '-' }}</div>
+                        </div>
+                        <span class="mc-badge mc-badge--pending">
+                            <span class="mc-badge-dot"></span>
+                            Menunggu
+                        </span>
+                    </div>
+
+                    <div class="mc-card-details">
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Barang:</span>
+                            <div class="mc-card-val" style="text-align: right;">
+                                @foreach($items as $detail)
+                                    @php
+                                        $detailName = ($detail instanceof \App\Models\Item) ? $detail->name : ($detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia');
+                                        $detailQty = ($detail instanceof \App\Models\Item) ? ($request->quantity ?? 1) : ($detail->quantity ?? $request->quantity ?? 1);
+                                    @endphp
+                                    <div>{{ $detailName }} <span style="color: var(--accent); font-weight: 700;">({{ $detailQty }} unit)</span></div>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Total Unit:</span>
+                            <span class="mc-card-val"><strong>{{ $totalQty }}</strong> unit</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Tgl Pinjam:</span>
+                            <span class="mc-card-val">{{ $request->borrow_date ? $request->borrow_date->format('d/m/Y') : '-' }}</span>
+                        </div>
+                        @if($request->return_date)
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Tgl Kembali:</span>
+                            <span class="mc-card-val">{{ $request->return_date->format('d/m/Y') }} {{ $request->return_time ?? '' }}</span>
+                        </div>
+                        @endif
+                    </div>
+
+                    <div class="mc-card-actions">
+                        <button type="button"
+                                onclick='openApprovalModal(@json($modalData))'
+                                class="mc-card-btn mc-card-btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            Review & Proses
+                        </button>
+                    </div>
+                </div>
+            @endforeach
+        </div>
     @else
         <div class="empty-state">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -355,6 +561,7 @@
     @endif
 </div>
 
+{{-- SECTION: Peminjaman Aktif --}}
 <div class="section-card">
     <div class="section-header">
         <h2 class="section-title">Peminjaman Aktif</h2>
@@ -364,39 +571,112 @@
     </div>
     
     @if($activeBorrowings->count() > 0)
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Guru</th>
-                    <th>Barang</th>
-                    <th>Jumlah</th>
-                    <th>Tanggal Pinjam</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($activeBorrowings as $borrowing)
-                    @php $items = $borrowing->items->count() ? $borrowing->items : collect([$borrowing->item])->filter(); @endphp
-                    <tr>
-                        <td>{{ $borrowing->user->name }}</td>
-                        <td>
-                            @foreach($items as $detail)
-                                {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia' }} ({{ $detail->quantity ?? $borrowing->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}
-                            @endforeach
-                        </td>
-                        <td>{{ $borrowing->items->sum('quantity') ?: ($borrowing->quantity ?? 0) }}</td>
-                        <td>{{ $borrowing->borrow_date ? $borrowing->borrow_date->format('d/m/Y') : '-' }}</td>
-                        <td>
-                            @if($borrowing->status === 'approved')
-                                <span class="status-badge status-approved">Disetujui</span>
-                            @elseif($borrowing->status === 'borrowed')
-                                <span class="status-badge status-borrowed">Dipinjam</span>
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+        {{-- 1. Desktop Table View (>= 769px) --}}
+        <div class="desktop-table-view">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Guru</th>
+                            <th>Barang</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal Pinjam</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($activeBorrowings as $borrowing)
+                            @php 
+                                $items = $borrowing->items->count() ? $borrowing->items : collect([$borrowing->item])->filter(); 
+                                $totalQty = $borrowing->totalQuantity();
+                            @endphp
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 700; color: var(--text);">{{ $borrowing->user->name ?? 'Guru' }}</div>
+                                </td>
+                                <td>
+                                    @foreach($items as $detail)
+                                        @php
+                                            $detailName = ($detail instanceof \App\Models\Item) ? $detail->name : ($detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia');
+                                            $detailQty = ($detail instanceof \App\Models\Item) ? ($borrowing->quantity ?? 1) : ($detail->quantity ?? $borrowing->quantity ?? 1);
+                                        @endphp
+                                        <div>
+                                            {{ $detailName }}
+                                            @if($items->count() > 1)
+                                                <span style="font-weight:600; color:var(--muted); font-size:12px;">({{ $detailQty }} unit)</span>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </td>
+                                <td><strong>{{ $totalQty }}</strong> unit</td>
+                                <td>{{ $borrowing->borrow_date ? $borrowing->borrow_date->format('d/m/Y') : '-' }}</td>
+                                <td>
+                                    @if($borrowing->status === 'approved')
+                                        <span class="status-badge status-approved">Disetujui</span>
+                                    @elseif($borrowing->status === 'borrowed')
+                                        <span class="status-badge status-borrowed">Dipinjam</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- 2. Mobile Card Stack View (<= 768px) --}}
+        <div class="mobile-cards-view">
+            @foreach($activeBorrowings as $borrowing)
+                @php
+                    $items = $borrowing->items->count() ? $borrowing->items : collect([$borrowing->item])->filter();
+                    $totalQty = $borrowing->totalQuantity();
+                    $cardStatusClass = 'mc-card--' . ($borrowing->status ?? 'pending');
+                    $badgeClass = 'mc-badge--' . ($borrowing->status ?? 'pending');
+                    $badgeLabel = $borrowing->status === 'approved' ? 'Disetujui' : ($borrowing->status === 'borrowed' ? 'Dipinjam' : ucfirst($borrowing->status));
+                @endphp
+                <div class="mc-card {{ $cardStatusClass }}">
+                    <div class="mc-card-header">
+                        <div>
+                            <div class="mc-card-user">{{ $borrowing->user->name ?? 'Guru' }}</div>
+                            <div class="mc-card-user-sub">NIP: {{ $borrowing->user->nip ?? '-' }}</div>
+                        </div>
+                        <span class="mc-badge {{ $badgeClass }}">
+                            <span class="mc-badge-dot"></span>
+                            {{ $badgeLabel }}
+                        </span>
+                    </div>
+
+                    <div class="mc-card-details">
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Barang:</span>
+                            <div class="mc-card-val" style="text-align: right;">
+                                @foreach($items as $detail)
+                                    @php
+                                        $detailName = ($detail instanceof \App\Models\Item) ? $detail->name : ($detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia');
+                                        $detailQty = ($detail instanceof \App\Models\Item) ? ($borrowing->quantity ?? 1) : ($detail->quantity ?? $borrowing->quantity ?? 1);
+                                    @endphp
+                                    <div>{{ $detailName }} <span style="color: var(--accent); font-weight: 700;">({{ $detailQty }} unit)</span></div>
+                                @endforeach
+                            </div>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Total Unit:</span>
+                            <span class="mc-card-val"><strong>{{ $totalQty }}</strong> unit</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Tgl Pinjam:</span>
+                            <span class="mc-card-val">{{ $borrowing->borrow_date ? $borrowing->borrow_date->format('d/m/Y') : '-' }}</span>
+                        </div>
+                        @if($borrowing->return_date)
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Batas Kembali:</span>
+                            <span class="mc-card-val">{{ $borrowing->return_date->format('d/m/Y') }} {{ $borrowing->return_time ?? '' }}</span>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
     @else
         <div class="empty-state">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -408,24 +688,24 @@
 </div>
 
 {{-- MODAL REVIEW & APPROVAL KAJUR --}}
-<div id="kajurApprovalModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 16px;">
-    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 18px; max-width: 580px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: modalPop .2s cubic-bezier(.34,1.56,.64,1);">
+<div id="kajurApprovalModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 14px;">
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: 16px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: modalPop .2s cubic-bezier(.34,1.56,.64,1);">
         
         {{-- Modal Header --}}
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
             <div>
-                <h3 style="font-size: 17px; font-weight: 800; color: var(--text); margin: 0;">Persetujuan Peminjaman Guru</h3>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--text); margin: 0;">Persetujuan Peminjaman Guru</h3>
                 <p style="font-size: 12px; color: var(--muted); margin: 2px 0 0 0;">Verifikasi rincian barang sebelum menyetujui atau menolak</p>
             </div>
             <button type="button" onclick="closeApprovalModal()" style="background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); font-size: 18px; line-height: 1;">&times;</button>
         </div>
 
         {{-- Section 1: Guru Info --}}
-        <div style="background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px;">
-            <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;" id="mGuruAvatar">GR</div>
+        <div style="background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;" id="mGuruAvatar">GR</div>
             <div style="flex: 1; min-width: 0;">
-                <div style="font-weight: 800; font-size: 15px; color: var(--text);" id="mGuruName">-</div>
-                <div style="font-size: 12px; color: var(--muted); display: flex; gap: 12px; margin-top: 2px; flex-wrap: wrap;">
+                <div style="font-weight: 800; font-size: 14.5px; color: var(--text);" id="mGuruName">-</div>
+                <div style="font-size: 11.5px; color: var(--muted); display: flex; gap: 10px; margin-top: 2px; flex-wrap: wrap;">
                     <span>NIP: <strong id="mGuruNip" style="color: var(--text);">-</strong></span>
                     <span>No. WA: <strong id="mGuruPhone" style="color: var(--text);">-</strong></span>
                 </div>
@@ -433,8 +713,8 @@
         </div>
 
         {{-- Section 2: Items List --}}
-        <div style="margin-bottom: 16px;">
-            <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="margin-bottom: 14px;">
+            <div style="font-size: 12.5px; font-weight: 700; color: var(--text); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                 <span>Daftar Barang yang Diajukan</span>
                 <span style="font-size: 11px; background: rgba(133,30,42,0.1); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-weight: 700;" id="mTotalUnits">0 unit</span>
             </div>
@@ -444,7 +724,7 @@
         </div>
 
         {{-- Section 3: Waktu & Keperluan --}}
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
             <div style="background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;">
                 <div style="font-size: 11px; color: var(--muted); font-weight: 600;">Tanggal Pinjam</div>
                 <div style="font-size: 13px; font-weight: 700; color: var(--text); margin-top: 2px;" id="mBorrowDate">-</div>
@@ -455,13 +735,13 @@
             </div>
         </div>
 
-        <div style="background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 20px;">
+        <div style="background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 16px;">
             <div style="font-size: 11px; color: var(--muted); font-weight: 600;">Keperluan / Catatan</div>
-            <div style="font-size: 13px; color: var(--text); margin-top: 4px; line-height: 1.4;" id="mPurpose">-</div>
+            <div style="font-size: 12.5px; color: var(--text); margin-top: 4px; line-height: 1.4;" id="mPurpose">-</div>
         </div>
 
         {{-- Form Reject (Hidden toggle) --}}
-        <div id="mRejectBox" style="display: none; background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 14px; margin-bottom: 20px;">
+        <div id="mRejectBox" style="display: none; background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
             <form id="mRejectForm" method="POST" action="">
                 @csrf
                 <label style="display: block; font-size: 12px; font-weight: 700; color: #b91c1c; margin-bottom: 6px;">
@@ -476,12 +756,12 @@
         </div>
 
         {{-- Action Buttons --}}
-        <div id="mActionButtons" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding-top: 14px; border-top: 1px solid var(--border);">
-            <button type="button" onclick="closeApprovalModal()" class="view-all-btn" style="background: var(--bg3); border: 1px solid var(--border); cursor: pointer; padding: 9px 16px; font-size: 13px;">Tutup</button>
-            <button type="button" onclick="toggleRejectBox(true)" style="background: rgba(239, 68, 68, 0.1); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25); padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;">Tolak</button>
+        <div id="mActionButtons" style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding-top: 14px; border-top: 1px solid var(--border); flex-wrap: wrap;">
+            <button type="button" onclick="closeApprovalModal()" class="view-all-btn" style="background: var(--bg3); border: 1px solid var(--border); cursor: pointer; padding: 9px 14px; font-size: 13px;">Tutup</button>
+            <button type="button" onclick="toggleRejectBox(true)" style="background: rgba(239, 68, 68, 0.1); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25); padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;">Tolak</button>
             <form id="mApproveForm" method="POST" action="" style="margin: 0;">
                 @csrf
-                <button type="submit" onclick="return confirm('Setujui permohonan peminjaman guru ini?')" style="background: #059669; color: #ffffff; border: none; padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <button type="submit" onclick="return confirm('Setujui permohonan peminjaman guru ini?')" style="background: #059669; color: #ffffff; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width: 15px; height: 15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                     Setujui Peminjaman
                 </button>
@@ -514,13 +794,13 @@ function openApprovalModal(data) {
     if (data.items && data.items.length > 0) {
         data.items.forEach(function(it) {
             const row = document.createElement('div');
-            row.style.cssText = 'background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;';
+            row.style.cssText = 'background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px;';
             row.innerHTML = `
                 <div>
                     <div style="font-weight: 700; font-size: 13px; color: var(--text);">${it.name}</div>
                     <div style="font-size: 11px; color: var(--muted);">Kode: ${it.code} · Kategori: ${it.category}</div>
                 </div>
-                <div style="background: rgba(16, 185, 129, 0.1); color: #059669; font-weight: 800; font-size: 12px; padding: 3px 8px; border-radius: 6px;">
+                <div style="background: rgba(16, 185, 129, 0.1); color: #059669; font-weight: 800; font-size: 12px; padding: 3px 8px; border-radius: 6px; white-space: nowrap;">
                     ${it.quantity} unit
                 </div>
             `;
@@ -562,5 +842,13 @@ document.addEventListener('keydown', function(e) {
 document.getElementById('kajurApprovalModal')?.addEventListener('click', function(e) {
     if (e.target === this) closeApprovalModal();
 });
+
+function handleTableScroll(element) {
+    if (element.scrollLeft > 10) {
+        element.classList.add('scrolled');
+    } else {
+        element.classList.remove('scrolled');
+    }
+}
 </script>
 @endsection

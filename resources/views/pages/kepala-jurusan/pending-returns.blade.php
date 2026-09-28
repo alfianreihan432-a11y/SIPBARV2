@@ -235,66 +235,153 @@
     </form>
     
     @if($pendingReturns->count() > 0)
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Guru</th>
-                    <th>Barang</th>
-                    <th>Jumlah</th>
-                    <th>Tanggal Kembali</th>
-                    <th>Kondisi Barang</th>
-                    <th>Catatan</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($pendingReturns as $return)
-                    @php
-                        $borrowing = $return->borrowingRequest;
-                        $item = $borrowing->item ?? $borrowing->itemWithTrashed;
-                    @endphp
-                    <tr>
-                        <td>{{ $return->user->name }}</td>
-                        <td>{{ $item->name }}</td>
-                        <td>{{ $borrowing->quantity }}</td>
-                        <td>{{ $return->created_at->format('d/m/Y H:i') }}</td>
-                        <td>
-                            @if($return->kondisi_barang === 'baik')
-                                <span class="condition-badge condition-baik">Baik</span>
-                            @elseif($return->kondisi_barang === 'rusak_ringan')
-                                <span class="condition-badge condition-rusak-ringan">Rusak Ringan</span>
-                            @elseif($return->kondisi_barang === 'rusak_berat')
-                                <span class="condition-badge condition-rusak-berat">Rusak Berat</span>
-                            @elseif($return->kondisi_barang === 'hilang')
-                                <span class="condition-badge" style="background: rgba(100, 116, 139, 0.15); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.3);">Hilang</span>
-                            @else
-                                <span class="condition-badge">{{ $return->kondisi_label }}</span>
-                            @endif
+        {{-- Desktop Table View --}}
+        <div class="desktop-table-view">
+            <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table class="table" style="min-width: 680px;">
+                    <thead>
+                        <tr>
+                            <th>Guru</th>
+                            <th>Barang</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal Kembali</th>
+                            <th>Kondisi Barang</th>
+                            <th>Catatan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pendingReturns as $return)
+                            @php
+                                $borrowing = $return->borrowingRequest;
+                                $itemName = $borrowing ? $borrowing->item_display_name : ($return->item?->name ?? 'Barang');
+                                $itemQty = $borrowing ? $borrowing->totalQuantity() : 1;
+                            @endphp
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 700; color: var(--text);">{{ $return->user->name ?? 'Guru' }}</div>
+                                </td>
+                                <td>
+                                    <div>{{ $itemName }}</div>
+                                    @if($borrowing && $borrowing->items->isNotEmpty() && $borrowing->items->count() > 1)
+                                        <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+                                            @foreach($borrowing->items as $detail)
+                                                <span>• {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}</span>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </td>
+                                <td><strong>{{ $itemQty }}</strong> unit</td>
+                                <td>{{ $return->created_at->format('d/m/Y H:i') }}</td>
+                                <td>
+                                    @if($return->kondisi_barang === 'baik')
+                                        <span class="condition-badge condition-baik">Baik</span>
+                                    @elseif($return->kondisi_barang === 'rusak_ringan')
+                                        <span class="condition-badge condition-rusak-ringan">Rusak Ringan</span>
+                                    @elseif($return->kondisi_barang === 'rusak_berat')
+                                        <span class="condition-badge condition-rusak-berat">Rusak Berat</span>
+                                    @elseif($return->kondisi_barang === 'hilang')
+                                        <span class="condition-badge" style="background: rgba(100, 116, 139, 0.15); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.3);">Hilang</span>
+                                    @else
+                                        <span class="condition-badge">{{ $return->kondisi_label }}</span>
+                                    @endif
 
-                            @if($return->foto_bukti)
-                                <div style="margin-top: 4px;">
-                                    <a href="{{ asset('storage/' . $return->foto_bukti) }}" target="_blank" style="font-size: 11px; color: var(--accent); display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-weight: 600;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    @if($return->foto_bukti)
+                                        <div style="margin-top: 4px;">
+                                            <a href="{{ asset('storage/' . $return->foto_bukti) }}" target="_blank" style="font-size: 11px; color: var(--accent); display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-weight: 600;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                </svg>
+                                                Foto Bukti
+                                            </a>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td>{{ Str::limit($return->catatan ?? '-', 20) }}</td>
+                                <td>
+                                    <button type="button" class="action-btn btn-verify" onclick="showVerifyModal({{ $return->id }}, '{{ $return->kondisi_label }}', '{{ $return->catatan ?? '' }}', '{{ $return->foto_bukti ? asset('storage/' . $return->foto_bukti) : '' }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                         </svg>
-                                        Foto Bukti
-                                    </a>
-                                </div>
-                            @endif
-                        </td>
-                        <td>{{ Str::limit($return->catatan ?? '-', 20) }}</td>
-                        <td>
-                            <button type="button" class="action-btn btn-verify" onclick="showVerifyModal({{ $return->id }}, '{{ $return->kondisi_label }}', '{{ $return->catatan ?? '' }}', '{{ $return->foto_bukti ? asset('storage/' . $return->foto_bukti) : '' }}')">
-                                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                                Verifikasi
-                            </button>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                                        Verifikasi
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Mobile Cards View --}}
+        <div class="mobile-cards-view">
+            @foreach($pendingReturns as $return)
+                @php
+                    $borrowing = $return->borrowingRequest;
+                    $itemName = $borrowing ? $borrowing->item_display_name : ($return->item?->name ?? 'Barang');
+                    $itemQty = $borrowing ? $borrowing->totalQuantity() : 1;
+                @endphp
+                <div class="mc-card mc-card--pending">
+                    <div class="mc-card-header">
+                        <div>
+                            <div class="mc-card-user">{{ $return->user->name ?? 'Guru' }}</div>
+                            <div class="mc-card-user-sub">NIP: {{ $return->user->nip ?? '-' }}</div>
+                        </div>
+                        <span class="mc-badge mc-badge--pending">
+                            <span class="mc-badge-dot"></span>
+                            Menunggu Verifikasi
+                        </span>
+                    </div>
+
+                    <div class="mc-card-details">
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Barang:</span>
+                            <span class="mc-card-val">{{ $itemName }}</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Jumlah:</span>
+                            <span class="mc-card-val">{{ $itemQty }} unit</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Kondisi:</span>
+                            <span class="mc-card-val">{{ $return->kondisi_label }}</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Tgl Kembali:</span>
+                            <span class="mc-card-val">{{ $return->created_at->format('d/m/Y H:i') }}</span>
+                        </div>
+                        @if($return->catatan)
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Catatan:</span>
+                            <span class="mc-card-val">{{ $return->catatan }}</span>
+                        </div>
+                        @endif
+                        @if($return->foto_bukti)
+                        <div class="mc-card-row" style="margin-top: 4px; padding-top: 6px; border-top: 1px dashed var(--border);">
+                            <span class="mc-card-label">Foto Bukti:</span>
+                            <a href="{{ asset('storage/' . $return->foto_bukti) }}" target="_blank" style="font-size: 11.5px; color: var(--accent); font-weight: 600; text-decoration: none;">Lihat Foto</a>
+                        </div>
+                        @endif
+                    </div>
+
+                    <div class="mc-card-actions">
+                        <button type="button" class="mc-card-btn mc-card-btn-primary" onclick="showVerifyModal({{ $return->id }}, '{{ $return->kondisi_label }}', '{{ $return->catatan ?? '' }}', '{{ $return->foto_bukti ? asset('storage/' . $return->foto_bukti) : '' }}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Verifikasi Pengembalian
+                        </button>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <style>
+            @media (max-width: 768px) {
+                .desktop-table-view { display: none !important; }
+                .mobile-cards-view { display: flex !important; }
+            }
+        </style>
         
         @if($pendingReturns->hasPages())
             <div style="margin-top: 20px; display: flex; justify-content: center; gap: 8px;">

@@ -179,55 +179,148 @@
     </div>
     
     @if($pendingRequests->count() > 0)
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Guru</th>
-                    <th>Barang</th>
-                    <th>Jumlah</th>
-                    <th>Tanggal Pinjam</th>
-                    <th>Tanggal Kembali</th>
-                    <th>Tujuan</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($pendingRequests as $request)
-                    @php $items = $request->items->count() ? $request->items : collect([$request->item])->filter(); @endphp
-                    <tr>
-                        <td>{{ $request->user->name }}</td>
-                        <td>
-                            @foreach($items as $detail)
-                                {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia' }} ({{ $detail->quantity ?? $request->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}
-                            @endforeach
-                        </td>
-                        <td>{{ $request->items->sum('quantity') ?: ($request->quantity ?? 0) }}</td>
-                        <td>{{ $request->borrow_date->format('d/m/Y') }}</td>
-                        <td>{{ $request->return_date->format('d/m/Y') }}</td>
-                        <td>{{ Str::limit($request->purpose, 30) }}</td>
-                        <td>
-                            <div style="display: flex; gap: 8px;">
-                                <form method="POST" action="{{ route('kajur.approve-request', $request->id) }}" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="action-btn btn-approve" onclick="return confirm('Setujui permohonan peminjaman ini?')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        Setujui
-                                    </button>
-                                </form>
-                                <button type="button" class="action-btn btn-reject" onclick="showRejectModal({{ $request->id }})">
-                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                    Tolak
-                                </button>
+        {{-- Desktop Table View --}}
+        <div class="desktop-table-view">
+            <div class="table-responsive" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table class="table" style="min-width: 680px;">
+                    <thead>
+                        <tr>
+                            <th>Guru</th>
+                            <th>Barang</th>
+                            <th>Jumlah</th>
+                            <th>Tanggal Pinjam</th>
+                            <th>Tanggal Kembali</th>
+                            <th>Tujuan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pendingRequests as $request)
+                            @php 
+                                $items = $request->items->count() ? $request->items : collect([$request->item])->filter(); 
+                                $totalQty = $request->totalQuantity();
+                            @endphp
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 700; color: var(--text);">{{ $request->user->name ?? 'Guru' }}</div>
+                                </td>
+                                <td>
+                                    @foreach($items as $detail)
+                                        @php
+                                            $detailName = ($detail instanceof \App\Models\Item) ? $detail->name : ($detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia');
+                                            $detailQty = ($detail instanceof \App\Models\Item) ? ($request->quantity ?? 1) : ($detail->quantity ?? $request->quantity ?? 1);
+                                        @endphp
+                                        <div>{{ $detailName }} @if($items->count() > 1)<span style="color:var(--muted); font-size:11.5px;">({{ $detailQty }} unit)</span>@endif</div>
+                                    @endforeach
+                                </td>
+                                <td><strong>{{ $totalQty }}</strong> unit</td>
+                                <td>{{ $request->borrow_date ? $request->borrow_date->format('d/m/Y') : '-' }}</td>
+                                <td>{{ $request->return_date ? $request->return_date->format('d/m/Y') : '-' }}</td>
+                                <td>{{ Str::limit($request->purpose ?? '-', 30) }}</td>
+                                <td>
+                                    <div style="display: flex; gap: 8px;">
+                                        <form method="POST" action="{{ route('kajur.approve-request', $request->id) }}" style="display: inline;">
+                                            @csrf
+                                            <button type="submit" class="action-btn btn-approve" onclick="return confirm('Setujui permohonan peminjaman ini?')">
+                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                                Setujui
+                                            </button>
+                                        </form>
+                                        <button type="button" class="action-btn btn-reject" onclick="showRejectModal({{ $request->id }})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                            Tolak
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Mobile Cards View --}}
+        <div class="mobile-cards-view">
+            @foreach($pendingRequests as $request)
+                @php 
+                    $items = $request->items->count() ? $request->items : collect([$request->item])->filter(); 
+                    $totalQty = $request->totalQuantity();
+                @endphp
+                <div class="mc-card mc-card--pending">
+                    <div class="mc-card-header">
+                        <div>
+                            <div class="mc-card-user">{{ $request->user->name ?? 'Guru' }}</div>
+                            <div class="mc-card-user-sub">NIP: {{ $request->user->nip ?? '-' }}</div>
+                        </div>
+                        <span class="mc-badge mc-badge--pending">
+                            <span class="mc-badge-dot"></span>
+                            Menunggu
+                        </span>
+                    </div>
+
+                    <div class="mc-card-details">
+                        @foreach($items as $detail)
+                            @php
+                                $detailName = ($detail instanceof \App\Models\Item) ? $detail->name : ($detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia');
+                                $detailQty = ($detail instanceof \App\Models\Item) ? ($request->quantity ?? 1) : ($detail->quantity ?? $request->quantity ?? 1);
+                            @endphp
+                            <div class="mc-card-row">
+                                <span class="mc-card-label">{{ $loop->first ? 'Barang:' : '' }}</span>
+                                <span class="mc-card-val">{{ $detailName }} ({{ $detailQty }} unit)</span>
                             </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+                        @endforeach
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Total:</span>
+                            <span class="mc-card-val">{{ $totalQty }} unit</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Tgl Pinjam:</span>
+                            <span class="mc-card-val">{{ $request->borrow_date ? $request->borrow_date->format('d/m/Y') : '-' }}</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Tgl Kembali:</span>
+                            <span class="mc-card-val">{{ $request->return_date ? $request->return_date->format('d/m/Y') : '-' }}</span>
+                        </div>
+                        @if($request->purpose)
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Keperluan:</span>
+                            <span class="mc-card-val">{{ Str::limit($request->purpose, 30) }}</span>
+                        </div>
+                        @endif
+                    </div>
+
+                    <div class="mc-card-actions">
+                        <form method="POST" action="{{ route('kajur.approve-request', $request->id) }}" style="flex: 1;">
+                            @csrf
+                            <button type="submit" class="mc-card-btn mc-card-btn-primary" onclick="return confirm('Setujui permohonan peminjaman ini?')">
+                                Setujui
+                            </button>
+                        </form>
+                        <button type="button" class="mc-card-btn mc-card-btn-secondary" onclick="showRejectModal({{ $request->id }})">
+                            Tolak
+                        </button>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <style>
+            .desktop-table-view {
+                display: block;
+            }
+            .mobile-cards-view {
+                display: none;
+            }
+
+            @media (max-width: 767px) {
+                .desktop-table-view { display: none !important; }
+                .mobile-cards-view { display: flex !important; flex-direction: column; gap: 12px; }
+            }
+        </style>
         
         @if($pendingRequests->hasPages())
             <div style="margin-top: 20px; display: flex; justify-content: center; gap: 8px;">

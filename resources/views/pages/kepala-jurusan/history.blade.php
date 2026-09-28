@@ -420,6 +420,43 @@
     .modal-btn-close:hover {
         background: #e2e8f0;
     }
+
+    /* Mobile Card Layout (using reusable classes) */
+    .desktop-table-view {
+        display: block;
+    }
+    .mobile-cards-view {
+        display: none;
+    }
+
+    @media (max-width: 767px) {
+        .desktop-table-view {
+            display: none !important;
+        }
+        .mobile-cards-view {
+            display: flex !important;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .section-card {
+            padding: 16px 14px;
+        }
+        .filter-bar-wrap {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .filter-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .form-group {
+            width: 100%;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            min-width: unset;
+        }
+    }
 </style>
 
 <div class="section-card">
@@ -511,9 +548,16 @@
                                 @endif
                             </td>
                             <td>
-                                <strong>{{ $item->itemWithTrashed?->name ?? ($item->item?->name ?? 'Barang #' . $item->item_id) }}</strong>
+                                <strong>{{ $item->item_display_name }}</strong>
+                                @if($item->items->isNotEmpty() && $item->items->count() > 1)
+                                <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
+                                    @foreach($item->items as $detail)
+                                        <span>• {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}</span>
+                                    @endforeach
+                                </div>
+                                @endif
                             </td>
-                            <td><strong>{{ $item->quantity }}</strong> unit</td>
+                            <td><strong>{{ $item->totalQuantity() }}</strong> unit</td>
                             <td>{{ $item->borrow_date->format('d/m/Y') }}</td>
                             <td>
                                 {{ $item->return_date->format('d/m/Y') }}
@@ -574,6 +618,103 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+
+        {{-- Mobile Card View (<= 767px) --}}
+        <div class="mobile-cards-view">
+            @foreach($history as $item)
+                @php
+                    $isReturned = ($item->status === 'returned');
+                    $itemJurusan = $item->user->jurusan->nama ?? ($item->user->jurusan ?? (auth()->user()->jurusan->nama ?? '-'));
+                    $itemCategory = $item->itemWithTrashed?->category?->name ?? ($item->item?->category?->name ?? '-');
+                    $itemLocation = $item->itemWithTrashed?->location?->name ?? ($item->item?->location?->name ?? '-');
+                    $itemInitialCondition = $item->itemWithTrashed?->condition ?? ($item->item?->condition ?? 'Baik');
+                    $cardStatusClass = 'mc-card--' . ($item->status ?? 'pending');
+                    $badgeClass = 'mc-badge--' . ($item->status ?? 'pending');
+                    $badgeLabel = $item->status === 'pending' ? 'Pending' : ($item->status === 'approved' ? 'Disetujui' : ($item->status === 'borrowed' ? 'Dipinjam' : ($item->status === 'returned' ? 'Dikembalikan' : ($item->status === 'rejected' ? 'Ditolak' : ($item->status === 'cancelled' ? 'Dibatalkan' : ucfirst($item->status))))));
+                @endphp
+                <div class="mc-card {{ $cardStatusClass }}">
+                    <div class="mc-card-header">
+                        <div>
+                            <div class="mc-card-user">{{ $item->user->name ?? 'Guru' }}</div>
+                            <div class="mc-card-user-sub">NIP: {{ $item->user->nip ?? '-' }}</div>
+                        </div>
+                        <span class="mc-badge {{ $badgeClass }}">
+                            <span class="mc-badge-dot"></span>
+                            {{ $badgeLabel }}
+                        </span>
+                    </div>
+
+                    <div class="mc-card-details">
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Barang:</span>
+                            <span class="mc-card-val">{{ $item->item_display_name }}</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Jumlah:</span>
+                            <span class="mc-card-val">{{ $item->totalQuantity() }} unit</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Tgl Pinjam:</span>
+                            <span class="mc-card-val">{{ $item->borrow_date->format('d/m/Y') }}</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Tgl Kembali:</span>
+                            <span class="mc-card-val">{{ $item->return_date->format('d/m/Y') }}</span>
+                        </div>
+                        @if($item->return_time)
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Jam:</span>
+                            <span class="mc-card-val">{{ $item->return_time }}</span>
+                        </div>
+                        @endif
+                    </div>
+
+                    @if($item->items->isNotEmpty() && $item->items->count() > 1)
+                    <div class="mc-card-item">
+                        <div class="mc-card-item-name">Rincian Barang ({{ $item->items->count() }}):</div>
+                        @foreach($item->items as $detail)
+                        <div class="mc-card-item-detail">
+                            • {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang' }} ({{ $detail->quantity ?? 1 }})
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+
+                    <div class="mc-card-actions">
+                        <input type="checkbox" class="row-checkbox custom-checkbox" value="{{ $item->id }}" data-date="{{ $item->borrow_date->format('Y-m-d') }}" style="width: 16px; height: 16px;">
+                        <button type="button"
+                                class="mc-card-btn mc-card-btn-primary"
+                                onclick="openDetailModal({{ json_encode([
+                                    'id' => $item->id,
+                                    'guru_name' => $item->user->name ?? '-',
+                                    'guru_nip' => $item->user->nip ?? '-',
+                                    'guru_jurusan' => $itemJurusan,
+                                    'guru_phone' => $item->user->phone ?? '-',
+                                    'item_name' => $item->itemWithTrashed?->name ?? ($item->item?->name ?? 'Barang'),
+                                    'item_category' => $itemCategory,
+                                    'item_condition' => $itemInitialCondition,
+                                    'item_location' => $itemLocation,
+                                    'quantity' => $item->quantity,
+                                    'borrow_date' => $item->borrow_date ? $item->borrow_date->format('d F Y') : '-',
+                                    'return_date' => $item->return_date ? $item->return_date->format('d F Y') : '-',
+                                    'return_time' => $item->return_time ?? '-',
+                                    'purpose' => $item->purpose ?? '-',
+                                    'notes' => $item->notes ?? '-',
+                                    'status' => $item->status_label ?? ucfirst($item->status),
+                                    'approved_by' => $item->approvedByKajur->name ?? (auth()->user()->name ?? 'Kepala Jurusan'),
+                                    'approved_at' => $item->approved_at ? $item->approved_at->format('d F Y H:i') : ($item->created_at ? $item->created_at->format('d F Y H:i') : '-'),
+                                    'is_returned' => $isReturned,
+                                    'returned_at' => $item->returned_at ? $item->returned_at->format('d F Y H:i') : ($item->updated_at && $isReturned ? $item->updated_at->format('d F Y H:i') : '-'),
+                                    'return_condition' => in_array($item->return_condition, ['good', 'Baik']) ? 'Baik' : (in_array($item->return_condition, ['damaged', 'Rusak Ringan']) ? 'Rusak Ringan' : (in_array($item->return_condition, ['lost', 'Rusak Berat']) ? 'Rusak Berat' : ($item->return_condition ?? '-'))),
+                                    'return_notes' => $item->return_notes ?? '-',
+                                    'verified_by' => $item->checkinBy->name ?? ($isReturned ? (auth()->user()->name ?? 'Kepala Jurusan') : '-')
+                                ]) }})">
+                            Detail
+                        </button>
+                    </div>
+                </div>
+            @endforeach
         </div>
         
         @if($history->hasPages())
