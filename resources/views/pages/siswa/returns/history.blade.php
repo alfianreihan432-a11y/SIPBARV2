@@ -58,8 +58,9 @@
     </div>
 
     @if($returns->count() > 0)
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px;">
+        {{-- Desktop Table View (> 640px) --}}
+        <div class="s-history-table-wrap" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; min-width: 680px;">
                 <thead>
                     <tr>
                         <th style="background: var(--bg3); color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border2); border-top-left-radius: 8px;">Barang</th>
@@ -71,13 +72,18 @@
                 </thead>
                 <tbody>
                     @foreach($returns as $ret)
+                        @php
+                            $req = $ret->borrowingRequest;
+                            $itemName = $req ? $req->item_display_name : ($ret->item?->name ?? 'Barang');
+                            $itemQty = $req ? $req->totalQuantity() : 1;
+                        @endphp
                         <tr>
                             <td style="padding: 14px; border-bottom: 1px solid var(--border2); color: var(--text); vertical-align: middle;">
                                 <div style="font-weight: 800; color: var(--text);">
-                                    {{ $ret->borrowingRequest?->item?->name ?? 'Barang' }}
+                                    {{ $itemName }}
                                 </div>
                                 <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">
-                                    ID Peminjaman: #{{ $ret->borrowing_request_id }} &bull; Qty: {{ $ret->borrowingRequest?->quantity ?? 1 }}
+                                    ID Peminjaman: #{{ $ret->borrowing_request_id }} &bull; Qty: {{ $itemQty ?? 1 }}
                                 </div>
                             </td>
 
@@ -156,6 +162,85 @@
             </table>
         </div>
 
+        {{-- Mobile Cards View (<= 768px) --}}
+        <div class="mobile-cards-view">
+            @foreach($returns as $ret)
+                @php
+                    $req = $ret->borrowingRequest;
+                    $itemName = $req ? $req->item_display_name : ($ret->item?->name ?? 'Barang');
+                    $itemQty = $req ? $req->totalQuantity() : 1;
+                    $statusKey = $ret->status === 'menunggu' ? 'pending' : ($ret->status === 'disetujui' ? 'returned' : ($ret->status === 'ditolak' ? 'rejected' : 'pending'));
+                    $statusLabel = $ret->status === 'menunggu' ? 'Menunggu' : ($ret->status === 'disetujui' ? 'Disetujui' : ($ret->status === 'ditolak' ? 'Ditolak' : ucfirst($ret->status)));
+                    $cardStatusClass = 'mc-card--' . $statusKey;
+                    $badgeClass = 'mc-badge--' . $statusKey;
+                @endphp
+                <div class="mc-card {{ $cardStatusClass }}">
+                    <div class="mc-card-header">
+                        <div>
+                            <div class="mc-card-user">{{ auth()->user()->name ?? 'Siswa' }}</div>
+                            <div class="mc-card-user-sub">NIS: {{ auth()->user()->nis ?? '-' }} &bull; ID: #{{ $ret->borrowing_request_id }}</div>
+                        </div>
+                        <span class="mc-badge {{ $badgeClass }}">
+                            <span class="mc-badge-dot"></span>
+                            {{ $statusLabel }}
+                        </span>
+                    </div>
+
+                    <div class="mc-card-details">
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Barang:</span>
+                            <span class="mc-card-val">{{ $itemName }}</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Jumlah:</span>
+                            <span class="mc-card-val">{{ $itemQty }} unit</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Kondisi Fisik:</span>
+                            <span class="mc-card-val">{{ $ret->kondisi_label }}</span>
+                        </div>
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Tgl Pengajuan:</span>
+                            <span class="mc-card-val">{{ $ret->created_at->format('d/m/Y H:i') }}</span>
+                        </div>
+                        @if($ret->catatan)
+                        <div class="mc-card-row">
+                            <span class="mc-card-label">Catatan:</span>
+                            <span class="mc-card-val">"{{ $ret->catatan }}"</span>
+                        </div>
+                        @endif
+                        @if($ret->status === 'ditolak' && $ret->alasan_ditolak)
+                        <div class="mc-card-row" style="margin-top: 4px; padding-top: 6px; border-top: 1px dashed var(--border2); color: var(--s-rejected);">
+                            <span class="mc-card-label" style="color: var(--s-rejected); font-weight: 700;">Alasan Ditolak:</span>
+                            <span class="mc-card-val" style="color: var(--s-rejected); font-weight: 700;">"{{ $ret->alasan_ditolak }}"</span>
+                        </div>
+                        @endif
+                        @if($ret->foto_bukti)
+                        <div class="mc-card-row" style="margin-top: 4px; padding-top: 6px; border-top: 1px dashed var(--border2);">
+                            <span class="mc-card-label">Foto Bukti:</span>
+                            <span class="mc-card-val" style="cursor: pointer; color: var(--primary);" onclick="openPhotoModal('{{ asset('storage/' . $ret->foto_bukti) }}')">Lihat Foto</span>
+                        </div>
+                        @endif
+                    </div>
+
+                    @if($ret->status === 'ditolak' && $ret->borrowingRequest && $ret->borrowingRequest->status === 'borrowed')
+                        <div class="mc-card-actions">
+                            <a href="{{ route('student.returns.create', $ret->borrowing_request_id) }}" class="mc-card-btn mc-card-btn-primary">
+                                Ajukan Pengembalian Ulang &rarr;
+                            </a>
+                        </div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+
+        <style>
+            @media (max-width: 640px) {
+                .s-history-table-wrap { display: none !important; }
+                .s-history-cards-mobile { display: flex !important; }
+            }
+        </style>
+
         <div style="margin-top: 18px;">
             {{ $returns->links() }}
         </div>
@@ -163,7 +248,7 @@
         <div class="s-empty">
             <div class="s-empty-icon-wrap">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
             </div>
             <div class="s-empty-title">Belum Ada Riwayat Pengembalian</div>

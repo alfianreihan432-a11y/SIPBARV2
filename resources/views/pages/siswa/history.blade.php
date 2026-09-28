@@ -211,14 +211,16 @@
         </div>
     </div>
 
-    @foreach($histories as $h)
-    @php 
-        $st = $statusMap[$h->status] ?? $statusMap['pending']; 
-        // Check if truly returned (either status returned OR has approved item return)
-        $isReturned = ($h->status === 'returned') || 
-                      ($h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->status === 'disetujui');
-    @endphp
-    <div class="s-loan-row {{ $st['row'] }}">
+    {{-- Desktop Table View --}}
+    <div class="desktop-table-view">
+        @foreach($histories as $h)
+        @php 
+            $st = $statusMap[$h->status] ?? $statusMap['pending']; 
+            // Check if truly returned (either status returned OR has approved item return)
+            $isReturned = ($h->status === 'returned') || 
+                          ($h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->status === 'disetujui');
+        @endphp
+        <div class="s-loan-row {{ $st['row'] }}">
         <div class="s-loan-icon">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         </div>
@@ -234,7 +236,7 @@
             @else
                 {{-- Legacy single-item display --}}
                 <div class="s-loan-name">{{ $h->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</div>
-                <div class="s-loan-code">Kode: {{ $h->itemWithTrashed?->code ?? '-' }} · Qty: {{ $h->quantity }} unit</div>
+                <div class="s-loan-code">Kode: {{ $h->itemWithTrashed?->code ?? '-' }} · Qty: {{ $h->quantity ?? 1 }} unit</div>
             @endif
 
             <div class="s-loan-meta" style="margin-top:8px">
@@ -332,6 +334,107 @@
         </div>
     </div>
     @endforeach
+    </div>
+    </div>
+
+    {{-- Mobile Cards View --}}
+    <div class="mobile-cards-view">
+        @foreach($histories as $h)
+        @php 
+            $st = $statusMap[$h->status] ?? $statusMap['pending']; 
+            $isReturned = ($h->status === 'returned') || 
+                          ($h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->status === 'disetujui');
+            $cardStatusClass = 'mc-card--' . ($h->status ?? 'pending');
+            $badgeClass = 'mc-badge--' . ($h->status ?? 'pending');
+            $badgeLabel = $st['label'];
+        @endphp
+        <div class="mc-card {{ $cardStatusClass }}">
+            <div class="mc-card-header">
+                <div>
+                    <div class="mc-card-user">{{ auth()->user()->name ?? 'Siswa' }}</div>
+                    <div class="mc-card-user-sub">NIS: {{ auth()->user()->nis ?? '-' }}</div>
+                </div>
+                <span class="mc-badge {{ $badgeClass }}">
+                    <span class="mc-badge-dot"></span>
+                    {{ $badgeLabel }}
+                </span>
+            </div>
+
+            <div class="mc-card-details">
+                @if($h->items->isNotEmpty())
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Barang:</span>
+                        <span class="mc-card-val">{{ $h->items->count() }} item</span>
+                    </div>
+                    @foreach($h->items as $detail)
+                    <div class="mc-card-row">
+                        <span class="mc-card-label"></span>
+                        <span class="mc-card-val">• {{ $detail->itemWithTrashed?->name ?? 'Barang' }} ({{ $detail->quantity }})</span>
+                    </div>
+                    @endforeach
+                @else
+                    <div class="mc-card-row">
+                        <span class="mc-card-label">Barang:</span>
+                        <span class="mc-card-val">{{ $h->itemWithTrashed?->name ?? 'Barang tidak tersedia' }}</span>
+                    </div>
+                @endif
+                <div class="mc-card-row">
+                    <span class="mc-card-label">Jumlah:</span>
+                    <span class="mc-card-val">{{ $h->quantity ?? 1 }} unit</span>
+                </div>
+                <div class="mc-card-row">
+                    <span class="mc-card-label">Tgl Pinjam:</span>
+                    <span class="mc-card-val">{{ \Carbon\Carbon::parse($h->borrow_date)->format('d/m/Y') }}</span>
+                </div>
+                <div class="mc-card-row">
+                    <span class="mc-card-label">Tgl Kembali:</span>
+                    <span class="mc-card-val">{{ \Carbon\Carbon::parse($h->return_date)->format('d/m/Y') }}</span>
+                </div>
+                @if($h->return_time)
+                <div class="mc-card-row">
+                    <span class="mc-card-label">Jam:</span>
+                    <span class="mc-card-val">{{ $h->return_time }}</span>
+                </div>
+                @endif
+            </div>
+
+            <div class="mc-card-actions">
+                <button type="button"
+                        class="mc-card-btn mc-card-btn-primary"
+                        onclick="openDetailModal({{ json_encode([
+                            'id' => $h->id,
+                            'item_name' => $h->items->isNotEmpty() ? $h->items->count() . ' Barang' : ($h->itemWithTrashed?->name ?? ($h->item?->name ?? 'Barang tidak tersedia')),
+                            'item_code' => $h->itemWithTrashed?->code ?? ($h->item?->code ?? '-'),
+                            'quantity' => $h->quantity,
+                            'items' => $h->items->isNotEmpty() ? $h->items->map(fn($item) => [
+                                'name' => $item->itemWithTrashed?->name ?? ($item->item?->name ?? 'Barang tidak tersedia'),
+                                'code' => $item->itemWithTrashed?->code ?? ($item->item?->code ?? '-'),
+                                'quantity' => $item->quantity
+                            ])->toArray() : null,
+                            'borrow_date' => $h->borrow_date ? $h->borrow_date->format('d F Y') : '-',
+                            'return_date' => $h->return_date ? $h->return_date->format('d F Y') : '-',
+                            'return_time' => $h->return_time ?? '-',
+                            'purpose' => $h->purpose ?? '-',
+                            'notes' => $h->notes ?? '-',
+                            'status' => $st['label'],
+                            'teacher_name' => $h->teacher?->name ?? '-',
+                            'approved_at' => $h->approved_at ? $h->approved_at->format('d F Y H:i') : '-',
+                            'borrowed_at' => $h->borrowed_at ? $h->borrowed_at->format('d F Y H:i') : '-',
+                            'returned_at' => $h->returned_at ? $h->returned_at->format('d F Y H:i') : '-',
+                            'return_condition' => $h->return_condition ? ucfirst($h->return_condition) : '-',
+                            'return_notes' => $h->return_notes ?? '-',
+                            'is_returned' => $isReturned,
+                            'rejection_reason' => $h->rejection_reason ?? '-',
+                            'item_return_status' => $h->itemReturns && $h->itemReturns->isNotEmpty() ? $h->itemReturns->first()->status : '-',
+                            'item_return_verified_by' => $h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->verifier ? $h->itemReturns->first()->verifier->name : '-',
+                            'item_return_verified_at' => $h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->tanggal_verifikasi ? $h->itemReturns->first()->tanggal_verifikasi->format('d F Y H:i') : '-'
+                        ]) }})">
+                    Detail
+                </button>
+            </div>
+        </div>
+        @endforeach
+    </div>
 
     {{-- Pagination --}}
     <div style="padding-top:16px;border-top:1px solid var(--border2);margin-top:8px">

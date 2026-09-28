@@ -51,6 +51,10 @@
         .cart-side-col {
             position: static;
         }
+        /* Hide desktop submit button on mobile, show mobile button instead */
+        .cart-side-col form .s-btn--primary[type="submit"] {
+            display: none !important;
+        }
     }
 
     /* Cards */
@@ -1048,8 +1052,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // 1. Media query toggle for mobile buttons
     function checkMobile() {
         const wrap = document.getElementById('mobileActionWrap');
+        const desktopSubmit = document.querySelector('.cart-side-col form .s-btn--primary[type="submit"]');
         if (wrap) {
-            wrap.style.display = window.innerWidth <= 1024 ? 'block' : 'none';
+            const isMobile = window.innerWidth <= 1024;
+            wrap.style.display = isMobile ? 'block' : 'none';
+            if (desktopSubmit) {
+                desktopSubmit.style.display = isMobile ? 'none' : 'inline-flex';
+            }
         }
     }
     window.addEventListener('resize', checkMobile);

@@ -135,6 +135,14 @@
     .s-loan-card--borrowed { border-left-color: var(--s-borrowed); }
     .s-loan-card--returned { border-left-color: var(--s-returned); }
     .s-loan-card--rejected { border-left-color: var(--s-rejected); }
+
+    /* Mobile responsive fixes for history cards */
+    @media(max-width:767px){
+        .s-loan-card{padding:14px 16px;gap:12px}
+        .s-loan-meta{flex-direction:column;gap:4px}
+        .s-loan-meta-item{font-size:11px}
+        .s-loan-name{font-size:13.5px}
+    }
 </style>
 
 {{-- Loan List --}}

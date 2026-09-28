@@ -36,7 +36,7 @@
                 <div style="font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;">Barang yang Dipinjam</div>
                 <div style="font-size: 16px; font-weight: 800; color: var(--text); margin-top: 2px;">{{ $borrowing->item?->name ?? 'Barang #' . $borrowing->item_id }}</div>
                 <div style="font-size: 12px; color: var(--muted); margin-top: 2px;">
-                    Kode: <strong style="color: var(--text)">{{ $borrowing->item?->code ?? '-' }}</strong> &bull; Qty: <strong style="color: var(--text)">{{ $borrowing->quantity }} Unit</strong>
+                    Kode: <strong style="color: var(--text)">{{ $borrowing->item?->code ?? '-' }}</strong> &bull; Qty: <strong style="color: var(--text)">{{ $borrowing->quantity ?? 1 }} Unit</strong>
                 </div>
             </div>
             <div style="text-align: right;">
