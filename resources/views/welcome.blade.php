@@ -43,35 +43,35 @@ body{background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;o
   --shadow-lg:0 12px 32px rgba(29,78,216,.12);
 }
 
-/* ─── DARK MODE TOKENS ─── */
+/* ─── DARK MODE TOKENS (REVISI: SOLID, TENANG, MINIM EFEK) ─── */
 html.dark{
-  --primary:#3b82f6;--primary-hover:#60a5fa;--primary-light:#60a5fa;
-  --accent:#f59e0b;--accent-hover:#fb923c;
-  --bg:#0b1328;
-  --bg2:#101a33;
-  --bg3:#162447;
-  --surface:#101a33;
-  --border:#1e3158;
-  --border2:#192949;
-  --card:rgba(18,28,52,0.85);
-  --text:#f0f6ff;
-  --text2:#dce9ff;
-  --muted:#94a3b8;
-  --subtle:#64748b;
-  --nav-bg:rgba(10,17,34,.95);
-  --nav-border:rgba(30,49,88,.8);
-  --shadow:0 4px 16px rgba(0,0,0,.4);
-  --shadow-lg:0 12px 36px rgba(0,0,0,.5);
+  --primary:#7aa2f7;--primary-hover:#93c5fd;--primary-light:rgba(122,162,247,.15);
+  --accent:#7aa2f7;--accent-hover:#93c5fd;
+  --bg:#0f172a;
+  --bg2:#111827;
+  --bg3:#1e293b;
+  --surface:#1e293b;
+  --border:rgba(148,163,184,.16);
+  --border2:rgba(148,163,184,.20);
+  --card:#1e293b;
+  --text:#f1f5f9;
+  --text2:#a8b3c7;
+  --muted:#8b98ad;
+  --subtle:#8b98ad;
+  --nav-bg:rgba(15,23,42,.92);
+  --nav-border:rgba(148,163,184,.15);
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.4);
 
-  /* Unified Continuous Blue Gradient for all sections */
-  --dark-gradient-blue: linear-gradient(180deg, #0d1a38 0%, #070e1e 100%);
-  --dark-bg-fitur: linear-gradient(180deg, #0d1a38 0%, #0b152d 100%);
-  --dark-bg-stats: linear-gradient(180deg, #0b152d 0%, #091124 100%);
-  --dark-bg-tentang: linear-gradient(180deg, #091124 0%, #070d1c 100%);
-  --dark-bg-footer: linear-gradient(180deg, #070d1c 0%, #050a14 100%);
+  /* Solid section backgrounds (alternating calm dark tones) */
+  --dark-bg-fitur:#0f172a;
+  --dark-bg-stats:#111827;
+  --dark-bg-tentang:#0f172a;
+  --dark-bg-bantuan:#111827;
+  --dark-bg-footer:#0b1220;
 
-  --dark-card-bg: rgba(18, 29, 54, 0.75);
-  --dark-card-border: rgba(59, 130, 246, 0.2);
+  --dark-card-bg:#1e293b;
+  --dark-card-border:rgba(148,163,184,.16);
 }
 
 /* ─── NAVBAR ─── */
@@ -125,10 +125,6 @@ html.dark{
   width:100%; height:100%;
   object-fit:contain;
   border-radius:50%;
-}
-html.dark .nav-logo-wrap{
-  background:rgba(255,255,255,.92);
-  box-shadow:0 2px 10px rgba(0,0,0,.4), 0 0 0 1.5px rgba(255,255,255,.12);
 }
 .nav-brand-text{display:flex;flex-direction:column;gap:1.5px}
 .nav-brand-title{
@@ -215,6 +211,17 @@ html.dark .nav-logo-wrap{
 }
 .theme-toggle:active svg{transform:rotate(45deg) scale(0.9)}
 
+/* ─── VIEW TRANSITIONS & THEME ANIMATION ─── */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+html.theme-fade, html.theme-fade * {
+  transition: background-color .35s ease, color .35s ease, border-color .35s ease, fill .35s ease, stroke .35s ease !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+
 .btn-nav-cta{
   display:inline-flex;
   align-items:center;
@@ -262,7 +269,6 @@ html.dark .nav-logo-wrap{
   cursor:pointer;
   transition:all .2s ease;
   gap:5px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.03);
 }
 .nav-ham:hover{
   border-color:#2563eb;
@@ -278,9 +284,16 @@ html.dark .nav-logo-wrap{
   transition:transform .3s cubic-bezier(0.4,0,0.2,1), opacity .2s ease;
   transform-origin:center;
 }
-.nav-ham.active .ham-line:nth-child(1){transform:translateY(7.2px) rotate(45deg)}
-.nav-ham.active .ham-line:nth-child(2){opacity:0;transform:scaleX(0)}
-.nav-ham.active .ham-line:nth-child(3){transform:translateY(-7.2px) rotate(-45deg)}
+.nav-ham.active .ham-line:nth-child(1){
+  transform:translateY(7.2px) rotate(45deg);
+}
+.nav-ham.active .ham-line:nth-child(2){
+  opacity:0;
+  transform:scaleX(0);
+}
+.nav-ham.active .ham-line:nth-child(3){
+  transform:translateY(-7.2px) rotate(-45deg);
+}
 
 /* 5. Mobile Drawer */
 .nav-mobile{
@@ -293,7 +306,7 @@ html.dark .nav-logo-wrap{
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
   box-shadow:0 16px 36px rgba(0,0,0,0.12);
-  animation:slideDownNav .25s cubic-bezier(0.4,0,0.2,1);
+  animation:slideDownNav .25s cubic-bezier(0.16,1,0.3,1);
 }
 @keyframes slideDownNav{
   from{opacity:0;transform:translateY(-10px)}
@@ -362,7 +375,6 @@ html.dark .nav-logo-wrap{
   align-items:center;
   justify-content:center;
   gap:8px;
-  text-align:center;
   padding:12px;
   min-height:46px;
   border-radius:12px;
@@ -371,84 +383,64 @@ html.dark .nav-logo-wrap{
   font-weight:700;
   text-decoration:none;
   background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%);
-  color:#fff;
+  color:#ffffff;
   box-shadow:0 4px 14px rgba(29,78,216,0.25);
-  transition:all .2s ease;
+  transition:all .2s;
 }
+.nav-mob-login:hover{filter:brightness(1.06)}
+
+/* 6. Theme Icon Toggle Visibility */
 .icon-sun{display:none}
 .icon-moon{display:block}
 html.dark .icon-sun{display:block}
 html.dark .icon-moon{display:none}
+
 .mob-t-sun{display:none}
 .mob-t-moon{display:inline-flex;align-items:center;gap:4px}
 html.dark .mob-t-sun{display:inline-flex;align-items:center;gap:4px}
 html.dark .mob-t-moon{display:none}
-</style>
-<style>
+
 /* ─── HERO ─── */
-.hero{position:relative;background:linear-gradient(135deg,rgba(29,78,216,0.85),rgba(37,99,235,0.80)),url('{{ \App\Models\SiteSetting::get('hero_background', '/sekolaheskasaba.jpeg') }}');background-size:cover;background-position:center;overflow:hidden;padding:100px 24px 70px;min-height:550px;display:flex;align-items:center}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 40%,rgba(59,130,246,.1) 0%,transparent 70%)}
-.hero-inner{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:2}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:#1d4ed8;border:1px solid rgba(255,255,255,.3);border-radius:999px;font-size:11px;font-weight:700;color:#ffffff;margin-bottom:20px;box-shadow:0 4px 16px rgba(29,78,216,.5);letter-spacing:.02em;text-transform:uppercase}
-.hero-badge-pulse{width:6px;height:6px;background:#ffffff;border-radius:50%;opacity:.8}
-.hero-h1{font-size:48px;font-weight:800;line-height:1.15;letter-spacing:-.02em;color:#fff;margin-bottom:20px;font-family:'Inter',sans-serif;text-shadow:0 2px 16px rgba(0,0,0,.3)}
-.hero-h1 em{font-style:normal;color:#fff}
-.hero-p{font-size:17px;color:#f8fafc;line-height:1.65;margin-bottom:32px;max-width:580px;margin-left:auto;margin-right:auto;text-shadow:0 1px 2px rgba(0,0,0,.2);font-weight:400}
-.hero-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:40px}
-.hero-btn-main{display:inline-flex;align-items:center;gap:10px;padding:13px 30px;background:rgba(255,255,255,.15);color:#ffffff;font-size:15px;font-weight:700;border-radius:12px;text-decoration:none;border:2px solid rgba(255,255,255,.3);backdrop-filter:blur(8px);transition:all .2s}
-.hero-btn-main:hover{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5);transform:translateY(-2px)}
-.hero-btn-alt{display:inline-flex;align-items:center;gap:10px;padding:13px 28px;background:rgba(255,255,255,.15);color:#fff;font-size:15px;font-weight:600;border-radius:12px;border:2px solid rgba(255,255,255,.3);text-decoration:none;transition:all .2s}
-.hero-btn-alt:hover{background:rgba(255,255,255,.25);transform:translateY(-2px)}
-.hero-trust{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.trust-item{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
-.trust-icon{width:44px;height:44px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center}
-.trust-label{font-size:12px;font-weight:700;color:#fff}
-.trust-sub{font-size:11px;color:#e2e8f0;line-height:1.4}
-</style>
-<style>
-/* ─── MOCKUP ─── */
-.hero-mockup{position:relative;z-index:2}
-.mockup-glow{position:absolute;inset:-30px;background:radial-gradient(ellipse at center,rgba(37,99,235,.4),transparent 70%);border-radius:50%;z-index:0}
-.mockup-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:20px;overflow:hidden;backdrop-filter:blur(12px);box-shadow:0 32px 80px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.08);position:relative;z-index:1}
-.mc-header{background:rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.1);padding:10px 14px;display:flex;align-items:center;justify-content:space-between}
-.mc-dots{display:flex;gap:5px}
-.mc-dot{width:9px;height:9px;border-radius:50%}
-.mc-body{display:flex;min-height:300px}
-.mc-sidebar{width:90px;background:rgba(29,78,216,.7);padding:10px 6px;display:flex;flex-direction:column;gap:2px}
-.mc-menu{padding:7px 8px;border-radius:6px;font-size:9px;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:6px;cursor:default}
-.mc-menu.act{background:rgba(255,255,255,.25);color:#fff;font-weight:700}
-.mc-menu-dot{width:6px;height:6px;background:currentColor;border-radius:1.5px;flex-shrink:0;opacity:.6}
-.mc-menu.act .mc-menu-dot{opacity:1}
-.mc-content{flex:1;padding:12px;background:rgba(248,250,252,.04)}
-.mc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
-.mc-stat{background:rgba(255,255,255,.08);border-radius:8px;padding:8px;border:1px solid rgba(255,255,255,.06)}
-.mc-stat-label{font-size:8px;color:rgba(255,255,255,.45);margin-bottom:3px}
-.mc-stat-val{font-size:13px;font-weight:800;color:#fff}
-.mc-stat-chg{font-size:8px;margin-top:2px}
-.mc-chart{background:rgba(255,255,255,.06);border-radius:8px;padding:8px;border:1px solid rgba(255,255,255,.06);margin-bottom:10px}
-.mc-chart-label{font-size:8px;color:rgba(255,255,255,.45);margin-bottom:6px}
-.mc-items{background:rgba(255,255,255,.06);border-radius:8px;padding:8px;border:1px solid rgba(255,255,255,.06)}
-.mc-items-label{font-size:8px;color:rgba(255,255,255,.45);margin-bottom:6px;font-weight:700}
-.mc-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.mc-row:last-child{border-bottom:none}
-.mc-row-left{display:flex;align-items:center;gap:6px}
-.mc-avatar{width:18px;height:18px;background:rgba(96,165,250,.6);border-radius:4px}
-.mc-name{font-size:9px;color:rgba(255,255,255,.7);font-weight:600}
-.mc-cat{font-size:8px;color:rgba(255,255,255,.35)}
-.mc-pill{font-size:8px;padding:2px 6px;border-radius:999px;font-weight:600}
-.pill-green{background:rgba(52,211,153,.15);color:#34d399}
-.pill-red{background:rgba(248,113,113,.15);color:#f87171}
-</style>
-<style>
-/* ─── SECTIONS ─── */
+.hero{
+  position:relative;
+  padding:110px 24px 90px;
+  text-align:center;
+  overflow:hidden;
+}
+.hero::before{
+  content:'';
+  position:absolute;
+  inset:-8px;
+  background-image:linear-gradient(135deg,rgba(255,255,255,.88),rgba(255,255,255,.75)),url('{{ \App\Models\SiteSetting::get('hero_background', '/sekolaheskasaba.jpeg') }}');
+  background-size:cover;
+  background-position:center;
+  filter:blur(1px) saturate(1.1);
+  z-index:1;
+  pointer-events:none;
+}
+.hero-inner{max-width:820px;margin:0 auto;position:relative;z-index:2}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;padding:6px 18px;
+  background:rgba(255,255,255,.92);border:1px solid rgba(29,78,216,.2);
+  border-radius:999px;color:#1d4ed8;font-size:13px;font-weight:700;
+  letter-spacing:.04em;margin-bottom:28px;backdrop-filter:blur(8px);
+  box-shadow:0 2px 8px rgba(29,78,216,.08);
+}
+.hero-badge-pulse{width:6px;height:6px;background:#1d4ed8;border-radius:50%;opacity:.8}
+.hero-h1{font-size:48px;font-weight:800;line-height:1.15;letter-spacing:-.02em;color:#0f172a;margin-bottom:20px;font-family:'Inter',sans-serif;text-shadow:none}
+.hero-h1 em{font-style:normal;color:#1d4ed8}
+.hero-p{font-size:17px;color:#475569;line-height:1.65;margin-bottom:24px;max-width:580px;margin-left:auto;margin-right:auto;text-shadow:none;font-weight:400}
+
+/* ─── COMMON SECTION ─── */
 .section{padding:80px 24px}
 .section-inner{max-width:1200px;margin:0 auto}
-.section-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
-.section-eyebrow-dot{width:6px;height:6px;background:var(--blue);border-radius:50%}
-.section-h2{font-size:36px;font-weight:800;line-height:1.2;letter-spacing:-.01em;color:var(--text);margin-bottom:12px}
-.section-h2 em{font-style:normal;color:var(--blue)}
+.section-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#1d4ed8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;background:rgba(29,78,216,.08);padding:6px 16px;border-radius:999px;border:1px solid rgba(29,78,216,.15)}
+.section-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:#1d4ed8}
+.section-h2{font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:800;line-height:1.2;letter-spacing:-.02em;color:#0f172a;margin-bottom:14px}
+.section-h2 em{font-style:normal;color:#1d4ed8}
 .section-lead{font-size:17px;color:var(--muted);line-height:1.65;max-width:540px;margin:0 auto;font-weight:400}
 .section-head{text-align:center;margin-bottom:50px}
+
 /* ─── CATEGORIES ─── */
 .cat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
 .cat-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:24px 16px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
@@ -460,6 +452,7 @@ html.dark .mob-t-moon{display:none}
 .cat-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px;font-weight:400}
 .cat-link{font-size:12px;font-weight:700;color:#1d4ed8;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:gap .15s}
 .cat-link:hover{gap:8px}
+
 /* ─── FEATURES (BALANCED BENTO GRID) ─── */
 .feat-bg{background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);position:relative}
 .feat-bg::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#e2e8f0 50%,transparent)}
@@ -468,38 +461,30 @@ html.dark .mob-t-moon{display:none}
 .feat-bento-card:hover{transform:translateY(-3px);border-color:#2563eb;box-shadow:0 12px 28px rgba(37,99,235,.09)}
 .feat-card-row1{grid-column:span 6}
 .feat-card-row2{grid-column:span 4}
-
 .feat-top-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
 .feat-index{font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;font-weight:800;letter-spacing:.04em;color:#2563eb;background:rgba(37,99,235,.08);padding:3px 9px;border-radius:999px;flex-shrink:0}
 .feat-icon-wrap{width:52px;height:52px;border-radius:14px;background:#eff6ff;border:1.5px solid #dbeafe;display:flex;align-items:center;justify-content:center;color:#1d4ed8;flex-shrink:0;transition:all .25s ease}
 .feat-bento-card:hover .feat-icon-wrap{background:#1d4ed8;color:#ffffff;border-color:#1d4ed8;transform:scale(1.05)}
-
 .feat-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:16.5px;font-weight:800;color:#0f172a;margin:0 0 6px 0;line-height:1.3;letter-spacing:-.015em;transition:color .2s}
 .feat-bento-card:hover .feat-title{color:#1d4ed8}
-.feat-summary{font-size:13.5px;color:#64748b;line-height:1.55;font-weight:400;margin:0 0 10px 0}
-
-.feat-workflow-flow{display:flex;align-items:center;gap:6px;background:rgba(239,246,255,.6);border:1px solid #dbeafe;border-radius:10px;padding:8px 12px;margin-bottom:10px}
+.feat-summary{font-size:13.5px;color:#64748b;line-height:1.55;font-weight:400;margin:0 0 6px 0}
+.feat-workflow-flow{display:inline-flex;align-items:center;gap:6px;background:rgba(239,246,255,.6);border:1px solid #dbeafe;border-radius:10px;padding:6px 10px;margin-top:8px;flex-wrap:wrap}
 .feat-flow-step{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#1e293b}
 .feat-flow-dot{width:18px;height:18px;border-radius:5px;background:#1d4ed8;color:#ffffff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800}
 .feat-flow-arrow{color:#94a3b8;flex-shrink:0}
-
-.feat-action-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1d4ed8;margin-top:auto;padding-top:10px;transition:all .2s ease}
-.feat-bento-card:hover .feat-action-link{gap:10px;color:#1e40af}
+.feat-action-link{display:none !important}
+.feat-bento-card:hover .feat-action-link{display:none !important}
 
 /* ─── STATS / DATA INVENTARIS ─── */
 .stats-bg{background:#ffffff;position:relative;overflow:hidden;padding:70px 24px}
-.stats-bg::before{content:'';position:absolute;top:0;left:0;width:6px;height:100%;background:#f59e0b}
 .stats-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1;display:grid;grid-template-columns:1fr 1.1fr;gap:50px;align-items:center}
 .stats-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#1d4ed8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;background:rgba(29,78,216,.08);padding:6px 16px;border-radius:999px;border:1px solid rgba(29,78,216,.15)}
-.stats-eyebrow-pulse{width:6px;height:6px;border-radius:50%;background:#f59e0b}
+.stats-eyebrow-pulse{width:6px;height:6px;border-radius:50%;background:#2563eb}
 .stats-h2{font-family:'Plus Jakarta Sans',sans-serif;font-size:34px;font-weight:800;color:#0f172a;line-height:1.2;margin-bottom:14px;letter-spacing:-.01em}
-.stats-h2 em{font-style:normal;color:#f59e0b}
+.stats-h2 em{font-style:normal;color:#2563eb}
 .stats-p{font-size:16px;color:#4b5563;line-height:1.65;margin-bottom:24px;font-weight:400}
-.stats-cta-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;background:#1d4ed8;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;transition:all .2s;box-shadow:0 4px 12px rgba(29,78,216,.25)}
-.stats-cta-btn:hover{transform:translateY(-2px);background:#1e40af;box-shadow:0 6px 16px rgba(29,78,216,.35)}
+.stats-cta-btn{display:none !important}
 .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-
-/* Solid Rectangle Cards */
 .stat-block{background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .2s ease;position:relative;overflow:hidden}
 .stat-block:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.08);border-color:#cbd5e1}
 .stat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -508,87 +493,69 @@ html.dark .mob-t-moon{display:none}
 .stat-num-b{font-family:'Plus Jakarta Sans',sans-serif;font-size:32px;font-weight:800;color:#0f172a;line-height:1;letter-spacing:-.02em}
 .stat-lbl-b{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;color:#1e293b;margin-top:8px;letter-spacing:-.01em}
 .stat-sub-b{font-size:12px;font-weight:500;color:#64748b;margin-top:3px}
-</style>
-<style>
-/* ─── ABOUT SECTION REDESIGNED ─── */
-.about-grid-redesigned{display:grid;grid-template-columns:1fr 1px 1.05fr;gap:0;align-items:stretch;position:relative}
-.about-content-redesigned{position:relative;padding-right:48px;display:flex;flex-direction:column}
 
-/* Decorative large number */
+/* ─── ABOUT SECTION ─── */
+.about-grid-redesigned{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:center;position:relative}
+.about-content-redesigned{position:relative;display:flex;flex-direction:column;gap:16px}
 .decorative-number{position:absolute;top:-60px;left:-20px;font-family:'Plus Jakarta Sans',sans-serif;font-size:180px;font-weight:900;color:rgba(29,78,216,.04);line-height:1;z-index:0;pointer-events:none}
-
-/* Eyebrow label */
-.about-eyebrow-redesigned{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#1d4ed8;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;position:relative;z-index:1}
+.about-eyebrow-redesigned{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#1d4ed8;letter-spacing:.12em;text-transform:uppercase;position:relative;z-index:1}
 .eyebrow-dot{width:6px;height:6px;background:#1d4ed8;border-radius:50%}
-
-/* Headline with hierarchy */
-.about-headline-redesigned{font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:800;line-height:1.2;color:#0f172a;margin-bottom:16px;position:relative;z-index:1;letter-spacing:-.01em}
+.about-headline-redesigned{font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:800;line-height:1.25;color:#0f172a;position:relative;z-index:1;letter-spacing:-.01em;margin:0}
 .headline-accent{color:#1d4ed8;font-style:normal}
-
-/* Description */
-.about-desc-redesigned{font-size:16px;color:#64748b;line-height:1.75;margin-bottom:40px;position:relative;z-index:1;max-width:520px}
-
-/* Feature Cards Grid */
-.feature-cards-redesigned{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;position:relative;z-index:1}
-
-/* Feature Card */
-.feature-card{background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;padding:20px;transition:all .3s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
-.feature-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:#e5e7eb;transition:background .3s}
-.feature-card:hover{transform:translateY(-4px);border-color:#1d4ed8;box-shadow:0 12px 32px rgba(29,78,216,.12)}
-.feature-card:hover::before{background:#1d4ed8}
-
-/* Primary Card (highlighted) */
-.feature-card-primary{background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%);border-color:#1d4ed8}
-.feature-card-primary::before{background:rgba(255,255,255,.3)}
-.feature-card-primary:hover{box-shadow:0 16px 40px rgba(29,78,216,.25)}
-.feature-card-primary .card-num{color:#fff}
-.feature-card-primary .card-title{color:#fff}
-.feature-card-primary .card-desc{color:rgba(255,255,255,.9)}
-.feature-card-primary .card-icon{background:rgba(255,255,255,.2);color:#fff}
-
-/* Card Header with icon and number */
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.card-icon{width:36px;height:36px;background:#eff6ff;border:1px solid #dbeafe;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#1d4ed8;flex-shrink:0;transition:all .3s}
-.feature-card:hover .card-icon{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
-.card-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;color:#1d4ed8;letter-spacing:.05em}
-
-/* Card Content */
-.card-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:#0f172a;line-height:1.3;margin:0}
-.card-desc{font-size:13px;color:#64748b;line-height:1.55;margin:0;font-weight:400}
-
-/* Vertical Divider */
-.vertical-divider{width:1px;background:linear-gradient(to bottom,transparent,#e2e8f0 20%,#e2e8f0 80%,transparent);position:relative}
-
-/* Visual Column */
-.about-visual-redesigned{padding-left:48px;display:flex;align-items:center}
-.school-photo-frame-redesigned{background:linear-gradient(145deg,#ffffff 0%,#f8fafc 100%);border:1.5px solid #e2e8f0;border-radius:24px;padding:20px;box-shadow:0 24px 64px rgba(29,78,216,.1);position:relative;overflow:hidden;width:100%}
-.photo-wrapper{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:4/3}
-.school-photo{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(0.4,0,0.2,1)}
-.photo-wrapper:hover .school-photo{transform:scale(1.05)}
-.photo-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.95) 0%,rgba(15,23,42,.5) 35%,transparent 65%);pointer-events:none}
-
-/* Glassmorphism Badge */
-.glass-badge{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:14px;padding:10px 16px;border:1px solid rgba(255,255,255,.4);box-shadow:0 8px 24px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;transition:all .3s ease}
-.photo-wrapper:hover .glass-badge{background:rgba(255,255,255,.95);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.about-desc-redesigned{font-size:16px;color:#64748b;line-height:1.8;position:relative;z-index:1;margin:0}
+.about-visual-redesigned{display:flex;align-items:center;width:100%}
+.school-photo-frame-redesigned{background:linear-gradient(145deg,#ffffff 0%,#f8fafc 100%);border:1.5px solid #e2e8f0;border-radius:24px;padding:16px;box-shadow:0 20px 48px rgba(29,78,216,.08);position:relative;overflow:hidden;width:100%}
+.photo-wrapper{position:relative;border-radius:18px;overflow:hidden;aspect-ratio:16/10;width:100%}
+.school-photo{width:100%;height:100%;object-fit:cover;object-position:center 30%;transition:transform .5s cubic-bezier(0.4,0,0.2,1);display:block}
+.photo-wrapper:hover .school-photo{transform:scale(1.04)}
+.photo-gradient{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,23,42,.95) 0%,rgba(15,23,42,.4) 35%,transparent 65%);pointer-events:none}
+.glass-badge{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:14px;padding:10px 16px;border:1px solid rgba(255,255,255,.4);box-shadow:0 8px 24px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;transition:all .3s ease;z-index:2}
+.photo-wrapper:hover .glass-badge{background:rgba(255,255,255,.96);box-shadow:0 12px 32px rgba(0,0,0,.18)}
 .badge-icon{width:28px;height:28px;background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(29,78,216,.3)}
 .badge-content{display:flex;flex-direction:column;gap:2px}
 .badge-year{font-size:10px;font-weight:800;color:#1d4ed8;letter-spacing:.08em;text-transform:uppercase}
 .badge-name{font-size:12px;font-weight:700;color:#0f172a;line-height:1.2}
-
-/* Caption */
-.photo-caption{position:absolute;bottom:0;left:0;right:0;padding:20px 24px;color:#fff;z-index:1}
+.photo-caption{position:absolute;bottom:0;left:0;right:0;padding:20px 24px;color:#fff;z-index:2}
 .caption-label{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;line-height:1.3}
 .caption-sub{font-size:13px;color:rgba(255,255,255,.9);line-height:1.5;max-width:90%}
+
+/* ─── FAQ PREVIEW (SECTION BANTUAN) ─── */
+.faq-preview-sec{background:#f8fafc;padding:80px 24px;position:relative}
+.faq-preview-inner{max-width:860px;margin:0 auto}
+.faq-preview-head{text-align:center;margin-bottom:44px}
+.faq-preview-list{display:flex;flex-direction:column;gap:12px;margin-bottom:28px}
+.faq-preview-item{background:#ffffff;border:1.5px solid #e2e8f0;border-radius:14px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.faq-preview-item:hover{border-color:#2563eb}
+.faq-preview-item.faq-open{border-color:#2563eb;box-shadow:0 4px 16px rgba(37,99,235,.08)}
+.faq-preview-q{width:100%;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:none;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:var(--text);text-align:left;transition:background .15s}
+.faq-preview-q:hover{background:rgba(37,99,235,.04)}
+.faq-preview-item.faq-open .faq-preview-q{color:#1d4ed8;background:rgba(37,99,235,.05)}
+.faq-preview-icon{width:28px;height:28px;border-radius:8px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#2563eb;transition:transform .25s ease,background .25s ease,color .25s ease}
+.faq-preview-item.faq-open .faq-preview-icon{background:#2563eb;color:#fff;border-color:#2563eb;transform:rotate(180deg)}
+.faq-preview-a{display:none;padding:0 22px 18px;border-top:1px solid var(--border);animation:fadeSlideIn .2s ease}
+.faq-preview-item.faq-open .faq-preview-a{display:block}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.faq-preview-steps{margin:14px 0 0;display:flex;flex-direction:column;gap:8px}
+.faq-preview-step{display:flex;align-items:flex-start;gap:12px;font-size:14px;color:var(--text2);line-height:1.6}
+.faq-preview-step-num{width:22px;height:22px;border-radius:6px;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:2px}
+.faq-preview-note{margin-top:12px;padding:10px 14px;background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.15);border-radius:8px;font-size:13px;color:var(--muted);line-height:1.55}
+.faq-preview-more{text-align:center;margin-top:24px}
+.faq-preview-link{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;color:#1d4ed8;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:gap .2s,color .2s}
+.faq-preview-link:hover{gap:9px;color:#1e40af;text-decoration:underline}
+
 /* ─── FOOTER ─── */
 .footer{background:#ffffff;color:#475569;padding:72px 24px 32px;border-top:1px solid #e2e8f0;position:relative}
 .footer-inner{max-width:1200px;margin:0 auto}
-.footer-grid{display:grid;grid-template-columns:2.2fr 1fr 1.2fr 1.2fr;gap:48px 36px;margin-bottom:48px}
+.footer-grid{display:grid;grid-template-columns:1.8fr 1fr;gap:48px 60px;margin-bottom:48px;align-items:start}
 .footer-brand{display:flex;flex-direction:column;align-items:flex-start}
 .footer-logo-wrap{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .footer-logo-box{width:46px;height:46px;border-radius:50%;background:#ffffff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;box-shadow:0 2px 10px rgba(0,0,0,.08);border:1px solid #e2e8f0;flex-shrink:0}
 .footer-brand-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;color:#0f172a;letter-spacing:-.01em;line-height:1.2}
 .footer-brand-sub{font-size:11px;color:#1d4ed8;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.footer-desc{font-size:13.5px;line-height:1.7;color:#64748b;max-width:320px;font-weight:400;margin:0}
+.footer-desc{font-size:13.5px;line-height:1.7;color:#64748b;max-width:340px;font-weight:400;margin:0 0 12px 0}
+.footer-brand-extra{margin-top:2px}
+.footer-help-sublink{font-size:13px;font-weight:600;color:#1d4ed8;text-decoration:none;transition:color .2s}
+.footer-help-sublink:hover{color:#1e40af;text-decoration:underline}
 .footer-col{display:flex;flex-direction:column}
 .footer-heading{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#0f172a;margin-bottom:18px;letter-spacing:.04em;text-transform:uppercase}
 .footer-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin:0;padding:0}
@@ -598,17 +565,17 @@ html.dark .mob-t-moon{display:none}
 .footer-divider{border:none;border-top:1px solid #e2e8f0;margin-bottom:24px}
 .footer-bottom{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px}
 .footer-copy{text-align:center;font-size:12.5px;color:#64748b;font-weight:400;margin:0}
+
 /* ─── RESPONSIVE ─── */
 @media(max-width:1024px){
-  .hero-inner,.stats-inner{grid-template-columns:1fr}
-  .hero{padding-bottom:50px}
-  .hero-trust{grid-template-columns:repeat(2,1fr)}
   .cat-grid{grid-template-columns:repeat(3,1fr)}
   .feat-bento{grid-template-columns:repeat(6,1fr)}
   .feat-card-row1{grid-column:span 3}
   .feat-card-row2{grid-column:span 2}
-  .about-grid-modern{grid-template-columns:1fr;gap:40px}
-  .footer-grid{grid-template-columns:repeat(2,1fr);gap:40px 32px}
+  .about-grid-redesigned{grid-template-columns:1fr;gap:36px}
+  .about-content-redesigned{padding-right:0}
+  .about-visual-redesigned{padding-left:0}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px 40px}
   .section{padding:60px 24px}
 }
 @media(max-width:768px){
@@ -616,303 +583,427 @@ html.dark .mob-t-moon{display:none}
   .nav-links,.nav-actions{display:none !important}
   .nav-mobile-ctrls{display:flex !important}
   .nav-ham{display:flex !important}
-  .nav-brand{gap:10px}
-  .nav-logo-wrap{width:46px;height:46px}
-  .nav-brand-title{font-size:18px}
-  .nav-brand-subtitle{font-size:9.5px}
-  .hero-h1{font-size:34px}
-  .section-h2{font-size:26px}
-  .stats-h2{font-size:26px}
+  .hero{padding:70px 16px 50px}
+  .hero-h1{font-size:32px}
+  .hero-p{font-size:15px}
   .cat-grid{grid-template-columns:repeat(2,1fr)}
-  .feat-bento{grid-template-columns:1fr}
+  .feat-bento{grid-template-columns:1fr;gap:14px}
   .feat-card-row1,.feat-card-row2{grid-column:span 1}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  
-  /* About section responsive */
-  .about-grid-redesigned{grid-template-columns:1fr;gap:40px}
-  .vertical-divider{display:none}
-  .about-content-redesigned{padding-right:0}
-  .about-visual-redesigned{padding-left:0}
-  .decorative-number{font-size:120px;top:-40px;left:-10px}
-  .about-headline-redesigned{font-size:28px}
-  .feature-cards-redesigned{grid-template-columns:1fr;gap:12px}
-  .glass-badge{top:12px;right:12px;padding:8px 12px}
-  .badge-icon{width:24px;height:24px}
-  .caption-label{font-size:14px}
-  .caption-sub{font-size:12px}
+  .stats-inner{grid-template-columns:1fr;gap:36px}
+  .stats-h2{font-size:26px}
+  .section-h2{font-size:26px}
+  .about-headline-redesigned{font-size:26px}
+  .faq-preview-sec{padding:60px 16px}
+  .footer{padding:48px 20px 24px}
+  .footer-grid{grid-template-columns:1fr;gap:28px;margin-bottom:36px}
 }
 @media(max-width:480px){
-  .nav-inner{height:64px;padding:0 14px}
-  .nav-brand-title{font-size:17px}
-  .nav-brand-subtitle{font-size:9px}
-  .cat-grid{grid-template-columns:1fr}
-  .hero-h1{font-size:30px}
+  .hero-h1{font-size:26px}
   .section-h2{font-size:22px}
+  .about-headline-redesigned{font-size:22px}
   .stats-h2{font-size:22px}
   .stats-grid{grid-template-columns:1fr}
-  .footer{padding:48px 20px 24px}
-  .footer-grid{grid-template-columns:1fr;gap:32px;margin-bottom:36px}
-  .footer-desc{max-width:100%}
   .section{padding:48px 16px}
   .feat-workflow-flow{flex-direction:column;align-items:flex-start}
-  
-  /* About section mobile */
-  .decorative-number{font-size:100px;top:-30px;left:-5px}
-  .about-headline-redesigned{font-size:24px}
-  .card-icon{width:32px;height:32px}
-  .glass-badge{top:10px;right:10px;padding:6px 10px}
-  .badge-icon{width:22px;height:22px}
-  .badge-year{font-size:9px}
-  .badge-name{font-size:11px}
-  .caption-label{font-size:13px}
-  .caption-sub{font-size:11px}
-}
-/* ════════════════════════════════════════
-   DARK MODE OVERRIDES — SEMUA ELEMEN
-════════════════════════════════════════ */
-
-/* ── NAVBAR (DARK MODE) ── */
-html.dark .nav {
-  background: rgba(11, 19, 40, 0.85) !important;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.18) !important;
-  backdrop-filter: blur(16px) !important;
-}
-html.dark .nav.scrolled {
-  background: rgba(11, 19, 40, 0.96) !important;
-  border-bottom-color: rgba(59, 130, 246, 0.28) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-}
-html.dark .nav-brand-title { color: #60a5fa !important }
-html.dark .nav-brand-subtitle { color: #94a3b8 !important }
-html.dark .nav-links {
-  background: rgba(18, 29, 54, 0.75) !important;
-  border-color: rgba(59, 130, 246, 0.2) !important;
-}
-html.dark .nav-links a { color: #94a3b8 !important }
-html.dark .nav-links a:hover {
-  background: rgba(59, 130, 246, 0.15) !important;
-  color: #f0f6ff !important;
-}
-html.dark .nav-links a.active {
-  background: rgba(59, 130, 246, 0.25) !important;
-  color: #60a5fa !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
-}
-html.dark .theme-toggle {
-  background: rgba(18, 29, 54, 0.8) !important;
-  border-color: rgba(59, 130, 246, 0.25) !important;
-  color: #94a3b8 !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
-}
-html.dark .theme-toggle:hover {
-  background: rgba(59, 130, 246, 0.2) !important;
-  border-color: #60a5fa !important;
-  color: #60a5fa !important;
-  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.25) !important;
-}
-html.dark .btn-nav-cta {
-  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4) !important;
-}
-html.dark .btn-nav-cta:hover {
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.55) !important;
-}
-html.dark .nav-ham {
-  border-color: rgba(59, 130, 246, 0.25) !important;
-}
-html.dark .ham-line {
-  background: #94a3b8 !important;
-}
-html.dark .nav-mobile {
-  background: rgba(11, 19, 40, 0.98) !important;
-  border-top-color: rgba(59, 130, 246, 0.2) !important;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6) !important;
-}
-html.dark .nav-mobile-links a { color: #94a3b8 !important }
-html.dark .nav-mobile-links a:hover {
-  background: rgba(59, 130, 246, 0.15) !important;
-  color: #f0f6ff !important;
-}
-html.dark .nav-mob-login {
-  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35) !important;
 }
 
-/* ── SECTION COMMON & SEAMLESS GRADIENTS ── */
-html.dark .section { background: var(--dark-gradient-blue) !important }
+/* ═══════════════════════════════════════════════════════════════════
+   ─── DARK MODE: GLOBAL GRADIENT BACKGROUND (VIBRANT TOP-RIGHT GLOW) ───
+   ═══════════════════════════════════════════════════════════════════ */
+html.dark body{
+  background:#000004 !important;
+  position:relative !important;
+  isolation:isolate !important;
+  min-height:100vh;
+}
+html.dark body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse 85% 60% at 88% 0%, #0a84f0 0%, rgba(0,123,224,.85) 22%, rgba(0,90,190,.55) 45%, rgba(0,50,120,.25) 65%, transparent 82%),
+    linear-gradient(180deg, #0068c8 0%, #003a80 22%, #00204f 38%, #050028 52%, #030014 68%, #00000a 85%, #000004 100%) !important;
+}
+
+#dark-bg{
+  display:none;
+}
+
+/* All section wrappers go transparent in dark mode so the gradient shows through seamlessly (EXCEPT .hero) */
+html.dark #kategori,
 html.dark #fitur,
-html.dark .feat-bg { background: var(--dark-bg-fitur) !important }
-html.dark .feat-bg::before { background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2) 50%, transparent) !important }
-
+html.dark .feat-bg,
 html.dark #data-inventaris,
-html.dark .stats-bg { background: var(--dark-bg-stats) !important }
-
-html.dark #tentang { background: var(--dark-bg-tentang) !important }
-
-html.dark .section-eyebrow { color: #60a5fa !important }
-html.dark .section-eyebrow-dot { background: #60a5fa !important }
-html.dark .section-h2 { color: #f0f6ff !important }
-html.dark .section-h2 em { color: #60a5fa !important }
-html.dark .section-lead { color: #94a3b8 !important }
-
-/* ── KATEGORI ── */
-html.dark .cat-card {
-  background: var(--dark-card-bg) !important;
-  border-color: var(--dark-card-border) !important;
-  backdrop-filter: blur(10px) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,.3) !important;
+html.dark .stats-bg,
+html.dark #tentang,
+html.dark .section,
+html.dark #bantuan,
+html.dark .faq-preview-sec,
+html.dark .footer{
+  background-color:transparent !important;
+  background-image:none !important;
 }
-html.dark .cat-card:hover {
-  border-color: #60a5fa !important;
-  box-shadow: 0 12px 32px rgba(96,165,250,.2) !important;
-}
-html.dark .cat-icon-wrap { background: rgba(59, 130, 246, 0.15) !important }
-html.dark .cat-icon-wrap svg { color: #60a5fa !important }
-html.dark .cat-card:hover .cat-icon-wrap { background: #3b82f6 !important }
-html.dark .cat-card:hover .cat-icon-wrap svg { color: #fff !important }
-html.dark .cat-name { color: #f0f6ff !important }
-html.dark .cat-desc { color: #94a3b8 !important }
-html.dark .cat-link { color: #60a5fa !important }
+html.dark .feat-bg::before{display:none !important}
+html.dark .stats-bg::before{display:none !important}
 
-/* ── FITUR (DARK MODE) ── */
+/* ═══════════════════════════════════════════════════════════════════
+   ─── DARK MODE OVERRIDES (DARK NAVY GLASS CARDS, HERO VIGNETTE) ───
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* 1. Navbar */
+html.dark .nav{
+  background:rgba(6,18,48,.85) !important;
+  backdrop-filter:blur(16px) !important;
+  -webkit-backdrop-filter:blur(16px) !important;
+  border-bottom:1px solid rgba(120,170,255,.18) !important;
+}
+html.dark .nav.scrolled{
+  background:rgba(6,18,48,.94) !important;
+  border-bottom-color:rgba(120,170,255,.25) !important;
+  box-shadow:0 4px 16px rgba(0,0,0,.45) !important;
+}
+html.dark .nav-brand-title{color:#8ab4ff !important}
+html.dark .nav-brand-subtitle{color:#8fa3c4 !important}
+html.dark .nav-logo-wrap{
+  background:rgba(255,255,255,.92) !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.4) !important;
+}
+html.dark .nav-links{
+  background:rgba(6,18,48,.75) !important;
+  border-color:rgba(120,170,255,.18) !important;
+}
+html.dark .nav-links a{color:#8fa3c4 !important}
+html.dark .nav-links a:hover{
+  background:rgba(96,150,255,.14) !important;
+  color:#f4f8ff !important;
+}
+html.dark .nav-links a.active{
+  background:#2563eb !important;
+  color:#ffffff !important;
+  box-shadow:none !important;
+}
+html.dark .theme-toggle{
+  background:rgba(6,18,48,.75) !important;
+  border-color:rgba(120,170,255,.18) !important;
+  color:#8fa3c4 !important;
+  box-shadow:none !important;
+}
+html.dark .theme-toggle:hover{
+  background:rgba(96,150,255,.14) !important;
+  border-color:#8ab4ff !important;
+  color:#8ab4ff !important;
+}
+html.dark .btn-nav-cta{
+  background:#2563eb !important;
+  color:#ffffff !important;
+  box-shadow:none !important;
+}
+html.dark .btn-nav-cta:hover{
+  background:#1d4ed8 !important;
+  transform:none !important;
+  box-shadow:none !important;
+}
+html.dark .nav-ham{
+  background:rgba(6,18,48,.75) !important;
+  border-color:rgba(120,170,255,.18) !important;
+  color:#8fa3c4 !important;
+}
+html.dark .ham-line{background:#8fa3c4 !important}
+html.dark .nav-mobile{
+  background:rgba(6,18,48,.96) !important;
+  border-top-color:rgba(120,170,255,.18) !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.5) !important;
+}
+html.dark .nav-mobile-links a{
+  background:rgba(12,26,62,.85) !important;
+  border:1px solid rgba(120,170,255,.15) !important;
+  color:#8fa3c4 !important;
+}
+html.dark .nav-mobile-links a:hover{
+  background:rgba(96,150,255,.16) !important;
+  color:#f4f8ff !important;
+}
+html.dark .nav-mob-login{
+  background:#2563eb !important;
+  color:#ffffff !important;
+  box-shadow:none !important;
+}
+
+/* 2. Hero Section (Photo Banner with smooth dark fade & vignette) */
+html.dark .hero{
+  background:none !important;
+}
+html.dark .hero::before{
+  background-image:linear-gradient(180deg, rgba(0,10,30,.55) 0%, rgba(0,10,30,.45) 45%, rgba(0,4,20,.85) 100%), url('{{ \App\Models\SiteSetting::get('hero_background', '/sekolaheskasaba.jpeg') }}') !important;
+  filter:blur(1px) saturate(1.1) !important;
+}
+html.dark .hero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  box-shadow:inset 0 0 120px rgba(0,0,0,.55);
+  pointer-events:none;
+  z-index:1;
+}
+html.dark .hero-badge{
+  background:rgba(6,18,48,.85) !important;
+  border-color:rgba(120,170,255,.25) !important;
+  color:#f4f8ff !important;
+  backdrop-filter:blur(8px) !important;
+  -webkit-backdrop-filter:blur(8px) !important;
+  box-shadow:none !important;
+}
+html.dark .hero-badge-pulse{background:#8ab4ff !important;opacity:1 !important}
+html.dark .hero-h1{
+  color:#ffffff !important;
+  text-shadow:0 2px 16px rgba(0,0,0,.4) !important;
+}
+html.dark .hero-h1 em{color:#ffffff !important}
+html.dark .hero-p{
+  color:#f8fafc !important;
+  text-shadow:0 1px 4px rgba(0,0,0,.35) !important;
+}
+
+/* 3. Section Headings (Outside Cards - High Contrast on Dark Gradient) */
+html.dark #fitur{border-top:none !important}
+html.dark .stats-bg{border-top:none !important;border-bottom:none !important}
+
+html.dark .section-eyebrow{
+  background:rgba(96,150,255,.14) !important;
+  border-color:rgba(120,170,255,.25) !important;
+  color:#8ab4ff !important;
+}
+html.dark .section-eyebrow-dot{background:#8ab4ff !important}
+html.dark .section-h2{color:#f4f8ff !important}
+html.dark .section-h2 em{color:#8ab4ff !important}
+html.dark .section-lead{color:#b4c3dc !important}
+
+/* 4. Bento Feature Cards (Dark Navy Glass with Blur) */
 html.dark .feat-bento-card{
-  background: var(--dark-card-bg) !important;
-  border-color: var(--dark-card-border) !important;
-  backdrop-filter: blur(12px) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,.3) !important;
+  background:rgba(6,18,48,.72) !important;
+  backdrop-filter:blur(10px) !important;
+  -webkit-backdrop-filter:blur(10px) !important;
+  border:1px solid rgba(120,170,255,.18) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.35) !important;
 }
 html.dark .feat-bento-card:hover{
-  border-color: #3b82f6 !important;
-  box-shadow: 0 16px 36px rgba(0,0,0,.5), 0 0 20px rgba(59, 130, 246, 0.2) !important;
+  border-color:rgba(120,170,255,.38) !important;
+  transform:translateY(-2px) !important;
+  box-shadow:0 6px 18px rgba(0,0,0,.45) !important;
 }
 html.dark .feat-index{
-  color: #60a5fa !important;
-  background: rgba(59, 130, 246, 0.15) !important;
+  background:rgba(96,150,255,.12) !important;
+  border:1px solid rgba(120,170,255,.25) !important;
+  color:#8ab4ff !important;
 }
 html.dark .feat-icon-wrap{
-  background: rgba(59, 130, 246, 0.12) !important;
-  border-color: rgba(59, 130, 246, 0.25) !important;
-  color: #60a5fa !important;
+  background:rgba(96,150,255,.14) !important;
+  border:1.5px solid rgba(120,170,255,.22) !important;
+  color:#8ab4ff !important;
 }
 html.dark .feat-bento-card:hover .feat-icon-wrap{
-  background: #3b82f6 !important;
-  color: #ffffff !important;
-  border-color: #3b82f6 !important;
+  background:rgba(96,150,255,.26) !important;
+  border-color:rgba(120,170,255,.38) !important;
+  color:#ffffff !important;
 }
-html.dark .feat-title{ color: #f0f6ff !important }
-html.dark .feat-bento-card:hover .feat-title{ color: #60a5fa !important }
-html.dark .feat-summary{ color: #94a3b8 !important }
+html.dark .feat-title{color:#f4f8ff !important}
+html.dark .feat-bento-card:hover .feat-title{color:#8ab4ff !important}
+html.dark .feat-summary{color:#b4c3dc !important}
 html.dark .feat-workflow-flow{
-  background: rgba(14, 23, 44, 0.8) !important;
-  border-color: rgba(59, 130, 246, 0.25) !important;
+  background:rgba(0,10,30,.55) !important;
+  border:1px solid rgba(120,170,255,.16) !important;
 }
-html.dark .feat-flow-step{ color: #dce9ff !important }
-html.dark .feat-action-link{ color: #60a5fa !important }
-html.dark .feat-bento-card:hover .feat-action-link{ color: #93c5fd !important }
+html.dark .feat-flow-step{color:#dbe7ff !important}
+html.dark .feat-flow-dot{background:#2563eb !important;color:#ffffff !important}
+html.dark .feat-flow-arrow{color:#8fa3c4 !important}
 
-/* ── STATS SECTION ── */
-html.dark .stats-eyebrow { background: rgba(59,130,246,.15) !important; color: #60a5fa !important; border-color: rgba(59,130,246,.3) !important }
-html.dark .stats-eyebrow-pulse { background: #fb923c !important }
-html.dark .stats-h2 { color: #f0f6ff !important }
-html.dark .stats-h2 em { color: #fb923c !important }
-html.dark .stats-p { color: #94a3b8 !important }
-html.dark .stats-cta-btn { background: linear-gradient(135deg, #2563eb, #3b82f6) !important; color: #ffffff !important; box-shadow: 0 4px 14px rgba(37,99,235,.4) !important }
-html.dark .stats-cta-btn:hover { background: linear-gradient(135deg, #1d4ed8, #2563eb) !important; box-shadow: 0 6px 20px rgba(37,99,235,.5) !important }
-html.dark .stat-block {
-  background: var(--dark-card-bg) !important;
-  border-color: var(--dark-card-border) !important;
-  backdrop-filter: blur(12px) !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,.3) !important;
+/* 5. Stats Section (Dark Navy Glass with Blur & Pastel Icons) */
+html.dark .stats-eyebrow{
+  background:rgba(96,150,255,.14) !important;
+  border-color:rgba(120,170,255,.25) !important;
+  color:#8ab4ff !important;
 }
-html.dark .stat-block:hover { 
-  border-color: #3b82f6 !important;
-  box-shadow: 0 8px 24px rgba(59,130,246,.25) !important;
+html.dark .stats-eyebrow-pulse{background:#8ab4ff !important}
+html.dark .stats-h2{color:#f4f8ff !important}
+html.dark .stats-h2 em{color:#8ab4ff !important}
+html.dark .stats-p{color:#b4c3dc !important}
+
+html.dark .stat-block{
+  background:rgba(6,18,48,.72) !important;
+  backdrop-filter:blur(10px) !important;
+  -webkit-backdrop-filter:blur(10px) !important;
+  border:1px solid rgba(120,170,255,.18) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.35) !important;
 }
-html.dark .stat-icon-b {
-  filter: brightness(1.1) !important;
+html.dark .stat-block:hover{
+  border-color:rgba(120,170,255,.38) !important;
+  box-shadow:0 6px 18px rgba(0,0,0,.45) !important;
 }
-html.dark .stat-num-b { color: #f0f6ff !important }
-html.dark .stat-lbl-b { color: #dce9ff !important }
-html.dark .stat-sub-b { color: #94a3b8 !important }
-html.dark .stat-block:nth-child(1) .stat-trend { background: rgba(59, 130, 246, 0.2) !important; color: #93c5fd !important }
-html.dark .stat-block:nth-child(2) .stat-trend { background: rgba(14, 165, 233, 0.2) !important; color: #7dd3fc !important }
-html.dark .stat-block:nth-child(3) .stat-trend { background: rgba(168, 85, 247, 0.2) !important; color: #d8b4fe !important }
-html.dark .stat-block:nth-child(4) .stat-trend { background: rgba(16, 185, 129, 0.2) !important; color: #6ee7b7 !important }
+html.dark .stat-num-b{color:#f4f8ff !important}
+html.dark .stat-lbl-b{color:#dbe7ff !important}
+html.dark .stat-sub-b{color:#8fa3c4 !important}
 
-/* ── TENTANG (DARK MODE) ── */
-/* ── ABOUT SECTION (DARK MODE) ── */
-html.dark .decorative-number{color:rgba(96,165,250,.06)}
-html.dark .about-eyebrow-redesigned{color:#60a5fa}
-html.dark .eyebrow-dot{background:#60a5fa}
-html.dark .about-headline-redesigned{color:#f0f6ff}
-html.dark .headline-accent{color:#60a5fa}
-html.dark .about-desc-redesigned{color:#94a3b8}
-
-html.dark .feature-card{
-  background:var(--dark-card-bg);
-  border-color:var(--dark-card-border);
-  backdrop-filter:blur(10px)
+html.dark .stat-block:nth-child(1) .stat-icon-b{
+  background:rgba(37,99,235,.14) !important;
+  border:1px solid rgba(120,170,255,.22) !important;
 }
-html.dark .feature-card::before{background:rgba(59,130,246,.2)}
-html.dark .feature-card:hover{border-color:#60a5fa;box-shadow:0 12px 32px rgba(59,130,250,.2)}
-html.dark .feature-card:hover::before{background:#60a5fa}
-html.dark .card-icon{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.25);color:#60a5fa}
-html.dark .feature-card:hover .card-icon{background:#3b82f6;color:#fff;border-color:#3b82f6}
-html.dark .card-num{color:#60a5fa}
-html.dark .card-title{color:#f0f6ff}
-html.dark .card-desc{color:#94a3b8}
+html.dark .stat-block:nth-child(1) .stat-icon-b svg{
+  stroke:#8ab4ff !important;
+}
+html.dark .stat-block:nth-child(1) .stat-trend{
+  background:rgba(96,150,255,.12) !important;
+  color:#8ab4ff !important;
+  border:1px solid rgba(120,170,255,.25) !important;
+}
 
-html.dark .feature-card-primary{background:linear-gradient(135deg,#2563eb 0%,#3b82f6 100%);border-color:#3b82f6}
-html.dark .feature-card-primary::before{background:rgba(255,255,255,.25)}
-html.dark .feature-card-primary:hover{box-shadow:0 16px 40px rgba(59,130,250,.35)}
+html.dark .stat-block:nth-child(2) .stat-icon-b{
+  background:rgba(14,165,233,.14) !important;
+  border:1px solid rgba(56,189,248,.22) !important;
+}
+html.dark .stat-block:nth-child(2) .stat-icon-b svg{
+  stroke:#7dd3fc !important;
+}
+html.dark .stat-block:nth-child(2) .stat-trend{
+  background:rgba(14,165,233,.12) !important;
+  color:#7dd3fc !important;
+  border:1px solid rgba(56,189,248,.25) !important;
+}
 
-html.dark .vertical-divider{background:linear-gradient(to bottom,transparent,rgba(59,130,246,.2) 20%,rgba(59,130,246,.2) 80%,transparent)}
+html.dark .stat-block:nth-child(3) .stat-icon-b{
+  background:rgba(147,51,234,.14) !important;
+  border:1px solid rgba(192,132,252,.22) !important;
+}
+html.dark .stat-block:nth-child(3) .stat-icon-b svg{
+  stroke:#d8b4fe !important;
+}
+html.dark .stat-block:nth-child(3) .stat-trend{
+  background:rgba(147,51,234,.12) !important;
+  color:#d8b4fe !important;
+  border:1px solid rgba(192,132,252,.25) !important;
+}
+
+html.dark .stat-block:nth-child(4) .stat-icon-b{
+  background:rgba(16,185,129,.14) !important;
+  border:1px solid rgba(52,211,153,.22) !important;
+}
+html.dark .stat-block:nth-child(4) .stat-icon-b svg{
+  stroke:#6ee7b7 !important;
+}
+html.dark .stat-block:nth-child(4) .stat-trend{
+  background:rgba(16,185,129,.12) !important;
+  color:#6ee7b7 !important;
+  border:1px solid rgba(52,211,153,.25) !important;
+}
+
+/* 6. Tentang Section */
+html.dark .decorative-number{color:rgba(120,170,255,.05) !important}
+html.dark .about-eyebrow-redesigned{color:#8ab4ff !important}
+html.dark .eyebrow-dot{background:#8ab4ff !important}
+html.dark .about-headline-redesigned{color:#f4f8ff !important}
+html.dark .headline-accent{color:#8ab4ff !important}
+html.dark .about-desc-redesigned{color:#b4c3dc !important}
 
 html.dark .school-photo-frame-redesigned{
-  background:linear-gradient(145deg,rgba(20,32,60,.9) 0%,rgba(13,22,42,.95) 100%);
-  border-color:rgba(59,130,246,.25);
-  box-shadow:0 24px 64px rgba(0,0,0,.6)
+  background:rgba(6,18,48,.85) !important;
+  border:1px solid rgba(120,170,255,.22) !important;
+  box-shadow:0 12px 32px rgba(0,0,0,.5) !important;
+}
+html.dark .photo-gradient{
+  background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,8,24,.75) 100%) !important;
+  box-shadow:inset 0 0 60px rgba(0,0,0,.45) !important;
 }
 html.dark .glass-badge{
-  background:rgba(18,29,54,.9);
-  border-color:rgba(59,130,246,.3);
-  box-shadow:0 8px 24px rgba(0,0,0,.4)
+  background:rgba(6,18,48,.90) !important;
+  border:1px solid rgba(120,170,255,.30) !important;
+  box-shadow:0 4px 12px rgba(0,0,0,.35) !important;
 }
-html.dark .glass-badge:hover{background:rgba(18,29,54,.95)}
+html.dark .photo-wrapper:hover .glass-badge{
+  background:rgba(6,18,48,.96) !important;
+  box-shadow:0 6px 16px rgba(0,0,0,.45) !important;
+}
 html.dark .badge-icon{
-  background:linear-gradient(135deg,#3b82f6 0%,#60a5fa 100%);
-  box-shadow:0 4px 12px rgba(59,130,246,.4)
+  background:rgba(96,150,255,.20) !important;
+  border:1px solid rgba(120,170,255,.25) !important;
+  color:#8ab4ff !important;
+  box-shadow:none !important;
 }
-html.dark .badge-year{color:#60a5fa}
-html.dark .badge-name{color:#f0f6ff}
-html.dark .about-badge-lbl { color: #94a3b8 !important }
-html.dark .about-badge-icon { background: linear-gradient(135deg, #3b82f6, #60a5fa) !important }
+html.dark .badge-year{color:#8ab4ff !important}
+html.dark .badge-name{color:#f4f8ff !important}
 
-/* ── FOOTER ── */
-html.dark .footer { background: var(--dark-bg-footer) !important; border-top: 1px solid rgba(59, 130, 246, 0.15) !important }
-html.dark .footer-logo-box { background: rgba(15, 23, 42, 0.8) !important; border-color: rgba(59, 130, 246, 0.25) !important; box-shadow: 0 4px 14px rgba(0,0,0,.4) !important }
-html.dark .footer-brand-name { color: #f1f5f9 !important }
-html.dark .footer-brand-sub { color: #60a5fa !important }
-html.dark .footer-desc { color: #94a3b8 !important }
-html.dark .footer-heading { color: #f1f5f9 !important }
-html.dark .footer-list a { color: #94a3b8 !important }
-html.dark .footer-list a:hover { color: #60a5fa !important }
-html.dark .footer-divider { border-top-color: rgba(59, 130, 246, 0.15) !important }
-html.dark .footer-copy { color: #64748b !important }
+/* 7. FAQ Preview (Section Bantuan) in Dark Mode: Dark Navy Cards */
+html.dark .faq-preview-sec{
+  border-top:none !important;
+  border-bottom:none !important;
+}
+html.dark .faq-preview-item{
+  background:rgba(6,18,48,.85) !important;
+  border:1px solid rgba(120,170,255,.18) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.35) !important;
+}
+html.dark .faq-preview-item:hover{
+  border-color:rgba(120,170,255,.38) !important;
+}
+html.dark .faq-preview-item.faq-open{
+  border-color:rgba(120,170,255,.38) !important;
+  box-shadow:0 4px 14px rgba(0,0,0,.45) !important;
+}
+html.dark .faq-preview-q{color:#f4f8ff !important}
+html.dark .faq-preview-q:hover{background:rgba(96,150,255,.05) !important}
+html.dark .faq-preview-item.faq-open .faq-preview-q{
+  color:#8ab4ff !important;
+  background:rgba(96,150,255,.08) !important;
+}
+html.dark .faq-preview-icon{
+  background:rgba(96,150,255,.14) !important;
+  border-color:rgba(120,170,255,.22) !important;
+  color:#8ab4ff !important;
+}
+html.dark .faq-preview-item.faq-open .faq-preview-icon{
+  background:#2563eb !important;
+  color:#ffffff !important;
+  border-color:#2563eb !important;
+}
+html.dark .faq-preview-a{
+  background:rgba(0,10,30,.45) !important;
+  border-top:1px solid rgba(120,170,255,.12) !important;
+}
+html.dark .faq-preview-step{color:#b4c3dc !important}
+html.dark .faq-preview-step-num{background:#2563eb !important;color:#ffffff !important}
+html.dark .faq-preview-note{
+  background:rgba(96,150,255,.10) !important;
+  border-color:rgba(120,170,255,.18) !important;
+  color:#dbe7ff !important;
+}
+html.dark .faq-preview-link{color:#8ab4ff !important}
+html.dark .faq-preview-link:hover{color:#93c5fd !important}
 
-/* ── MISC ── */
-html.dark .hero-h1 { text-shadow:0 2px 20px rgba(0,0,0,.5) }
-html.dark .hero-badge { background:#1e40af !important; color:#ffffff !important; border-color:rgba(255,255,255,.4) !important }
-html.dark .hero-badge-pulse { background:#ffffff !important; opacity:.9 !important }
-html.dark .hero { background-image:linear-gradient(135deg,rgba(30,64,175,0.85),rgba(37,99,235,0.80)),url('{{ \App\Models\SiteSetting::get('hero_background', '/sekolaheskasaba.jpeg') }}') !important }
-html.dark .hero-btn-main { background:rgba(255,255,255,.2) !important; color:#ffffff !important; border-color:rgba(255,255,255,.4) !important }
-html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; border-color:rgba(255,255,255,.6) !important }
-/* ─── MOBILE NAV LINKS ─── */
-.nav-mob-login{background:var(--bg3);color:var(--text2)}
-.nav-mob-register{background:#1d4ed8;color:#fff}
+/* 8. Footer in Dark Mode */
+html.dark .footer{
+  border-top:none !important;
+}
+html.dark .footer-logo-box{
+  background:rgba(255,255,255,.95) !important;
+  border-color:rgba(255,255,255,.8) !important;
+  box-shadow:none !important;
+}
+html.dark .footer-brand-name{color:#f4f8ff !important}
+html.dark .footer-brand-sub{color:#8ab4ff !important}
+html.dark .footer-desc{color:#b4c3dc !important}
+html.dark .footer-help-sublink{color:#8ab4ff !important}
+html.dark .footer-help-sublink:hover{color:#93c5fd !important}
+html.dark .footer-heading{color:#f4f8ff !important}
+html.dark .footer-list a{color:#b4c3dc !important}
+html.dark .footer-list a:hover{color:#8ab4ff !important}
+html.dark .footer-divider{border-top-color:rgba(120,170,255,.15) !important}
+html.dark .footer-copy{color:#8fa3c4 !important}
 </style>
 </head>
 <body>
+{{-- Dark mode global gradient background (fixed, z-index:-1) --}}
+<div id="dark-bg" aria-hidden="true"></div>
+
 
 {{-- ═══════════════ NAVBAR ═══════════════ --}}
 <header class="site-header">
@@ -931,22 +1022,19 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
 
     {{-- Center Navigation Links --}}
     <div class="nav-links">
-      <a href="#beranda" class="active">{{ \App\Models\SiteSetting::get('nav_link_home', 'Beranda') }}</a>
+      <a href="#beranda">{{ \App\Models\SiteSetting::get('nav_link_home', 'Beranda') }}</a>
       <a href="#fitur">{{ \App\Models\SiteSetting::get('nav_link_features', 'Fitur') }}</a>
       <a href="#data-inventaris">{{ \App\Models\SiteSetting::get('nav_link_inventory', 'Inventaris') }}</a>
       <a href="#tentang">{{ \App\Models\SiteSetting::get('nav_link_about', 'Tentang') }}</a>
-      <a href="#kontak">{{ \App\Models\SiteSetting::get('nav_link_help', 'Bantuan') }}</a>
+      <a href="#bantuan">{{ \App\Models\SiteSetting::get('nav_link_help', 'Bantuan') }}</a>
     </div>
 
     {{-- Right Actions: Desktop Theme Toggle & Login CTA --}}
     <div class="nav-actions">
-      {{-- Dark Mode Toggle Button (Desktop) --}}
-      <button type="button" class="theme-toggle theme-toggle-btn" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
-        {{-- Sun icon (visible in dark mode) --}}
+      <button type="button" class="theme-toggle theme-toggle-btn" aria-label="Ganti Tema" title="Ganti Tema">
         <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/>
         </svg>
-        {{-- Moon icon (visible in light mode) --}}
         <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
         </svg>
@@ -954,21 +1042,24 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
 
       @auth
         <a href="{{ route('dashboard') }}" class="btn-nav-cta">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
           <span>Dashboard</span>
         </a>
       @else
         <a href="{{ route('login') }}" class="btn-nav-cta">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+          </svg>
           <span>Masuk</span>
         </a>
       @endauth
     </div>
 
-    {{-- Mobile Controls: Theme Toggle & Hamburger Button --}}
+    {{-- Mobile Controls (Theme Toggle & Hamburger) --}}
     <div class="nav-mobile-ctrls">
-      {{-- Dark Mode Toggle Button (Mobile Topbar) --}}
-      <button type="button" class="theme-toggle theme-toggle-btn" aria-label="Ganti Tema Tampilan" title="Ganti Tema">
+      <button type="button" class="theme-toggle theme-toggle-btn" aria-label="Ganti Tema" title="Ganti Tema">
         <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/>
         </svg>
@@ -976,9 +1067,7 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
           <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
         </svg>
       </button>
-
-      {{-- Mobile Hamburger Button --}}
-      <button type="button" class="nav-ham" id="navHamBtn" aria-label="Buka Menu Navigasi" aria-expanded="false" title="Menu Navigasi">
+      <button type="button" class="nav-ham" id="navHamBtn" aria-label="Buka Menu" aria-expanded="false">
         <span class="ham-line"></span>
         <span class="ham-line"></span>
         <span class="ham-line"></span>
@@ -986,28 +1075,28 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
     </div>
   </div>
 
-  {{-- Mobile Nav Drawer --}}
+  {{-- Mobile Drawer Menu --}}
   <div id="navMob" class="nav-mobile">
     <div class="nav-mobile-links">
       <a href="#beranda" onclick="closeNavMob()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        <span>{{ \App\Models\SiteSetting::get('nav_link_home', 'Beranda') }}</span>
+        <span>{{ \App\Models\SiteSetting::get('nav_link_home_mobile', 'Beranda') }}</span>
       </a>
       <a href="#fitur" onclick="closeNavMob()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        <span>{{ \App\Models\SiteSetting::get('nav_link_features_mobile', 'Fitur Utama') }}</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        <span>{{ \App\Models\SiteSetting::get('nav_link_features_mobile', 'Fitur Unggulan') }}</span>
       </a>
       <a href="#data-inventaris" onclick="closeNavMob()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-        <span>{{ \App\Models\SiteSetting::get('nav_link_inventory_mobile', 'Katalog Inventaris') }}</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        <span>{{ \App\Models\SiteSetting::get('nav_link_inventory_mobile', 'Data Inventaris') }}</span>
       </a>
       <a href="#tentang" onclick="closeNavMob()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         <span>{{ \App\Models\SiteSetting::get('nav_link_about_mobile', 'Tentang SIPBAR') }}</span>
       </a>
-      <a href="#kontak" onclick="closeNavMob()">
+      <a href="#bantuan" onclick="closeNavMob()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        <span>{{ \App\Models\SiteSetting::get('nav_link_help_mobile', 'Bantuan & Kontak') }}</span>
+        <span>{{ \App\Models\SiteSetting::get('nav_link_help_mobile', 'Bantuan & FAQ') }}</span>
       </a>
     </div>
 
@@ -1055,162 +1144,117 @@ html.dark .hero-btn-main:hover { background:rgba(255,255,255,.3) !important; bor
       <div class="hero-badge"><span class="hero-badge-pulse"></span>{{ \App\Models\SiteSetting::get('hero_badge', 'Sistem Inventaris Modern') }}</div>
       <h1 class="hero-h1">{!! \App\Models\SiteSetting::html('hero_title', 'Kelola Inventaris<br><em>Lebih Mudah</em> & Efisien') !!}</h1>
       <p class="hero-p">{{ \App\Models\SiteSetting::get('hero_description', 'Platform web modern untuk mengelola inventaris sekolah secara digital, transparan, dan terintegrasi.') }}</p>
-      <div class="hero-btns">
-        {{-- Tombol CTA utama ("Dashboard") dihapus — hero hanya menyisakan tombol "Pelajari Lebih Lanjut". --}}
-        <a href="#fitur" class="hero-btn-alt">{{ \App\Models\SiteSetting::get('hero_cta_alt_text', 'Pelajari Lebih Lanjut') }}</a>
+    </div>
+  </div>
+</section>
+
+{{-- ═══════════════ FITUR UNGGULAN (BENTO GRID) ═══════════════ --}}
+<section class="section feat-bg" id="fitur">
+  <div class="section-inner">
+    <div class="section-head">
+      <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>{{ \App\Models\SiteSetting::get('features_eyebrow', 'Kapabilitas Sistem') }}</div>
+      <h2 class="section-h2">{!! \App\Models\SiteSetting::html('features_title', 'Solusi Lengkap Inventaris <em>Digital</em>') !!}</h2>
+      <p class="section-lead">{{ \App\Models\SiteSetting::get('features_lead', 'Solusi terpadu untuk efisiensi dan transparansi pengelolaan inventaris sekolah.') }}</p>
+    </div>
+
+    @php
+    $featureCards = \App\Models\SiteSetting::getJson('feature_cards', []);
+    $feat = function (int $i, string $key, $default = '') use ($featureCards) {
+        return $featureCards[$i][$key] ?? $default;
+    };
+    @endphp
+
+    <div class="feat-bento">
+      {{-- BENTO CARD 1: Peminjaman & Approval Digital --}}
+      <div class="feat-bento-card feat-card-row1">
+        <div>
+          <div class="feat-top-meta">
+            <span class="feat-index">{{ $feat(0, 'number', '01') }}</span>
+            <div class="feat-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            </div>
+          </div>
+          <div class="feat-title">{{ $feat(0, 'title', 'Peminjaman & Approval Digital') }}</div>
+          <p class="feat-summary">{{ $feat(0, 'description', 'Pengajuan barang instan dengan persetujuan guru via link tanpa login.') }}</p>
+          <div class="feat-workflow-flow">
+            <div class="feat-flow-step">
+              <span class="feat-flow-dot">1</span>
+              <span>Pengajuan Siswa</span>
+            </div>
+            <svg class="feat-flow-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            <div class="feat-flow-step">
+              <span class="feat-flow-dot">2</span>
+              <span>Approval Guru</span>
+            </div>
+            <svg class="feat-flow-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            <div class="feat-flow-step">
+              <span class="feat-flow-dot">3</span>
+              <span>Scan QR Sarpras</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{-- BENTO CARD 2: Manajemen Stok & Aset --}}
+      <div class="feat-bento-card feat-card-row1">
+        <div>
+          <div class="feat-top-meta">
+            <span class="feat-index">{{ $feat(1, 'number', '02') }}</span>
+            <div class="feat-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            </div>
+          </div>
+          <div class="feat-title">{{ $feat(1, 'title', 'Manajemen Stok & Tracking Aset') }}</div>
+          <p class="feat-summary">{{ $feat(1, 'description', 'Katalog aset terstruktur dengan nomor registrasi, kondisi fisik, dan lokasi.') }}</p>
+        </div>
+      </div>
+
+      {{-- BENTO CARD 3: Verifikasi Pengembalian --}}
+      <div class="feat-bento-card feat-card-row2">
+        <div>
+          <div class="feat-top-meta">
+            <span class="feat-index">{{ $feat(2, 'number', '03') }}</span>
+            <div class="feat-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+          <div class="feat-title">{{ $feat(2, 'title', 'Verifikasi Pengembalian') }}</div>
+          <p class="feat-summary">{{ $feat(2, 'description', 'Pemeriksaan kondisi fisik barang saat dikembalikan untuk menjaga aset.') }}</p>
+        </div>
+      </div>
+
+      {{-- BENTO CARD 4: Audit & Rekapitulasi Otomatis --}}
+      <div class="feat-bento-card feat-card-row2">
+        <div>
+          <div class="feat-top-meta">
+            <span class="feat-index">{{ $feat(3, 'number', '04') }}</span>
+            <div class="feat-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </div>
+          </div>
+          <div class="feat-title">{{ $feat(3, 'title', 'Audit & Rekapitulasi Otomatis') }}</div>
+          <p class="feat-summary">{{ $feat(3, 'description', 'Laporan sirkulasi dan statistik pemakaian barang berkala secara akurat.') }}</p>
+        </div>
+      </div>
+
+      {{-- BENTO CARD 5: Kontrol Akses Multi-Peran --}}
+      <div class="feat-bento-card feat-card-row2">
+        <div>
+          <div class="feat-top-meta">
+            <span class="feat-index">{{ $feat(4, 'number', '05') }}</span>
+            <div class="feat-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+          </div>
+          <div class="feat-title">{{ $feat(4, 'title', 'Kontrol Akses Multi-Peran') }}</div>
+          <p class="feat-summary">{{ $feat(4, 'description', 'Hak akses terstruktur untuk Siswa, Guru, Kaprog, dan Sarpras.') }}</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-{{-- ═══════════════ FITUR UNGGULAN ═══════════════ --}}
-<section class="section feat-bg" id="fitur">
-  <div class="section-inner">
-    <div class="section-head">
-      <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>{{ \App\Models\SiteSetting::get('features_eyebrow', 'Kapabilitas Sistem') }}</div>
-      <h2 class="section-h2">{!! \App\Models\SiteSetting::html('features_title', 'Tata Kelola Inventaris <em>Cepat & Terintegrasi</em>') !!}</h2>
-      <p class="section-lead">{{ \App\Models\SiteSetting::get('features_description', 'Mulai dari pengajuan siswa, approval guru secara instan, hingga serah-terima barang dengan QR code.') }}</p>
-    </div>
-
-    @php
-    $featureCards = \App\Models\SiteSetting::getJson('feature_cards', []);
-    $feat = function (int $i, string $key, string $default = '') use ($featureCards) {
-        return $featureCards[$i][$key] ?? $default;
-    };
-    @endphp
-    <div class="feat-bento">
-      {{-- BENTO CARD 1: Peminjaman & Validasi QR (Row 1 - Span 6) --}}
-      @auth
-      <a href="{{ route('loans.index') }}" class="feat-bento-card feat-card-row1">
-      @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-row1">
-      @endauth
-        <div>
-          <div class="feat-top-meta">
-            <div class="feat-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-            </div>
-            <span class="feat-index">{{ $feat(0, 'index', '01') }}</span>
-          </div>
-          <div class="feat-title">{{ $feat(0, 'title', 'Sirkulasi Peminjaman Digital & Validasi QR Code') }}</div>
-          <p class="feat-summary">{{ $feat(0, 'description', 'Pengajuan mandiri & verifikasi ambil barang via QR code tanpa formulir kertas.') }}</p>
-
-          {{-- Mini interactive workflow preview --}}
-          <div class="feat-workflow-flow">
-            <div class="feat-flow-step">
-              <span class="feat-flow-dot">1</span>
-              <span>{{ $featureCards[0]['workflow'][0] ?? 'Pengajuan Siswa' }}</span>
-            </div>
-            <svg class="feat-flow-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-            <div class="feat-flow-step">
-              <span class="feat-flow-dot">2</span>
-              <span>{{ $featureCards[0]['workflow'][1] ?? 'Approval Guru' }}</span>
-            </div>
-            <svg class="feat-flow-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-            <div class="feat-flow-step">
-              <span class="feat-flow-dot">3</span>
-              <span>{{ $featureCards[0]['workflow'][2] ?? 'Scan QR Sarpras' }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="feat-action-link">
-          <span>{{ $feat(0, 'link_text', 'Pelajari Alur Peminjaman') }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </div>
-      </a>
-
-      {{-- BENTO CARD 2: Manajemen Stok & Aset (Row 1 - Span 6) --}}
-      @auth
-      <a href="{{ route('inventory.index') }}" class="feat-bento-card feat-card-row1">
-      @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-row1">
-      @endauth
-        <div>
-          <div class="feat-top-meta">
-            <div class="feat-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            </div>
-            <span class="feat-index">{{ $feat(1, 'index', '02') }}</span>
-          </div>
-          <div class="feat-title">{{ $feat(1, 'title', 'Manajemen Stok & Tracking Aset') }}</div>
-          <p class="feat-summary">{{ $feat(1, 'description', 'Katalog aset lengkap dengan nomor registrasi, kondisi fisik, dan lokasi penempatan.') }}</p>
-        </div>
-        <div class="feat-action-link">
-          <span>{{ $feat(1, 'link_text', 'Kelola Inventaris') }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </div>
-      </a>
-
-      {{-- BENTO CARD 3: Verifikasi Pengembalian (Row 2 - Span 4) --}}
-      @auth
-      <a href="{{ route('returns.index') }}" class="feat-bento-card feat-card-row2">
-      @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-row2">
-      @endauth
-        <div>
-          <div class="feat-top-meta">
-            <div class="feat-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <span class="feat-index">{{ $feat(2, 'index', '03') }}</span>
-          </div>
-          <div class="feat-title">{{ $feat(2, 'title', 'Verifikasi Pengembalian') }}</div>
-          <p class="feat-summary">{{ $feat(2, 'description', 'Cek kondisi fisik barang otomatis saat dikembalikan guna menjaga kualitas aset.') }}</p>
-        </div>
-        <div class="feat-action-link">
-          <span>{{ $feat(2, 'link_text', 'Lihat Pengembalian') }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </div>
-      </a>
-
-      {{-- BENTO CARD 4: Audit & Rekapitulasi Otomatis (Row 2 - Span 4) --}}
-      @auth
-      <a href="{{ route('reports.index') }}" class="feat-bento-card feat-card-row2">
-      @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-row2">
-      @endauth
-        <div>
-          <div class="feat-top-meta">
-            <div class="feat-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            </div>
-            <span class="feat-index">{{ $feat(3, 'index', '04') }}</span>
-          </div>
-          <div class="feat-title">{{ $feat(3, 'title', 'Audit & Rekapitulasi Otomatis') }}</div>
-          <p class="feat-summary">{{ $feat(3, 'description', 'Laporan sirkulasi & statistik pemakaian barang berkala secara instan dan akurat.') }}</p>
-        </div>
-        <div class="feat-action-link">
-          <span>{{ $feat(3, 'link_text', 'Buka Laporan') }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </div>
-      </a>
-
-      {{-- BENTO CARD 5: Kontrol Akses Multi-Peran (Row 2 - Span 4) --}}
-      @auth
-      <a href="{{ route('users.index') }}" class="feat-bento-card feat-card-row2">
-      @else
-      <a href="{{ route('login') }}" class="feat-bento-card feat-card-row2">
-      @endauth
-        <div>
-          <div class="feat-top-meta">
-            <div class="feat-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
-            <span class="feat-index">{{ $feat(4, 'index', '05') }}</span>
-          </div>
-          <div class="feat-title">{{ $feat(4, 'title', 'Kontrol Akses Multi-Peran') }}</div>
-          <p class="feat-summary">{{ $feat(4, 'description', 'Hak akses terstruktur untuk Siswa, Guru Penanggung Jawab, Kepala Jurusan, dan Sarpras.') }}</p>
-        </div>
-        <div class="feat-action-link">
-          <span>{{ $feat(4, 'link_text', 'Atur Pengguna') }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </div>
-      </a>
-    </div>
-  </div>
-</section>
-
-{{-- ═══════════════ DATA INVENTARIS STATS ═══════════════ --}}
+{{-- ═══════════════ STATS & DATA INVENTARIS ═══════════════ --}}
 @php
 use Illuminate\Support\Facades\Cache;
 use App\Models\Item;
@@ -1247,8 +1291,11 @@ $stats = Cache::remember('homepage_stats', 900, function () {
     $completedBorrowings = BorrowingRequest::where('status', BorrowingRequest::STATUS_RETURNED)->count();
     $completionRate = $totalBorrowings > 0 ? round(($completedBorrowings / $totalBorrowings) * 100, 1) : 0;
 
+    $readyItems = Item::where('status', 'available')->count();
+
     return [
         'total_items' => $totalItems,
+        'ready_items' => $readyItems,
         'total_categories' => $totalCategories,
         'top_category' => $topCategoryName,
         'total_users' => $totalUsers,
@@ -1257,34 +1304,23 @@ $stats = Cache::remember('homepage_stats', 900, function () {
         'completion_rate' => $completionRate,
     ];
 });
+
+$statsCards = \App\Models\SiteSetting::getJson('stats_cards', []);
+$stat = function (int $i, string $key, $default = '') use ($statsCards) {
+    return $statsCards[$i][$key] ?? $default;
+};
 @endphp
 
-<section class="section stats-bg" id="data-inventaris">
+<section class="stats-bg" id="data-inventaris">
   <div class="stats-inner">
-    <div class="stats-left">
-      @php
-      $statsData = \App\Models\SiteSetting::getJson('stats_data', []);
-      $stat = function (int $i, string $key, string $default = '') use ($statsData) {
-          return $statsData[$i][$key] ?? $default;
-      };
-      @endphp
+
+    <div>
       <div class="stats-eyebrow">
         <span class="stats-eyebrow-pulse"></span>
-        {{ \App\Models\SiteSetting::get('stats_eyebrow', 'Data Inventaris System') }}
+        {{ \App\Models\SiteSetting::get('stats_eyebrow', 'Transparansi Data') }}
       </div>
       <h2 class="stats-h2">{!! \App\Models\SiteSetting::html('stats_title', 'Inventaris Sekolah<br><em>dalam Real-Time Data</em>') !!}</h2>
       <p class="stats-p">{{ \App\Models\SiteSetting::get('stats_description', 'Kelola dan pantau seluruh aset fisik sekolah secara terintegrasi, transparan, dan dapat diakses dari mana saja dengan sistem inventaris modern.') }}</p>
-      @auth
-      <a href="{{ route('inventory.index') }}" class="stats-cta-btn">
-        <span>{{ \App\Models\SiteSetting::get('stats_cta_text', 'Jelajahi Data Inventaris') }}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-      </a>
-      @else
-      <a href="{{ route('login') }}" class="stats-cta-btn">
-        <span>{{ \App\Models\SiteSetting::get('stats_cta_text', 'Jelajahi Data Inventaris') }}</span>
-        <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-      </a>
-      @endauth
     </div>
     <div class="stats-grid">
       {{-- Total Items --}}
@@ -1293,24 +1329,24 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           <div class="stat-icon-b" style="background:#1d4ed8">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#ffffff" fill="none" viewBox="0 0 24 24" stroke="#ffffff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
           </div>
-          <span class="stat-trend" style="background:#dbeafe;color:#1e40af">{{ $stat(0, 'trend', 'Real-time') }}</span>
+          <span class="stat-trend" style="background:#eff6ff;color:#1d4ed8">{{ $stat(0, 'trend', 'Tersedia') }}</span>
         </div>
-        <div class="stat-num-b">{{ number_format($stats['total_items'], 0, ',', '.') }}</div>
-        <div class="stat-lbl-b">{{ $stat(0, 'label', 'Total Barang Terdata') }}</div>
-        <div class="stat-sub-b">{{ $stat(0, 'sublabel', 'Terintegrasi seluruh unit') }}</div>
+        <div class="stat-num-b">{{ number_format($stats['total_items'] ?? 0, 0, ',', '.') }}</div>
+        <div class="stat-lbl-b">{{ $stat(0, 'label', 'Total Unit Barang') }}</div>
+        <div class="stat-sub-b">{{ number_format($stats['ready_items'] ?? 0, 0, ',', '.') }} {{ $stat(0, 'sublabel', 'siap digunakan') }}</div>
       </div>
 
-      {{-- Total Categories --}}
+      {{-- Categories --}}
       <div class="stat-block">
         <div class="stat-header">
-          <div class="stat-icon-b" style="background:#0891b2">
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#ffffff" fill="none" viewBox="0 0 24 24" stroke="#ffffff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+          <div class="stat-icon-b" style="background:#0284c7">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#ffffff" fill="none" viewBox="0 0 24 24" stroke="#ffffff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
           </div>
           <span class="stat-trend" style="background:#e0f2fe;color:#0369a1">{{ $stat(1, 'trend', 'Terstruktur') }}</span>
         </div>
-        <div class="stat-num-b">{{ number_format($stats['total_categories'], 0, ',', '.') }}</div>
+        <div class="stat-num-b">{{ number_format($stats['total_categories'] ?? 0, 0, ',', '.') }}</div>
         <div class="stat-lbl-b">{{ $stat(1, 'label', 'Kategori Aset') }}</div>
-        <div class="stat-sub-b">{{ $stats['top_category'] }} {{ $stat(1, 'sublabel', 'terbanyak') }}</div>
+        <div class="stat-sub-b">{{ $stats['top_category'] ?? 'Berbagai Kategori' }} {{ $stat(1, 'sublabel', 'terbanyak') }}</div>
       </div>
 
       {{-- Total Users --}}
@@ -1321,9 +1357,9 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           </div>
           <span class="stat-trend" style="background:#f3e8ff;color:#6b21a8">{{ $stat(2, 'trend', 'Tersinkron') }}</span>
         </div>
-        <div class="stat-num-b">{{ number_format($stats['total_users'], 0, ',', '.') }}</div>
+        <div class="stat-num-b">{{ number_format($stats['total_users'] ?? 0, 0, ',', '.') }}</div>
         <div class="stat-lbl-b">{{ $stat(2, 'label', 'Pengguna Aktif') }}</div>
-        <div class="stat-sub-b">{{ trim((string) $stat(2, 'sublabel')) !== '' ? $stat(2, 'sublabel') : $stats['user_breakdown'] }}</div>
+        <div class="stat-sub-b">{{ trim((string) $stat(2, 'sublabel')) !== '' ? $stat(2, 'sublabel') : ($stats['user_breakdown'] ?? '') }}</div>
       </div>
 
       {{-- Total Borrowings --}}
@@ -1332,9 +1368,9 @@ $stats = Cache::remember('homepage_stats', 900, function () {
           <div class="stat-icon-b" style="background:#059669">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:24px;height:24px;color:#ffffff" fill="none" viewBox="0 0 24 24" stroke="#ffffff"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
           </div>
-          <span class="stat-trend" style="background:#d1fae5;color:#065f46">{{ $stats['completion_rate'] }}% {{ $stat(3, 'trend', 'Selesai') }}</span>
+          <span class="stat-trend" style="background:#d1fae5;color:#065f46">{{ $stats['completion_rate'] ?? 0 }}% {{ $stat(3, 'trend', 'Selesai') }}</span>
         </div>
-        <div class="stat-num-b">{{ number_format($stats['total_borrowings'], 0, ',', '.') }}</div>
+        <div class="stat-num-b">{{ number_format($stats['total_borrowings'] ?? 0, 0, ',', '.') }}</div>
         <div class="stat-lbl-b">{{ $stat(3, 'label', 'Sirkulasi Peminjaman') }}</div>
         <div class="stat-sub-b">{{ $stat(3, 'sublabel', 'Proses approval cepat') }}</div>
       </div>
@@ -1348,15 +1384,8 @@ $stats = Cache::remember('homepage_stats', 900, function () {
     <div class="about-grid-redesigned">
       {{-- Left column: Content with decorative numbers --}}
       <div class="about-content-redesigned">
-        {{-- Decorative large number in background --}}
         <div class="decorative-number">04</div>
 
-        @php
-        $aboutFeatures = \App\Models\SiteSetting::getJson('about_features', []);
-        $aboutFeat = function (int $i, string $key, $default = '') use ($aboutFeatures) {
-            return $aboutFeatures[$i][$key] ?? $default;
-        };
-        @endphp
         <div class="about-eyebrow-redesigned">
           <span class="eyebrow-dot"></span>
           {{ \App\Models\SiteSetting::get('about_eyebrow', 'Tentang Platform SIPBAR') }}
@@ -1369,71 +1398,9 @@ $stats = Cache::remember('homepage_stats', 900, function () {
         <p class="about-desc-redesigned">
           {{ \App\Models\SiteSetting::get('about_description', 'SIPBAR mentransformasi pencatatan inventaris sekolah konvensional menjadi ekosistem digital yang terintegrasi, transparan, dan dapat diakses dari mana saja.') }}
         </p>
-
-        {{-- Feature Cards with hierarchy and icons --}}
-        <div class="feature-cards-redesigned">
-          {{-- Card 01 - Highlighted as primary feature --}}
-          <div class="feature-card {{ $aboutFeat(0, 'primary') ? 'feature-card-primary' : '' }}">
-            <div class="card-header">
-              <div class="card-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-              </div>
-              <span class="card-num">{{ $aboutFeat(0, 'number', '01') }}</span>
-            </div>
-            <h3 class="card-title">{{ $aboutFeat(0, 'title', 'Integrasi') }}</h3>
-            <p class="card-desc">{{ $aboutFeat(0, 'description', 'Persetujuan cepat tanpa kertas — guru dapat menyetujui peminjaman langsung dari smartphone.') }}</p>
-          </div>
-
-          {{-- Card 02 --}}
-          <div class="feature-card {{ $aboutFeat(1, 'primary') ? 'feature-card-primary' : '' }}">
-            <div class="card-header">
-              <div class="card-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-              </div>
-              <span class="card-num">{{ $aboutFeat(1, 'number', '02') }}</span>
-            </div>
-            <h3 class="card-title">{{ $aboutFeat(1, 'title', 'Akurasi') }}</h3>
-            <p class="card-desc">{{ $aboutFeat(1, 'description', 'Inventaris real-time — stok aset bertambah/berkurang otomatis setiap transaksi terverifikasi.') }}</p>
-          </div>
-
-          {{-- Card 03 --}}
-          <div class="feature-card {{ $aboutFeat(2, 'primary') ? 'feature-card-primary' : '' }}">
-            <div class="card-header">
-              <div class="card-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                </svg>
-              </div>
-              <span class="card-num">{{ $aboutFeat(2, 'number', '03') }}</span>
-            </div>
-            <h3 class="card-title">{{ $aboutFeat(2, 'title', 'Akuntabilitas') }}</h3>
-            <p class="card-desc">{{ $aboutFeat(2, 'description', 'Riwayat & log transparan — setiap pergerakan barang memiliki jejak audit lengkap.') }}</p>
-          </div>
-
-          {{-- Card 04 --}}
-          <div class="feature-card {{ $aboutFeat(3, 'primary') ? 'feature-card-primary' : '' }}">
-            <div class="card-header">
-              <div class="card-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                </svg>
-              </div>
-              <span class="card-num">{{ $aboutFeat(3, 'number', '04') }}</span>
-            </div>
-            <h3 class="card-title">{{ $aboutFeat(3, 'title', 'Aksesibilitas') }}</h3>
-            <p class="card-desc">{{ $aboutFeat(3, 'description', 'Akses fleksibel multi-perangkat — responsif di PC, tablet, maupun ponsel.') }}</p>
-          </div>
-        </div>
       </div>
 
-      {{-- Vertical divider line --}}
-      <div class="vertical-divider"></div>
-
-      {{-- Right column: Photo frame with connection to headline --}}
+      {{-- Right column: Photo frame --}}
       <div class="about-visual-redesigned">
         <div class="school-photo-frame-redesigned">
           <div class="photo-wrapper">
@@ -1458,7 +1425,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
 
             <div class="photo-caption">
               <div class="caption-label">{{ \App\Models\SiteSetting::get('about_caption_label', 'Gedung Utama Sekolah') }}</div>
-              <div class="caption-sub">{{ \App\Models\SiteSetting::get('about_caption_sub', 'Pusat kegiatan belajar mengajar dan inovasi digital') }}</div>
+              <div class="caption-sub">{{ \App\Models\SiteSetting::get('about_caption_sub', 'Pusat operasional dan tata kelola sarana prasarana SMKN 1 BANGSRI') }}</div>
             </div>
           </div>
         </div>
@@ -1467,34 +1434,159 @@ $stats = Cache::remember('homepage_stats', 900, function () {
   </div>
 </section>
 
+{{-- ═══════════════ FAQ RINGKAS (SECTION BANTUAN) ═══════════════ --}}
+<section class="faq-preview-sec" id="bantuan">
+  <div class="faq-preview-inner">
+    <div class="faq-preview-head">
+      <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>Bantuan & FAQ</div>
+      <h2 class="section-h2">Pertanyaan yang <em>Sering Diajukan</em></h2>
+      <p class="section-lead">Jawaban cepat atas kendala umum seputar akun, peminjaman, persetujuan guru, dan pengembalian di SIPBAR.</p>
+    </div>
+
+    <div class="faq-preview-list">
+      {{-- FAQ 1: Akun & Login --}}
+      <div class="faq-preview-item">
+        <button type="button" class="faq-preview-q" aria-expanded="false">
+          <span>Lupa password atau tidak bisa login ke akun SIPBAR?</span>
+          <span class="faq-preview-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </span>
+        </button>
+        <div class="faq-preview-a">
+          <div class="faq-preview-steps">
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">1</span>
+              <span>Pastikan username / NISN / email dan password yang dimasukkan sudah sesuai (perhatikan huruf besar/kecil).</span>
+            </div>
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">2</span>
+              <span>Jika tetap tidak bisa masuk, hubungi petugas Sarpras sekolah untuk melakukan reset password akun Anda.</span>
+            </div>
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">3</span>
+              <span>Setelah di-reset oleh petugas, masuk kembali melalui halaman <strong>Login</strong> dengan password baru.</span>
+            </div>
+          </div>
+          <div class="faq-preview-note">Catatan: Perubahan data kredensial siswa dan guru dikelola langsung oleh petugas Sarpras/operator sekolah.</div>
+        </div>
+      </div>
+
+      {{-- FAQ 2: Katalog & Stok --}}
+      <div class="faq-preview-item">
+        <button type="button" class="faq-preview-q" aria-expanded="false">
+          <span>Barang yang ingin dipinjam tidak muncul di katalog atau stok habis?</span>
+          <span class="faq-preview-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </span>
+        </button>
+        <div class="faq-preview-a">
+          <div class="faq-preview-steps">
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">1</span>
+              <span>Periksa ketersediaan barang di katalog inventaris; barang bersisa stok 0 sedang dipinjam peminjam lain atau dalam pemeliharaan.</span>
+            </div>
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">2</span>
+              <span>Cek kembali secara berkala saat barang telah dikembalikan ke ruang Sarpras.</span>
+            </div>
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">3</span>
+              <span>Jika barang mendesak untuk kegiatan KBM/praktik, hubungi petugas Sarpras sekolah secara langsung.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{-- FAQ 3: Status Peminjaman Pending --}}
+      <div class="faq-preview-item">
+        <button type="button" class="faq-preview-q" aria-expanded="false">
+          <span>Status pengajuan peminjaman masih tertahan di status "Menunggu Persetujuan"?</span>
+          <span class="faq-preview-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </span>
+        </button>
+        <div class="faq-preview-a">
+          <div class="faq-preview-steps">
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">1</span>
+              <span>Buka menu <strong>Riwayat Peminjaman</strong> di akun Siswa dan periksa Guru Pembimbing yang Anda pilih saat pengajuan.</span>
+            </div>
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">2</span>
+              <span>Ingatkan atau hubungi Guru Pembimbing terkait untuk memeriksa link persetujuan / Dashboard Guru beliau.</span>
+            </div>
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">3</span>
+              <span>Setelah Guru menyetujui, status akan berubah dan QR Code pengambilan barang siap ditampilkan.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{-- FAQ 4: Guru tidak terima link persetujuan --}}
+      <div class="faq-preview-item">
+        <button type="button" class="faq-preview-q" aria-expanded="false">
+          <span>Guru tidak menerima tautan persetujuan (approval) atau link tidak terbuka?</span>
+          <span class="faq-preview-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </span>
+        </button>
+        <div class="faq-preview-a">
+          <div class="faq-preview-steps">
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">1</span>
+              <span>Siswa dapat membuka detail pengajuan di akunnya, lalu menyalin tautan persetujuan (magic link) untuk dikirimkan ke Guru bersangkutan.</span>
+            </div>
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">2</span>
+              <span>Alternatif: Guru dapat login ke SIPBAR dan membuka <strong>Dashboard Guru</strong> untuk melihat pengajuan yang menunggu approval.</span>
+            </div>
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">3</span>
+              <span>Guru menekan tombol <strong>Setujui</strong> atau <strong>Tolak</strong> pada item permohonan siswa.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{-- FAQ 5: Alur Pengembalian --}}
+      <div class="faq-preview-item">
+        <button type="button" class="faq-preview-q" aria-expanded="false">
+          <span>Bagaimana alur dan tata cara pengembalian barang yang sedang dipinjam?</span>
+          <span class="faq-preview-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </span>
+        </button>
+        <div class="faq-preview-a">
+          <div class="faq-preview-steps">
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">1</span>
+              <span>Bawa barang fisik dalam kondisi lengkap dan bersih ke ruang Sarpras sekolah.</span>
+            </div>
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">2</span>
+              <span>Buka menu <strong>Pengembalian</strong> pada akun Siswa dan tunjukkan nomor / kode transaksi pengembalian kepada petugas.</span>
+            </div>
+            <div class="faq-preview-step">
+              <span class="faq-preview-step-num">3</span>
+              <span>Petugas Sarpras memverifikasi kondisi fisik barang dan menyelesaikan transaksi pengembalian di sistem.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {{-- Link teks kecil biasa ke halaman penuh --}}
+    <div class="faq-preview-more">
+      <a href="{{ route('faq') }}" class="faq-preview-link">
+        <span>Lihat semua pertanyaan</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
 {{-- ═══════════════ FOOTER ═══════════════ --}}
-@php
-$footerLinks = \App\Models\SiteSetting::getJson('footer_links', [
-    'navigation' => [
-        ['text' => 'Beranda', 'url' => '#beranda'],
-        ['text' => 'Fitur', 'url' => '#fitur'],
-        ['text' => 'Tentang', 'url' => '#tentang'],
-    ],
-    'information' => [
-        ['text' => 'Manajemen Barang', 'url' => '#fitur'],
-        ['text' => 'Peminjaman', 'url' => '#fitur'],
-        ['text' => 'Pengembalian', 'url' => '#fitur'],
-        ['text' => 'Laporan', 'url' => '#fitur'],
-        ['text' => 'Pengguna', 'url' => '#fitur'],
-    ],
-    'legal' => [
-        ['text' => 'Panduan Penggunaan', 'url' => '#'],
-        ['text' => 'FAQ', 'url' => '#'],
-        ['text' => 'Kebijakan Privasi', 'url' => '#'],
-        ['text' => 'Syarat & Ketentuan', 'url' => '#'],
-    ],
-    'social' => [
-        ['text' => 'Instagram', 'url' => '#', 'icon' => 'instagram'],
-        ['text' => 'Facebook', 'url' => '#', 'icon' => 'facebook'],
-        ['text' => 'Twitter', 'url' => '#', 'icon' => 'twitter'],
-    ],
-]);
-@endphp
 <footer class="footer" id="kontak">
   <div class="footer-inner">
     <div class="footer-grid">
@@ -1510,35 +1602,17 @@ $footerLinks = \App\Models\SiteSetting::getJson('footer_links', [
           </div>
         </div>
         <p class="footer-desc">{{ \App\Models\SiteSetting::get('footer_description', 'Sistem inventaris berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.') }}</p>
-      </div>
-
-      {{-- Menu Column --}}
-      <div class="footer-col">
-        <div class="footer-heading">{{ \App\Models\SiteSetting::get('footer_heading_menu', 'Menu') }}</div>
-        <ul class="footer-list">
-          @foreach(($footerLinks['navigation'] ?? []) as $flink)
-          <li><a href="{{ $flink['url'] ?? '#' }}">{{ $flink['text'] ?? '' }}</a></li>
-          @endforeach
-        </ul>
-      </div>
-
-      {{-- Fitur Column --}}
-      <div class="footer-col">
-        <div class="footer-heading">{{ \App\Models\SiteSetting::get('footer_heading_features', 'Fitur') }}</div>
-        <ul class="footer-list">
-          @foreach(($footerLinks['information'] ?? []) as $flink)
-          <li><a href="{{ $flink['url'] ?? '#' }}">{{ $flink['text'] ?? '' }}</a></li>
-          @endforeach
-        </ul>
+        <div class="footer-brand-extra">
+          <a href="{{ route('faq') }}" class="footer-help-sublink">Pusat Bantuan</a>
+        </div>
       </div>
 
       {{-- Bantuan Column --}}
       <div class="footer-col">
-        <div class="footer-heading">{{ \App\Models\SiteSetting::get('footer_heading_help', 'Bantuan') }}</div>
+        <div class="footer-heading">Bantuan</div>
         <ul class="footer-list">
-          @foreach(($footerLinks['legal'] ?? []) as $flink)
-          <li><a href="{{ $flink['url'] ?? '#' }}">{{ $flink['text'] ?? '' }}</a></li>
-          @endforeach
+          <li><a href="{{ route('faq') }}">FAQ</a></li>
+          <li><a href="#bantuan">Bantuan Singkat</a></li>
         </ul>
       </div>
     </div>
@@ -1550,6 +1624,7 @@ $footerLinks = \App\Models\SiteSetting::getJson('footer_links', [
     </div>
   </div>
 </footer>
+
 <script>
 (function(){
   // ─── Apply saved theme IMMEDIATELY (no flash) ───
@@ -1578,25 +1653,58 @@ document.addEventListener('DOMContentLoaded', function(){
   window.addEventListener('scroll', handleNavScroll, {passive: true});
   handleNavScroll(); // initialize
 
-  // ─── Toggle Theme function ───
+  // ─── Theme Transition & Toggle ───
+  var isThemeTransitioning = false;
+
   function updateThemeBtnTitles(isDark){
     themeBtns.forEach(function(b){
       b.title = isDark ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap';
     });
   }
 
-  function toggleTheme(){
-    var isDark = html.classList.toggle('dark');
-    localStorage.setItem('sipbar-theme', isDark ? 'dark' : 'light');
-    updateThemeBtnTitles(isDark);
-    themeBtns.forEach(function(b){
-      b.style.transform = 'rotate(25deg) scale(0.9)';
-      setTimeout(function(){ b.style.transform = ''; }, 250);
+  function applyTheme(toDark, x, y) {
+    if (isThemeTransitioning) return;
+    function change() {
+      html.classList.toggle('dark', toDark);
+      localStorage.setItem('sipbar-theme', toDark ? 'dark' : 'light');
+      updateThemeBtnTitles(toDark);
+    }
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { change(); return; }
+    if (!document.startViewTransition) {
+      isThemeTransitioning = true;
+      html.classList.add('theme-fade');
+      change();
+      setTimeout(function () {
+        html.classList.remove('theme-fade');
+        isThemeTransitioning = false;
+      }, 400);
+      return;
+    }
+    isThemeTransitioning = true;
+    var r = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+    var t = document.startViewTransition(change);
+    t.ready.then(function () {
+      var anim = html.animate(
+        { clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)', 'circle(' + r + 'px at ' + x + 'px ' + y + 'px)'] },
+        { duration: 500, easing: 'cubic-bezier(.4,0,.2,1)', pseudoElement: '::view-transition-new(root)' }
+      );
+      anim.onfinish = function () { isThemeTransitioning = false; };
+      anim.oncancel = function () { isThemeTransitioning = false; };
+    }).catch(function () {
+      isThemeTransitioning = false;
+    });
+    t.finished.finally(function () {
+      isThemeTransitioning = false;
     });
   }
 
-  themeBtns.forEach(function(b){
-    b.addEventListener('click', toggleTheme);
+  themeBtns.forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      var b = e.currentTarget.getBoundingClientRect();
+      var toDark = !html.classList.contains('dark');
+      applyTheme(toDark, b.left + b.width / 2, b.top + b.height / 2);
+    });
   });
   updateThemeBtnTitles(html.classList.contains('dark'));
 
@@ -1628,7 +1736,10 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // ─── Keyboard shortcut: Alt + D ───
   document.addEventListener('keydown', function(e){
-    if(e.altKey && e.key === 'd') toggleTheme();
+    if(e.altKey && e.key.toLowerCase() === 'd') {
+      var toDark = !html.classList.contains('dark');
+      applyTheme(toDark, window.innerWidth / 2, window.innerHeight / 2);
+    }
     if(e.key === 'Escape' && navMob && navMob.classList.contains('open')) closeNavMob();
   });
 
@@ -1639,7 +1750,22 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   });
 
-  // ─── Active nav link on scroll ───
+  // ─── Accordion Toggle for Section Bantuan ───
+  document.querySelectorAll('.faq-preview-q').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var item = this.closest('.faq-preview-item');
+      var wasOpen = item.classList.contains('faq-open');
+      if(wasOpen){
+        item.classList.remove('faq-open');
+        this.setAttribute('aria-expanded', 'false');
+      } else {
+        item.classList.add('faq-open');
+        this.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  // ─── Active nav link on scroll (Scrollspy including #bantuan) ───
   var sections = document.querySelectorAll('section[id], footer[id]');
   var navLinks = document.querySelectorAll('.nav-links a');
   var observer = new IntersectionObserver(function(entries){
@@ -1650,7 +1776,7 @@ document.addEventListener('DOMContentLoaded', function(){
         if(active) active.classList.add('active');
       }
     });
-  }, {rootMargin:'-30% 0px -60% 0px'});
+  }, {rootMargin:'-25% 0px -55% 0px'});
   sections.forEach(function(s){ observer.observe(s); });
 });
 </script>

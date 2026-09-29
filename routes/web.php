@@ -33,6 +33,7 @@ use App\Livewire\AddExtracurricular;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+Route::view('/faq', 'faq')->name('faq');
 
 // ─── MAGIC LINK APPROVAL (Signed URL — tidak perlu login) ───────────────────
 // Siswa → Guru (Approval oleh Guru)
