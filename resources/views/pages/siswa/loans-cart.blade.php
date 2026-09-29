@@ -483,7 +483,7 @@
                             </svg>
                         </div>
                         <div class="s-empty-title">Keranjang masih kosong</div>
-                        <div class="s-empty-sub">Silakan pilih barang yang ingin Anda pinjam dari katalog inventaris terlebih dahulu.</div>
+                        <div class="s-empty-sub">Silakan pilih barang yang ingin Anda pinjam dari katalog barang terlebih dahulu.</div>
                         <a href="{{ route('student.catalog') }}" class="s-btn s-btn--primary s-btn--sm">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" class="svg-icon-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>

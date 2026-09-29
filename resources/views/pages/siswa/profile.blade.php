@@ -196,7 +196,7 @@
             </div>
             <div class="info-row">
                 <div class="info-lbl">Peran</div>
-                <div class="info-val">Siswa / Peminjam Inventaris</div>
+                <div class="info-val">Siswa / Peminjam</div>
             </div>
             <div class="info-row">
                 <div class="info-lbl">Terdaftar Sejak</div>

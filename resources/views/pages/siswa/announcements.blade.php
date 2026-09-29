@@ -45,7 +45,7 @@
             <span class="page-title-count">Semua aman</span>
             @endif
         </div>
-        <div class="page-subtitle">Informasi penting seputar status peminjaman dan inventaris</div>
+        <div class="page-subtitle">Informasi penting seputar status peminjaman barang</div>
     </div>
 </div>
 
@@ -128,7 +128,7 @@
             </div>
             <div>
                 <div class="s-card-title">Peminjaman Disetujui</div>
-                <div class="s-card-sub">Ambil barang dari ruang inventaris dengan QR Code</div>
+                <div class="s-card-sub">Ambil barang di tempat pengambilan barang dengan QR Code</div>
             </div>
         </div>
     </div>
@@ -202,7 +202,7 @@
 
     @php
     $sysAnn = [
-        ['icon'=>'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z', 'color'=>'var(--primary)', 'bg'=>'var(--primary-light)', 'title'=>'Cara Menggunakan QR Code', 'body'=>'Setelah peminjaman disetujui, QR Code akan muncul di pengumuman ini. Tunjukkan QR Code kepada admin untuk mengambil barang dari gudang inventaris.', 'date'=>'Hari ini'],
+        ['icon'=>'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z', 'color'=>'var(--primary)', 'bg'=>'var(--primary-light)', 'title'=>'Cara Menggunakan QR Code', 'body'=>'Setelah peminjaman disetujui, QR Code akan muncul di pengumuman ini. Tunjukkan QR Code kepada petugas / admin untuk mengambil barang di tempat pengambilan barang.', 'date'=>'Hari ini'],
         ['icon'=>'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'color'=>'#d97706', 'bg'=>'rgba(217,119,6,.1)', 'title'=>'Kebijakan Pengembalian', 'body'=>'Pastikan mengembalikan barang tepat waktu sesuai tanggal yang tertera. Keterlambatan dapat berdampak pada reputasi peminjaman dan izin penggunaan fasilitas ke depannya.', 'date'=>'2 hari lalu'],
         ['icon'=>'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', 'color'=>'#059669', 'bg'=>'rgba(5,150,105,.1)', 'title'=>'Tanggung Jawab Perawatan Barang', 'body'=>'Jaga kondisi barang selama masa pinjam. Laporkan segera jika terjadi kerusakan sebelum dikembalikan. Pengembalian dalam kondisi baik adalah kewajiban setiap peminjam.', 'date'=>'1 minggu lalu'],
     ];

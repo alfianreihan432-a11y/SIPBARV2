@@ -142,7 +142,7 @@
             Riwayat Peminjaman
             <span class="page-title-count">{{ $totalAll }} total</span>
         </div>
-        <div class="page-subtitle">Seluruh catatan transaksi peminjaman barang inventaris kamu</div>
+        <div class="page-subtitle">Seluruh catatan transaksi peminjaman barang kamu</div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div style="display:flex;gap:10px">
@@ -458,7 +458,7 @@
             @if(request()->hasAny(['search','status','date_from','date_to']))
                 Coba ubah filter pencarian atau hapus beberapa kriteria
             @else
-                Mulai ajukan peminjaman dari katalog barang inventaris sekolah
+                Mulai ajukan peminjaman dari katalog barang sekolah
             @endif
         </div>
         @if(request()->hasAny(['search','status','date_from','date_to']))

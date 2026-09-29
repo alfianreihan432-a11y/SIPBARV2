@@ -53,7 +53,7 @@
     <div class="s-card-header">
         <div>
             <div class="s-card-title">Daftar Pengajuan Pengembalian</div>
-            <div class="s-card-sub">Hasil verifikasi kondisi barang oleh petugas inventaris</div>
+            <div class="s-card-sub">Hasil verifikasi kondisi barang oleh petugas / admin</div>
         </div>
     </div>
 
@@ -252,7 +252,7 @@
                 </svg>
             </div>
             <div class="s-empty-title">Belum Ada Riwayat Pengembalian</div>
-            <div class="s-empty-sub">Anda belum pernah mengajukan pengembalian barang inventaris.</div>
+            <div class="s-empty-sub">Anda belum pernah mengajukan pengembalian barang pinjaman.</div>
         </div>
     @endif
 </div>
