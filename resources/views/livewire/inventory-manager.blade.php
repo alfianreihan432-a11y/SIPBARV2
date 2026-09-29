@@ -481,7 +481,7 @@
         {{-- Total Inventaris --}}
         <div class="im-kpi-card">
             <div style="display:flex;align-items:center;justify-content:space-between">
-                <span class="im-kpi-label">Total Inventaris</span>
+                <span class="im-kpi-label">Total Jenis Barang</span>
                 <div class="im-kpi-icon" style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2)">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;color:var(--color-info)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
@@ -689,7 +689,7 @@
                             <h2 style="font-size:18px;font-weight:800;color:var(--text-primary);margin:0;line-height:1.2">Import Data KIBB</h2>
                             <span style="font-size:10px;font-weight:700;letter-spacing:.05em;padding:3px 8px;border-radius:999px;background:rgba(16,185,129,0.12);color:var(--color-success);border:1px solid rgba(16,185,129,0.25);text-transform:uppercase">Excel .xlsx</span>
                         </div>
-                        <p style="font-size:12.5px;color:var(--text-muted);margin:3px 0 0;line-height:1.3">Impor massal data inventaris aset dari lembar kerja Excel KIBB.</p>
+                        <p style="font-size:12.5px;color:var(--text-muted);margin:3px 0 0;line-height:1.3">Impor massal data barang dari lembar kerja Excel KIBB.</p>
                     </div>
                 </div>
                 <button type="button" onclick="closeImportModal()" style="background:var(--input-bg);border:1px solid var(--border-alt);border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);cursor:pointer;transition:all .15s;flex-shrink:0" onmouseover="this.style.color='var(--text-primary)';this.style.borderColor='var(--blue)'" onmouseout="this.style.color='var(--text-muted)';this.style.borderColor='var(--border-alt)'">
@@ -786,7 +786,7 @@
                         <ul style="margin:0;padding-left:20px;line-height:1.6;list-style-type:disc">
                             <li>File harus memiliki sheet aktif bernama <strong style="color:var(--text-primary)">"KIBB"</strong>.</li>
                             <li>Kolom wajib: <strong style="color:var(--text-primary)">Kode Barang</strong> dan <strong style="color:var(--text-primary)">Jenis Barang / Nama Barang</strong>.</li>
-                            <li>Baris dengan Kode KIBB yang sudah ada di inventaris akan dilewati secara otomatis (mencegah duplikasi).</li>
+                            <li>Baris dengan Kode KIBB yang sudah ada di sistem akan dilewati secara otomatis (mencegah duplikasi).</li>
                         </ul>
                     </div>
 
@@ -803,7 +803,7 @@
                         </svg>
                         <div>
                             <div style="font-size:13px;font-weight:700;color:var(--text-primary)">Memproses & Mengimpor Data...</div>
-                            <div style="font-size:11px;color:var(--text-muted)">Sistem sedang membaca sheet KIBB dan memetakan data barang ke inventaris.</div>
+                            <div style="font-size:11px;color:var(--text-muted)">Sistem sedang membaca sheet KIBB dan memetakan data barang ke sistem.</div>
                         </div>
                     </div>
 
@@ -1091,7 +1091,7 @@
                     </span>
                     @endif
                 </div>
-                <p class="im-form-sub">{{ $editingId ? 'Perbarui spesifikasi, lokasi, dan stok barang ini.' : 'Isi rincian barang untuk mencatatnya ke dalam sistem inventaris.' }}</p>
+                <p class="im-form-sub">{{ $editingId ? 'Perbarui spesifikasi, lokasi, dan stok barang ini.' : 'Isi rincian barang untuk mencatatnya ke dalam katalog barang.' }}</p>
             </div>
             <button type="button" wire:click="resetForm" style="background:#1e293b;border:1.5px solid rgba(148,163,184,.14);border-radius:10px;padding:7px;color:#64748b;cursor:pointer;transition:all .15s" onmouseover="this.style.color='#fff';this.style.background='#334155'" onmouseout="this.style.color='#64748b';this.style.background='#1e293b'">
                 <svg style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -1249,7 +1249,7 @@
         {{-- List Header --}}
         <div class="im-list-header">
             <div style="display:flex;align-items:center">
-                <span class="im-list-title">Daftar Barang Inventaris</span>
+                <span class="im-list-title">Daftar Barang</span>
                 <span class="im-count-badge">{{ $items->count() }} Item</span>
             </div>
             @if($search || $filterCategory || $filterStatus || $filterCondition)
@@ -1271,7 +1271,7 @@
                 @if($search || $filterCategory || $filterStatus || $filterCondition)
                 Tidak ada hasil untuk kriteria pencarian atau filter Anda. Coba sesuaikan filter.
                 @else
-                Belum ada barang terdaftar dalam inventaris. Tambahkan barang baru untuk memulai.
+                Belum ada barang terdaftar dalam sistem. Tambahkan barang baru untuk memulai.
                 @endif
             </p>
             <div style="display:flex;justify-content:center;gap:8px">
