@@ -18,16 +18,16 @@ class SiteSettingSeeder extends Seeder
         $this->put('site_favicon', '/favicon.ico', 'image', 'general', 'Favicon (Logo Tab Browser)');
         $this->put('site_title', 'SIPBAR – Sistem Informasi Pengelolaan Barang', 'text', 'general', 'Judul Halaman (SEO)');
 
-        $this->put('hero_badge', 'Sistem Inventaris Modern', 'text', 'hero', 'Badge Hero');
-        $this->put('hero_title', 'Kelola Inventaris<br><em>Lebih Mudah</em> & Efisien', 'text', 'hero', 'Judul Hero');
-        $this->put('hero_description', 'Platform web modern untuk mengelola inventaris sekolah secara digital, transparan, dan terintegrasi.', 'text', 'hero', 'Deskripsi Hero');
+        $this->put('hero_badge', 'Sistem Peminjaman Online', 'text', 'hero', 'Badge Hero');
+        $this->put('hero_title', 'Pinjam Barang Sekolah<br><em>Lebih Mudah</em> & Cepat', 'text', 'hero', 'Judul Hero');
+        $this->put('hero_description', 'Platform digital terintegrasi untuk peminjaman sarana dan alat praktik sekolah dengan persetujuan online & QR code.', 'text', 'hero', 'Deskripsi Hero');
         $this->put('hero_background', '/sekolaheskasaba.jpeg', 'image', 'hero', 'Gambar Background Hero');
         $this->put('hero_cta_text', 'Dashboard', 'text', 'hero', 'Teks Tombol CTA Utama');
         $this->put('hero_cta_alt_text', 'Pelajari Lebih Lanjut', 'text', 'hero', 'Teks Tombol CTA Alternatif');
 
         $this->put('features_eyebrow', 'Kapabilitas Sistem', 'text', 'features', 'Label Fitur');
-        $this->put('features_title', 'Tata Kelola Inventaris <em>Cepat & Terintegrasi</em>', 'text', 'features', 'Judul Section Fitur');
-        $this->put('features_description', 'Mulai dari pengajuan siswa, approval guru secara instan, hingga serah-terima barang dengan QR code.', 'text', 'features', 'Deskripsi Section Fitur');
+        $this->put('features_title', 'Alur Peminjaman Barang <em>Digital & Transparan</em>', 'text', 'features', 'Judul Section Fitur');
+        $this->put('features_description', 'Mulai dari pengajuan siswa, persetujuan guru, hingga serah-terima barang dengan scan QR code.', 'text', 'features', 'Deskripsi Section Fitur');
 
         $this->putJson('feature_cards', [
             [
@@ -35,23 +35,23 @@ class SiteSettingSeeder extends Seeder
                 'title' => 'Sirkulasi Peminjaman Digital & Validasi QR Code',
                 'description' => 'Pengajuan mandiri & verifikasi ambil barang via QR code tanpa formulir kertas.',
                 'icon' => 'qr',
-                'workflow' => ['Pengajuan Siswa', 'Approval Guru', 'Scan QR Sarpras'],
+                'workflow' => ['Pengajuan Siswa', 'Approval Guru', 'Scan QR Pengambilan'],
                 'link_text' => 'Pelajari Alur Peminjaman',
                 'route' => 'loans.index',
             ],
             [
                 'index' => '02',
-                'title' => 'Manajemen Stok & Tracking Aset',
-                'description' => 'Katalog aset lengkap dengan nomor registrasi, kondisi fisik, dan lokasi penempatan.',
+                'title' => 'Ketersediaan Barang & Stok',
+                'description' => 'Katalog barang terstruktur dengan informasi ketersediaan, kondisi fisik, dan lokasi penyimpanan.',
                 'icon' => 'inventory',
                 'workflow' => [],
-                'link_text' => 'Kelola Inventaris',
+                'link_text' => 'Lihat Katalog',
                 'route' => 'inventory.index',
             ],
             [
                 'index' => '03',
                 'title' => 'Verifikasi Pengembalian',
-                'description' => 'Cek kondisi fisik barang otomatis saat dikembalikan guna menjaga kualitas aset.',
+                'description' => 'Pemeriksaan kondisi fisik barang saat dikembalikan untuk menjaga keutuhan sarana.',
                 'icon' => 'return',
                 'workflow' => [],
                 'link_text' => 'Lihat Pengembalian',
@@ -69,7 +69,7 @@ class SiteSettingSeeder extends Seeder
             [
                 'index' => '05',
                 'title' => 'Kontrol Akses Multi-Peran',
-                'description' => 'Hak akses terstruktur untuk Siswa, Guru Penanggung Jawab, Kepala Jurusan, dan Sarpras.',
+                'description' => 'Hak akses terstruktur untuk Siswa, Guru Penanggung Jawab, Kepala Jurusan, dan Admin.',
                 'icon' => 'users',
                 'workflow' => [],
                 'link_text' => 'Atur Pengguna',
@@ -77,21 +77,21 @@ class SiteSettingSeeder extends Seeder
             ],
         ], 'features');
 
-        $this->put('stats_eyebrow', 'Data Inventaris System', 'text', 'stats', 'Label Statistik');
-        $this->put('stats_title', 'Inventaris Sekolah<br><em>dalam Real-Time Data</em>', 'text', 'stats', 'Judul Section Statistik');
-        $this->put('stats_description', 'Kelola dan pantau seluruh aset fisik sekolah secara terintegrasi, transparan, dan dapat diakses dari mana saja dengan sistem inventaris modern.', 'text', 'stats', 'Deskripsi Section Statistik');
-        $this->put('stats_cta_text', 'Jelajahi Data Inventaris', 'text', 'stats', 'Teks Tombol CTA Statistik');
+        $this->put('stats_eyebrow', 'Transparansi Data', 'text', 'stats', 'Label Statistik');
+        $this->put('stats_title', 'Ketersediaan Barang & Peminjaman<br><em>dalam Real-Time</em>', 'text', 'stats', 'Judul Section Statistik');
+        $this->put('stats_description', 'Pantau ketersediaan barang dan riwayat sirkulasi peminjaman sekolah secara terintegrasi, transparan, dan real-time.', 'text', 'stats', 'Deskripsi Section Statistik');
+        $this->put('stats_cta_text', 'Jelajahi Data Barang', 'text', 'stats', 'Teks Tombol CTA Statistik');
 
         $this->putJson('stats_data', [
             ['label' => 'Total Barang Terdata', 'sublabel' => 'Terintegrasi seluruh unit', 'trend' => 'Real-time', 'icon' => 'box', 'color' => 'blue'],
-            ['label' => 'Kategori Aset', 'sublabel' => 'terbanyak', 'trend' => 'Terstruktur', 'icon' => 'tag', 'color' => 'cyan'],
+            ['label' => 'Kategori Barang', 'sublabel' => 'terbanyak', 'trend' => 'Terstruktur', 'icon' => 'tag', 'color' => 'cyan'],
             ['label' => 'Pengguna Aktif', 'sublabel' => '', 'trend' => 'Tersinkron', 'icon' => 'users', 'color' => 'purple'],
             ['label' => 'Sirkulasi Peminjaman', 'sublabel' => 'Proses approval cepat', 'trend' => 'Selesai', 'icon' => 'swap', 'color' => 'green'],
         ], 'stats');
 
         $this->put('about_eyebrow', 'Tentang Platform SIPBAR', 'text', 'about', 'Label Tentang');
         $this->put('about_title', 'Membangun Sistem Peminjaman Barang yang <span class="headline-accent">Terintegrasi</span>', 'text', 'about', 'Judul Section Tentang');
-        $this->put('about_description', 'SIPBAR mentransformasi pencatatan inventaris sekolah konvensional menjadi ekosistem digital yang terintegrasi, transparan, dan dapat diakses dari mana saja.', 'text', 'about', 'Deskripsi Section Tentang');
+        $this->put('about_description', 'SIPBAR mentransformasi proses peminjaman alat dan barang sekolah konvensional menjadi ekosistem digital yang terintegrasi, transparan, dan mudah dipantau.', 'text', 'about', 'Deskripsi Section Tentang');
         $this->put('about_image', '/sekolaheskasaba.jpeg', 'image', 'about', 'Gambar Section Tentang');
         $this->put('about_badge_year', '2026', 'text', 'about', 'Tahun Badge');
         $this->put('about_badge_name', 'SMKN 1 BANGSRI', 'text', 'about', 'Nama Badge');
@@ -100,14 +100,14 @@ class SiteSettingSeeder extends Seeder
 
         $this->putJson('about_features', [
             ['number' => '01', 'title' => 'Integrasi', 'description' => 'Persetujuan cepat tanpa kertas — guru dapat menyetujui peminjaman langsung dari smartphone.', 'icon' => 'check', 'primary' => true],
-            ['number' => '02', 'title' => 'Akurasi', 'description' => 'Inventaris real-time — stok aset bertambah/berkurang otomatis setiap transaksi terverifikasi.', 'icon' => 'lightning', 'primary' => false],
+            ['number' => '02', 'title' => 'Akurasi', 'description' => 'Ketersediaan real-time — stok barang berkurang/bertambah otomatis setiap transaksi terverifikasi.', 'icon' => 'lightning', 'primary' => false],
             ['number' => '03', 'title' => 'Akuntabilitas', 'description' => 'Riwayat & log transparan — setiap pergerakan barang memiliki jejak audit lengkap.', 'icon' => 'clipboard', 'primary' => false],
             ['number' => '04', 'title' => 'Aksesibilitas', 'description' => 'Akses fleksibel multi-perangkat — responsif di PC, tablet, maupun ponsel.', 'icon' => 'device', 'primary' => false],
         ], 'about');
 
         $this->put('footer_brand_name', 'SIPBAR', 'text', 'footer', 'Nama Brand Footer');
         $this->put('footer_brand_subtitle', 'SMKN 1 BANGSRI', 'text', 'footer', 'Subjudul Brand Footer');
-        $this->put('footer_description', 'Sistem inventaris berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.', 'text', 'footer', 'Deskripsi Footer');
+        $this->put('footer_description', 'Sistem peminjaman barang berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.', 'text', 'footer', 'Deskripsi Footer');
         $this->put('footer_copyright', '© '.date('Y').' SIPBAR – Sistem Informasi Pengelolaan Barang. All rights reserved.', 'text', 'footer', 'Teks Copyright');
         $this->put('footer_heading_menu', 'Menu', 'text', 'footer', 'Judul Kolom Menu');
         $this->put('footer_heading_features', 'Fitur', 'text', 'footer', 'Judul Kolom Fitur');
@@ -120,7 +120,7 @@ class SiteSettingSeeder extends Seeder
                 ['text' => 'Tentang', 'url' => '#tentang'],
             ],
             'information' => [
-                ['text' => 'Manajemen Barang', 'url' => '#fitur'],
+                ['text' => 'Katalog Barang', 'url' => '#fitur'],
                 ['text' => 'Peminjaman', 'url' => '#fitur'],
                 ['text' => 'Pengembalian', 'url' => '#fitur'],
                 ['text' => 'Laporan', 'url' => '#fitur'],
@@ -145,11 +145,11 @@ class SiteSettingSeeder extends Seeder
 
         $this->put('nav_link_home', 'Beranda', 'text', 'navigation', 'Link Beranda');
         $this->put('nav_link_features', 'Fitur', 'text', 'navigation', 'Link Fitur');
-        $this->put('nav_link_inventory', 'Inventaris', 'text', 'navigation', 'Link Inventaris');
+        $this->put('nav_link_inventory', 'Katalog Barang', 'text', 'navigation', 'Link Katalog Barang');
         $this->put('nav_link_about', 'Tentang', 'text', 'navigation', 'Link Tentang');
         $this->put('nav_link_help', 'Bantuan', 'text', 'navigation', 'Link Bantuan');
         $this->put('nav_link_features_mobile', 'Fitur Utama', 'text', 'navigation', 'Link Fitur (Mobile)');
-        $this->put('nav_link_inventory_mobile', 'Katalog Inventaris', 'text', 'navigation', 'Link Inventaris (Mobile)');
+        $this->put('nav_link_inventory_mobile', 'Katalog Barang', 'text', 'navigation', 'Link Katalog Barang (Mobile)');
         $this->put('nav_link_about_mobile', 'Tentang SIPBAR', 'text', 'navigation', 'Link Tentang (Mobile)');
         $this->put('nav_link_help_mobile', 'Bantuan & Kontak', 'text', 'navigation', 'Link Bantuan (Mobile)');
 
