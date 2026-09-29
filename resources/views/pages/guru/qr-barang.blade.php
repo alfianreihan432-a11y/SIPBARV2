@@ -29,7 +29,7 @@
         <div id="qr-token" style="font-size:11.5px;color:var(--muted);font-family:monospace;background:var(--bg3);border-radius:6px;padding:4px 10px;display:inline-block;margin-bottom:14px;letter-spacing:.04em"></div>
         
         <div style="font-size:12px;color:var(--muted);line-height:1.5;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:10px 14px;margin-bottom:12px;text-align:left">
-            Kepala Jurusan akan memindai QR Code ini untuk konfirmasi serah terima barang inventaris.
+            Kepala Jurusan akan memindai QR Code ini untuk konfirmasi serah terima barang pinjaman.
         </div>
         <div id="qr-expires" style="font-size:11px;color:var(--subtle)"></div>
     </div>
@@ -388,7 +388,7 @@
         els.imgWrap.style.display = 'none';
         els.spinner.style.display = 'block';
         els.error.style.display   = 'none';
-        els.itemName.textContent  = itemName || 'Barang Inventaris';
+        els.itemName.textContent  = itemName || 'Barang Pinjaman';
         els.token.textContent     = '';
         els.expires.textContent   = '';
 

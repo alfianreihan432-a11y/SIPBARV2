@@ -339,7 +339,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
             </div>
             <div class="g-empty-title">Belum ada permohonan</div>
-            <div class="g-empty-sub">Ajukan peminjaman barang inventaris sekolah untuk keperluan mengajar</div>
+            <div class="g-empty-sub">Ajukan peminjaman barang sekolah untuk keperluan mengajar</div>
             <a href="{{ route('teacher.peminjaman-guru.create') }}" class="g-btn g-btn--primary" style="margin-top:16px">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                 Ajukan Peminjaman
@@ -468,7 +468,7 @@
         els.imgWrap.style.display  = 'none';
         els.spinner.style.display  = 'block';
         els.error.style.display    = 'none';
-        els.itemName.textContent   = itemName || 'Barang Inventaris';
+        els.itemName.textContent   = itemName || 'Barang Pinjaman';
         els.token.textContent      = '';
         els.expires.textContent    = '';
 

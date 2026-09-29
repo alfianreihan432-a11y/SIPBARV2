@@ -439,7 +439,7 @@
                     <span class="page-title-count">{{ $totalItems }} jenis barang</span>
                 @endif
             </div>
-            <div class="page-subtitle">Review daftar barang dan lengkapi permohonan peminjaman inventaris sebelum diajukan.</div>
+            <div class="page-subtitle">Review daftar barang dan lengkapi permohonan peminjaman sebelum diajukan.</div>
         </div>
         <a href="{{ route('teacher.barang') }}" class="guru-btn guru-btn--primary">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="svg-icon-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
