@@ -481,7 +481,7 @@ html.dark .footer-copy{color:#8fa3c4 !important}
     <div class="nav-links">
       <a href="{{ route('home') }}#beranda">{{ \App\Models\SiteSetting::get('nav_link_home', 'Beranda') }}</a>
       <a href="{{ route('home') }}#fitur">{{ \App\Models\SiteSetting::get('nav_link_features', 'Fitur') }}</a>
-      <a href="{{ route('home') }}#data-inventaris">{{ \App\Models\SiteSetting::get('nav_link_inventory', 'Inventaris') }}</a>
+      <a href="{{ route('home') }}#data-inventaris">{{ \App\Models\SiteSetting::get('nav_link_inventory', 'Katalog Barang') }}</a>
       <a href="{{ route('home') }}#tentang">{{ \App\Models\SiteSetting::get('nav_link_about', 'Tentang') }}</a>
       <a href="{{ route('faq') }}" class="active">{{ \App\Models\SiteSetting::get('nav_link_help', 'Bantuan') }}</a>
     </div>
@@ -563,14 +563,14 @@ html.dark .footer-copy{color:#8fa3c4 !important}
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">2</span>
-                  <span>Jika tetap tidak bisa masuk, hubungi petugas Sarpras sekolah atau admin sistem untuk melakukan reset password akun Anda.</span>
+                  <span>Jika tetap tidak bisa masuk, hubungi petugas / admin sekolah untuk melakukan reset password akun Anda.</span>
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">3</span>
                   <span>Setelah reset dilakukan oleh petugas, masuk kembali melalui halaman <strong>Login</strong> menggunakan kredensial baru.</span>
                 </div>
               </div>
-              <div class="faq-note">Catatan: Untuk keamanan sistem, perubahan kredensial akun siswa dan guru hanya dapat dilakukan melalui admin/petugas Sarpras sekolah.</div>
+              <div class="faq-note">Catatan: Untuk keamanan sistem, perubahan kredensial akun siswa dan guru hanya dapat dilakukan melalui petugas / admin sekolah.</div>
             </div>
           </div>
 
@@ -614,15 +614,15 @@ html.dark .footer-copy{color:#8fa3c4 !important}
               <div class="faq-steps">
                 <div class="faq-step">
                   <span class="faq-step-num">1</span>
-                  <span>Periksa status ketersediaan barang di menu katalog inventaris; barang dengan stok 0 sedang dipinjam peminjam lain atau dalam pemeliharaan.</span>
+                  <span>Periksa status ketersediaan barang di menu Katalog Barang; barang dengan stok 0 sedang dipinjam oleh peminjam lain atau sedang dalam pemeliharaan.</span>
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">2</span>
-                  <span>Cek kembali secara berkala saat barang telah selesai dikembalikan ke gudang Sarpras.</span>
+                  <span>Cek kembali secara berkala saat barang telah selesai dikembalikan ke tempat penyimpanan barang.</span>
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">3</span>
-                  <span>Jika barang dibutuhkan mendesak untuk kegiatan KBM/praktik, konfirmasi langsung ke petugas Sarpras sekolah.</span>
+                  <span>Jika barang dibutuhkan mendesak untuk kegiatan KBM/praktik, konfirmasi langsung ke petugas / admin sekolah.</span>
                 </div>
               </div>
             </div>
@@ -761,7 +761,7 @@ html.dark .footer-copy{color:#8fa3c4 !important}
 
           <div class="faq-item">
             <button type="button" class="faq-question" aria-expanded="false">
-              <span>QR Code tidak terbaca oleh scanner petugas Sarpras?</span>
+              <span>QR Code tidak terbaca oleh scanner petugas / admin?</span>
               <span class="faq-q-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></span>
             </button>
             <div class="faq-answer">
@@ -772,11 +772,11 @@ html.dark .footer-copy{color:#8fa3c4 !important}
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">2</span>
-                  <span>Jika pemindaian tetap gagal, beritahukan <strong>Kode / Nomor Transaksi Peminjaman</strong> Anda kepada petugas Sarpras.</span>
+                  <span>Jika pemindaian tetap gagal, beritahukan <strong>Kode / Nomor Transaksi Peminjaman</strong> Anda kepada petugas / admin.</span>
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">3</span>
-                  <span>Petugas Sarpras akan memproses verifikasi penyerahan barang secara manual di sistem.</span>
+                  <span>Petugas / admin akan memproses verifikasi penyerahan barang secara manual di sistem.</span>
                 </div>
               </div>
             </div>
@@ -791,7 +791,7 @@ html.dark .footer-copy{color:#8fa3c4 !important}
               <div class="faq-steps">
                 <div class="faq-step">
                   <span class="faq-step-num">1</span>
-                  <span>Segera datangi ruang Sarpras sekolah dan tunjukkan nomor transaksi peminjaman Anda.</span>
+                  <span>Segera datangi tempat pengambilan barang sekolah dan tunjukkan nomor transaksi peminjaman Anda.</span>
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">2</span>
@@ -818,15 +818,15 @@ html.dark .footer-copy{color:#8fa3c4 !important}
               <div class="faq-steps">
                 <div class="faq-step">
                   <span class="faq-step-num">1</span>
-                  <span>Bawa barang fisik dalam kondisi lengkap dan bersih ke ruang Sarpras sekolah.</span>
+                  <span>Bawa barang fisik dalam kondisi lengkap dan bersih ke tempat pengembalian barang sekolah.</span>
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">2</span>
-                  <span>Buka menu <strong>Pengembalian</strong> pada akun siswa dan tunjukkan QR Code / kode transaksi pengembalian kepada petugas.</span>
+                  <span>Buka menu <strong>Pengembalian</strong> pada akun siswa dan tunjukkan QR Code / kode transaksi pengembalian kepada petugas / admin.</span>
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">3</span>
-                  <span>Petugas Sarpras akan memverifikasi fisik barang dan menyelesaikan transaksi pengembalian di sistem.</span>
+                  <span>Petugas / admin akan memverifikasi fisik barang dan menyelesaikan transaksi pengembalian di sistem.</span>
                 </div>
               </div>
             </div>
@@ -841,15 +841,15 @@ html.dark .footer-copy{color:#8fa3c4 !important}
               <div class="faq-steps">
                 <div class="faq-step">
                   <span class="faq-step-num">1</span>
-                  <span>Laporkan kondisi sebenarnya secara jujur kepada petugas Sarpras sekolah saat proses pengembalian.</span>
+                  <span>Laporkan kondisi sebenarnya secara jujur kepada petugas / admin sekolah saat proses pengembalian.</span>
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">2</span>
-                  <span>Petugas akan mencatat status kondisi barang (Rusak Ringan, Rusak Berat, atau Hilang) di sistem.</span>
+                  <span>Petugas / admin akan mencatat status kondisi barang (Rusak Ringan, Rusak Berat, atau Hilang) di sistem.</span>
                 </div>
                 <div class="faq-step">
                   <span class="faq-step-num">3</span>
-                  <span>Peminjam bersama Guru Pembimbing menyelesaikan kewajiban perbaikan atau penggantian sesuai tata tertib Sarpras sekolah.</span>
+                  <span>Peminjam bersama Guru Pembimbing menyelesaikan kewajiban perbaikan atau penggantian sesuai tata tertib peminjaman barang sekolah.</span>
                 </div>
               </div>
             </div>
@@ -918,7 +918,7 @@ html.dark .footer-copy{color:#8fa3c4 !important}
     <div id="faqNotFound">
       <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       <p>Pertanyaan Tidak Ditemukan</p>
-      <span>Maaf, tidak ada topik FAQ yang cocok dengan kata kunci pencarian Anda. Silakan hubungi petugas Sarpras sekolah secara langsung.</span>
+      <span>Maaf, tidak ada topik FAQ yang cocok dengan kata kunci pencarian Anda. Silakan hubungi petugas / admin sekolah secara langsung.</span>
     </div>
 
   </div>
@@ -937,7 +937,7 @@ html.dark .footer-copy{color:#8fa3c4 !important}
             <div class="footer-brand-sub">{{ \App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 BANGSRI') }}</div>
           </div>
         </div>
-        <p class="footer-desc">{{ \App\Models\SiteSetting::get('footer_description', 'Sistem inventaris berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.') }}</p>
+        <p class="footer-desc">{{ \App\Models\SiteSetting::get('footer_description', 'Sistem peminjaman barang berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.') }}</p>
         <div class="footer-brand-extra">
           <a href="{{ route('home') }}" class="footer-help-sublink">&larr; Kembali ke Beranda</a>
         </div>

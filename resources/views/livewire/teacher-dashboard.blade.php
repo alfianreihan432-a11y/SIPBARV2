@@ -638,7 +638,7 @@
                     @endphp
                     {{ $greet }}, {{ auth()->check() ? auth()->user()->name : 'Guru' }}
                 </div>
-                <div class="gd-greeting-sub">{{ now()->translatedFormat('l, d F Y') }} • Portal Pengelolaan Inventaris Guru Penanggung Jawab</div>
+                <div class="gd-greeting-sub">{{ now()->translatedFormat('l, d F Y') }} • Portal Peminjaman Barang Guru Penanggung Jawab</div>
             </div>
         </div>
 
@@ -662,7 +662,7 @@
         <div class="gd-section-head">
             <div class="gd-section-title-wrap">
                 <span class="gd-section-indicator"></span>
-                <h2 class="gd-section-title">Ringkasan Inventaris & Sirkulasi</h2>
+                <h2 class="gd-section-title">Ringkasan Ketersediaan & Peminjaman</h2>
             </div>
             <span class="gd-section-tag">Data Real-time</span>
         </div>
@@ -752,7 +752,7 @@
             @foreach($upcomingDeadlines as $deadline)
             <div class="gd-deadline-item">
                 <div>
-                    <div class="gd-deadline-item-name">{{ $deadline->details?->first()?->item?->name ?? 'Barang Inventaris' }}</div>
+                    <div class="gd-deadline-item-name">{{ $deadline->details?->first()?->item?->name ?? 'Barang Pinjaman' }}</div>
                     <div class="gd-deadline-item-user">Peminjam: {{ $deadline->user->name ?? 'Siswa/Guru' }}</div>
                 </div>
                 <div class="gd-deadline-badge">
@@ -791,7 +791,7 @@
                     <div class="gd-txn-item">
                         <div class="gd-txn-top">
                             <div>
-                                <div class="gd-txn-name">{{ $borrowing->details?->first()?->item?->name ?? 'Barang Inventaris' }}</div>
+                                <div class="gd-txn-name">{{ $borrowing->details?->first()?->item?->name ?? 'Barang Pinjaman' }}</div>
                                 <div class="gd-txn-type">Diajukan oleh: <strong style="color:var(--gd-text-primary)">{{ $borrowing->user->name ?? 'Siswa' }}</strong></div>
                             </div>
                             <span class="gd-badge {{ $borrowing->status === 'borrowed' ? 'gd-badge-borrowed' : ($borrowing->status === 'returned' ? 'gd-badge-returned' : ($borrowing->status === 'approved' ? 'gd-badge-approved' : ($borrowing->status === 'rejected' ? 'gd-badge-rejected' : 'gd-badge-pending'))) }}">
@@ -839,7 +839,7 @@
                     <div class="gd-txn-item">
                         <div class="gd-txn-top">
                             <div>
-                                <div class="gd-txn-name">{{ $borrowing->details?->first()?->item?->name ?? 'Barang Inventaris' }}</div>
+                                <div class="gd-txn-name">{{ $borrowing->details?->first()?->item?->name ?? 'Barang Pinjaman' }}</div>
                                 <div class="gd-txn-type">Kode: #{{ $borrowing->number ?? $borrowing->id }}</div>
                             </div>
                             <span class="gd-badge {{ $borrowing->status === 'borrowed' ? 'gd-badge-borrowed' : ($borrowing->status === 'returned' ? 'gd-badge-returned' : ($borrowing->status === 'approved' ? 'gd-badge-approved' : ($borrowing->status === 'rejected' ? 'gd-badge-rejected' : 'gd-badge-pending'))) }}">
@@ -926,7 +926,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
                 </div>
                 <div class="gd-menu-title">Peminjaman Aktif</div>
-                <div class="gd-menu-desc">Monitor aset sarpras yang sedang dipinjam</div>
+                <div class="gd-menu-desc">Monitor barang yang sedang dipinjam</div>
                 @if($totalBorrowed > 0)
                 <div class="gd-menu-badge" style="background:rgba(2,132,199,.12);color:#0284c7;border:1px solid rgba(2,132,199,.25)">
                     <span class="gd-badge-dot"></span>
@@ -941,7 +941,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div class="gd-menu-title">Pengembalian</div>
-                <div class="gd-menu-desc">Verifikasi pengembalian barang dan kondisi aset</div>
+                <div class="gd-menu-desc">Verifikasi pengembalian barang dan kondisi barang</div>
             </a>
 
             {{-- Laporan & Riwayat --}}
@@ -959,7 +959,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
                 <div class="gd-menu-title">Katalog Barang</div>
-                <div class="gd-menu-desc">Daftar barang inventaris dan ketersediaan stok</div>
+                <div class="gd-menu-desc">Daftar barang dan ketersediaan stok</div>
             </a>
         </div>
     </div>

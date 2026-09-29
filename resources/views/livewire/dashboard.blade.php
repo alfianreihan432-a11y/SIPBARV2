@@ -140,8 +140,8 @@
     <div class="hero-section">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1 class="hero-title">Sistem Inventaris Modern</h1>
-            <p class="hero-subtitle">Kelola Inventaris Lebih Mudah, Cepat & Terorganisir</p>
+            <h1 class="hero-title">Sistem Peminjaman Modern</h1>
+            <p class="hero-subtitle">Pinjam & Kelola Barang Lebih Mudah, Cepat & Terorganisir</p>
             <div class="hero-greeting">
                 @php
                     $hour = now()->hour;
@@ -253,7 +253,7 @@
             <div class="db-panel-header">
                 <div>
                     <div class="db-panel-title">Statistik Barang</div>
-                    <div class="db-panel-sub">Overview inventaris</div>
+                    <div class="db-panel-sub">Overview ketersediaan barang</div>
                 </div>
             </div>
             <div class="db-chart-big-num">{{ $totalItems }}</div>

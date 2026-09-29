@@ -146,7 +146,7 @@ table.cm-table tbody td { padding: 13px 18px; font-size: 13px; color: var(--text
                     {{ $editingId ? 'Edit Kategori' : 'Tambah Kategori Baru' }}
                 </div>
                 <div class="cm-form-sub">
-                    {{ $editingId ? 'Perbarui data kategori inventaris.' : 'Tambahkan kategori baru untuk mengelompokkan barang inventaris.' }}
+                    {{ $editingId ? 'Perbarui data kategori barang.' : 'Tambahkan kategori baru untuk mengelompokkan barang.' }}
                 </div>
             </div>
             <div style="display:flex;align-items:center;gap:10px">

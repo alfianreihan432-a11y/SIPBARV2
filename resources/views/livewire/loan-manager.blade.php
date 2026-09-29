@@ -189,7 +189,7 @@ html.dark .mc-card-val-overdue {
             </div>
             <div>
                 <div class="lm-title">Daftar Peminjaman</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:1px">Semua transaksi peminjaman barang inventaris</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:1px">Semua transaksi peminjaman barang</div>
             </div>
             <span class="lm-count">{{ $borrowings->count() }} transaksi</span>
         </div>

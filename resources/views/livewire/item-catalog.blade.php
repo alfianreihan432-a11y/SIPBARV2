@@ -8,7 +8,7 @@
                 <span class="page-title-count">{{ $items->total() }} item</span>
                 @endif
             </div>
-            <div class="page-subtitle">Pilih barang yang ingin kamu pinjam dari inventaris sekolah</div>
+            <div class="page-subtitle">Pilih barang yang ingin kamu pinjam untuk keperluan praktik / belajar</div>
         </div>
     </div>
 
