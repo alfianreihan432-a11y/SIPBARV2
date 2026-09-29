@@ -47,6 +47,6 @@ class SipbarCoreTest extends TestCase
         $response = $this->get('/inventory');
 
         $response->assertOk();
-        $response->assertSee('Inventaris Barang');
+        $response->assertSee('Data Barang');
     }
 }
