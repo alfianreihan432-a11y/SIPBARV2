@@ -213,7 +213,7 @@ class InventoryManager extends Component
         $this->clearItemCaches();
         $this->resetForm();
         $this->loadItems();
-        session()->flash('message', 'Inventaris berhasil disimpan.');
+        session()->flash('message', 'Data barang berhasil disimpan.');
     }
 
     public function edit($id): void
@@ -257,7 +257,7 @@ class InventoryManager extends Component
         $this->clearItemCaches();
         $this->loadItems();
         $this->dispatch('itemUpdated');
-        session()->flash('message', 'Inventaris berhasil dihapus.');
+        session()->flash('message', 'Data barang berhasil dihapus.');
     }
 
     protected function clearItemCaches(): void

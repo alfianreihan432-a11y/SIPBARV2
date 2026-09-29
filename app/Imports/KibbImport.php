@@ -218,7 +218,7 @@ class KibbImport implements ToCollection
                         'row' => $rowNumber,
                         'kode_kibb' => $kodeBarang,
                         'name' => $namaBarang,
-                        'reason' => "Barang dengan Kode KIBB '{$kodeBarang}'{$regText} sudah ada di inventaris ({$existing->name}).",
+                        'reason' => "Barang dengan Kode KIBB '{$kodeBarang}'{$regText} sudah terdaftar di sistem ({$existing->name}).",
                     ];
                     continue;
                 }

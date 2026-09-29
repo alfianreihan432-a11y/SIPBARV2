@@ -135,7 +135,7 @@ class BorrowingApprovalService
             $item = $detail->item;
 
             if (! $item) {
-                throw new InsufficientStockException('Barang pada permohonan tidak ditemukan di inventaris.');
+                throw new InsufficientStockException('Barang pada permohonan tidak ditemukan dalam daftar barang.');
             }
 
             $reservedStock = BorrowingRequestItem::query()

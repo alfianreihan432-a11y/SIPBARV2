@@ -336,7 +336,7 @@ class LoanManager extends Component
 
 Kami informasikan bahwa peminjaman barang {$itemName} dengan nomor peminjaman {$borrowingNumber} telah melewati batas waktu pengembalian yang dijadwalkan pada {$returnDateTime}.
 
-Mohon kesediaannya untuk segera mengembalikan barang tersebut ke petugas inventaris SIPBAR SMKN 1 Bangsri. Jika ada kendala, silakan hubungi kami.
+Mohon kesediaannya untuk segera mengembalikan barang tersebut ke petugas / admin SIPBAR SMKN 1 Bangsri. Jika ada kendala, silakan hubungi kami.
 
 Terima kasih atas perhatian dan kerja samanya.";
 
