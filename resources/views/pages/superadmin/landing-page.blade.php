@@ -393,17 +393,17 @@
                 
                 <div class="form-group">
                     <label for="hero_badge" class="form-label">Badge Hero</label>
-                    <input type="text" id="hero_badge" name="hero_badge" value="{{ $settings['hero']['hero_badge'] ?? 'Sistem Inventaris Modern' }}" class="form-control">
+                    <input type="text" id="hero_badge" name="hero_badge" value="{{ $settings['hero']['hero_badge'] ?? 'Sistem Peminjaman Online' }}" class="form-control">
                 </div>
                 
                 <div class="form-group">
                     <label for="hero_title" class="form-label">Judul Hero (HTML diizinkan)</label>
-                    <textarea id="hero_title" name="hero_title" rows="2" class="form-control" style="resize:vertical;">{{ $settings['hero']['hero_title'] ?? 'Kelola Inventaris<br><em>Lebih Mudah</em> & Efisien' }}</textarea>
+                    <textarea id="hero_title" name="hero_title" rows="2" class="form-control" style="resize:vertical;">{{ $settings['hero']['hero_title'] ?? 'Pinjam Barang Sekolah<br><em>Lebih Mudah</em> & Cepat' }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="hero_description" class="form-label">Deskripsi Hero</label>
-                    <textarea id="hero_description" name="hero_description" rows="3" class="form-control" style="resize:vertical;">{{ $settings['hero']['hero_description'] ?? 'Platform web modern untuk mengelola inventaris sekolah secara digital, transparan, dan terintegrasi.' }}</textarea>
+                    <textarea id="hero_description" name="hero_description" rows="3" class="form-control" style="resize:vertical;">{{ $settings['hero']['hero_description'] ?? 'Platform digital terintegrasi untuk peminjaman sarana dan alat praktik sekolah dengan persetujuan online & QR code.' }}</textarea>
                 </div>
                 
                 <div class="form-group">
@@ -445,7 +445,7 @@
                 
                 <div class="form-group">
                     <label for="features_title" class="form-label">Judul Section Fitur (HTML diizinkan)</label>
-                    <textarea id="features_title" name="features_title" rows="2" class="form-control" style="resize:vertical;">{{ $settings['features']['features_title'] ?? 'Tata Kelola Inventaris <em>Cepat & Terintegrasi</em>' }}</textarea>
+                    <textarea id="features_title" name="features_title" rows="2" class="form-control" style="resize:vertical;">{{ $settings['features']['features_title'] ?? 'Alur Peminjaman Barang <em>Digital & Transparan</em>' }}</textarea>
                 </div>
                 
                 <div class="form-group">
@@ -542,7 +542,7 @@
                 
                 <div class="form-group">
                     <label for="stats_eyebrow" class="form-label">Label Statistik</label>
-                    <input type="text" id="stats_eyebrow" name="stats_eyebrow" value="{{ $settings['stats']['stats_eyebrow'] ?? 'Data Inventaris' }}" class="form-control">
+                    <input type="text" id="stats_eyebrow" name="stats_eyebrow" value="{{ $settings['stats']['stats_eyebrow'] ?? 'Transparansi Data' }}" class="form-control">
                 </div>
                 
                 <div class="form-group">
@@ -552,7 +552,7 @@
                 
                 <div class="form-group">
                     <label for="stats_description" class="form-label">Deskripsi Section Statistik</label>
-                    <textarea id="stats_description" name="stats_description" rows="3" class="form-control" style="resize:vertical;">{{ $settings['stats']['stats_description'] ?? 'Pantau kondisi inventaris, peminjaman aktif, dan pengembalian barang dalam satu dashboard terpusat.' }}</textarea>
+                    <textarea id="stats_description" name="stats_description" rows="3" class="form-control" style="resize:vertical;">{{ $settings['stats']['stats_description'] ?? 'Pantau ketersediaan barang dan riwayat sirkulasi peminjaman sekolah secara terintegrasi, transparan, dan real-time.' }}</textarea>
                 </div>
                 
                 <div class="form-group">
@@ -644,12 +644,12 @@
                 
                 <div class="form-group">
                     <label for="about_title" class="form-label">Judul Section Tentang (HTML diizinkan)</label>
-                    <textarea id="about_title" name="about_title" rows="2" class="form-control" style="resize:vertical;">{{ $settings['about']['about_title'] ?? 'Platform <em>Digitalisasi</em> Inventaris Sekolah' }}</textarea>
+                    <textarea id="about_title" name="about_title" rows="2" class="form-control" style="resize:vertical;">{{ $settings['about']['about_title'] ?? 'Membangun Sistem Peminjaman Barang yang <span class="headline-accent">Terintegrasi</span>' }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="about_description" class="form-label">Deskripsi Section Tentang</label>
-                    <textarea id="about_description" name="about_description" rows="3" class="form-control" style="resize:vertical;">{{ $settings['about']['about_description'] ?? 'SIPBAR membantu sekolah mengelola inventaris secara modern dengan fitur QR code, approval otomatis, dan laporan real-time. Solusi lengkap untuk manajemen sarana prasarana.' }}</textarea>
+                    <textarea id="about_description" name="about_description" rows="3" class="form-control" style="resize:vertical;">{{ $settings['about']['about_description'] ?? 'SIPBAR mentransformasi proses peminjaman alat dan barang sekolah konvensional menjadi ekosistem digital yang terintegrasi, transparan, dan mudah dipantau.' }}</textarea>
                 </div>
                 
                 <div class="form-group">
@@ -676,7 +676,7 @@
                     </div>
                     <div class="form-group">
                         <label for="about_caption_sub" class="form-label">Sub Caption Gambar</label>
-                        <input type="text" id="about_caption_sub" name="about_caption_sub" value="{{ $settings['about']['about_caption_sub'] ?? 'Menghadirkan solusi inventaris terbaik untuk mendukung pembelajaran yang berkualitas.' }}" class="form-control">
+                        <input type="text" id="about_caption_sub" name="about_caption_sub" value="{{ $settings['about']['about_caption_sub'] ?? 'Pusat kegiatan belajar mengajar dan inovasi digital' }}" class="form-control">
                     </div>
                 </div>
                 
@@ -762,7 +762,7 @@
                 
                 <div class="form-group">
                     <label for="footer_description" class="form-label">Deskripsi Footer</label>
-                    <textarea id="footer_description" name="footer_description" rows="3" class="form-control" style="resize:vertical;">{{ $settings['footer']['footer_description'] ?? 'Sistem Informasi Pengelolaan Barang - Solusi modern untuk manajemen inventaris sekolah secara digital dan terintegrasi.' }}</textarea>
+                    <textarea id="footer_description" name="footer_description" rows="3" class="form-control" style="resize:vertical;">{{ $settings['footer']['footer_description'] ?? 'Sistem peminjaman barang berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.' }}</textarea>
                 </div>
                 
                 <div class="form-group">
@@ -901,8 +901,8 @@
                         <input type="text" id="nav_link_features" name="nav_link_features" value="{{ $settings['navigation']['nav_link_features'] ?? 'Fitur' }}" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label for="nav_link_inventory" class="form-label">Link Inventaris</label>
-                        <input type="text" id="nav_link_inventory" name="nav_link_inventory" value="{{ $settings['navigation']['nav_link_inventory'] ?? 'Inventaris' }}" class="form-control">
+                        <label for="nav_link_inventory" class="form-label">Link Katalog Barang</label>
+                        <input type="text" id="nav_link_inventory" name="nav_link_inventory" value="{{ $settings['navigation']['nav_link_inventory'] ?? 'Katalog Barang' }}" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="nav_link_about" class="form-label">Link Tentang</label>
@@ -917,8 +917,8 @@
                         <input type="text" id="nav_link_features_mobile" name="nav_link_features_mobile" value="{{ $settings['navigation']['nav_link_features_mobile'] ?? 'Fitur Utama' }}" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label for="nav_link_inventory_mobile" class="form-label">Inventaris (Mobile)</label>
-                        <input type="text" id="nav_link_inventory_mobile" name="nav_link_inventory_mobile" value="{{ $settings['navigation']['nav_link_inventory_mobile'] ?? 'Katalog Inventaris' }}" class="form-control">
+                        <label for="nav_link_inventory_mobile" class="form-label">Katalog Barang (Mobile)</label>
+                        <input type="text" id="nav_link_inventory_mobile" name="nav_link_inventory_mobile" value="{{ $settings['navigation']['nav_link_inventory_mobile'] ?? 'Katalog Barang' }}" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="nav_link_about_mobile" class="form-label">Tentang (Mobile)</label>
