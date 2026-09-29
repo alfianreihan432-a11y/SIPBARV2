@@ -544,7 +544,7 @@
                                         @if($ret->status === 'menunggu')
                                             <div style="display: inline-flex; align-items: center; gap: 6px;">
                                                 {{-- Approve Form --}}
-                                                <form action="{{ route('admin.returns.approve', $ret->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin menyetujui pengembalian barang ini? Stok inventaris dan status peminjaman akan diperbarui.')">
+                                                <form action="{{ route('admin.returns.approve', $ret->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin menyetujui pengembalian barang ini? Stok dan status peminjaman akan diperbarui.')">
                                                     @csrf
                                                     <button type="submit" class="btn-approve" title="Setujui Pengembalian">
                                                         <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor">

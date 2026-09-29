@@ -236,7 +236,7 @@
         </div>
 
         <h1 class="login-title">Masuk ke Akun</h1>
-        <p class="login-subtitle">Akses sistem inventaris sekolah dengan mudah, cepat, dan aman.</p>
+        <p class="login-subtitle">Akses sistem peminjaman barang sekolah dengan mudah, cepat, dan aman.</p>
 
         {{-- Session status --}}
         @if (session('status'))
