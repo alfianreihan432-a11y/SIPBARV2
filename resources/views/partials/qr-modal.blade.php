@@ -9,7 +9,7 @@
 
         <div class="qr-modal-header">
             <div class="qr-modal-title">QR Code Peminjaman</div>
-            <div class="qr-modal-subtitle">Tunjukkan QR Code ini kepada petugas inventaris saat mengambil barang</div>
+            <div class="qr-modal-subtitle">Tunjukkan QR Code ini kepada petugas / admin saat mengambil barang</div>
         </div>
 
         {{-- Spinner Loader --}}

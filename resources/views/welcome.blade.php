@@ -1024,7 +1024,7 @@ html.dark .footer-copy{color:#8fa3c4 !important}
     <div class="nav-links">
       <a href="#beranda">{{ \App\Models\SiteSetting::get('nav_link_home', 'Beranda') }}</a>
       <a href="#fitur">{{ \App\Models\SiteSetting::get('nav_link_features', 'Fitur') }}</a>
-      <a href="#data-inventaris">{{ \App\Models\SiteSetting::get('nav_link_inventory', 'Inventaris') }}</a>
+      <a href="#data-inventaris">{{ \App\Models\SiteSetting::get('nav_link_inventory', 'Katalog Barang') }}</a>
       <a href="#tentang">{{ \App\Models\SiteSetting::get('nav_link_about', 'Tentang') }}</a>
       <a href="#bantuan">{{ \App\Models\SiteSetting::get('nav_link_help', 'Bantuan') }}</a>
     </div>
@@ -1088,7 +1088,7 @@ html.dark .footer-copy{color:#8fa3c4 !important}
       </a>
       <a href="#data-inventaris" onclick="closeNavMob()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-        <span>{{ \App\Models\SiteSetting::get('nav_link_inventory_mobile', 'Data Inventaris') }}</span>
+        <span>{{ \App\Models\SiteSetting::get('nav_link_inventory_mobile', 'Katalog Barang') }}</span>
       </a>
       <a href="#tentang" onclick="closeNavMob()">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1141,9 +1141,9 @@ html.dark .footer-copy{color:#8fa3c4 !important}
 <section class="hero" id="beranda">
   <div class="hero-inner">
     <div>
-      <div class="hero-badge"><span class="hero-badge-pulse"></span>{{ \App\Models\SiteSetting::get('hero_badge', 'Sistem Inventaris Modern') }}</div>
-      <h1 class="hero-h1">{!! \App\Models\SiteSetting::html('hero_title', 'Kelola Inventaris<br><em>Lebih Mudah</em> & Efisien') !!}</h1>
-      <p class="hero-p">{{ \App\Models\SiteSetting::get('hero_description', 'Platform web modern untuk mengelola inventaris sekolah secara digital, transparan, dan terintegrasi.') }}</p>
+      <div class="hero-badge"><span class="hero-badge-pulse"></span>{{ \App\Models\SiteSetting::get('hero_badge', 'Sistem Peminjaman Online') }}</div>
+      <h1 class="hero-h1">{!! \App\Models\SiteSetting::html('hero_title', 'Pinjam Barang Sekolah<br><em>Lebih Mudah</em> & Cepat') !!}</h1>
+      <p class="hero-p">{{ \App\Models\SiteSetting::get('hero_description', 'Platform digital terintegrasi untuk peminjaman sarana dan alat praktik sekolah dengan persetujuan online & QR code.') }}</p>
     </div>
   </div>
 </section>
@@ -1153,8 +1153,8 @@ html.dark .footer-copy{color:#8fa3c4 !important}
   <div class="section-inner">
     <div class="section-head">
       <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>{{ \App\Models\SiteSetting::get('features_eyebrow', 'Kapabilitas Sistem') }}</div>
-      <h2 class="section-h2">{!! \App\Models\SiteSetting::html('features_title', 'Solusi Lengkap Inventaris <em>Digital</em>') !!}</h2>
-      <p class="section-lead">{{ \App\Models\SiteSetting::get('features_lead', 'Solusi terpadu untuk efisiensi dan transparansi pengelolaan inventaris sekolah.') }}</p>
+      <h2 class="section-h2">{!! \App\Models\SiteSetting::html('features_title', 'Alur Peminjaman Barang <em>Digital & Transparan</em>') !!}</h2>
+      <p class="section-lead">{{ \App\Models\SiteSetting::get('features_lead', 'Solusi terpadu untuk efisiensi dan kemudahan proses peminjaman sarana prasarana sekolah.') }}</p>
     </div>
 
     @php
@@ -1189,13 +1189,13 @@ html.dark .footer-copy{color:#8fa3c4 !important}
             <svg class="feat-flow-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             <div class="feat-flow-step">
               <span class="feat-flow-dot">3</span>
-              <span>Scan QR Sarpras</span>
+              <span>Scan QR Pengambilan</span>
             </div>
           </div>
         </div>
       </div>
 
-      {{-- BENTO CARD 2: Manajemen Stok & Aset --}}
+      {{-- BENTO CARD 2: Ketersediaan Barang & Stok --}}
       <div class="feat-bento-card feat-card-row1">
         <div>
           <div class="feat-top-meta">
@@ -1204,8 +1204,8 @@ html.dark .footer-copy{color:#8fa3c4 !important}
               <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             </div>
           </div>
-          <div class="feat-title">{{ $feat(1, 'title', 'Manajemen Stok & Tracking Aset') }}</div>
-          <p class="feat-summary">{{ $feat(1, 'description', 'Katalog aset terstruktur dengan nomor registrasi, kondisi fisik, dan lokasi.') }}</p>
+          <div class="feat-title">{{ $feat(1, 'title', 'Ketersediaan Barang & Stok') }}</div>
+          <p class="feat-summary">{{ $feat(1, 'description', 'Katalog barang terstruktur dengan informasi ketersediaan, kondisi fisik, dan lokasi penyimpanan.') }}</p>
         </div>
       </div>
 
@@ -1219,7 +1219,7 @@ html.dark .footer-copy{color:#8fa3c4 !important}
             </div>
           </div>
           <div class="feat-title">{{ $feat(2, 'title', 'Verifikasi Pengembalian') }}</div>
-          <p class="feat-summary">{{ $feat(2, 'description', 'Pemeriksaan kondisi fisik barang saat dikembalikan untuk menjaga aset.') }}</p>
+          <p class="feat-summary">{{ $feat(2, 'description', 'Pemeriksaan kondisi fisik barang saat dikembalikan untuk menjaga keutuhan sarana.') }}</p>
         </div>
       </div>
 
@@ -1319,8 +1319,8 @@ $stat = function (int $i, string $key, $default = '') use ($statsCards) {
         <span class="stats-eyebrow-pulse"></span>
         {{ \App\Models\SiteSetting::get('stats_eyebrow', 'Transparansi Data') }}
       </div>
-      <h2 class="stats-h2">{!! \App\Models\SiteSetting::html('stats_title', 'Inventaris Sekolah<br><em>dalam Real-Time Data</em>') !!}</h2>
-      <p class="stats-p">{{ \App\Models\SiteSetting::get('stats_description', 'Kelola dan pantau seluruh aset fisik sekolah secara terintegrasi, transparan, dan dapat diakses dari mana saja dengan sistem inventaris modern.') }}</p>
+      <h2 class="stats-h2">{!! \App\Models\SiteSetting::html('stats_title', 'Ketersediaan Barang & Peminjaman<br><em>dalam Real-Time</em>') !!}</h2>
+      <p class="stats-p">{{ \App\Models\SiteSetting::get('stats_description', 'Pantau ketersediaan barang dan riwayat sirkulasi peminjaman sekolah secara terintegrasi, transparan, dan real-time.') }}</p>
     </div>
     <div class="stats-grid">
       {{-- Total Items --}}
@@ -1345,7 +1345,7 @@ $stat = function (int $i, string $key, $default = '') use ($statsCards) {
           <span class="stat-trend" style="background:#e0f2fe;color:#0369a1">{{ $stat(1, 'trend', 'Terstruktur') }}</span>
         </div>
         <div class="stat-num-b">{{ number_format($stats['total_categories'] ?? 0, 0, ',', '.') }}</div>
-        <div class="stat-lbl-b">{{ $stat(1, 'label', 'Kategori Aset') }}</div>
+        <div class="stat-lbl-b">{{ $stat(1, 'label', 'Kategori Barang') }}</div>
         <div class="stat-sub-b">{{ $stats['top_category'] ?? 'Berbagai Kategori' }} {{ $stat(1, 'sublabel', 'terbanyak') }}</div>
       </div>
 
@@ -1396,7 +1396,7 @@ $stat = function (int $i, string $key, $default = '') use ($statsCards) {
         </h2>
 
         <p class="about-desc-redesigned">
-          {{ \App\Models\SiteSetting::get('about_description', 'SIPBAR mentransformasi pencatatan inventaris sekolah konvensional menjadi ekosistem digital yang terintegrasi, transparan, dan dapat diakses dari mana saja.') }}
+          {{ \App\Models\SiteSetting::get('about_description', 'SIPBAR mentransformasi proses peminjaman alat dan barang sekolah konvensional menjadi ekosistem digital yang terintegrasi, transparan, dan mudah dipantau.') }}
         </p>
       </div>
 
@@ -1460,14 +1460,14 @@ $stat = function (int $i, string $key, $default = '') use ($statsCards) {
             </div>
             <div class="faq-preview-step">
               <span class="faq-preview-step-num">2</span>
-              <span>Jika tetap tidak bisa masuk, hubungi petugas Sarpras sekolah untuk melakukan reset password akun Anda.</span>
+              <span>Jika tetap tidak bisa masuk, hubungi petugas / admin sekolah untuk melakukan reset password akun Anda.</span>
             </div>
             <div class="faq-preview-step">
               <span class="faq-preview-step-num">3</span>
               <span>Setelah di-reset oleh petugas, masuk kembali melalui halaman <strong>Login</strong> dengan password baru.</span>
             </div>
           </div>
-          <div class="faq-preview-note">Catatan: Perubahan data kredensial siswa dan guru dikelola langsung oleh petugas Sarpras/operator sekolah.</div>
+          <div class="faq-preview-note">Catatan: Perubahan data kredensial siswa dan guru dikelola langsung oleh petugas / admin sekolah.</div>
         </div>
       </div>
 
@@ -1483,15 +1483,15 @@ $stat = function (int $i, string $key, $default = '') use ($statsCards) {
           <div class="faq-preview-steps">
             <div class="faq-preview-step">
               <span class="faq-preview-step-num">1</span>
-              <span>Periksa ketersediaan barang di katalog inventaris; barang bersisa stok 0 sedang dipinjam peminjam lain atau dalam pemeliharaan.</span>
+              <span>Periksa ketersediaan barang di Katalog Barang; barang dengan stok 0 sedang dipinjam oleh peminjam lain atau sedang dalam pemeliharaan.</span>
             </div>
             <div class="faq-preview-step">
               <span class="faq-preview-step-num">2</span>
-              <span>Cek kembali secara berkala saat barang telah dikembalikan ke ruang Sarpras.</span>
+              <span>Cek kembali secara berkala saat barang telah selesai dikembalikan ke tempat penyimpanan barang.</span>
             </div>
             <div class="faq-preview-step">
               <span class="faq-preview-step-num">3</span>
-              <span>Jika barang mendesak untuk kegiatan KBM/praktik, hubungi petugas Sarpras sekolah secara langsung.</span>
+              <span>Jika barang mendesak untuk kegiatan KBM/praktik, hubungi petugas / admin sekolah secara langsung.</span>
             </div>
           </div>
         </div>
@@ -1561,15 +1561,15 @@ $stat = function (int $i, string $key, $default = '') use ($statsCards) {
           <div class="faq-preview-steps">
             <div class="faq-preview-step">
               <span class="faq-preview-step-num">1</span>
-              <span>Bawa barang fisik dalam kondisi lengkap dan bersih ke ruang Sarpras sekolah.</span>
+              <span>Bawa barang fisik dalam kondisi lengkap dan bersih ke tempat pengembalian barang sekolah.</span>
             </div>
             <div class="faq-preview-step">
               <span class="faq-preview-step-num">2</span>
-              <span>Buka menu <strong>Pengembalian</strong> pada akun Siswa dan tunjukkan nomor / kode transaksi pengembalian kepada petugas.</span>
+              <span>Buka menu <strong>Pengembalian</strong> pada akun Siswa dan tunjukkan nomor / kode transaksi pengembalian kepada petugas / admin.</span>
             </div>
             <div class="faq-preview-step">
               <span class="faq-preview-step-num">3</span>
-              <span>Petugas Sarpras memverifikasi kondisi fisik barang dan menyelesaikan transaksi pengembalian di sistem.</span>
+              <span>Petugas / admin memverifikasi kondisi fisik barang dan menyelesaikan transaksi pengembalian di sistem.</span>
             </div>
           </div>
         </div>
@@ -1601,7 +1601,7 @@ $stat = function (int $i, string $key, $default = '') use ($statsCards) {
             <div class="footer-brand-sub">{{ \App\Models\SiteSetting::get('footer_brand_subtitle', 'SMKN 1 BANGSRI') }}</div>
           </div>
         </div>
-        <p class="footer-desc">{{ \App\Models\SiteSetting::get('footer_description', 'Sistem inventaris berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.') }}</p>
+        <p class="footer-desc">{{ \App\Models\SiteSetting::get('footer_description', 'Sistem peminjaman barang berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.') }}</p>
         <div class="footer-brand-extra">
           <a href="{{ route('faq') }}" class="footer-help-sublink">Pusat Bantuan</a>
         </div>
