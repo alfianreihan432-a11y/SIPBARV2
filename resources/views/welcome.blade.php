@@ -623,7 +623,7 @@ html.dark body::before{
   z-index:-1;
   pointer-events:none;
   background:
-    radial-gradient(ellipse 85% 60% at 88% 0%, #0a84f0 0%, rgba(0,123,224,.85) 22%, rgba(0,90,190,.55) 45%, rgba(0,50,120,.25) 65%, transparent 82%),
+    radial-gradient(ellipse 85% 60% at 88% 0%, rgba(10,132,240,.75) 0%, rgba(0,123,224,.65) 22%, rgba(0,90,190,.42) 45%, rgba(0,50,120,.18) 65%, transparent 82%),
     linear-gradient(180deg, #0068c8 0%, #003a80 22%, #00204f 38%, #050028 52%, #030014 68%, #00000a 85%, #000004 100%) !important;
 }
 
