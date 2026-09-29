@@ -23,7 +23,7 @@
     {{-- ═══ CONTENT PANEL ═══ --}}
     <div style="background:var(--bg-card);border:1px solid var(--border-alt);border-radius:18px;padding:24px 28px;box-shadow:var(--card-shadow)">
         <div style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:8px">Halaman Statistik</div>
-        <div style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:16px">Di sini akan ditampilkan statistik penggunaan barang dan peminjaman sistem secara keseluruhan. Superadmin dapat memantau tren penggunaan inventaris di seluruh sekolah.</div>
+        <div style="font-size:14px;color:var(--text-muted);line-height:1.6;margin-bottom:16px">Di sini akan ditampilkan statistik penggunaan barang dan peminjaman sistem secara keseluruhan. Superadmin dapat memantau tren peminjaman barang di seluruh sekolah.</div>
         <a href="{{ route('superadmin.dashboard') }}" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:var(--blue-dark);border:none;border-radius:10px;font-size:12px;font-weight:700;color:#ffffff !important;text-decoration:none;transition:opacity .15s">
             Kembali ke Dashboard
         </a>

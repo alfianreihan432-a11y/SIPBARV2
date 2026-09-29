@@ -12,7 +12,7 @@
             </svg>
         </div>
         <div>
-            <div style="font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Manajemen Inventaris</div>
+            <div style="font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Manajemen Barang</div>
             <div style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Kelola Barang</div>
             <div style="font-size:13px;color:var(--text-muted)">Superadmin dapat menambah, mengedit, dan menghapus data barang yang sama dengan panel Admin.</div>
         </div>
