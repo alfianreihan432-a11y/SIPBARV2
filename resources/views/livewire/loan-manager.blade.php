@@ -254,15 +254,6 @@ html.dark .mc-card-val-overdue {
         </svg>
         <div style="font-size:14px;color:var(--text-primary);font-weight:600">Tidak ada data peminjaman yang sesuai filter.</div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Coba ubah opsi filter tipe atau status di atas.</div>
-    </div>
-    @else
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch" onscroll="handleLoanTableScroll(this)">
-        <svg xmlns="http://www.w3.org/2000/svg" style="width:40px;height:40px;margin:0 auto 12px;color:var(--text-muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-        </svg>
-        <div style="font-size:14px;color:var(--text-primary);font-weight:600">Tidak ada data peminjaman yang sesuai filter.</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Coba ubah opsi filter tipe atau status di atas.</div>
-    </div>
     @else
     {{-- Desktop Table View --}}
     <div class="desktop-table-view" style="overflow-x:auto;-webkit-overflow-scrolling:touch">
