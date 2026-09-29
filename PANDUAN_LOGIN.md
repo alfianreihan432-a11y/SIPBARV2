@@ -48,7 +48,7 @@ Untuk mengganti password:
 ### Dashboard Guru:
 Setelah berhasil login, guru akan diarahkan ke dashboard guru yang berisi:
 - **Menu Peminjaman**: Melihat dan menyetujui permintaan peminjaman barang
-- **Menu Inventaris**: Mengelola barang yang tersedia
+- **Menu Barang**: Mengelola barang yang tersedia
 - **Menu Pengembalian**: Memproses pengembalian barang
 - **Menu QR Scan**: Memindai QR Code untuk konfirmasi pengambilan/pengembalian barang
 - **Statistik**: Ringkasan aktivitas peminjaman
@@ -92,7 +92,7 @@ Setelah berhasil login, siswa akan diarahkan ke dashboard siswa yang berisi:
 Jika mengalami masalah yang tidak dapat diselesaikan:
 - Hubungi admin SIPBAR di sekolah
 - Email: admin@smkn1bangsri.sch.id
-- Atau datang ke ruang inventaris untuk bantuan langsung
+- Atau datang ke tempat pengambilan barang untuk bantuan langsung
 
 ---
 
