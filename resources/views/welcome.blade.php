@@ -459,54 +459,67 @@ html.dark .mob-t-moon{display:none}
 
 /* Desktop: 4 kolom sejajar dengan garis penghubung */
 .alur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;margin-top:40px}
-.alur-card{background:#ffffff;border:1.5px solid #e2e8f0;border-radius:16px;padding:28px 20px;text-align:center;transition:all .25s cubic-bezier(0.4,0,0.2,1);position:relative;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.alur-card:hover{transform:translateY(-4px);border-color:#2563eb;box-shadow:0 8px 24px rgba(37,99,235,.12)}
 
-/* Nomor di lingkaran */
-.alur-num-wrap{width:48px;height:48px;border-radius:50%;background:#eff6ff;border:2px solid #dbeafe;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;color:#1d4ed8;transition:all .25s ease}
-.alur-card:hover .alur-num-wrap{background:#1d4ed8;border-color:#1d4ed8;color:#ffffff;transform:scale(1.08)}
+/* Garis putus-putus horizontal di belakang tile (desktop) */
+.alur-grid::before{content:'';position:absolute;top:52px;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg,#e2e8f0 0,#e2e8f0 8px,transparent 8px,transparent 16px);z-index:0}
 
-/* Ikon SVG */
-.alur-icon-wrap{width:52px;height:52px;border-radius:14px;background:#f8fafc;border:1.5px solid #e2e8f0;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#1d4ed8;transition:all .25s ease}
-.alur-card:hover .alur-icon-wrap{background:#eff6ff;border-color:#2563eb;color:#1d4ed8}
+/* Garis biru solid yang terisi saat masuk viewport */
+.alur-progress-line{position:absolute;top:52px;left:0;height:2px;background:linear-gradient(90deg,#1d4ed8 0%,#2563eb 100%);width:0%;z-index:1;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+
+.alur-card{background:#ffffff;border:1px solid #e2e8f0;border-top:3px solid #1d4ed8;border-radius:20px;padding:24px 20px;text-align:center;transition:all .3s cubic-bezier(0.4,0,0.2,1);position:relative;box-shadow:0 2px 8px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.02);z-index:2}
+.alur-card:hover{transform:translateY(-4px);border-color:#cbd5e1;border-top-color:#2563eb;box-shadow:0 8px 24px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04)}
+
+/* Tile ikon besar dengan gradien biru */
+.alur-icon-tile{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;position:relative;box-shadow:0 4px 12px rgba(29,78,216,.2);transition:all .3s ease}
+.alur-card:hover .alur-icon-tile{transform:scale(1.05);box-shadow:0 6px 16px rgba(29,78,216,.3)}
+.alur-icon-tile svg{width:28px;height:28px;color:#ffffff}
+
+/* Nomor badge kecil di pojok kanan atas tile */
+.alur-num-badge{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:999px;background:#ffffff;border:2px solid #1d4ed8;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;color:#1d4ed8;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+
+/* Label "Inti sistem" pill (hanya kartu Ambil) */
+.alur-badge-core{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#eff6ff;border:1px solid #dbeafe;border-radius:999px;font-size:10px;font-weight:700;color:#1d4ed8;letter-spacing:.04em;text-transform:uppercase;margin-top:12px}
 
 /* Judul & keterangan */
-.alur-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;color:#0f172a;margin:0 0 8px 0;line-height:1.3;letter-spacing:-.01em}
+.alur-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:600;color:#0f172a;margin:0 0 6px 0;line-height:1.3;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .alur-card:hover .alur-title{color:#1d4ed8}
-.alur-desc{font-size:13px;color:#64748b;line-height:1.5;font-weight:400;margin:0}
+.alur-desc{font-size:13px;color:#64748b;line-height:1.4;font-weight:400;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Garis penghubung antar kartu (desktop) */
-.alur-card:not(:last-child)::after{content:'';position:absolute;top:52px;right:-12px;width:24px;height:2px;background:linear-gradient(90deg,#e2e8f0 0%,#cbd5e1 100%);z-index:0}
-.alur-card:hover::after{background:linear-gradient(90deg,#cbd5e1 0%,#94a3b8 100%)}
-
-/* Chip kecil di bawah */
-.alur-chips{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:40px;flex-wrap:wrap}
-.alur-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:999px;font-size:12px;font-weight:600;color:#475569;transition:all .2s ease}
-.alur-chip:hover{background:#eff6ff;border-color:#2563eb;color:#1d4ed8}
+/* Chip strip panel tipis */
+.alur-chips-panel{background:#eff6ff;border:1px solid #dbeafe;border-radius:16px;padding:16px 24px;margin-top:32px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.alur-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#ffffff;border:1px solid #e2e8f0;border-radius:999px;font-size:12px;font-weight:600;color:#475569;transition:all .2s ease}
+.alur-chip:hover{background:#f8fafc;border-color:#2563eb;color:#1d4ed8}
 .alur-chip svg{width:14px;height:14px;color:#1d4ed8}
 
-/* Tablet: grid 2x2 */
+/* Tablet: grid 2x2 tanpa garis horizontal */
 @media(max-width:1023px){
   .alur-grid{grid-template-columns:repeat(2,1fr);gap:20px}
-  .alur-card:not(:last-child)::after{display:none}
+  .alur-grid::before{display:none}
+  .alur-progress-line{display:none}
 }
 
 /* HP: timeline vertikal */
 @media(max-width:640px){
-  .alur-grid{display:flex;flex-direction:column;gap:0;position:relative;padding-left:0}
-  .alur-card{border:none;background:transparent;box-shadow:none;padding:16px 0 24px 64px;text-align:left;position:relative}
-  .alur-card:hover{transform:none;border:none;box-shadow:none;background:transparent}
+  .alur-grid{display:flex;flex-direction:column;gap:16px;position:relative;padding-left:0}
+  .alur-card{border:1px solid #e2e8f0;border-top:2px solid #1d4ed8;border-radius:16px;padding:16px 16px 16px 64px;text-align:left;position:relative}
+  .alur-card:hover{transform:none}
   
   /* Garis vertikal di kiri */
-  .alur-grid::before{content:'';position:absolute;left:23px;top:24px;bottom:0;width:2px;background:linear-gradient(180deg,#e2e8f0 0%,#cbd5e1 100%)}
+  .alur-grid::before{content:'';position:absolute;left:27px;top:52px;bottom:0;width:2px;background:repeating-linear-gradient(180deg,#e2e8f0 0,#e2e8f0 8px,transparent 8px,transparent 16px);display:block}
   
-  /* Nomor di lingkaran di posisi kiri */
-  .alur-num-wrap{position:absolute;left:0;top:16px;margin:0;width:48px;height:48px;z-index:1}
-  .alur-icon-wrap{margin:0 0 12px 0}
-  .alur-title{font-size:15px}
-  .alur-desc{font-size:12px}
+  /* Garis biru solid vertikal */
+  .alur-progress-line{top:52px;left:27px;width:2px;height:0%;background:linear-gradient(180deg,#1d4ed8 0%,#2563eb 100%);transition:height 1.2s cubic-bezier(0.4,0,0.2,1)}
   
-  .alur-chips{flex-direction:column;align-items:flex-start;gap:8px;margin-top:32px}
+  /* Tile ikon ke kiri */
+  .alur-icon-tile{position:absolute;left:0;top:12px;margin:0;width:54px;height:54px}
+  .alur-icon-tile svg{width:26px;height:26px}
+  .alur-num-badge{top:-4px;right:-4px;width:20px;height:20px;font-size:10px}
+  
+  .alur-title{font-size:15px;margin:0 0 4px 0}
+  .alur-desc{font-size:12px;margin:0}
+  .alur-badge-core{margin-top:8px}
+  
+  .alur-chips-panel{flex-direction:column;align-items:flex-start;gap:10px;padding:14px 18px;margin-top:24px}
   .alur-chip{width:100%;justify-content:center}
 }
 
@@ -815,42 +828,49 @@ html.dark .alur-card{
   backdrop-filter:blur(10px) !important;
   -webkit-backdrop-filter:blur(10px) !important;
   border:1px solid rgba(120,170,255,.18) !important;
+  border-top-color:rgba(120,170,255,.38) !important;
   box-shadow:0 2px 8px rgba(0,0,0,.35) !important;
 }
 html.dark .alur-card:hover{
-  border-color:rgba(120,170,255,.38) !important;
+  border-color:rgba(120,170,255,.30) !important;
+  border-top-color:rgba(120,170,255,.50) !important;
   transform:translateY(-4px) !important;
   box-shadow:0 6px 18px rgba(0,0,0,.45) !important;
 }
-html.dark .alur-num-wrap{
-  background:rgba(96,150,255,.14) !important;
-  border:2px solid rgba(120,170,255,.25) !important;
-  color:#8ab4ff !important;
+html.dark .alur-icon-tile{
+  background:linear-gradient(135deg,rgba(37,99,235,.7) 0%,rgba(59,130,246,.6) 100%) !important;
+  box-shadow:0 4px 12px rgba(0,0,0,.3) !important;
 }
-html.dark .alur-card:hover .alur-num-wrap{
-  background:rgba(96,150,255,.26) !important;
+html.dark .alur-card:hover .alur-icon-tile{
+  box-shadow:0 6px 16px rgba(0,0,0,.4) !important;
+}
+html.dark .alur-num-badge{
+  background:rgba(6,18,48,.85) !important;
   border-color:rgba(120,170,255,.38) !important;
-  color:#ffffff !important;
-}
-html.dark .alur-icon-wrap{
-  background:rgba(0,10,30,.55) !important;
-  border:1.5px solid rgba(120,170,255,.22) !important;
   color:#8ab4ff !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.3) !important;
 }
-html.dark .alur-card:hover .alur-icon-wrap{
-  background:rgba(96,150,255,.18) !important;
-  border-color:rgba(120,170,255,.38) !important;
+html.dark .alur-badge-core{
+  background:rgba(96,150,255,.12) !important;
+  border-color:rgba(120,170,255,.25) !important;
   color:#8ab4ff !important;
 }
 html.dark .alur-title{color:#f4f8ff !important}
 html.dark .alur-card:hover .alur-title{color:#8ab4ff !important}
 html.dark .alur-desc{color:#b4c3dc !important}
-html.dark .alur-card:not(:last-child)::after{
-  background:linear-gradient(90deg,rgba(120,170,255,.18) 0%,rgba(120,170,255,.30) 100%) !important;
+html.dark .alur-grid::before{
+  background:repeating-linear-gradient(90deg,rgba(120,170,255,.12) 0,rgba(120,170,255,.12) 8px,transparent 8px,transparent 16px) !important;
+}
+html.dark .alur-progress-line{
+  background:linear-gradient(90deg,rgba(120,170,255,.5) 0%,rgba(147,197,253,.4) 100%) !important;
+}
+html.dark .alur-chips-panel{
+  background:rgba(0,10,30,.55) !important;
+  border-color:rgba(120,170,255,.18) !important;
 }
 html.dark .alur-chip{
-  background:rgba(0,10,30,.55) !important;
-  border:1px solid rgba(120,170,255,.18) !important;
+  background:rgba(6,18,48,.72) !important;
+  border-color:rgba(120,170,255,.18) !important;
   color:#b4c3dc !important;
 }
 html.dark .alur-chip:hover{
@@ -863,7 +883,10 @@ html.dark .alur-chip svg{color:#8ab4ff !important}
 /* Mobile timeline vertical line in dark mode */
 @media(max-width:640px){
   html.dark .alur-grid::before{
-    background:linear-gradient(180deg,rgba(120,170,255,.18) 0%,rgba(120,170,255,.30) 100%) !important;
+    background:repeating-linear-gradient(180deg,rgba(120,170,255,.12) 0,rgba(120,170,255,.12) 8px,transparent 8px,transparent 16px) !important;
+  }
+  html.dark .alur-progress-line{
+    background:linear-gradient(180deg,rgba(120,170,255,.5) 0%,rgba(147,197,253,.4) 100%) !important;
   }
 }
 
@@ -1204,25 +1227,29 @@ $alurLangkah = [
     'num' => '1',
     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>',
     'title' => 'Ajukan',
-    'desc' => 'Pilih barang & ajukan'
+    'desc' => 'Pilih barang & ajukan',
+    'isCore' => false
   ],
   [
     'num' => '2',
     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
     'title' => 'Disetujui',
-    'desc' => 'Guru setujui via WA'
+    'desc' => 'Guru setujui via WA',
+    'isCore' => false
   ],
   [
     'num' => '3',
     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>',
     'title' => 'Ambil',
-    'desc' => 'Scan QR saat ambil'
+    'desc' => 'Scan QR saat ambil',
+    'isCore' => true
   ],
   [
     'num' => '4',
     'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>',
     'title' => 'Kembalikan',
-    'desc' => 'Scan QR saat kembali'
+    'desc' => 'Scan QR saat kembali',
+    'isCore' => false
   ]
 ];
 
@@ -1234,7 +1261,7 @@ $alurChips = [
 ];
 @endphp
 
-<section class="section feat-bg" id="fitur">
+<section class="section feat-bg" id="fitur" style="padding:56px 24px;">
   <div class="section-inner">
     <div class="section-head">
       <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>ALUR PEMINJAMAN</div>
@@ -1243,17 +1270,26 @@ $alurChips = [
     </div>
 
     <div class="alur-grid" data-alur-observe>
+      <div class="alur-progress-line"></div>
       @foreach($alurLangkah as $langkah)
       <div class="alur-card alur-fade-up">
-        <div class="alur-num-wrap">{{ $langkah['num'] }}</div>
-        <div class="alur-icon-wrap">{!! $langkah['icon'] !!}</div>
+        <div class="alur-icon-tile">
+          <span class="alur-num-badge">{{ $langkah['num'] }}</span>
+          {!! $langkah['icon'] !!}
+        </div>
         <h3 class="alur-title">{{ $langkah['title'] }}</h3>
         <p class="alur-desc">{{ $langkah['desc'] }}</p>
+        @if($langkah['isCore'])
+        <div class="alur-badge-core">
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Inti sistem
+        </div>
+        @endif
       </div>
       @endforeach
     </div>
 
-    <div class="alur-chips">
+    <div class="alur-chips-panel">
       @foreach($alurChips as $chip)
       <div class="alur-chip">
         {!! $chip['icon'] !!}
@@ -1266,21 +1302,34 @@ $alurChips = [
 
 <script>
 (function() {
-  // Fade-up animation on scroll with reduced-motion support
+  // Stagger fade-up animation & progress line with reduced-motion support
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (prefersReducedMotion) return;
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        const cards = entry.target.querySelectorAll('.alur-card');
+        const grid = entry.target;
+        const cards = grid.querySelectorAll('.alur-card');
+        const progressLine = grid.querySelector('.alur-progress-line');
+        
+        // Animate progress line
+        if (progressLine) {
+          setTimeout(() => {
+            progressLine.style.width = '100%';
+            progressLine.style.height = '100%';
+          }, 100);
+        }
+        
+        // Stagger cards with 80ms delay
         cards.forEach((card, index) => {
           setTimeout(() => {
             card.style.opacity = '1';
             card.style.transform = 'translateY(0)';
-          }, index * 100);
+          }, index * 80);
         });
-        observer.unobserve(entry.target);
+        
+        observer.unobserve(grid);
       }
     });
   }, { threshold: 0.2 });
@@ -1292,7 +1341,7 @@ $alurChips = [
     cards.forEach(card => {
       card.style.opacity = '0';
       card.style.transform = 'translateY(20px)';
-      card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     });
     observer.observe(grid);
   }
