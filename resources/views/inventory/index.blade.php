@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title', 'Inventaris Barang')
+@section('title', 'Data Barang')
 @section('page-heading', 'Barang')
 
 @section('content')
@@ -12,9 +12,9 @@
             </svg>
         </div>
         <div>
-            <div style="font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Inventaris Barang</div>
-            <div style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Kelola Barang</div>
-            <div style="font-size:13px;color:var(--text-muted)">Manajemen dan pemantauan aset serta inventaris sekolah secara terpadu.</div>
+            <div style="font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">Data Barang</div>
+            <div style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Data Barang</div>
+            <div style="font-size:13px;color:var(--text-muted)">Manajemen dan pemantauan barang serta fasilitas sekolah secara terpadu.</div>
         </div>
     </div>
 
