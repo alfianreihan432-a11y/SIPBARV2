@@ -30,6 +30,7 @@ class InventoryManager extends Component
     public $description = '';
     public $category_id = '';
     public $location_id = '';
+    public $location_name = '';
     public $supplier_id = '';
     public $brand = '';
     public $type = '';
@@ -54,7 +55,7 @@ class InventoryManager extends Component
         'name' => 'required|string|min:3',
         'description' => 'nullable|string',
         'category_id' => 'nullable|exists:categories,id',
-        'location_id' => 'nullable|exists:locations,id',
+        'location_name' => 'nullable|string|max:255',
         'supplier_id' => 'nullable|exists:suppliers,id',
         'brand' => 'nullable|string',
         'type' => 'nullable|string',
@@ -180,7 +181,7 @@ class InventoryManager extends Component
             'name' => $this->name,
             'description' => $this->description,
             'category_id' => $this->category_id ?: null,
-            'location_id' => $this->location_id ?: null,
+            'location_id' => $this->findOrCreateLocation($this->location_name) ?: null,
             'supplier_id' => $this->supplier_id ?: null,
             'brand' => $this->brand ?: null,
             'type' => $this->type ?: null,
@@ -230,6 +231,7 @@ class InventoryManager extends Component
         $this->description = $item->description;
         $this->category_id = $item->category_id;
         $this->location_id = $item->location_id;
+        $this->location_name = $item->location?->name ?? '';
         $this->supplier_id = $item->supplier_id;
         $this->brand = $item->brand;
         $this->type = $item->type;
@@ -291,12 +293,68 @@ class InventoryManager extends Component
         return 'INV-' . str_pad($number, 4, '0', STR_PAD_LEFT);
     }
 
+    protected function findOrCreateLocation(?string $input): ?int
+    {
+        if (empty($input)) {
+            return null;
+        }
+
+        $trimmed = trim($input);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        // Normalize for comparison: trim, single spaces, case-insensitive, treat all dashes as same
+        $normalized = preg_replace('/\s+/', ' ', $trimmed);
+        $normalized = mb_strtolower($normalized);
+        $normalized = str_replace(['–', '—'], '-', $normalized);
+
+        // Search for existing location by comparing normalized display name
+        $existing = Location::withoutTrashed()
+            ->get()
+            ->first(function ($loc) use ($normalized) {
+                $locName = preg_replace('/\s+/', ' ', $loc->name);
+                $locName = mb_strtolower($locName);
+                $locName = str_replace(['–', '—'], '-', $locName);
+                return $locName === $normalized;
+            });
+
+        if ($existing) {
+            return $existing->id;
+        }
+
+        // Normalize dashes in input before parsing
+        $forParsing = str_replace(['–', '—'], '-', $trimmed);
+
+        // Parse input to building/floor/room
+        // Pattern: "Gedung X Lt.N - R-xxx" or variations (matches accessor format)
+        $building = $forParsing;
+        $floor = null;
+        $room = null;
+
+        // Try to match pattern like "Gedung A Lt.2 - R-201"
+        if (preg_match('/^(.+?)\s+Lt\.?(\d+)\s+-\s*(.+)$/i', $forParsing, $matches)) {
+            $building = trim($matches[1]);
+            $floor = trim($matches[2]);
+            $room = trim($matches[3]);
+        }
+
+        $location = Location::create([
+            'building' => $building,
+            'floor' => $floor,
+            'room' => $room,
+        ]);
+
+        return $location->id;
+    }
+
     public function resetForm(): void
     {
         $this->name = '';
         $this->description = '';
         $this->category_id = '';
         $this->location_id = '';
+        $this->location_name = '';
         $this->supplier_id = '';
         $this->brand = '';
         $this->type = '';

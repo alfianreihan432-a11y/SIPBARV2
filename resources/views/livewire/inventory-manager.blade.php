@@ -1193,12 +1193,13 @@
                 <div class="im-field-grid-2-3">
                     <div>
                         <label class="im-label">Lokasi Ruangan</label>
-                        <select wire:model="location_id" class="im-select-field">
-                            <option value="">— Pilih Lokasi —</option>
+                        <input wire:model="location_name" type="text" list="location-datalist" class="im-input" placeholder="Ketik atau pilih lokasi, mis. Gedung A Lt.2 - R-201">
+                        <datalist id="location-datalist">
                             @foreach($locations as $loc)
-                            <option value="{{ $loc->id }}">{{ $loc->building }}{{ $loc->floor ? ' Lt.'.$loc->floor : '' }} — {{ $loc->room }}</option>
+                            <option value="{{ $loc->name }}">{{ $loc->name }}</option>
                             @endforeach
-                        </select>
+                        </datalist>
+                        @error('location_name') <span class="im-field-error">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <label class="im-label">Kondisi Fisik</label>

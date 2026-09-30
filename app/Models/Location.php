@@ -11,6 +11,18 @@ class Location extends Model
 
     protected $fillable = ['building', 'floor', 'room'];
 
+    public function getNameAttribute(): string
+    {
+        $result = $this->building;
+        if ($this->floor) {
+            $result .= ' Lt.' . $this->floor;
+        }
+        if ($this->room) {
+            $result .= ' - ' . $this->room;
+        }
+        return $result;
+    }
+
     public function items()
     {
         return $this->hasMany(Item::class);
