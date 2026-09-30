@@ -21,10 +21,35 @@ class SettingsController extends Controller
     {
         $user = Auth::user();
 
+        // Normalisasi nomor WA sebelum validasi
+        $phoneInput = $request->input('phone');
+        if (!empty($phoneInput)) {
+            $phoneInput = trim($phoneInput);
+            // Hapus spasi, tanda hubung, dan tanda kurung
+            $phoneInput = preg_replace('/[\s\-\(\)]/', '', $phoneInput);
+            // Ubah awalan 0 menjadi 62
+            if (str_starts_with($phoneInput, '0')) {
+                $phoneInput = '62' . substr($phoneInput, 1);
+            }
+            // Pastikan awalan +62 menjadi 62
+            if (str_starts_with($phoneInput, '+62')) {
+                $phoneInput = '62' . substr($phoneInput, 3);
+            }
+            $request->merge(['phone' => $phoneInput]);
+        }
+
         $validated = $request->validate([
             'name'  => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'phone' => ['nullable', 'string', 'regex:/^62[0-9]{9,13}$/'],
+        ], [
+            'phone.regex' => 'Format nomor WhatsApp tidak valid (contoh: 08xxxxxxxxxx atau 628xxxxxxxxxx)',
         ]);
+
+        // Jika phone kosong setelah normalisasi, set ke null
+        if (empty($validated['phone'])) {
+            $validated['phone'] = null;
+        }
 
         if ($user->email !== $validated['email']) {
             $user->email_verified_at = null;

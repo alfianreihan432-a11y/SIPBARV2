@@ -52,6 +52,14 @@
                 @error('email') <p style="font-size:12px;color:#f87171;margin-top:3px">{{ $message }}</p> @enderror
             </div>
 
+            <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:24px">
+                <label for="phone" style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted)">Nomor WhatsApp</label>
+                <input id="phone" name="phone" type="text" value="{{ old('phone', auth()->user()->phone ? (preg_match('/^62/', auth()->user()->phone) ? '0' . substr(auth()->user()->phone, 2) : auth()->user()->phone) : '') }}" placeholder="08xxxxxxxxxx" autocomplete="tel"
+                    style="width:100%;background:var(--input-bg);border:1.5px solid {{ $errors->has('phone') ? '#f87171' : 'var(--input-border)' }};border-radius:10px;padding:10px 14px;font-size:14px;color:var(--text-primary);outline:none;transition:border-color .2s;font-family:inherit">
+                <p style="font-size:12px;color:var(--text-muted);margin-top:3px">Dipakai untuk notifikasi peminjaman via WhatsApp.</p>
+                @error('phone') <p style="font-size:12px;color:#f87171;margin-top:3px">{{ $message }}</p> @enderror
+            </div>
+
             <div style="padding-top:18px;border-top:1px solid var(--border-subtle)">
                 <button type="submit" style="display:inline-flex;align-items:center;gap:7px;background:var(--blue-dark);color:#fff;border:none;border-radius:10px;padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(29,78,216,.3);transition:all .2s">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
