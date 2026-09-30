@@ -453,27 +453,72 @@ html.dark .mob-t-moon{display:none}
 .cat-link{font-size:12px;font-weight:700;color:#1d4ed8;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:gap .15s}
 .cat-link:hover{gap:8px}
 
-/* ─── FEATURES (BALANCED BENTO GRID) ─── */
+/* ─── FEATURES (ALUR PEMINJAMAN 4 LANGKAH) ─── */
 .feat-bg{background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);position:relative}
 .feat-bg::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#e2e8f0 50%,transparent)}
-.feat-bento{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
-.feat-bento-card{background:#ffffff;border:1.5px solid #e2e8f0;border-radius:16px;padding:22px 20px;text-align:left;transition:all .25s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 2px 6px rgba(0,0,0,.02)}
-.feat-bento-card:hover{transform:translateY(-3px);border-color:#2563eb;box-shadow:0 12px 28px rgba(37,99,235,.09)}
-.feat-card-row1{grid-column:span 6}
-.feat-card-row2{grid-column:span 4}
-.feat-top-meta{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
-.feat-index{font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;font-weight:800;letter-spacing:.04em;color:#2563eb;background:rgba(37,99,235,.08);padding:3px 9px;border-radius:999px;flex-shrink:0}
-.feat-icon-wrap{width:52px;height:52px;border-radius:14px;background:#eff6ff;border:1.5px solid #dbeafe;display:flex;align-items:center;justify-content:center;color:#1d4ed8;flex-shrink:0;transition:all .25s ease}
-.feat-bento-card:hover .feat-icon-wrap{background:#1d4ed8;color:#ffffff;border-color:#1d4ed8;transform:scale(1.05)}
-.feat-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:16.5px;font-weight:800;color:#0f172a;margin:0 0 6px 0;line-height:1.3;letter-spacing:-.015em;transition:color .2s}
-.feat-bento-card:hover .feat-title{color:#1d4ed8}
-.feat-summary{font-size:13.5px;color:#64748b;line-height:1.55;font-weight:400;margin:0 0 6px 0}
-.feat-workflow-flow{display:inline-flex;align-items:center;gap:6px;background:rgba(239,246,255,.6);border:1px solid #dbeafe;border-radius:10px;padding:6px 10px;margin-top:8px;flex-wrap:wrap}
-.feat-flow-step{display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#1e293b}
-.feat-flow-dot{width:18px;height:18px;border-radius:5px;background:#1d4ed8;color:#ffffff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800}
-.feat-flow-arrow{color:#94a3b8;flex-shrink:0}
-.feat-action-link{display:none !important}
-.feat-bento-card:hover .feat-action-link{display:none !important}
+
+/* Desktop: 4 kolom sejajar dengan align-items: stretch */
+.alur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;margin-top:40px;align-items:stretch}
+
+.alur-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;padding:24px 20px;text-align:center;transition:all .3s cubic-bezier(0.4,0,0.2,1);position:relative;box-shadow:0 2px 8px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.02);display:flex;flex-direction:column;align-items:center}
+.alur-card:hover{transform:translateY(-4px);border-color:#cbd5e1;box-shadow:0 8px 24px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04)}
+
+/* Tile ikon besar dengan gradien biru dan glow radial */
+.alur-icon-tile{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;position:relative;box-shadow:0 4px 12px rgba(29,78,216,.2);transition:all .3s ease}
+.alur-icon-tile::before{content:'';position:absolute;inset:-8px;background:radial-gradient(circle,rgba(29,78,216,.15) 0%,transparent 70%);border-radius:24px;opacity:0;transition:opacity .3s ease}
+.alur-card:hover .alur-icon-tile{transform:scale(1.05);box-shadow:0 6px 16px rgba(29,78,216,.3)}
+.alur-card:hover .alur-icon-tile::before{opacity:1}
+.alur-icon-tile svg{width:28px;height:28px;color:#ffffff}
+
+/* Nomor badge kecil di pojok kanan atas tile */
+.alur-num-badge{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:999px;background:#ffffff;border:2px solid #1d4ed8;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;color:#1d4ed8;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+
+/* Label "Inti sistem" pill di pojok kanan atas kartu */
+.alur-badge-core{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#eff6ff;border:1px solid #dbeafe;border-radius:999px;font-size:10px;font-weight:700;color:#1d4ed8;letter-spacing:.04em;text-transform:uppercase;z-index:3}
+
+/* Judul & keterangan */
+.alur-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:600;color:#0f172a;margin:0 0 6px 0;line-height:1.3;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alur-card:hover .alur-title{color:#1d4ed8}
+.alur-desc{font-size:14px;color:#64748b;line-height:1.4;font-weight:400;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Chevron/panah penghubung antar-kartu (desktop only) */
+.alur-connector{position:absolute;top:60px;right:-12px;width:20px;height:20px;color:#94a3b8;z-index:1;display:flex;align-items:center;justify-content:center;background:#ffffff;border-radius:50%;border:1px solid #e2e8f0;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.alur-connector svg{width:12px;height:12px}
+.alur-card:last-child .alur-connector{display:none}
+
+/* Chip strip tanpa panel pembungkus */
+.alur-chips-panel{margin-top:28px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:16px 20px;background:#eff6ff;border-radius:16px;border:1px solid #dbeafe}
+.alur-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#ffffff;border:1px solid #e2e8f0;border-radius:999px;font-size:12px;font-weight:600;color:#475569;transition:all .2s ease}
+.alur-chip:hover{background:#f8fafc;border-color:#2563eb;color:#1d4ed8}
+.alur-chip svg{width:14px;height:14px;color:#1d4ed8}
+
+/* Tablet: grid 2x2 */
+@media(max-width:1023px){
+  .alur-grid{grid-template-columns:repeat(2,1fr);gap:20px}
+  .alur-connector{display:none}
+}
+
+/* HP: timeline vertikal */
+@media(max-width:640px){
+  .alur-grid{display:flex;flex-direction:column;gap:16px;position:relative;padding-left:0}
+  .alur-card{border:1px solid #e2e8f0;border-radius:16px;padding:16px 16px 16px 64px;text-align:left;position:relative}
+  .alur-card:hover{transform:none}
+  
+  /* Garis vertikal tipis di kiri */
+  .alur-grid::before{content:'';position:absolute;left:27px;top:60px;bottom:0;width:2px;background:#e2e8f0;display:block}
+  
+  /* Tile ikon ke kiri */
+  .alur-icon-tile{position:absolute;left:0;top:12px;margin:0;width:54px;height:54px}
+  .alur-icon-tile svg{width:26px;height:26px}
+  .alur-num-badge{top:-4px;right:-4px;width:20px;height:20px;font-size:10px}
+  
+  .alur-title{font-size:16px;margin:0 0 4px 0}
+  .alur-desc{font-size:13px;margin:0}
+  .alur-badge-core{top:8px;right:8px}
+  
+  .alur-chips-panel{flex-direction:column;align-items:flex-start;gap:10px;padding:14px 18px;margin-top:24px}
+  .alur-chip{width:100%;justify-content:center}
+}
 
 /* ─── STATS / DATA INVENTARIS ─── */
 .stats-bg{background:#ffffff;position:relative;overflow:hidden;padding:70px 24px}
@@ -569,9 +614,6 @@ html.dark .mob-t-moon{display:none}
 /* ─── RESPONSIVE ─── */
 @media(max-width:1024px){
   .cat-grid{grid-template-columns:repeat(3,1fr)}
-  .feat-bento{grid-template-columns:repeat(6,1fr)}
-  .feat-card-row1{grid-column:span 3}
-  .feat-card-row2{grid-column:span 2}
   .about-grid-redesigned{grid-template-columns:1fr;gap:36px}
   .about-content-redesigned{padding-right:0}
   .about-visual-redesigned{padding-left:0}
@@ -587,8 +629,6 @@ html.dark .mob-t-moon{display:none}
   .hero-h1{font-size:32px}
   .hero-p{font-size:15px}
   .cat-grid{grid-template-columns:repeat(2,1fr)}
-  .feat-bento{grid-template-columns:1fr;gap:14px}
-  .feat-card-row1,.feat-card-row2{grid-column:span 1}
   .stats-inner{grid-template-columns:1fr;gap:36px}
   .stats-h2{font-size:26px}
   .section-h2{font-size:26px}
@@ -604,7 +644,6 @@ html.dark .mob-t-moon{display:none}
   .stats-h2{font-size:22px}
   .stats-grid{grid-template-columns:1fr}
   .section{padding:48px 16px}
-  .feat-workflow-flow{flex-direction:column;align-items:flex-start}
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -780,44 +819,67 @@ html.dark .section-h2{color:#f4f8ff !important}
 html.dark .section-h2 em{color:#8ab4ff !important}
 html.dark .section-lead{color:#b4c3dc !important}
 
-/* 4. Bento Feature Cards (Dark Navy Glass with Blur) */
-html.dark .feat-bento-card{
+/* 4. Alur Peminjaman Cards (Dark Navy Glass with Blur) */
+html.dark .alur-card{
   background:rgba(6,18,48,.72) !important;
   backdrop-filter:blur(10px) !important;
   -webkit-backdrop-filter:blur(10px) !important;
   border:1px solid rgba(120,170,255,.18) !important;
   box-shadow:0 2px 8px rgba(0,0,0,.35) !important;
 }
-html.dark .feat-bento-card:hover{
-  border-color:rgba(120,170,255,.38) !important;
-  transform:translateY(-2px) !important;
+html.dark .alur-card:hover{
+  border-color:rgba(120,170,255,.30) !important;
+  transform:translateY(-4px) !important;
   box-shadow:0 6px 18px rgba(0,0,0,.45) !important;
 }
-html.dark .feat-index{
-  background:rgba(96,150,255,.12) !important;
-  border:1px solid rgba(120,170,255,.25) !important;
-  color:#8ab4ff !important;
+html.dark .alur-icon-tile{
+  background:linear-gradient(135deg,rgba(37,99,235,.6) 0%,rgba(59,130,246,.5) 100%) !important;
+  box-shadow:0 4px 12px rgba(0,0,0,.3) !important;
 }
-html.dark .feat-icon-wrap{
-  background:rgba(96,150,255,.14) !important;
-  border:1.5px solid rgba(120,170,255,.22) !important;
-  color:#8ab4ff !important;
+html.dark .alur-card:hover .alur-icon-tile{
+  box-shadow:0 6px 16px rgba(0,0,0,.4) !important;
 }
-html.dark .feat-bento-card:hover .feat-icon-wrap{
-  background:rgba(96,150,255,.26) !important;
+html.dark .alur-icon-tile::before{
+  background:radial-gradient(circle,rgba(120,170,255,.1) 0%,transparent 70%) !important;
+}
+html.dark .alur-num-badge{
+  background:rgba(6,18,48,.85) !important;
   border-color:rgba(120,170,255,.38) !important;
-  color:#ffffff !important;
+  color:#8ab4ff !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.3) !important;
 }
-html.dark .feat-title{color:#f4f8ff !important}
-html.dark .feat-bento-card:hover .feat-title{color:#8ab4ff !important}
-html.dark .feat-summary{color:#b4c3dc !important}
-html.dark .feat-workflow-flow{
+html.dark .alur-badge-core{
+  background:rgba(96,150,255,.12) !important;
+  border-color:rgba(120,170,255,.25) !important;
+  color:#8ab4ff !important;
+}
+html.dark .alur-connector{
+  background:rgba(6,18,48,.85) !important;
+  border-color:rgba(120,170,255,.18) !important;
+  color:#8fa3c4 !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.3) !important;
+}
+html.dark .alur-title{color:#f4f8ff !important}
+html.dark .alur-card:hover .alur-title{color:#8ab4ff !important}
+html.dark .alur-desc{color:#b4c3dc !important}
+html.dark .alur-grid::before{
+  background:rgba(120,170,255,.18) !important;
+}
+html.dark .alur-chips-panel{
   background:rgba(0,10,30,.55) !important;
-  border:1px solid rgba(120,170,255,.16) !important;
+  border-color:rgba(120,170,255,.18) !important;
 }
-html.dark .feat-flow-step{color:#dbe7ff !important}
-html.dark .feat-flow-dot{background:#2563eb !important;color:#ffffff !important}
-html.dark .feat-flow-arrow{color:#8fa3c4 !important}
+html.dark .alur-chip{
+  background:rgba(6,18,48,.72) !important;
+  border-color:rgba(120,170,255,.18) !important;
+  color:#b4c3dc !important;
+}
+html.dark .alur-chip:hover{
+  background:rgba(96,150,255,.14) !important;
+  border-color:rgba(120,170,255,.38) !important;
+  color:#8ab4ff !important;
+}
+html.dark .alur-chip svg{color:#8ab4ff !important}
 
 /* 5. Stats Section (Dark Navy Glass with Blur & Pastel Icons) */
 html.dark .stats-eyebrow{
@@ -1148,111 +1210,127 @@ html.dark .footer-copy{color:#8fa3c4 !important}
   </div>
 </section>
 
-{{-- ═══════════════ FITUR UNGGULAN (BENTO GRID) ═══════════════ --}}
-<section class="section feat-bg" id="fitur">
+{{-- ═══════════════ ALUR PEMINJAMAN 4 LANGKAH ═══════════════ --}}
+@php
+// Hardcode 4 langkah alur peminjaman
+$alurLangkah = [
+  [
+    'num' => '1',
+    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>',
+    'title' => 'Ajukan',
+    'desc' => 'Pilih barang & ajukan',
+    'isCore' => false
+  ],
+  [
+    'num' => '2',
+    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+    'title' => 'Disetujui',
+    'desc' => 'Guru setujui via WA',
+    'isCore' => false
+  ],
+  [
+    'num' => '3',
+    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>',
+    'title' => 'Ambil',
+    'desc' => 'Scan QR saat ambil',
+    'isCore' => true
+  ],
+  [
+    'num' => '4',
+    'icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>',
+    'title' => 'Kembalikan',
+    'desc' => 'Scan QR saat kembali',
+    'isCore' => false
+  ]
+];
+
+// 3 chip kecil
+$alurChips = [
+  ['icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>', 'text' => 'Stok real-time'],
+  ['icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>', 'text' => 'Riwayat tercatat'],
+  ['icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>', 'text' => 'Multi-peran']
+];
+@endphp
+
+<section class="section feat-bg" id="fitur" style="padding:48px 24px;">
   <div class="section-inner">
     <div class="section-head">
-      <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>{{ \App\Models\SiteSetting::get('features_eyebrow', 'Kapabilitas Sistem') }}</div>
-      <h2 class="section-h2">{!! \App\Models\SiteSetting::html('features_title', 'Alur Peminjaman Barang <em>Digital & Transparan</em>') !!}</h2>
-      <p class="section-lead">{{ \App\Models\SiteSetting::get('features_lead', 'Solusi terpadu untuk efisiensi dan kemudahan proses peminjaman sarana prasarana sekolah.') }}</p>
+      <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>ALUR PEMINJAMAN</div>
+      <h2 class="section-h2">Pinjam Barang dalam 4 Langkah</h2>
+      <p class="section-lead">Proses peminjaman barang sekolah jadi lebih cepat dan transparan</p>
     </div>
 
-    @php
-    $featureCards = \App\Models\SiteSetting::getJson('feature_cards', []);
-    $feat = function (int $i, string $key, $default = '') use ($featureCards) {
-        return $featureCards[$i][$key] ?? $default;
-    };
-    @endphp
-
-    <div class="feat-bento">
-      {{-- BENTO CARD 1: Peminjaman & Approval Digital --}}
-      <div class="feat-bento-card feat-card-row1">
-        <div>
-          <div class="feat-top-meta">
-            <span class="feat-index">{{ $feat(0, 'number', '01') }}</span>
-            <div class="feat-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-            </div>
-          </div>
-          <div class="feat-title">{{ $feat(0, 'title', 'Peminjaman & Approval Digital') }}</div>
-          <p class="feat-summary">{{ $feat(0, 'description', 'Pengajuan barang instan dengan persetujuan guru via link tanpa login.') }}</p>
-          <div class="feat-workflow-flow">
-            <div class="feat-flow-step">
-              <span class="feat-flow-dot">1</span>
-              <span>Pengajuan Siswa</span>
-            </div>
-            <svg class="feat-flow-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-            <div class="feat-flow-step">
-              <span class="feat-flow-dot">2</span>
-              <span>Approval Guru</span>
-            </div>
-            <svg class="feat-flow-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-            <div class="feat-flow-step">
-              <span class="feat-flow-dot">3</span>
-              <span>Scan QR Pengambilan</span>
-            </div>
-          </div>
+    <div class="alur-grid" data-alur-observe>
+      @foreach($alurLangkah as $langkah)
+      <div class="alur-card alur-fade-up">
+        @if($langkah['isCore'])
+        <div class="alur-badge-core">
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Inti sistem
+        </div>
+        @endif
+        <div class="alur-icon-tile">
+          <span class="alur-num-badge">{{ $langkah['num'] }}</span>
+          {!! $langkah['icon'] !!}
+        </div>
+        <h3 class="alur-title">{{ $langkah['title'] }}</h3>
+        <p class="alur-desc">{{ $langkah['desc'] }}</p>
+        <div class="alur-connector">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </div>
       </div>
+      @endforeach
+    </div>
 
-      {{-- BENTO CARD 2: Ketersediaan Barang & Stok --}}
-      <div class="feat-bento-card feat-card-row1">
-        <div>
-          <div class="feat-top-meta">
-            <span class="feat-index">{{ $feat(1, 'number', '02') }}</span>
-            <div class="feat-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            </div>
-          </div>
-          <div class="feat-title">{{ $feat(1, 'title', 'Ketersediaan Barang & Stok') }}</div>
-          <p class="feat-summary">{{ $feat(1, 'description', 'Katalog barang terstruktur dengan informasi ketersediaan, kondisi fisik, dan lokasi penyimpanan.') }}</p>
-        </div>
+    <div class="alur-chips-panel">
+      @foreach($alurChips as $chip)
+      <div class="alur-chip">
+        {!! $chip['icon'] !!}
+        <span>{{ $chip['text'] }}</span>
       </div>
-
-      {{-- BENTO CARD 3: Verifikasi Pengembalian --}}
-      <div class="feat-bento-card feat-card-row2">
-        <div>
-          <div class="feat-top-meta">
-            <span class="feat-index">{{ $feat(2, 'number', '03') }}</span>
-            <div class="feat-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-          </div>
-          <div class="feat-title">{{ $feat(2, 'title', 'Verifikasi Pengembalian') }}</div>
-          <p class="feat-summary">{{ $feat(2, 'description', 'Pemeriksaan kondisi fisik barang saat dikembalikan untuk menjaga keutuhan sarana.') }}</p>
-        </div>
-      </div>
-
-      {{-- BENTO CARD 4: Audit & Rekapitulasi Otomatis --}}
-      <div class="feat-bento-card feat-card-row2">
-        <div>
-          <div class="feat-top-meta">
-            <span class="feat-index">{{ $feat(3, 'number', '04') }}</span>
-            <div class="feat-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-            </div>
-          </div>
-          <div class="feat-title">{{ $feat(3, 'title', 'Audit & Rekapitulasi Otomatis') }}</div>
-          <p class="feat-summary">{{ $feat(3, 'description', 'Laporan sirkulasi dan statistik pemakaian barang berkala secara akurat.') }}</p>
-        </div>
-      </div>
-
-      {{-- BENTO CARD 5: Kontrol Akses Multi-Peran --}}
-      <div class="feat-bento-card feat-card-row2">
-        <div>
-          <div class="feat-top-meta">
-            <span class="feat-index">{{ $feat(4, 'number', '05') }}</span>
-            <div class="feat-icon-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
-          </div>
-          <div class="feat-title">{{ $feat(4, 'title', 'Kontrol Akses Multi-Peran') }}</div>
-          <p class="feat-summary">{{ $feat(4, 'description', 'Hak akses terstruktur untuk Siswa, Guru, Kaprog, dan Sarpras.') }}</p>
-        </div>
-      </div>
+      @endforeach
     </div>
   </div>
 </section>
+
+<script>
+(function() {
+  // Stagger fade-up animation with reduced-motion support
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const grid = entry.target;
+        const cards = grid.querySelectorAll('.alur-card');
+        
+        // Stagger cards with 80ms delay
+        cards.forEach((card, index) => {
+          setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, index * 80);
+        });
+        
+        observer.unobserve(grid);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  const grid = document.querySelector('[data-alur-observe]');
+  if (grid) {
+    // Initialize cards as hidden
+    const cards = grid.querySelectorAll('.alur-card');
+    cards.forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    });
+    observer.observe(grid);
+  }
+})();
+</script>
 
 {{-- ═══════════════ STATS & DATA INVENTARIS ═══════════════ --}}
 @php
