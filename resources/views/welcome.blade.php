@@ -457,67 +457,64 @@ html.dark .mob-t-moon{display:none}
 .feat-bg{background:linear-gradient(180deg,#f8fafc 0%,#ffffff 100%);position:relative}
 .feat-bg::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#e2e8f0 50%,transparent)}
 
-/* Desktop: 4 kolom sejajar dengan garis penghubung */
-.alur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;margin-top:40px}
+/* Desktop: 4 kolom sejajar dengan align-items: stretch */
+.alur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;position:relative;margin-top:40px;align-items:stretch}
 
-/* Garis putus-putus horizontal di belakang tile (desktop) */
-.alur-grid::before{content:'';position:absolute;top:52px;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg,#e2e8f0 0,#e2e8f0 8px,transparent 8px,transparent 16px);z-index:0}
+.alur-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:20px;padding:24px 20px;text-align:center;transition:all .3s cubic-bezier(0.4,0,0.2,1);position:relative;box-shadow:0 2px 8px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.02);display:flex;flex-direction:column;align-items:center}
+.alur-card:hover{transform:translateY(-4px);border-color:#cbd5e1;box-shadow:0 8px 24px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04)}
 
-/* Garis biru solid yang terisi saat masuk viewport */
-.alur-progress-line{position:absolute;top:52px;left:0;height:2px;background:linear-gradient(90deg,#1d4ed8 0%,#2563eb 100%);width:0%;z-index:1;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
-
-.alur-card{background:#ffffff;border:1px solid #e2e8f0;border-top:3px solid #1d4ed8;border-radius:20px;padding:24px 20px;text-align:center;transition:all .3s cubic-bezier(0.4,0,0.2,1);position:relative;box-shadow:0 2px 8px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.02);z-index:2}
-.alur-card:hover{transform:translateY(-4px);border-color:#cbd5e1;border-top-color:#2563eb;box-shadow:0 8px 24px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.04)}
-
-/* Tile ikon besar dengan gradien biru */
-.alur-icon-tile{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;position:relative;box-shadow:0 4px 12px rgba(29,78,216,.2);transition:all .3s ease}
+/* Tile ikon besar dengan gradien biru dan glow radial */
+.alur-icon-tile{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 100%);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;position:relative;box-shadow:0 4px 12px rgba(29,78,216,.2);transition:all .3s ease}
+.alur-icon-tile::before{content:'';position:absolute;inset:-8px;background:radial-gradient(circle,rgba(29,78,216,.15) 0%,transparent 70%);border-radius:24px;opacity:0;transition:opacity .3s ease}
 .alur-card:hover .alur-icon-tile{transform:scale(1.05);box-shadow:0 6px 16px rgba(29,78,216,.3)}
+.alur-card:hover .alur-icon-tile::before{opacity:1}
 .alur-icon-tile svg{width:28px;height:28px;color:#ffffff}
 
 /* Nomor badge kecil di pojok kanan atas tile */
-.alur-num-badge{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:999px;background:#ffffff;border:2px solid #1d4ed8;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;color:#1d4ed8;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.alur-num-badge{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:999px;background:#ffffff;border:2px solid #1d4ed8;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:800;color:#1d4ed8;box-shadow:0 2px 6px rgba(0,0,0,.1)}
 
-/* Label "Inti sistem" pill (hanya kartu Ambil) */
-.alur-badge-core{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#eff6ff;border:1px solid #dbeafe;border-radius:999px;font-size:10px;font-weight:700;color:#1d4ed8;letter-spacing:.04em;text-transform:uppercase;margin-top:12px}
+/* Label "Inti sistem" pill di pojok kanan atas kartu */
+.alur-badge-core{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#eff6ff;border:1px solid #dbeafe;border-radius:999px;font-size:10px;font-weight:700;color:#1d4ed8;letter-spacing:.04em;text-transform:uppercase;z-index:3}
 
 /* Judul & keterangan */
-.alur-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:600;color:#0f172a;margin:0 0 6px 0;line-height:1.3;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alur-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:600;color:#0f172a;margin:0 0 6px 0;line-height:1.3;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .alur-card:hover .alur-title{color:#1d4ed8}
-.alur-desc{font-size:13px;color:#64748b;line-height:1.4;font-weight:400;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alur-desc{font-size:14px;color:#64748b;line-height:1.4;font-weight:400;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Chip strip panel tipis */
-.alur-chips-panel{background:#eff6ff;border:1px solid #dbeafe;border-radius:16px;padding:16px 24px;margin-top:32px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+/* Chevron/panah penghubung antar-kartu (desktop only) */
+.alur-connector{position:absolute;top:60px;right:-12px;width:20px;height:20px;color:#94a3b8;z-index:1;display:flex;align-items:center;justify-content:center;background:#ffffff;border-radius:50%;border:1px solid #e2e8f0;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.alur-connector svg{width:12px;height:12px}
+.alur-card:last-child .alur-connector{display:none}
+
+/* Chip strip tanpa panel pembungkus */
+.alur-chips-panel{margin-top:28px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:16px 20px;background:#eff6ff;border-radius:16px;border:1px solid #dbeafe}
 .alur-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#ffffff;border:1px solid #e2e8f0;border-radius:999px;font-size:12px;font-weight:600;color:#475569;transition:all .2s ease}
 .alur-chip:hover{background:#f8fafc;border-color:#2563eb;color:#1d4ed8}
 .alur-chip svg{width:14px;height:14px;color:#1d4ed8}
 
-/* Tablet: grid 2x2 tanpa garis horizontal */
+/* Tablet: grid 2x2 */
 @media(max-width:1023px){
   .alur-grid{grid-template-columns:repeat(2,1fr);gap:20px}
-  .alur-grid::before{display:none}
-  .alur-progress-line{display:none}
+  .alur-connector{display:none}
 }
 
 /* HP: timeline vertikal */
 @media(max-width:640px){
   .alur-grid{display:flex;flex-direction:column;gap:16px;position:relative;padding-left:0}
-  .alur-card{border:1px solid #e2e8f0;border-top:2px solid #1d4ed8;border-radius:16px;padding:16px 16px 16px 64px;text-align:left;position:relative}
+  .alur-card{border:1px solid #e2e8f0;border-radius:16px;padding:16px 16px 16px 64px;text-align:left;position:relative}
   .alur-card:hover{transform:none}
   
-  /* Garis vertikal di kiri */
-  .alur-grid::before{content:'';position:absolute;left:27px;top:52px;bottom:0;width:2px;background:repeating-linear-gradient(180deg,#e2e8f0 0,#e2e8f0 8px,transparent 8px,transparent 16px);display:block}
-  
-  /* Garis biru solid vertikal */
-  .alur-progress-line{top:52px;left:27px;width:2px;height:0%;background:linear-gradient(180deg,#1d4ed8 0%,#2563eb 100%);transition:height 1.2s cubic-bezier(0.4,0,0.2,1)}
+  /* Garis vertikal tipis di kiri */
+  .alur-grid::before{content:'';position:absolute;left:27px;top:60px;bottom:0;width:2px;background:#e2e8f0;display:block}
   
   /* Tile ikon ke kiri */
   .alur-icon-tile{position:absolute;left:0;top:12px;margin:0;width:54px;height:54px}
   .alur-icon-tile svg{width:26px;height:26px}
   .alur-num-badge{top:-4px;right:-4px;width:20px;height:20px;font-size:10px}
   
-  .alur-title{font-size:15px;margin:0 0 4px 0}
-  .alur-desc{font-size:12px;margin:0}
-  .alur-badge-core{margin-top:8px}
+  .alur-title{font-size:16px;margin:0 0 4px 0}
+  .alur-desc{font-size:13px;margin:0}
+  .alur-badge-core{top:8px;right:8px}
   
   .alur-chips-panel{flex-direction:column;align-items:flex-start;gap:10px;padding:14px 18px;margin-top:24px}
   .alur-chip{width:100%;justify-content:center}
@@ -828,21 +825,22 @@ html.dark .alur-card{
   backdrop-filter:blur(10px) !important;
   -webkit-backdrop-filter:blur(10px) !important;
   border:1px solid rgba(120,170,255,.18) !important;
-  border-top-color:rgba(120,170,255,.38) !important;
   box-shadow:0 2px 8px rgba(0,0,0,.35) !important;
 }
 html.dark .alur-card:hover{
   border-color:rgba(120,170,255,.30) !important;
-  border-top-color:rgba(120,170,255,.50) !important;
   transform:translateY(-4px) !important;
   box-shadow:0 6px 18px rgba(0,0,0,.45) !important;
 }
 html.dark .alur-icon-tile{
-  background:linear-gradient(135deg,rgba(37,99,235,.7) 0%,rgba(59,130,246,.6) 100%) !important;
+  background:linear-gradient(135deg,rgba(37,99,235,.6) 0%,rgba(59,130,246,.5) 100%) !important;
   box-shadow:0 4px 12px rgba(0,0,0,.3) !important;
 }
 html.dark .alur-card:hover .alur-icon-tile{
   box-shadow:0 6px 16px rgba(0,0,0,.4) !important;
+}
+html.dark .alur-icon-tile::before{
+  background:radial-gradient(circle,rgba(120,170,255,.1) 0%,transparent 70%) !important;
 }
 html.dark .alur-num-badge{
   background:rgba(6,18,48,.85) !important;
@@ -855,14 +853,17 @@ html.dark .alur-badge-core{
   border-color:rgba(120,170,255,.25) !important;
   color:#8ab4ff !important;
 }
+html.dark .alur-connector{
+  background:rgba(6,18,48,.85) !important;
+  border-color:rgba(120,170,255,.18) !important;
+  color:#8fa3c4 !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.3) !important;
+}
 html.dark .alur-title{color:#f4f8ff !important}
 html.dark .alur-card:hover .alur-title{color:#8ab4ff !important}
 html.dark .alur-desc{color:#b4c3dc !important}
 html.dark .alur-grid::before{
-  background:repeating-linear-gradient(90deg,rgba(120,170,255,.12) 0,rgba(120,170,255,.12) 8px,transparent 8px,transparent 16px) !important;
-}
-html.dark .alur-progress-line{
-  background:linear-gradient(90deg,rgba(120,170,255,.5) 0%,rgba(147,197,253,.4) 100%) !important;
+  background:rgba(120,170,255,.18) !important;
 }
 html.dark .alur-chips-panel{
   background:rgba(0,10,30,.55) !important;
@@ -879,16 +880,6 @@ html.dark .alur-chip:hover{
   color:#8ab4ff !important;
 }
 html.dark .alur-chip svg{color:#8ab4ff !important}
-
-/* Mobile timeline vertical line in dark mode */
-@media(max-width:640px){
-  html.dark .alur-grid::before{
-    background:repeating-linear-gradient(180deg,rgba(120,170,255,.12) 0,rgba(120,170,255,.12) 8px,transparent 8px,transparent 16px) !important;
-  }
-  html.dark .alur-progress-line{
-    background:linear-gradient(180deg,rgba(120,170,255,.5) 0%,rgba(147,197,253,.4) 100%) !important;
-  }
-}
 
 /* 5. Stats Section (Dark Navy Glass with Blur & Pastel Icons) */
 html.dark .stats-eyebrow{
@@ -1261,7 +1252,7 @@ $alurChips = [
 ];
 @endphp
 
-<section class="section feat-bg" id="fitur" style="padding:56px 24px;">
+<section class="section feat-bg" id="fitur" style="padding:48px 24px;">
   <div class="section-inner">
     <div class="section-head">
       <div class="section-eyebrow"><span class="section-eyebrow-dot"></span>ALUR PEMINJAMAN</div>
@@ -1270,21 +1261,23 @@ $alurChips = [
     </div>
 
     <div class="alur-grid" data-alur-observe>
-      <div class="alur-progress-line"></div>
       @foreach($alurLangkah as $langkah)
       <div class="alur-card alur-fade-up">
-        <div class="alur-icon-tile">
-          <span class="alur-num-badge">{{ $langkah['num'] }}</span>
-          {!! $langkah['icon'] !!}
-        </div>
-        <h3 class="alur-title">{{ $langkah['title'] }}</h3>
-        <p class="alur-desc">{{ $langkah['desc'] }}</p>
         @if($langkah['isCore'])
         <div class="alur-badge-core">
           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           Inti sistem
         </div>
         @endif
+        <div class="alur-icon-tile">
+          <span class="alur-num-badge">{{ $langkah['num'] }}</span>
+          {!! $langkah['icon'] !!}
+        </div>
+        <h3 class="alur-title">{{ $langkah['title'] }}</h3>
+        <p class="alur-desc">{{ $langkah['desc'] }}</p>
+        <div class="alur-connector">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </div>
       </div>
       @endforeach
     </div>
@@ -1302,7 +1295,7 @@ $alurChips = [
 
 <script>
 (function() {
-  // Stagger fade-up animation & progress line with reduced-motion support
+  // Stagger fade-up animation with reduced-motion support
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (prefersReducedMotion) return;
 
@@ -1311,15 +1304,6 @@ $alurChips = [
       if (entry.isIntersecting) {
         const grid = entry.target;
         const cards = grid.querySelectorAll('.alur-card');
-        const progressLine = grid.querySelector('.alur-progress-line');
-        
-        // Animate progress line
-        if (progressLine) {
-          setTimeout(() => {
-            progressLine.style.width = '100%';
-            progressLine.style.height = '100%';
-          }, 100);
-        }
         
         // Stagger cards with 80ms delay
         cards.forEach((card, index) => {
