@@ -342,7 +342,7 @@
                             </div>
                             <div class="meta-row">
                                 <span class="meta-label">Lokasi:</span>
-                                <span class="meta-value">{{ $item->location->name ?? '-' }}</span>
+                                <span class="meta-value">{{ $item->location?->room ?? $item->location?->building ?? '-' }}</span>
                             </div>
                             <div class="meta-row">
                                 <span class="meta-label">Kondisi:</span>
