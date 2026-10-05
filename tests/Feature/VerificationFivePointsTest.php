@@ -226,7 +226,8 @@ class VerificationFivePointsTest extends TestCase
         $responseGuruNonMatch = $this->actingAs($this->guru)->get(route('teacher.barang', ['search' => 'XYZ_NONEXISTENT_ITEM_KEYWORD']));
         $responseGuruNonMatch->assertStatus(200);
         $responseGuruNonMatch->assertDontSee('Laptop Dell Latitude TestMatch');
-        $responseGuruNonMatch->assertSee('Tidak ada barang yang tersedia saat ini');
+        // View menampilkan "Barang tidak ditemukan" dan "Tidak ada barang yang sesuai" saat ada filter pencarian aktif
+        $responseGuruNonMatch->assertSee('Barang tidak ditemukan');
 
         // --- SISWA LIVEWIRE CATALOG SEARCH ---
         Livewire::actingAs($this->siswa)
