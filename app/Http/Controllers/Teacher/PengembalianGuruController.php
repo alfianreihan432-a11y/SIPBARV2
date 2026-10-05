@@ -182,7 +182,10 @@ class PengembalianGuruController extends Controller
             });
         }
 
-        $returns = $query->latest('updated_at')->paginate(20)->withQueryString();
+        $returns = $query->orderByRaw('COALESCE(returned_at, updated_at) DESC')
+            ->orderBy('id', 'DESC')
+            ->paginate(20)
+            ->withQueryString();
 
         return view('pages.guru.pengembalian-guru-history', [
             'returns' => $returns,
