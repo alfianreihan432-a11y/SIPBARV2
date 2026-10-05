@@ -273,33 +273,7 @@ class BorrowingRequest extends Model
     // Metode Pembantu
     // ==========================================
     
-    /**
-     * Periksa apakah peminjaman sudah terlambat
-     */
-    public function isOverdue(): bool
-    {
-        if ($this->status !== self::STATUS_BORROWED) {
-            return false;
-        }
 
-        // Gunakan zona waktu Asia/Jakarta untuk perbandingan yang akurat
-        $nowJakarta = now()->timezone('Asia/Jakarta');
-
-        // Periksa apakah tanggal kembali sudah terlewat
-        if ($this->return_date->lt($nowJakarta->toDateString())) {
-            return true;
-        }
-
-        // Jika tanggal kembali hari ini, periksa apakah jam kembali sudah terlewat
-        if ($this->return_date->toDateString() === $nowJakarta->toDateString() && $this->return_time) {
-            if ($this->return_time < $nowJakarta->toTimeString()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    
     /**
      * Hitung sisa hari hingga tanggal kembali
      */
