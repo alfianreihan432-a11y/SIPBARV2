@@ -242,7 +242,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('siswa/pengembalian/ajukan', [StudentReturnController::class, 'store'])->name('student.returns.store');
     Route::get('siswa/pengembalian/riwayat', [StudentReturnController::class, 'history'])->name('student.returns.history');
 
-    Route::view('siswa/riwayat', 'pages.siswa.history')->name('student.history');
+    Route::get('siswa/riwayat', [\App\Http\Controllers\Student\StudentBorrowingController::class, 'history'])->name('student.history');
     Route::view('siswa/pengumuman', 'pages.siswa.announcements')->name('student.announcements');
     Route::view('siswa/qr-barang', 'pages.siswa.announcements')->name('student.qr-barang');
     Route::view('siswa/profil', 'pages.siswa.profile')->name('student.profile');

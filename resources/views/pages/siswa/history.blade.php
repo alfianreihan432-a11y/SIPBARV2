@@ -208,54 +208,6 @@
 @endpush
 
 @section('content')
-@php
-    $query = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'item', 'teacher', 'itemReturns.verifier', 'items.itemWithTrashed', 'items.item'])
-        ->where('user_id', auth()->id());
-    if (request('search')) {
-        $search = trim(request('search'));
-        $query->where(function($q) use ($search) {
-            $q->whereHas('itemWithTrashed', fn($iq) => $iq->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
-              ->orWhereHas('item', fn($iq) => $iq->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
-              ->orWhereHas('items.itemWithTrashed', fn($iq) => $iq->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
-              ->orWhereHas('items.item', fn($iq) => $iq->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
-              ->orWhere('purpose', 'like', "%{$search}%");
-        });
-    }
-    if (request('status')) {
-        $stFilter = request('status');
-        if ($stFilter === 'returned') {
-            $query->where(function($q) {
-                $q->where('status', 'returned')
-                  ->orWhereHas('itemReturns', fn($returnQ) => $returnQ->where('status', 'disetujui'));
-            });
-        } else {
-            $query->where('status', $stFilter);
-        }
-    }
-    if (request('date_from')) $query->whereDate('borrow_date', '>=', request('date_from'));
-    if (request('date_to'))   $query->whereDate('borrow_date', '<=', request('date_to'));
-    $histories = $query->latest()->paginate(10);
-    $totalAll      = \App\Models\BorrowingRequest::where('user_id', auth()->id())->count();
-    // Count returned as either status='returned' OR has approved item return
-    $totalReturned = \App\Models\BorrowingRequest::where('user_id', auth()->id())
-        ->where(function($q) {
-            $q->where('status', 'returned')
-              ->orWhereHas('itemReturns', function($returnQ) {
-                  $returnQ->where('status', 'disetujui');
-              });
-        })->count();
-
-    $statusMap = [
-        'pending'   => ['label'=>'Menunggu',     'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
-        'approved'  => ['label'=>'Disetujui',    'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-        'qr_ready'  => ['label'=>'Siap Ambil',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-        'borrowed'  => ['label'=>'Dipinjam',     'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
-        'returned'  => ['label'=>'Dikembalikan', 'cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
-        'rejected'  => ['label'=>'Ditolak',      'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
-        'cancelled' => ['label'=>'Dibatalkan',   'cls'=>'s-badge--returned', 'row'=>'s-loan-row--pending',  'dot'=>'#94a3b8'],
-        'overdue'   => ['label'=>'Terlambat',    'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
-    ];
-@endphp
 
 {{-- Page Header --}}
 <div class="page-header flex flex-col lg:flex-row lg:items-center justify-between gap-4">
