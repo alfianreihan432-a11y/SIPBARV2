@@ -28,12 +28,12 @@ class ItemReturn extends Model
         'tanggal_verifikasi' => 'datetime',
     ];
 
-    // Status Constants
+    // Konstanta Status
     public const STATUS_MENUNGGU = 'menunggu';
     public const STATUS_DISETUJUI = 'disetujui';
     public const STATUS_DITOLAK = 'ditolak';
 
-    // Condition Constants
+    // Konstanta Kondisi
     public const KONDISI_BAIK = 'baik';
     public const KONDISI_RUSAK_RINGAN = 'rusak_ringan';
     public const KONDISI_RUSAK_BERAT = 'rusak_berat';
@@ -60,7 +60,7 @@ class ItemReturn extends Model
     }
 
     /**
-     * Scope: Only siswa returns (for Admin verification)
+     * Scope: Hanya pengembalian siswa (untuk verifikasi Admin)
      */
     public function scopeSiswa($query)
     {
@@ -68,7 +68,7 @@ class ItemReturn extends Model
     }
 
     /**
-     * Scope: Only guru returns (for Kepala Jurusan verification)
+     * Scope: Hanya pengembalian guru (untuk verifikasi Kepala Jurusan)
      */
     public function scopeGuru($query)
     {
@@ -106,7 +106,7 @@ class ItemReturn extends Model
         };
     }
 
-    // Scopes
+    // Scope Query
     public function scopeMenunggu($query)
     {
         return $query->where('status', self::STATUS_MENUNGGU);

@@ -65,7 +65,7 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     /**
-     * Get the attributes that should be cast.
+     * Dapatkan atribut yang harus di-cast.
      *
      * @return array<string, string>
      */

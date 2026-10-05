@@ -37,16 +37,16 @@ class BorrowingRequest extends Model
     protected $appends = ['display_status'];
 
     /**
-     * Accessor for display_status (real-time overdue check)
+     * Accessor untuk display_status (pengecekan keterlambatan secara real-time)
      */
     public function getDisplayStatusAttribute(): string
     {
-        // If already overdue in database, return it
+        // Jika sudah terlambat di database, kembalikan langsung
         if ($this->status === self::STATUS_OVERDUE) {
             return 'overdue';
         }
 
-        // Real-time check for borrowed loans
+        // Pengecekan real-time untuk peminjaman yang sedang aktif
         if ($this->status === self::STATUS_BORROWED) {
             $nowJakarta = now()->timezone('Asia/Jakarta');
 
@@ -244,11 +244,11 @@ class BorrowingRequest extends Model
     }
 
     // ==========================================
-    // Helper Methods
+    // Metode Pembantu
     // ==========================================
     
     /**
-     * Check if request is overdue
+     * Periksa apakah peminjaman sudah terlambat
      */
     public function isOverdue(): bool
     {
@@ -256,15 +256,15 @@ class BorrowingRequest extends Model
             return false;
         }
 
-        // Use Asia/Jakarta timezone for accurate comparison
+        // Gunakan zona waktu Asia/Jakarta untuk perbandingan yang akurat
         $nowJakarta = now()->timezone('Asia/Jakarta');
 
-        // Check if return date has passed
+        // Periksa apakah tanggal kembali sudah terlewat
         if ($this->return_date->lt($nowJakarta->toDateString())) {
             return true;
         }
 
-        // If return date is today, check if return time has passed
+        // Jika tanggal kembali hari ini, periksa apakah jam kembali sudah terlewat
         if ($this->return_date->toDateString() === $nowJakarta->toDateString() && $this->return_time) {
             if ($this->return_time < $nowJakarta->toTimeString()) {
                 return true;
@@ -275,7 +275,7 @@ class BorrowingRequest extends Model
     }
     
     /**
-     * Get days until return date
+     * Hitung sisa hari hingga tanggal kembali
      */
     public function daysUntilReturn(): ?int
     {
@@ -287,7 +287,7 @@ class BorrowingRequest extends Model
     }
     
     /**
-     * Check if reminder should be sent (H-1)
+     * Periksa apakah pengingat perlu dikirim (H-1)
      */
     public function shouldSendReminder(): bool
     {
@@ -297,7 +297,7 @@ class BorrowingRequest extends Model
     }
     
     /**
-     * Check if transaction is in terminal status
+     * Periksa apakah transaksi berada di status akhir (tidak bisa diubah lagi)
      */
     public function isTerminal(): bool
     {
@@ -309,7 +309,7 @@ class BorrowingRequest extends Model
     }
     
     /**
-     * Check if QR is active (can be scanned for actions)
+     * Periksa apakah QR Code masih aktif (bisa dipindai untuk aksi)
      */
     public function isQRActive(): bool
     {
@@ -320,7 +320,7 @@ class BorrowingRequest extends Model
     }
     
     /**
-     * Get human-readable status badge HTML
+     * Dapatkan HTML badge status yang mudah dibaca
      */
     public function getStatusBadgeAttribute(): string
     {
@@ -369,11 +369,11 @@ class BorrowingRequest extends Model
     }
     
     // ==========================================
-    // Scopes
+    // Scope Query
     // ==========================================
     
     /**
-     * Scope: Get overdue borrowings
+     * Scope: Ambil peminjaman yang sudah terlambat
      */
     public function scopeOverdue($query)
     {
@@ -391,7 +391,7 @@ class BorrowingRequest extends Model
     }
     
     /**
-     * Scope: Get active borrowings (borrowed status)
+     * Scope: Ambil peminjaman yang sedang aktif (status borrowed)
      */
     public function scopeActive($query)
     {
@@ -399,7 +399,7 @@ class BorrowingRequest extends Model
     }
     
     /**
-     * Scope: Get pending approval
+     * Scope: Ambil peminjaman yang menunggu persetujuan
      */
     public function scopePending($query)
     {
@@ -407,7 +407,7 @@ class BorrowingRequest extends Model
     }
     
     /**
-     * Scope: Need reminder (H-1)
+     * Scope: Ambil peminjaman yang perlu diingatkan (H-1)
      */
     public function scopeNeedReminder($query)
     {

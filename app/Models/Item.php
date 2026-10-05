@@ -47,7 +47,7 @@ class Item extends Model
     ];
 
     // ==========================================
-    // Relationships
+    // Relasi
     // ==========================================
 
     public function category()
@@ -71,7 +71,7 @@ class Item extends Model
     }
 
     /**
-     * Borrowing requests that are currently reserving stock
+     * Peminjaman yang saat ini sedang memakai stok
      * (status: approved atau borrowed)
      */
     public function activeBorrowingRequests()
@@ -236,7 +236,7 @@ class Item extends Model
     }
 
     // ==========================================
-    // Scopes
+    // Scope Query
     // ==========================================
 
     /**
