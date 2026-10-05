@@ -98,7 +98,7 @@ class AdminReturnController extends Controller
      */
     public function approve(Request $request, $id)
     {
-        $return = ItemReturn::with(['borrowingRequest.item', 'user'])->findOrFail($id);
+        $return = ItemReturn::with(['borrowingRequest.item', 'borrowingRequest.items.item', 'user'])->findOrFail($id);
 
         // Guard: Admin tidak boleh verifikasi pengembalian GURU
         if ($return->tipe_peminjam === 'guru') {
@@ -140,21 +140,48 @@ class AdminReturnController extends Controller
                     'checkin_by'       => $adminId,
                 ]);
 
-                // 3. Update status Item di inventaris
-                $item = $borrowing->item ? $borrowing->item : null;
-                if ($item) {
-                    if ($return->kondisi_barang === 'rusak_berat') {
-                        $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
-                    } else if ($return->kondisi_barang === 'hilang') {
-                        $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
-                    } else {
-                        $item->recalculateStatus();
+                // 3. Update status Item di inventaris (single-item & multi-item)
+                if ($borrowing->items && $borrowing->items->isNotEmpty()) {
+                    foreach ($borrowing->items as $detail) {
+                        $item = $detail->item;
+                        if ($item) {
+                            $qty = (int) ($detail->quantity ?? 1);
+                            if (in_array($kondisi, ['hilang', 'lost'])) {
+                                $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
+                            } elseif (in_array($kondisi, ['rusak_berat', 'rusak berat'])) {
+                                $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
+                                $item->increment('stock', $qty);
+                            } else {
+                                $item->increment('stock', $qty);
+                                if (in_array($kondisi, ['rusak_ringan', 'rusak ringan', 'damaged'])) {
+                                    $item->update(['condition' => 'Rusak Ringan']);
+                                }
+                                $item->recalculateStatus();
+                            }
+                        }
                     }
                 } else {
-                    Log::warning('Item not found for borrowing request during return approval', [
-                        'borrowing_request_id' => $borrowing->id,
-                        'item_return_id' => $return->id
-                    ]);
+                    $item = $borrowing->item ? $borrowing->item : null;
+                    if ($item) {
+                        $qty = (int) ($borrowing->quantity ?? 1);
+                        if (in_array($kondisi, ['hilang', 'lost'])) {
+                            $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
+                        } elseif (in_array($kondisi, ['rusak_berat', 'rusak berat'])) {
+                            $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
+                            $item->increment('stock', $qty);
+                        } else {
+                            $item->increment('stock', $qty);
+                            if (in_array($kondisi, ['rusak_ringan', 'rusak ringan', 'damaged'])) {
+                                $item->update(['condition' => 'Rusak Ringan']);
+                            }
+                            $item->recalculateStatus();
+                        }
+                    } else {
+                        Log::warning('Item not found for borrowing request during return approval', [
+                            'borrowing_request_id' => $borrowing->id,
+                            'item_return_id' => $return->id
+                        ]);
+                    }
                 }
 
                 // 4. Notifikasi in-app untuk Siswa

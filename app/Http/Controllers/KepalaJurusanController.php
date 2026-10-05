@@ -380,7 +380,7 @@ class KepalaJurusanController extends Controller
                 }
             })
             ->where('status', \App\Models\ItemReturn::STATUS_MENUNGGU)
-            ->with(['borrowingRequest.item', 'borrowingRequest.itemWithTrashed', 'user'])
+            ->with(['borrowingRequest.item', 'borrowingRequest.itemWithTrashed', 'borrowingRequest.items.item', 'borrowingRequest.items.itemWithTrashed', 'user'])
             ->findOrFail($id);
 
         $borrowing = $itemReturn->borrowingRequest;
@@ -413,19 +413,40 @@ class KepalaJurusanController extends Controller
                 'checkin_by'       => $kajurId,
             ]);
 
-            // Update kondisi item sesuai verifikasi
-            $item = $borrowing->item;
-            if ($item) {
-                if ($validated['verified_condition'] === 'Hilang') {
-                    $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
-                } elseif ($validated['verified_condition'] === 'Rusak Berat') {
-                    $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
-                    $item->increment('stock', $borrowing->quantity);
-                } else {
-                    // Baik atau Rusak Ringan — kembalikan stok
-                    $item->increment('stock', $borrowing->quantity);
-                    if ($validated['verified_condition'] === 'Rusak Ringan') {
-                        $item->update(['condition' => 'Rusak Ringan']);
+            // Update kondisi item sesuai verifikasi (mendukung single-item dan multi-item)
+            if ($borrowing->items && $borrowing->items->isNotEmpty()) {
+                foreach ($borrowing->items as $detail) {
+                    $item = $detail->item;
+                    if ($item) {
+                        $qty = (int) ($detail->quantity ?? 1);
+                        if ($validated['verified_condition'] === 'Hilang') {
+                            $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
+                        } elseif ($validated['verified_condition'] === 'Rusak Berat') {
+                            $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
+                            $item->increment('stock', $qty);
+                        } else {
+                            $item->increment('stock', $qty);
+                            if ($validated['verified_condition'] === 'Rusak Ringan') {
+                                $item->update(['condition' => 'Rusak Ringan']);
+                            }
+                        }
+                    }
+                }
+            } else {
+                $item = $borrowing->item;
+                if ($item) {
+                    $qty = (int) ($borrowing->quantity ?? 1);
+                    if ($validated['verified_condition'] === 'Hilang') {
+                        $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
+                    } elseif ($validated['verified_condition'] === 'Rusak Berat') {
+                        $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
+                        $item->increment('stock', $qty);
+                    } else {
+                        // Baik atau Rusak Ringan — kembalikan stok
+                        $item->increment('stock', $qty);
+                        if ($validated['verified_condition'] === 'Rusak Ringan') {
+                            $item->update(['condition' => 'Rusak Ringan']);
+                        }
                     }
                 }
             }
