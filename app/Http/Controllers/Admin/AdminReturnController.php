@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BorrowingRequest;
-use App\Models\Item;
 use App\Models\ItemReturn;
 use App\Models\Notification;
+use App\Services\ReturnStockService;
 use App\Services\WhatsAppNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -98,22 +98,42 @@ class AdminReturnController extends Controller
      */
     public function approve(Request $request, $id)
     {
-        $return = ItemReturn::with(['borrowingRequest.item', 'borrowingRequest.items.item', 'user'])->findOrFail($id);
+        $return = ItemReturn::with([
+            'borrowingRequest.item',
+            'borrowingRequest.items.item',
+            'user',
+        ])->findOrFail($id);
 
         // Guard: Admin tidak boleh verifikasi pengembalian GURU
         if ($return->tipe_peminjam === 'guru') {
             return back()->with('error', 'Pengembalian dari guru harus diverifikasi oleh Kepala Jurusan, bukan Admin.');
         }
 
+        // Guard: Proteksi verifikasi ganda
         if ($return->status !== ItemReturn::STATUS_MENUNGGU) {
             return back()->with('error', 'Pengembalian ini sudah diverifikasi sebelumnya.');
         }
 
-        try {
-            DB::transaction(function () use ($return) {
-                $now = now();
-                $adminId = Auth::id();
+        // Peta kondisi internal (enum ItemReturn) ke label tampilan BorrowingRequest
+        $conditionMap = [
+            'baik'         => 'Baik',
+            'rusak_ringan' => 'Rusak Ringan',
+            'rusak_berat'  => 'Rusak Berat',
+            'hilang'       => 'Hilang',
+        ];
+        $kondisi         = strtolower($return->kondisi_barang ?? 'baik');
+        $returnCondition = $conditionMap[$kondisi] ?? ($return->kondisi_barang ?? 'Baik');
+        $adminId         = Auth::id();
+        $now             = now();
+        $borrowing       = $return->borrowingRequest;
 
+        // Tangkap ringkasan nama barang SEBELUM transaction agar dapat dipakai di notifikasi.
+        // itemSummary() menangani single-item maupun multi-item dengan benar.
+        $itemSummary = $borrowing->itemSummary();
+
+        try {
+            // ── DB::transaction hanya untuk operasi DB ─────────────────────────
+            DB::transaction(function () use ($return, $borrowing, $kondisi, $returnCondition, $adminId, $now, $itemSummary) {
                 // 1. Update status ItemReturn
                 $return->update([
                     'status'             => ItemReturn::STATUS_DISETUJUI,
@@ -121,17 +141,7 @@ class AdminReturnController extends Controller
                     'tanggal_verifikasi' => $now,
                 ]);
 
-                // 2. Update status BorrowingRequest -> returned
-                $borrowing = $return->borrowingRequest;
-                $conditionMap = [
-                    'baik'         => 'Baik',
-                    'rusak_ringan' => 'Rusak Ringan',
-                    'rusak_berat'  => 'Rusak Berat',
-                    'hilang'       => 'Hilang',
-                ];
-                $kondisi = strtolower($return->kondisi_barang ?? 'baik');
-                $returnCondition = $conditionMap[$kondisi] ?? ($return->kondisi_barang ?? 'Baik');
-
+                // 2. Sinkronisasi BorrowingRequest → status 'returned'
                 $borrowing->update([
                     'status'           => BorrowingRequest::STATUS_RETURNED,
                     'returned_at'      => $borrowing->returned_at ?? $now,
@@ -140,74 +150,37 @@ class AdminReturnController extends Controller
                     'checkin_by'       => $adminId,
                 ]);
 
-                // 3. Update status Item di inventaris (single-item & multi-item)
-                if ($borrowing->items && $borrowing->items->isNotEmpty()) {
-                    foreach ($borrowing->items as $detail) {
-                        $item = $detail->item;
-                        if ($item) {
-                            $qty = (int) ($detail->quantity ?? 1);
-                            if (in_array($kondisi, ['hilang', 'lost'])) {
-                                $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
-                            } elseif (in_array($kondisi, ['rusak_berat', 'rusak berat'])) {
-                                $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
-                                $item->increment('stock', $qty);
-                            } else {
-                                $item->increment('stock', $qty);
-                                if (in_array($kondisi, ['rusak_ringan', 'rusak ringan', 'damaged'])) {
-                                    $item->update(['condition' => 'Rusak Ringan']);
-                                }
-                                $item->recalculateStatus();
-                            }
-                        }
-                    }
-                } else {
-                    $item = $borrowing->item ? $borrowing->item : null;
-                    if ($item) {
-                        $qty = (int) ($borrowing->quantity ?? 1);
-                        if (in_array($kondisi, ['hilang', 'lost'])) {
-                            $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
-                        } elseif (in_array($kondisi, ['rusak_berat', 'rusak berat'])) {
-                            $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
-                            $item->increment('stock', $qty);
-                        } else {
-                            $item->increment('stock', $qty);
-                            if (in_array($kondisi, ['rusak_ringan', 'rusak ringan', 'damaged'])) {
-                                $item->update(['condition' => 'Rusak Ringan']);
-                            }
-                            $item->recalculateStatus();
-                        }
-                    } else {
-                        Log::warning('Item not found for borrowing request during return approval', [
-                            'borrowing_request_id' => $borrowing->id,
-                            'item_return_id' => $return->id
-                        ]);
-                    }
-                }
+                // 3. Terapkan perubahan stok via ReturnStockService.
+                //    Single-item dan multi-item menggunakan jalur kode yang sama
+                //    melalui collectItemsWithQuantities() — tidak ada duplikasi blok.
+                app(ReturnStockService::class)->applyStockForReturn($borrowing, $kondisi);
 
-                // 4. Notifikasi in-app untuk Siswa
-                $itemName = $borrowing->item ? $borrowing->item->name : 'Barang tidak ditemukan';
+                // 4. Notifikasi in-app untuk Siswa.
+                //    Menggunakan $itemSummary (sudah di-capture sebelum closure)
+                //    agar multi-item tidak tampil "Barang tidak ditemukan".
                 Notification::sendToUser(
                     $return->user_id,
                     'pengembalian_disetujui',
-                    "Pengajuan pengembalian barang '{$itemName}' telah DISETUJUI oleh Admin. Terima kasih telah mengembalikan barang!",
+                    "Pengajuan pengembalian barang '{$itemSummary}' telah DISETUJUI oleh Admin. Terima kasih telah mengembalikan barang!",
                     ['item_return_id' => $return->id]
                 );
-
-                // 5. WhatsApp notification jika tersedia
-                try {
-                    $waService = app(WhatsAppNotificationService::class);
-                    $waService->notifyReturned($borrowing);
-                } catch (\Exception $we) {
-                    Log::info('WA notification return ignored: ' . $we->getMessage());
-                }
             });
+
+            // ── WhatsApp notification di LUAR transaction (setelah commit) ────
+            // Dipindahkan ke luar agar kegagalan WA tidak me-rollback transaksi DB.
+            try {
+                $waService = app(WhatsAppNotificationService::class);
+                $waService->notifyReturned($borrowing);
+            } catch (\Exception $we) {
+                Log::info('WA notification return (admin approve) ignored: ' . $we->getMessage());
+            }
 
             return back()->with('success', 'Pengembalian barang berhasil disetujui! Status barang dan peminjaman telah diperbarui.');
 
         } catch (\Exception $e) {
             Log::error('Error approving return request: ' . $e->getMessage(), [
                 'return_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace'     => $e->getTraceAsString(),
             ]);
 
             return back()->with('error', 'Terjadi kesalahan saat menyetujui pengembalian: ' . $e->getMessage());
@@ -227,7 +200,7 @@ class AdminReturnController extends Controller
             'alasan_ditolak.max'      => 'Alasan penolakan maksimal 500 karakter.',
         ]);
 
-        $return = ItemReturn::with(['borrowingRequest.item', 'user'])->findOrFail($id);
+        $return = ItemReturn::with(['borrowingRequest.item', 'borrowingRequest.items.itemWithTrashed', 'user'])->findOrFail($id);
 
         // Guard: Admin tidak boleh verifikasi pengembalian GURU
         if ($return->tipe_peminjam === 'guru') {
@@ -238,9 +211,12 @@ class AdminReturnController extends Controller
             return back()->with('error', 'Pengembalian ini sudah diverifikasi sebelumnya.');
         }
 
+        // Tangkap nama barang sebelum transaction
+        $itemSummary = $return->borrowingRequest->itemSummary();
+
         try {
-            DB::transaction(function () use ($return, $request) {
-                $now = now();
+            DB::transaction(function () use ($return, $request, $itemSummary) {
+                $now     = now();
                 $adminId = Auth::id();
 
                 // 1. Update status ItemReturn menjadi ditolak
@@ -252,14 +228,12 @@ class AdminReturnController extends Controller
                 ]);
 
                 // 2. Status peminjaman BorrowingRequest TETAP 'borrowed' agar siswa dapat mengajukan ulang
-                // Siswa diberi info penolakan
 
-                // 3. Notifikasi in-app untuk Siswa
-                $itemName = $return->borrowingRequest->item ? $return->borrowingRequest->item->name : 'Barang tidak ditemukan';
+                // 3. Notifikasi in-app untuk Siswa (menggunakan itemSummary agar nama barang jelas)
                 Notification::sendToUser(
                     $return->user_id,
                     'pengembalian_ditolak',
-                    "Pengajuan pengembalian barang '{$itemName}' DITOLAK. Alasan: {$request->alasan_ditolak}. Silakan ajukan ulang dengan data yang sesuai.",
+                    "Pengajuan pengembalian barang '{$itemSummary}' DITOLAK. Alasan: {$request->alasan_ditolak}. Silakan ajukan ulang dengan data yang sesuai.",
                     ['item_return_id' => $return->id, 'alasan' => $request->alasan_ditolak]
                 );
             });
@@ -269,7 +243,7 @@ class AdminReturnController extends Controller
         } catch (\Exception $e) {
             Log::error('Error rejecting return request: ' . $e->getMessage(), [
                 'return_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace'     => $e->getTraceAsString(),
             ]);
 
             return back()->with('error', 'Terjadi kesalahan saat menolak pengembalian: ' . $e->getMessage());

@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\BorrowingRequest;
-use App\Models\Item;
 use App\Models\LaporanJurusan;
 use App\Models\LaporanJurusanHistory;
 use App\Services\BorrowingApprovalService;
+use App\Services\ReturnStockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -363,13 +363,13 @@ class KepalaJurusanController extends Controller
     {
         $validated = $request->validate([
             'verified_condition' => 'required|in:Baik,Rusak Ringan,Rusak Berat,Hilang',
-            'verified_notes' => 'nullable|string|max:500',
+            'verified_notes'     => 'nullable|string|max:500',
         ]);
 
-        $kajurId = (int) Auth::id();
+        $kajurId   = (int) Auth::id();
         $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
 
-        // Find the ItemReturn record for this Kajur
+        // Cari ItemReturn milik guru yang relevan untuk Kajur ini
         $itemReturn = \App\Models\ItemReturn::guru()
             ->where(function ($query) use ($kajurId, $jurusanId) {
                 $query->where('kajur_id', $kajurId);
@@ -379,35 +379,49 @@ class KepalaJurusanController extends Controller
                     });
                 }
             })
-            ->with(['borrowingRequest.item', 'borrowingRequest.itemWithTrashed', 'borrowingRequest.items.item', 'borrowingRequest.items.itemWithTrashed', 'user'])
+            ->with([
+                'borrowingRequest.item',
+                'borrowingRequest.itemWithTrashed',
+                'borrowingRequest.items.item',
+                'borrowingRequest.items.itemWithTrashed',
+                'user',
+            ])
             ->findOrFail($id);
 
+        // Guard: Proteksi verifikasi ganda
         if ($itemReturn->status !== \App\Models\ItemReturn::STATUS_MENUNGGU) {
             return redirect()->back()->with('error', 'Pengembalian ini sudah diverifikasi sebelumnya.');
         }
 
         $borrowing = $itemReturn->borrowingRequest;
 
-        // Update ItemReturn status and BorrowingRequest within DB transaction
+        // Peta kondisi tampilan (dari form) ke enum internal ItemReturn
         $conditionEnumMap = [
-            'Baik'        => 'baik',
-            'Rusak Ringan'=> 'rusak_ringan',
-            'Rusak Berat' => 'rusak_berat',
-            'Hilang'      => 'hilang',
+            'Baik'         => 'baik',
+            'Rusak Ringan' => 'rusak_ringan',
+            'Rusak Berat'  => 'rusak_berat',
+            'Hilang'       => 'hilang',
         ];
+        $kondisiInternal = $conditionEnumMap[$validated['verified_condition']] ?? 'baik';
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($itemReturn, $borrowing, $validated, $conditionEnumMap, $kajurId) {
+        // Tangkap ringkasan nama barang sebelum transaction
+        // itemSummary() menangani single-item maupun multi-item dengan benar
+        $itemSummary = $borrowing->itemSummary();
+
+        // ── DB::transaction hanya untuk operasi DB ─────────────────────────
+        \Illuminate\Support\Facades\DB::transaction(function () use ($itemReturn, $borrowing, $validated, $kondisiInternal, $kajurId, $itemSummary) {
             $now = now();
 
+            // 1. Update status ItemReturn
             $itemReturn->update([
                 'status'             => \App\Models\ItemReturn::STATUS_DISETUJUI,
-                'kondisi_barang'     => $conditionEnumMap[$validated['verified_condition']] ?? 'baik',
+                'kondisi_barang'     => $kondisiInternal,
                 'catatan'            => $validated['verified_notes'] ?? $itemReturn->catatan,
                 'diverifikasi_oleh'  => $kajurId,
                 'tanggal_verifikasi' => $now,
             ]);
 
-            // Update BorrowingRequest to sync with ItemReturn
+            // 2. Sinkronisasi BorrowingRequest → status 'returned'
             $borrowing->update([
                 'status'           => \App\Models\BorrowingRequest::STATUS_RETURNED,
                 'returned_at'      => $borrowing->returned_at ?? $now,
@@ -416,56 +430,24 @@ class KepalaJurusanController extends Controller
                 'checkin_by'       => $kajurId,
             ]);
 
-            // Update kondisi item sesuai verifikasi (mendukung single-item dan multi-item)
-            if ($borrowing->items && $borrowing->items->isNotEmpty()) {
-                foreach ($borrowing->items as $detail) {
-                    $item = $detail->item;
-                    if ($item) {
-                        $qty = (int) ($detail->quantity ?? 1);
-                        if ($validated['verified_condition'] === 'Hilang') {
-                            $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
-                        } elseif ($validated['verified_condition'] === 'Rusak Berat') {
-                            $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
-                            $item->increment('stock', $qty);
-                        } else {
-                            $item->increment('stock', $qty);
-                            if ($validated['verified_condition'] === 'Rusak Ringan') {
-                                $item->update(['condition' => 'Rusak Ringan']);
-                            }
-                        }
-                    }
-                }
-            } else {
-                $item = $borrowing->item;
-                if ($item) {
-                    $qty = (int) ($borrowing->quantity ?? 1);
-                    if ($validated['verified_condition'] === 'Hilang') {
-                        $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
-                    } elseif ($validated['verified_condition'] === 'Rusak Berat') {
-                        $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
-                        $item->increment('stock', $qty);
-                    } else {
-                        // Baik atau Rusak Ringan — kembalikan stok
-                        $item->increment('stock', $qty);
-                        if ($validated['verified_condition'] === 'Rusak Ringan') {
-                            $item->update(['condition' => 'Rusak Ringan']);
-                        }
-                    }
-                }
+            // 3. Terapkan perubahan stok via ReturnStockService.
+            //    Single-item dan multi-item menggunakan jalur kode yang sama
+            //    melalui collectItemsWithQuantities() — tidak ada duplikasi blok.
+            app(ReturnStockService::class)->applyStockForReturn($borrowing, $kondisiInternal);
+
+            // 4. Notifikasi in-app ke guru
+            //    Menggunakan $itemSummary agar multi-item tampil dengan nama barang yang benar.
+            try {
+                \App\Models\Notification::sendToUser(
+                    $borrowing->user_id,
+                    'pengembalian_disetujui',
+                    "Pengembalian barang '{$itemSummary}' telah DIVERIFIKASI oleh Kepala Jurusan. Terima kasih!",
+                    ['borrowing_id' => $borrowing->id]
+                );
+            } catch (\Exception $e) {
+                // Non-fatal — lanjut
             }
         });
-
-        // Notifikasi in-app ke guru
-        try {
-            \App\Models\Notification::sendToUser(
-                $borrowing->user_id,
-                'pengembalian_disetujui',
-                "Pengembalian barang '{$borrowing->item?->name}' telah DIVERIFIKASI oleh Kepala Jurusan. Terima kasih!",
-                ['borrowing_id' => $borrowing->id]
-            );
-        } catch (\Exception $e) {
-            // Non-fatal — lanjut
-        }
 
         return redirect()->route('kajur.pending-returns')
             ->with('success', 'Pengembalian barang berhasil diverifikasi dan stok diperbarui.');
