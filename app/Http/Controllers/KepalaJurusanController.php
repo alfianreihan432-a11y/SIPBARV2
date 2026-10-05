@@ -379,9 +379,12 @@ class KepalaJurusanController extends Controller
                     });
                 }
             })
-            ->where('status', \App\Models\ItemReturn::STATUS_MENUNGGU)
             ->with(['borrowingRequest.item', 'borrowingRequest.itemWithTrashed', 'borrowingRequest.items.item', 'borrowingRequest.items.itemWithTrashed', 'user'])
             ->findOrFail($id);
+
+        if ($itemReturn->status !== \App\Models\ItemReturn::STATUS_MENUNGGU) {
+            return redirect()->back()->with('error', 'Pengembalian ini sudah diverifikasi sebelumnya.');
+        }
 
         $borrowing = $itemReturn->borrowingRequest;
 
