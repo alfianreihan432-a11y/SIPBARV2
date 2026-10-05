@@ -163,7 +163,6 @@ class PeminjamanGuruController extends Controller
     public function index(): View
     {
         $borrowings = BorrowingRequest::where('user_id', Auth::id())
-            ->where('tipe_peminjam', 'guru')
             ->with(['itemWithTrashed', 'item', 'items.itemWithTrashed', 'items.item', 'approvedByKajur', 'qrCode'])
             ->latest()
             ->get();
@@ -179,7 +178,6 @@ class PeminjamanGuruController extends Controller
     public function qrBarang(): View
     {
         $activeQrLoans = BorrowingRequest::where('user_id', Auth::id())
-            ->where('tipe_peminjam', 'guru')
             ->whereIn('status', [
                 BorrowingRequest::STATUS_APPROVED,
                 'qr_ready',

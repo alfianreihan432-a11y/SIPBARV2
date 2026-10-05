@@ -18,14 +18,12 @@ class PengembalianGuruController extends Controller
     public function index(): View
     {
         $activeBorrowings = BorrowingRequest::where('user_id', Auth::id())
-            ->where('tipe_peminjam', 'guru')
             ->whereIn('status', [BorrowingRequest::STATUS_BORROWED, BorrowingRequest::STATUS_APPROVED])
             ->with(['item', 'itemWithTrashed', 'items.itemWithTrashed', 'items.item', 'approvedByKajur'])
             ->latest()
             ->get();
 
         $completedReturns = BorrowingRequest::where('user_id', Auth::id())
-            ->where('tipe_peminjam', 'guru')
             ->where('status', BorrowingRequest::STATUS_RETURNED)
             ->with(['item', 'itemWithTrashed', 'items.itemWithTrashed', 'items.item', 'approvedByKajur'])
             ->latest()
@@ -43,7 +41,6 @@ class PengembalianGuruController extends Controller
     public function create(int $id): View
     {
         $borrowing = BorrowingRequest::where('user_id', Auth::id())
-            ->where('tipe_peminjam', 'guru')
             ->whereIn('status', [BorrowingRequest::STATUS_BORROWED, BorrowingRequest::STATUS_APPROVED])
             ->with(['item.category', 'itemWithTrashed.category', 'items.itemWithTrashed.category', 'items.item.category'])
             ->findOrFail($id);
@@ -59,7 +56,6 @@ class PengembalianGuruController extends Controller
     public function store(Request $request, int $id): RedirectResponse
     {
         $borrowing = BorrowingRequest::where('user_id', Auth::id())
-            ->where('tipe_peminjam', 'guru')
             ->whereIn('status', [BorrowingRequest::STATUS_BORROWED, BorrowingRequest::STATUS_APPROVED])
             ->findOrFail($id);
 
@@ -146,9 +142,8 @@ class PengembalianGuruController extends Controller
     public function history(Request $request): View
     {
         $query = BorrowingRequest::where('user_id', Auth::id())
-            ->where('tipe_peminjam', 'guru')
             ->where('status', BorrowingRequest::STATUS_RETURNED)
-            ->with(['item', 'itemWithTrashed', 'approvedByKajur', 'items.item']);
+            ->with(['item', 'itemWithTrashed', 'approvedByKajur', 'items.item', 'items.itemWithTrashed']);
 
         if ($request->filled('search')) {
             $search = trim($request->search);
@@ -162,19 +157,32 @@ class PengembalianGuruController extends Controller
                 })->orWhereHas('items.item', function($miq) use ($search) {
                     $miq->where('name', 'like', "%{$search}%")
                         ->orWhere('code', 'like', "%{$search}%");
-                });
+                })->orWhereHas('items.itemWithTrashed', function($miq) use ($search) {
+                    $miq->where('name', 'like', "%{$search}%")
+                        ->orWhere('code', 'like', "%{$search}%");
+                })->orWhere('purpose', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('date_from')) {
-            $query->whereDate('returned_at', '>=', $request->date_from);
+            $query->where(function($q) use ($request) {
+                $q->whereDate('returned_at', '>=', $request->date_from)
+                  ->orWhere(function($sq) use ($request) {
+                      $sq->whereNull('returned_at')->whereDate('borrow_date', '>=', $request->date_from);
+                  });
+            });
         }
 
         if ($request->filled('date_to')) {
-            $query->whereDate('returned_at', '<=', $request->date_to);
+            $query->where(function($q) use ($request) {
+                $q->whereDate('returned_at', '<=', $request->date_to)
+                  ->orWhere(function($sq) use ($request) {
+                      $sq->whereNull('returned_at')->whereDate('borrow_date', '<=', $request->date_to);
+                  });
+            });
         }
 
-        $returns = $query->latest('returned_at')->paginate(20)->withQueryString();
+        $returns = $query->latest('updated_at')->paginate(20)->withQueryString();
 
         return view('pages.guru.pengembalian-guru-history', [
             'returns' => $returns,

@@ -209,12 +209,29 @@
 
 @section('content')
 @php
-    $query = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'teacher', 'itemReturns', 'items.itemWithTrashed'])
+    $query = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'item', 'teacher', 'itemReturns.verifier', 'items.itemWithTrashed', 'items.item'])
         ->where('user_id', auth()->id());
     if (request('search')) {
-        $query->whereHas('itemWithTrashed', fn($q) => $q->where('name', 'like', '%'.request('search').'%'));
+        $search = trim(request('search'));
+        $query->where(function($q) use ($search) {
+            $q->whereHas('itemWithTrashed', fn($iq) => $iq->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
+              ->orWhereHas('item', fn($iq) => $iq->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
+              ->orWhereHas('items.itemWithTrashed', fn($iq) => $iq->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
+              ->orWhereHas('items.item', fn($iq) => $iq->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%"))
+              ->orWhere('purpose', 'like', "%{$search}%");
+        });
     }
-    if (request('status')) $query->where('status', request('status'));
+    if (request('status')) {
+        $stFilter = request('status');
+        if ($stFilter === 'returned') {
+            $query->where(function($q) {
+                $q->where('status', 'returned')
+                  ->orWhereHas('itemReturns', fn($returnQ) => $returnQ->where('status', 'disetujui'));
+            });
+        } else {
+            $query->where('status', $stFilter);
+        }
+    }
     if (request('date_from')) $query->whereDate('borrow_date', '>=', request('date_from'));
     if (request('date_to'))   $query->whereDate('borrow_date', '<=', request('date_to'));
     $histories = $query->latest()->paginate(10);
@@ -229,12 +246,14 @@
         })->count();
 
     $statusMap = [
-        'pending'  => ['label'=>'Menunggu',    'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
-        'approved' => ['label'=>'Disetujui',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-        'qr_ready' => ['label'=>'Siap Ambil',  'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
-        'borrowed' => ['label'=>'Dipinjam',    'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
-        'returned' => ['label'=>'Dikembalikan','cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
-        'rejected' => ['label'=>'Ditolak',     'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
+        'pending'   => ['label'=>'Menunggu',     'cls'=>'s-badge--pending',  'row'=>'s-loan-row--pending',  'dot'=>'var(--s-pending)'],
+        'approved'  => ['label'=>'Disetujui',    'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
+        'qr_ready'  => ['label'=>'Siap Ambil',   'cls'=>'s-badge--approved', 'row'=>'s-loan-row--approved', 'dot'=>'var(--s-approved)'],
+        'borrowed'  => ['label'=>'Dipinjam',     'cls'=>'s-badge--borrowed', 'row'=>'s-loan-row--borrowed', 'dot'=>'var(--s-borrowed)'],
+        'returned'  => ['label'=>'Dikembalikan', 'cls'=>'s-badge--returned', 'row'=>'s-loan-row--returned', 'dot'=>'var(--s-returned)'],
+        'rejected'  => ['label'=>'Ditolak',      'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
+        'cancelled' => ['label'=>'Dibatalkan',   'cls'=>'s-badge--returned', 'row'=>'s-loan-row--pending',  'dot'=>'#94a3b8'],
+        'overdue'   => ['label'=>'Terlambat',    'cls'=>'s-badge--rejected', 'row'=>'s-loan-row--rejected', 'dot'=>'var(--s-rejected)'],
     ];
 @endphp
 
@@ -274,11 +293,13 @@
                 <label class="s-filter-label" style="display:block;margin-bottom:6px">Status</label>
                 <select name="status" class="s-filter-input w-full">
                     <option value="">Semua Status</option>
-                    <option value="pending"  {{ request('status')==='pending'  ? 'selected' : '' }}>Menunggu</option>
-                    <option value="approved" {{ request('status')==='approved' ? 'selected' : '' }}>Disetujui</option>
-                    <option value="borrowed" {{ request('status')==='borrowed' ? 'selected' : '' }}>Dipinjam</option>
-                    <option value="returned" {{ request('status')==='returned' ? 'selected' : '' }}>Dikembalikan</option>
-                    <option value="rejected" {{ request('status')==='rejected' ? 'selected' : '' }}>Ditolak</option>
+                    <option value="pending"   {{ request('status')==='pending'   ? 'selected' : '' }}>Menunggu</option>
+                    <option value="approved"  {{ request('status')==='approved'  ? 'selected' : '' }}>Disetujui</option>
+                    <option value="borrowed"  {{ request('status')==='borrowed'  ? 'selected' : '' }}>Dipinjam</option>
+                    <option value="returned"  {{ request('status')==='returned'  ? 'selected' : '' }}>Dikembalikan</option>
+                    <option value="rejected"  {{ request('status')==='rejected'  ? 'selected' : '' }}>Ditolak</option>
+                    <option value="cancelled" {{ request('status')==='cancelled' ? 'selected' : '' }}>Dibatalkan</option>
+                    <option value="overdue"   {{ request('status')==='overdue'   ? 'selected' : '' }}>Terlambat</option>
                 </select>
             </div>
             <div>

@@ -154,7 +154,13 @@ class StudentReturnController extends Controller
         $userId = Auth::id();
 
         $returns = ItemReturn::where('user_id', $userId)
-            ->with(['borrowingRequest.item.category', 'verifier'])
+            ->with([
+                'borrowingRequest.item.category',
+                'borrowingRequest.itemWithTrashed.category',
+                'borrowingRequest.items.itemWithTrashed.category',
+                'borrowingRequest.items.item.category',
+                'verifier'
+            ])
             ->latest()
             ->paginate(10);
 
