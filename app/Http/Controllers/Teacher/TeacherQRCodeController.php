@@ -74,7 +74,7 @@ class TeacherQRCodeController extends Controller
                 'tipe_peminjam' => 'guru',
             ]);
 
-            // Save/update QR code record in database
+            // Simpan/perbarui catatan kode QR di database
             $qrCodeRecord = QRCode::updateOrCreate(
                 ['borrowing_request_id' => $borrowingRequest->id],
                 [

@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Log;
 class SendBorrowingReminders extends Command
 {
     /**
-     * The name and signature of the console command.
+     * Nama dan signature dari perintah konsol.
      *
      * @var string
      */
     protected $signature = 'borrowing:send-reminders';
 
     /**
-     * The console command description.
+     * Deskripsi dari perintah konsol.
      *
      * @var string
      */
@@ -33,7 +33,7 @@ class SendBorrowingReminders extends Command
     }
 
     /**
-     * Execute the console command.
+     * Jalankan perintah konsol.
      */
     public function handle(): int
     {

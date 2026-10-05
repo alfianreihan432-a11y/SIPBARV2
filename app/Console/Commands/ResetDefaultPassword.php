@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 class ResetDefaultPassword extends Command
 {
     /**
-     * The name and signature of the console command.
+     * Nama dan signature dari perintah konsol.
      *
      * @var string
      */
@@ -21,7 +21,7 @@ class ResetDefaultPassword extends Command
                             {--force : Lewati pertanyaan konfirmasi sebelum menjalankan reset}';
 
     /**
-     * The console command description.
+     * Deskripsi dari perintah konsol.
      *
      * @var string
      */
@@ -33,7 +33,7 @@ class ResetDefaultPassword extends Command
     protected array $protectedRoles = ['superadmin', 'admin', 'kepala_jurusan', 'petugas'];
 
     /**
-     * Execute the console command.
+     * Jalankan perintah konsol.
      */
     public function handle(): int
     {

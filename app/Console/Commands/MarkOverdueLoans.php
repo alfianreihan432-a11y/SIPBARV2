@@ -9,27 +9,27 @@ use Illuminate\Support\Facades\Log;
 class MarkOverdueLoans extends Command
 {
     /**
-     * The name and signature of the console command.
+     * Nama dan signature dari perintah konsol.
      *
      * @var string
      */
     protected $signature = 'loans:mark-overdue';
 
     /**
-     * The console command description.
+     * Deskripsi dari perintah konsol.
      *
      * @var string
      */
     protected $description = 'Mark borrowed loans as overdue when return date has passed';
 
     /**
-     * Execute the console command.
+     * Jalankan perintah konsol.
      */
     public function handle(): int
     {
         $this->info('Starting overdue loan marking process...');
 
-        // Use Asia/Jakarta timezone for comparison
+        // Gunakan zona waktu Asia/Jakarta untuk perbandingan
         $nowJakarta = now()->timezone('Asia/Jakarta');
 
         // Find all borrowed items that are overdue

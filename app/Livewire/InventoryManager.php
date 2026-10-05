@@ -48,7 +48,7 @@ class InventoryManager extends Component
     public $asal_usul = '';
     public $harga = '';
 
-    // ── READONLY MODE for Superadmin ──
+    // ── MODE HANYA BACA untuk Superadmin ──
     public bool $readonly = false;
 
     protected $rules = [
@@ -326,13 +326,13 @@ class InventoryManager extends Component
         // Normalize dashes in input before parsing
         $forParsing = str_replace(['–', '—'], '-', $trimmed);
 
-        // Parse input to building/floor/room
-        // Pattern: "Gedung X Lt.N - R-xxx" or variations (matches accessor format)
+        // Parsing input ke gedung/lantai/ruangan
+        // Pola: "Gedung X Lt.N - R-xxx" atau variasinya (sesuai format accessor)
         $building = $forParsing;
         $floor = null;
         $room = null;
 
-        // Try to match pattern like "Gedung A Lt.2 - R-201"
+        // Coba cocokkan pola seperti "Gedung A Lt.2 - R-201"
         if (preg_match('/^(.+?)\s+Lt\.?(\d+)\s+-\s*(.+)$/i', $forParsing, $matches)) {
             $building = trim($matches[1]);
             $floor = trim($matches[2]);

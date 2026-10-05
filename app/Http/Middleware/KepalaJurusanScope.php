@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class KepalaJurusanScope
 {
     /**
-     * Handle an incoming request.
+     * Tangani request yang masuk.
      *
      * @param  Closure(Request): (Response)  $next
      */
@@ -17,14 +17,14 @@ class KepalaJurusanScope
     {
         $user = $request->user();
 
-        // Check if user is kepala jurusan
+        // Periksa apakah user adalah kepala jurusan
         if ($user && $user->hasRole('kepala_jurusan')) {
-            // Ensure kepala jurusan has a jurusan assigned
+            // Pastikan kepala jurusan sudah ditugaskan ke jurusan
             if (!$user->jurusan_id) {
                 abort(403, 'Anda belum ditugaskan ke jurusan manapun. Hubungi administrator.');
             }
 
-            // Share jurusan_id with all views for scoping
+            // Bagikan jurusan_id ke semua view untuk keperluan scope
             view()->share('kajur_jurusan_id', $user->jurusan_id);
             view()->share('kajur_jurusan_nama', $user->jurusan ? $user->jurusan->nama : 'Unknown');
         }

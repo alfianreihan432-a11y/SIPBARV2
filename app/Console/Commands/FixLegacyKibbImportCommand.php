@@ -10,21 +10,21 @@ use Illuminate\Console\Command;
 class FixLegacyKibbImportCommand extends Command
 {
     /**
-     * The name and signature of the console command.
+     * Nama dan signature dari perintah konsol.
      *
      * @var string
      */
     protected $signature = 'kibb:fix-legacy-data {--dry-run : Preview changes without saving to database}';
 
     /**
-     * The console command description.
+     * Deskripsi dari perintah konsol.
      *
      * @var string
      */
     protected $description = 'Parse and split legacy combined description text into dedicated columns (nomor_registrasi, ukuran, bahan, asal_usul, dll)';
 
     /**
-     * Execute the console command.
+     * Jalankan perintah konsol.
      */
     public function handle(): int
     {

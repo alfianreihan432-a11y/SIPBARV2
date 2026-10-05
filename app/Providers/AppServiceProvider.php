@@ -15,7 +15,7 @@ use Illuminate\Validation\Rules\Password;
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Daftarkan layanan aplikasi apa pun.
      */
     public function register(): void
     {
@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Inisialisasi (bootstrap) layanan aplikasi apa pun.
      */
     public function boot(): void
     {

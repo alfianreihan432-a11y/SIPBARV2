@@ -30,7 +30,7 @@ class BorrowingApprovalService
             // 1. Validate stock availability
             $this->validateStock($request);
             
-            // 2. Update status to approved
+            // 2. Perbarui status menjadi disetujui (approved)
             $this->stateMachine->transitionTo(
                 $request,
                 BorrowingRequest::STATUS_APPROVED,
@@ -40,7 +40,7 @@ class BorrowingApprovalService
             // 3. Generate QR code
             $qrCode = $this->qrCodeService->generateForRequest($request);
 
-            // 4. Send notification (non-blocking - errors only logged)
+            // 4. Kirim notifikasi (non-blocking - error hanya dicatat ke log)
             try {
                 $qrBase64 = $this->qrCodeService->getImageBase64($qrCode);
 
@@ -72,14 +72,14 @@ class BorrowingApprovalService
             // 1. Set rejection reason
             $request->rejection_reason = $reason;
             
-            // 2. Update status to rejected
+            // 2. Perbarui status menjadi ditolak (rejected)
             $this->stateMachine->transitionTo(
                 $request,
                 BorrowingRequest::STATUS_REJECTED,
                 $teacherId
             );
             
-            // 3. Send notification (non-blocking)
+            // 3. Kirim notifikasi (non-blocking)
             try {
                 // WhatsApp langsung ke siswa agar alasan penolakan sampai ke siswa
                 $this->whatsAppService->notifyRejected($request);

@@ -121,7 +121,7 @@ class PengembalianGuruController extends Controller
             'returned_at'      => now(),
         ]);
 
-        // Create ItemReturn record — route to Kepala Jurusan, NOT Admin
+        // Buat catatan ItemReturn — arahkan ke Kepala Jurusan, BUKAN Admin
         ItemReturn::create([
             'borrowing_request_id' => $borrowing->id,
             'user_id'              => Auth::id(),

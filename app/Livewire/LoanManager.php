@@ -14,7 +14,7 @@ class LoanManager extends Component
     public bool $showModal = false;
     public ?BorrowingRequest $selectedBorrowing = null;
 
-    // ── READONLY MODE for Superadmin ──
+    // ── MODE HANYA BACA untuk Superadmin ──
     public bool $readonly = false;
 
     // ── WhatsApp Link Property ──
@@ -139,7 +139,7 @@ class LoanManager extends Component
      */
     public function approve(int $id): void
     {
-        // ── READONLY CHECK: Superadmin cannot approve ──
+        // ── CEK HANYA BACA: Superadmin tidak dapat menyetujui ──
         if ($this->readonly || auth()->user()->hasRole('superadmin')) {
             session()->flash('error', 'Superadmin tidak memiliki izin untuk menyetujui peminjaman. Halaman ini read-only.');
             return;
@@ -178,7 +178,7 @@ class LoanManager extends Component
      */
     public function markBorrowed(int $id): void
     {
-        // ── READONLY CHECK: Superadmin cannot mark borrowed ──
+        // ── CEK HANYA BACA: Superadmin tidak dapat menandai dipinjam ──
         if ($this->readonly || auth()->user()->hasRole('superadmin')) {
             session()->flash('error', 'Superadmin tidak memiliki izin untuk mengubah status peminjaman. Halaman ini read-only.');
             return;
@@ -206,7 +206,7 @@ class LoanManager extends Component
      */
     public function markReturned(int $id): void
     {
-        // ── READONLY CHECK: Superadmin cannot mark returned ──
+        // ── CEK HANYA BACA: Superadmin tidak dapat menandai dikembalikan ──
         if ($this->readonly || auth()->user()->hasRole('superadmin')) {
             session()->flash('error', 'Superadmin tidak memiliki izin untuk mengubah status peminjaman. Halaman ini read-only.');
             return;
@@ -240,7 +240,7 @@ class LoanManager extends Component
      */
     public function reject(int $id): void
     {
-        // ── READONLY CHECK: Superadmin cannot reject ──
+        // ── CEK HANYA BACA: Superadmin tidak dapat menolak ──
         if ($this->readonly || auth()->user()->hasRole('superadmin')) {
             session()->flash('error', 'Superadmin tidak memiliki izin untuk menolak peminjaman. Halaman ini read-only.');
             return;
@@ -311,7 +311,7 @@ class LoanManager extends Component
         }
 
         // If already starts with 62, keep as is
-        // If starts with other prefix (like +62), remove + and ensure 62
+        // Jika diawali awalan lain (seperti +62), hapus + dan pastikan diawali 62
         if (str_starts_with($number, '+62')) {
             $number = '62' . substr($number, 3);
         }

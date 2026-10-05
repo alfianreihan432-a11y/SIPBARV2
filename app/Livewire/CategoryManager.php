@@ -19,7 +19,7 @@ class CategoryManager extends Component
     public $editingId = null;
     public $search = '';
 
-    // ── READONLY MODE for Superadmin ──
+    // ── MODE HANYA BACA untuk Superadmin ──
     public bool $readonly = false;
 
     protected $rules = [
@@ -52,7 +52,7 @@ class CategoryManager extends Component
 
     public function save(): void
     {
-        // ── READONLY CHECK: Superadmin cannot save ──
+        // ── CEK HANYA BACA: Superadmin tidak dapat menyimpan ──
         if ($this->readonly || auth()->user()->hasRole('superadmin')) {
             session()->flash('error', 'Superadmin tidak memiliki izin untuk mengelola kategori. Halaman ini read-only.');
             return;
@@ -82,7 +82,7 @@ class CategoryManager extends Component
 
     public function edit(int $id): void
     {
-        // ── READONLY CHECK: Superadmin cannot edit ──
+        // ── CEK HANYA BACA: Superadmin tidak dapat mengedit ──
         if ($this->readonly || auth()->user()->hasRole('superadmin')) {
             session()->flash('error', 'Superadmin tidak memiliki izin untuk mengedit kategori. Halaman ini read-only.');
             return;
@@ -99,7 +99,7 @@ class CategoryManager extends Component
 
     public function delete(int $id): void
     {
-        // ── READONLY CHECK: Superadmin cannot delete ──
+        // ── CEK HANYA BACA: Superadmin tidak dapat menghapus ──
         if ($this->readonly || auth()->user()->hasRole('superadmin')) {
             session()->flash('error', 'Superadmin tidak memiliki izin untuk menghapus kategori. Halaman ini read-only.');
             return;

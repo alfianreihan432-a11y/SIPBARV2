@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 class SuperadminRestrictApprove
 {
     /**
-     * Handle an incoming request.
+     * Tangani request yang masuk.
      * 
      * Superadmin has READ-ONLY access to most pages EXCEPT:
      * 1. All Report pages (approve/reject allowed)
@@ -50,13 +50,13 @@ class SuperadminRestrictApprove
                 return $next($request); // ✅ Full access to users
             }
 
-            // 4. Inventory + import routes (full access to manage items)
+            // 4. Route inventaris + impor (akses penuh untuk mengelola barang)
             if (str_contains($currentRouteName, 'inventory') ||
                 str_contains($currentRouteName, 'items.import')) {
                 return $next($request); // ✅ Full access to item management and KIBB imports
             }
 
-            // 5. Dashboard & Read-only routes (GET)
+            // 5. Route dashboard & hanya-baca (GET)
             if ($request->isMethod('GET') && 
                 (str_contains($currentRouteName, 'dashboard') ||
                  str_contains($currentRouteName, 'qr-scanner') ||
@@ -83,7 +83,7 @@ class SuperadminRestrictApprove
                 }
             }
 
-            // Block POST/PUT/PATCH/DELETE requests on non-allowed routes
+            // Blokir request POST/PUT/PATCH/DELETE pada route yang tidak diizinkan
             if (in_array($request->method(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
                 abort(403, 'Superadmin tidak memiliki izin untuk melakukan operasi ini. Hanya halaman Laporan, Pengaturan, dan Pengguna yang dapat dimodifikasi.');
             }

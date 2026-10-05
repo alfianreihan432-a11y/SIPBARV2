@@ -10,21 +10,21 @@ use Illuminate\Console\Command;
 class BackfillGuruJurusan extends Command
 {
     /**
-     * The name and signature of the console command.
+     * Nama dan signature dari perintah konsol.
      *
      * @var string
      */
     protected $signature = 'guru:backfill-jurusan {--apply : Terapkan perubahan ke database}';
 
     /**
-     * The console command description.
+     * Deskripsi dari perintah konsol.
      *
      * @var string
      */
     protected $description = 'Backfill jurusan_id untuk user ber-role guru berdasarkan riwayat kajur tujuan peminjaman';
 
     /**
-     * Execute the console command.
+     * Jalankan perintah konsol.
      */
     public function handle(): int
     {

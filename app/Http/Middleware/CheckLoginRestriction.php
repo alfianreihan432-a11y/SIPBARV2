@@ -10,14 +10,14 @@ use Symfony\Component\HttpFoundation\Response;
 class CheckLoginRestriction
 {
     /**
-     * Handle an incoming request.
+     * Tangani request yang masuk.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Login is allowed whenever credentials are valid; role-based access checks are enforced by
-        // route middleware after authentication. This middleware must not reject login itself.
+        // Login diizinkan selama kredensial valid; pemeriksaan akses berbasis role ditangani oleh
+        // middleware route setelah autentikasi. Middleware ini tidak boleh menolak login secara langsung.
         return $next($request);
     }
 }

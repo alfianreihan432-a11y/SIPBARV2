@@ -14,7 +14,7 @@ use Spatie\Permission\Models\Role;
 class SipintuSyncUsers extends Command
 {
     /**
-     * The name and signature of the console command.
+     * Nama dan signature dari perintah konsol.
      *
      * @var string
      */
@@ -23,7 +23,7 @@ class SipintuSyncUsers extends Command
                             {--batch=100 : Number of records to process per batch}';
 
     /**
-     * The console command description.
+     * Deskripsi dari perintah konsol.
      *
      * @var string
      */
@@ -38,7 +38,7 @@ class SipintuSyncUsers extends Command
     }
 
     /**
-     * Execute the console command.
+     * Jalankan perintah konsol.
      */
     public function handle(): int
     {
@@ -170,9 +170,9 @@ class SipintuSyncUsers extends Command
                 $classroomId = null;
                 $kelasName = null;
                 
-                // Check if student is graduated/alumni - if so, clear kelas & classroom_id
+                // Cek apakah siswa sudah lulus/alumni - jika ya, kosongkan kelas & classroom_id
                 // SIJUNA marks alumni with graduated = true or status = 2
-                // Note: Do NOT use tahun_lulus <= currentYear because active students also have graduation years recorded in SIJUNA (e.g. 2026).
+                // Catatan: JANGAN gunakan tahun_lulus <= currentYear karena siswa aktif juga memiliki tahun kelulusan tercatat di SIJUNA (misalnya 2026).
                 $graduated = filter_var($student['graduated'] ?? false, FILTER_VALIDATE_BOOLEAN);
                 $status = (int) ($student['status'] ?? 0);
                 $isGraduated = $graduated || ($status === 2);

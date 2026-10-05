@@ -25,7 +25,7 @@ class SuperadminReportController extends Controller
         $completedRequests = BorrowingRequest::where('status', BorrowingRequest::STATUS_RETURNED)->count();
         $rejectedRequests  = BorrowingRequest::where('status', BorrowingRequest::STATUS_REJECTED)->count();
 
-        // ─── System-wide Inventory & User Stats ───
+        // ─── Statistik Inventaris & Pengguna Seluruh Sistem ───
         $totalItemTypes  = Item::count();
         $totalItemStock  = (int) Item::sum('stock');
         $borrowedStock   = (int) BorrowingRequest::whereIn('status', [

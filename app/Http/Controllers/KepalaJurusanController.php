@@ -545,7 +545,7 @@ class KepalaJurusanController extends Controller
         $existing = LaporanJurusan::where('jurusan_id', $jurusanId)->first();
 
         if ($existing) {
-            // Archive existing report state to history so previous submissions & admin notes are preserved
+            // Arsipkan laporan saat ini ke riwayat agar pengajuan sebelumnya & catatan admin tetap tersimpan
             LaporanJurusanHistory::create([
                 'laporan_jurusan_id' => $existing->id,
                 'jurusan_id'         => $existing->jurusan_id,

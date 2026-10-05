@@ -232,7 +232,7 @@ class KajurWarningService
      */
     public function sendWarning(BorrowingRequest $borrowing, User $sender, string $channel = 'whatsapp'): array
     {
-        // 1. Anti-spam check: Max 1 warning per 24 hours per borrowing request
+        // 1. Pemeriksaan anti-spam: Maksimal 1 peringatan per 24 jam per pengajuan peminjaman
         if (LateWarningLog::hasRecentWarning($borrowing->id)) {
             $latest = LateWarningLog::getLatestFor($borrowing->id);
             $lastSentStr = $latest && $latest->sent_at ? $latest->sent_at->diffForHumans() : 'baru-baru ini';
@@ -254,7 +254,7 @@ class KajurWarningService
         $channelsUsed = [];
         $apiSuccess = false;
 
-        // 2. Attempt WhatsApp API if configured
+        // 2. Coba kirim via WhatsApp API jika terkonfigurasi
         if ($phone) {
             $apiSuccess = $this->sendWhatsAppApi($phone, $message);
             if ($apiSuccess) {
@@ -264,7 +264,7 @@ class KajurWarningService
             }
         }
 
-        // 3. Fallback / complementary Email notification (synchronous with safe try/catch)
+        // 3. Notifikasi email pelengkap / fallback (sinkron dengan try/catch aman)
         if (!empty($email)) {
             try {
                 Mail::to($email)->send(new LateBorrowingWarningMail($borrowing, $sender, $daysOverdue));
@@ -299,7 +299,7 @@ class KajurWarningService
 
         $usedChannelSummary = !empty($channelsUsed) ? implode('+', $channelsUsed) : 'manual_wa';
 
-        // 5. Record to LateWarningLog
+        // 5. Catat ke LateWarningLog
         LateWarningLog::create([
             'borrowing_request_id' => $borrowing->id,
             'sender_id' => $sender->id,
