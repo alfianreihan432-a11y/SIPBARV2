@@ -105,7 +105,9 @@ class RiwayatPeminjamanTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Proyektor Epson EB-X400');
         $response->assertSee('Kamera DSLR Canon EOS');
-        $response->assertSee('Dikembalikan');
+        $response->assertSee('s-badge--returned');
+        $response->assertSeeInOrder(['Proyektor Epson EB-X400', 's-badge--returned']);
+        $response->assertSeeInOrder(['Kamera DSLR Canon EOS', 's-badge--returned']);
     }
 
     /**
@@ -237,7 +239,10 @@ class RiwayatPeminjamanTest extends TestCase
         $response = $this->actingAs($this->studentA)->get(route('student.history', ['status' => 'returned']));
         $response->assertStatus(200);
         $response->assertSee('Proyektor Epson EB-X400');
+        $response->assertSee('Barang Returned');
         $response->assertDontSee('Kamera DSLR Canon EOS');
+        $response->assertDontSee('Barang Pending');
+        $response->assertSeeInOrder(['Proyektor Epson EB-X400', 's-badge--returned']);
     }
 
     /**
@@ -334,7 +339,14 @@ class RiwayatPeminjamanTest extends TestCase
         $response->assertSee('Peminjaman Terlambat Test');
         $response->assertDontSee('Peminjaman Belum Lewat Test');
         $response->assertDontSee('Peminjaman Approved Lewat Test');
-        $response->assertSee('Terlambat');
+        $response->assertSee('s-badge--rejected');
+        $response->assertSeeInOrder(['Peminjaman Terlambat Test', 's-badge--rejected']);
+
+        // Verifikasi pada tampilan semua riwayat: baris belum lewat berstatus borrowed, baris lewat tenggat berstatus rejected/terlambat
+        $responseAll = $this->actingAs($this->studentA)->get(route('student.history'));
+        $responseAll->assertStatus(200);
+        $responseAll->assertSeeInOrder(['Peminjaman Belum Lewat Test', 's-badge--borrowed']);
+        $responseAll->assertSeeInOrder(['Peminjaman Terlambat Test', 's-badge--rejected']);
     }
 
     /**
