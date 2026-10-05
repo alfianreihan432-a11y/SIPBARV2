@@ -119,10 +119,14 @@ class StudentReturnController extends Controller
             $fotoPath = $request->file('foto_bukti')->store('returns', 'public');
         }
 
+        $user = Auth::user();
+        $tipePeminjam = $borrowing->tipe_peminjam ?? (($user && ($user->hasRole('guru') || $user->hasRole('kepala_jurusan'))) ? 'guru' : 'siswa');
+
         // Buat record pengembalian dengan status default 'menunggu'
         $returnRecord = ItemReturn::create([
             'borrowing_request_id' => $borrowing->id,
             'user_id'              => $userId,
+            'tipe_peminjam'        => $tipePeminjam,
             'kondisi_barang'       => $request->kondisi_barang,
             'catatan'              => $request->catatan,
             'foto_bukti'           => $fotoPath,

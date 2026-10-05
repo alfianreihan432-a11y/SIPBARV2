@@ -140,6 +140,9 @@ class StudentBorrowingController extends Controller
         $teacherId = (int) ($validated['teacher_id'] ?? 0);
         $teacherId = $teacherId > 0 ? $teacherId : null;
 
+        $user = Auth::user();
+        $tipePeminjam = ($user && ($user->hasRole('guru') || $user->hasRole('kepala_jurusan'))) ? 'guru' : 'siswa';
+
         $requestHeader = BorrowingRequest::create([
             'user_id'        => Auth::id(),
             'teacher_id'     => $teacherId,
@@ -150,7 +153,7 @@ class StudentBorrowingController extends Controller
             'whatsapp_number'=> $waNumber,
             'notes'          => $validated['notes'] ?? null,
             'status'         => BorrowingRequest::STATUS_PENDING,
-            'tipe_peminjam'  => 'siswa',
+            'tipe_peminjam'  => $tipePeminjam,
         ]);
 
         foreach ($cart as $itemId => $entry) {
