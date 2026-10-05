@@ -581,8 +581,30 @@
         @media (max-width: 768px) {
             body { overflow: auto !important; height: auto !important; }
             .main { overflow: visible !important; height: auto !important; }
+            .content { padding: 16px !important; overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+        }
+
+        /* ── Global Date Picker & Input Icon Dark/Light mode ── */
+        :is(html.dark, html[data-theme="dark"], body.dark) input[type="date"] {
+            color-scheme: dark !important;
+        }
+        :is(html.dark, html[data-theme="dark"], body.dark) input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) brightness(1.4) !important;
+            opacity: 1 !important;
+            cursor: pointer;
+        }
+        html:not(.dark) input[type="date"],
+        :root[data-theme="light"] input[type="date"] {
+            color-scheme: light !important;
+        }
+        html:not(.dark) input[type="date"]::-webkit-calendar-picker-indicator,
+        :root[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: none !important;
+            opacity: 1 !important;
+            cursor: pointer;
         }
     </style>
+    @stack('styles')
 </head>
 <body>
     {{-- ===== SIDEBAR ===== --}}

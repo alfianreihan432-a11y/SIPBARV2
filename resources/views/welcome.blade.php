@@ -542,7 +542,6 @@ html.dark .mob-t-moon{display:none}
 /* ─── ABOUT SECTION ─── */
 .about-grid-redesigned{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:center;position:relative}
 .about-content-redesigned{position:relative;display:flex;flex-direction:column;gap:16px}
-.decorative-number{position:absolute;top:-60px;left:-20px;font-family:'Plus Jakarta Sans',sans-serif;font-size:180px;font-weight:900;color:rgba(29,78,216,.04);line-height:1;z-index:0;pointer-events:none}
 .about-eyebrow-redesigned{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#1d4ed8;letter-spacing:.12em;text-transform:uppercase;position:relative;z-index:1}
 .eyebrow-dot{width:6px;height:6px;background:#1d4ed8;border-radius:50%}
 .about-headline-redesigned{font-family:'Plus Jakarta Sans',sans-serif;font-size:36px;font-weight:800;line-height:1.25;color:#0f172a;position:relative;z-index:1;letter-spacing:-.01em;margin:0}
@@ -662,8 +661,8 @@ html.dark body::before{
   z-index:-1;
   pointer-events:none;
   background:
-    radial-gradient(ellipse 85% 60% at 88% 0%, rgba(10,132,240,.75) 0%, rgba(0,123,224,.65) 22%, rgba(0,90,190,.42) 45%, rgba(0,50,120,.18) 65%, transparent 82%),
-    linear-gradient(180deg, #0068c8 0%, #003a80 22%, #00204f 38%, #050028 52%, #030014 68%, #00000a 85%, #000004 100%) !important;
+    radial-gradient(circle at 100% 0%, rgba(59,130,246,0.06) 0%, transparent 50%),
+    #060a14 !important;
 }
 
 #dark-bg{
@@ -696,26 +695,26 @@ html.dark .nav{
   background:rgba(6,18,48,.85) !important;
   backdrop-filter:blur(16px) !important;
   -webkit-backdrop-filter:blur(16px) !important;
-  border-bottom:1px solid rgba(120,170,255,.18) !important;
+  border-bottom:1px solid rgba(59,130,246,.18) !important;
 }
 html.dark .nav.scrolled{
   background:rgba(6,18,48,.94) !important;
-  border-bottom-color:rgba(120,170,255,.25) !important;
-  box-shadow:0 4px 16px rgba(0,0,0,.45) !important;
+  border-bottom-color:rgba(59,130,246,.25) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.3) !important;
 }
 html.dark .nav-brand-title{color:#8ab4ff !important}
 html.dark .nav-brand-subtitle{color:#8fa3c4 !important}
 html.dark .nav-logo-wrap{
   background:rgba(255,255,255,.92) !important;
-  box-shadow:0 2px 6px rgba(0,0,0,.4) !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.3) !important;
 }
 html.dark .nav-links{
   background:rgba(6,18,48,.75) !important;
-  border-color:rgba(120,170,255,.18) !important;
+  border-color:rgba(59,130,246,.18) !important;
 }
 html.dark .nav-links a{color:#8fa3c4 !important}
 html.dark .nav-links a:hover{
-  background:rgba(96,150,255,.14) !important;
+  background:rgba(59,130,246,.10) !important;
   color:#f4f8ff !important;
 }
 html.dark .nav-links a.active{
@@ -725,12 +724,12 @@ html.dark .nav-links a.active{
 }
 html.dark .theme-toggle{
   background:rgba(6,18,48,.75) !important;
-  border-color:rgba(120,170,255,.18) !important;
+  border-color:rgba(59,130,246,.18) !important;
   color:#8fa3c4 !important;
   box-shadow:none !important;
 }
 html.dark .theme-toggle:hover{
-  background:rgba(96,150,255,.14) !important;
+  background:rgba(59,130,246,.10) !important;
   border-color:#8ab4ff !important;
   color:#8ab4ff !important;
 }
@@ -746,22 +745,22 @@ html.dark .btn-nav-cta:hover{
 }
 html.dark .nav-ham{
   background:rgba(6,18,48,.75) !important;
-  border-color:rgba(120,170,255,.18) !important;
+  border-color:rgba(59,130,246,.18) !important;
   color:#8fa3c4 !important;
 }
 html.dark .ham-line{background:#8fa3c4 !important}
 html.dark .nav-mobile{
   background:rgba(6,18,48,.96) !important;
-  border-top-color:rgba(120,170,255,.18) !important;
-  box-shadow:0 8px 24px rgba(0,0,0,.5) !important;
+  border-top-color:rgba(59,130,246,.18) !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.3) !important;
 }
 html.dark .nav-mobile-links a{
   background:rgba(12,26,62,.85) !important;
-  border:1px solid rgba(120,170,255,.15) !important;
+  border:1px solid rgba(59,130,246,.15) !important;
   color:#8fa3c4 !important;
 }
 html.dark .nav-mobile-links a:hover{
-  background:rgba(96,150,255,.16) !important;
+  background:rgba(59,130,246,.10) !important;
   color:#f4f8ff !important;
 }
 html.dark .nav-mob-login{
@@ -788,7 +787,7 @@ html.dark .hero::after{
 }
 html.dark .hero-badge{
   background:rgba(6,18,48,.85) !important;
-  border-color:rgba(120,170,255,.25) !important;
+  border-color:rgba(59,130,246,.25) !important;
   color:#f4f8ff !important;
   backdrop-filter:blur(8px) !important;
   -webkit-backdrop-filter:blur(8px) !important;
@@ -797,12 +796,12 @@ html.dark .hero-badge{
 html.dark .hero-badge-pulse{background:#8ab4ff !important;opacity:1 !important}
 html.dark .hero-h1{
   color:#ffffff !important;
-  text-shadow:0 2px 16px rgba(0,0,0,.4) !important;
+  text-shadow:0 1px 8px rgba(0,0,0,.2) !important;
 }
 html.dark .hero-h1 em{color:#ffffff !important}
 html.dark .hero-p{
   color:#f8fafc !important;
-  text-shadow:0 1px 4px rgba(0,0,0,.35) !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.15) !important;
 }
 
 /* 3. Section Headings (Outside Cards - High Contrast on Dark Gradient) */
@@ -810,8 +809,8 @@ html.dark #fitur{border-top:none !important}
 html.dark .stats-bg{border-top:none !important;border-bottom:none !important}
 
 html.dark .section-eyebrow{
-  background:rgba(96,150,255,.14) !important;
-  border-color:rgba(120,170,255,.25) !important;
+  background:rgba(59,130,246,.10) !important;
+  border-color:rgba(59,130,246,.25) !important;
   color:#8ab4ff !important;
 }
 html.dark .section-eyebrow-dot{background:#8ab4ff !important}
@@ -824,67 +823,67 @@ html.dark .alur-card{
   background:rgba(6,18,48,.72) !important;
   backdrop-filter:blur(10px) !important;
   -webkit-backdrop-filter:blur(10px) !important;
-  border:1px solid rgba(120,170,255,.18) !important;
-  box-shadow:0 2px 8px rgba(0,0,0,.35) !important;
+  border:1px solid rgba(59,130,246,.14) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.3) !important;
 }
 html.dark .alur-card:hover{
-  border-color:rgba(120,170,255,.30) !important;
-  transform:translateY(-4px) !important;
-  box-shadow:0 6px 18px rgba(0,0,0,.45) !important;
+  border-color:rgba(59,130,246,.3) !important;
+  transform:translateY(-2px) !important;
+  box-shadow:0 4px 16px rgba(0,0,0,.3) !important;
 }
 html.dark .alur-icon-tile{
   background:linear-gradient(135deg,rgba(37,99,235,.6) 0%,rgba(59,130,246,.5) 100%) !important;
-  box-shadow:0 4px 12px rgba(0,0,0,.3) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.3) !important;
 }
 html.dark .alur-card:hover .alur-icon-tile{
-  box-shadow:0 6px 16px rgba(0,0,0,.4) !important;
+  box-shadow:0 4px 12px rgba(0,0,0,.35) !important;
 }
 html.dark .alur-icon-tile::before{
-  background:radial-gradient(circle,rgba(120,170,255,.1) 0%,transparent 70%) !important;
+  display:none !important;
 }
 html.dark .alur-num-badge{
   background:rgba(6,18,48,.85) !important;
-  border-color:rgba(120,170,255,.38) !important;
+  border-color:rgba(59,130,246,.25) !important;
   color:#8ab4ff !important;
-  box-shadow:0 2px 6px rgba(0,0,0,.3) !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.25) !important;
 }
 html.dark .alur-badge-core{
-  background:rgba(96,150,255,.12) !important;
-  border-color:rgba(120,170,255,.25) !important;
+  background:rgba(59,130,246,.10) !important;
+  border-color:rgba(59,130,246,.25) !important;
   color:#8ab4ff !important;
 }
 html.dark .alur-connector{
   background:rgba(6,18,48,.85) !important;
-  border-color:rgba(120,170,255,.18) !important;
+  border-color:rgba(59,130,246,.14) !important;
   color:#8fa3c4 !important;
-  box-shadow:0 2px 6px rgba(0,0,0,.3) !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.25) !important;
 }
 html.dark .alur-title{color:#f4f8ff !important}
 html.dark .alur-card:hover .alur-title{color:#8ab4ff !important}
 html.dark .alur-desc{color:#b4c3dc !important}
 html.dark .alur-grid::before{
-  background:rgba(120,170,255,.18) !important;
+  background:rgba(59,130,246,.14) !important;
 }
 html.dark .alur-chips-panel{
   background:rgba(0,10,30,.55) !important;
-  border-color:rgba(120,170,255,.18) !important;
+  border-color:rgba(59,130,246,.14) !important;
 }
 html.dark .alur-chip{
   background:rgba(6,18,48,.72) !important;
-  border-color:rgba(120,170,255,.18) !important;
+  border-color:rgba(59,130,246,.14) !important;
   color:#b4c3dc !important;
 }
 html.dark .alur-chip:hover{
-  background:rgba(96,150,255,.14) !important;
-  border-color:rgba(120,170,255,.38) !important;
+  background:rgba(59,130,246,.10) !important;
+  border-color:rgba(59,130,246,.25) !important;
   color:#8ab4ff !important;
 }
 html.dark .alur-chip svg{color:#8ab4ff !important}
 
 /* 5. Stats Section (Dark Navy Glass with Blur & Pastel Icons) */
 html.dark .stats-eyebrow{
-  background:rgba(96,150,255,.14) !important;
-  border-color:rgba(120,170,255,.25) !important;
+  background:rgba(59,130,246,.10) !important;
+  border-color:rgba(59,130,246,.25) !important;
   color:#8ab4ff !important;
 }
 html.dark .stats-eyebrow-pulse{background:#8ab4ff !important}
@@ -896,12 +895,12 @@ html.dark .stat-block{
   background:rgba(6,18,48,.72) !important;
   backdrop-filter:blur(10px) !important;
   -webkit-backdrop-filter:blur(10px) !important;
-  border:1px solid rgba(120,170,255,.18) !important;
-  box-shadow:0 2px 8px rgba(0,0,0,.35) !important;
+  border:1px solid rgba(59,130,246,.14) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.3) !important;
 }
 html.dark .stat-block:hover{
-  border-color:rgba(120,170,255,.38) !important;
-  box-shadow:0 6px 18px rgba(0,0,0,.45) !important;
+  border-color:rgba(59,130,246,.3) !important;
+  box-shadow:0 4px 16px rgba(0,0,0,.3) !important;
 }
 html.dark .stat-num-b{color:#f4f8ff !important}
 html.dark .stat-lbl-b{color:#dbe7ff !important}
@@ -909,15 +908,15 @@ html.dark .stat-sub-b{color:#8fa3c4 !important}
 
 html.dark .stat-block:nth-child(1) .stat-icon-b{
   background:rgba(37,99,235,.14) !important;
-  border:1px solid rgba(120,170,255,.22) !important;
+  border:1px solid rgba(59,130,246,.22) !important;
 }
 html.dark .stat-block:nth-child(1) .stat-icon-b svg{
   stroke:#8ab4ff !important;
 }
 html.dark .stat-block:nth-child(1) .stat-trend{
-  background:rgba(96,150,255,.12) !important;
+  background:rgba(59,130,246,.10) !important;
   color:#8ab4ff !important;
-  border:1px solid rgba(120,170,255,.25) !important;
+  border:1px solid rgba(59,130,246,.25) !important;
 }
 
 html.dark .stat-block:nth-child(2) .stat-icon-b{
@@ -928,22 +927,22 @@ html.dark .stat-block:nth-child(2) .stat-icon-b svg{
   stroke:#7dd3fc !important;
 }
 html.dark .stat-block:nth-child(2) .stat-trend{
-  background:rgba(14,165,233,.12) !important;
+  background:rgba(14,165,233,.10) !important;
   color:#7dd3fc !important;
   border:1px solid rgba(56,189,248,.25) !important;
 }
 
 html.dark .stat-block:nth-child(3) .stat-icon-b{
-  background:rgba(147,51,234,.14) !important;
-  border:1px solid rgba(192,132,252,.22) !important;
+  background:rgba(59,130,246,.14) !important;
+  border:1px solid rgba(96,165,250,.22) !important;
 }
 html.dark .stat-block:nth-child(3) .stat-icon-b svg{
-  stroke:#d8b4fe !important;
+  stroke:#93c5fd !important;
 }
 html.dark .stat-block:nth-child(3) .stat-trend{
-  background:rgba(147,51,234,.12) !important;
-  color:#d8b4fe !important;
-  border:1px solid rgba(192,132,252,.25) !important;
+  background:rgba(59,130,246,.10) !important;
+  color:#93c5fd !important;
+  border:1px solid rgba(96,165,250,.25) !important;
 }
 
 html.dark .stat-block:nth-child(4) .stat-icon-b{
@@ -954,13 +953,13 @@ html.dark .stat-block:nth-child(4) .stat-icon-b svg{
   stroke:#6ee7b7 !important;
 }
 html.dark .stat-block:nth-child(4) .stat-trend{
-  background:rgba(16,185,129,.12) !important;
+  background:rgba(16,185,129,.10) !important;
   color:#6ee7b7 !important;
   border:1px solid rgba(52,211,153,.25) !important;
 }
 
 /* 6. Tentang Section */
-html.dark .decorative-number{color:rgba(120,170,255,.05) !important}
+html.dark .decorative-number{color:rgba(59,130,246,.05) !important}
 html.dark .about-eyebrow-redesigned{color:#8ab4ff !important}
 html.dark .eyebrow-dot{background:#8ab4ff !important}
 html.dark .about-headline-redesigned{color:#f4f8ff !important}
@@ -969,25 +968,25 @@ html.dark .about-desc-redesigned{color:#b4c3dc !important}
 
 html.dark .school-photo-frame-redesigned{
   background:rgba(6,18,48,.85) !important;
-  border:1px solid rgba(120,170,255,.22) !important;
-  box-shadow:0 12px 32px rgba(0,0,0,.5) !important;
+  border:1px solid rgba(59,130,246,.22) !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.3) !important;
 }
 html.dark .photo-gradient{
   background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,8,24,.75) 100%) !important;
-  box-shadow:inset 0 0 60px rgba(0,0,0,.45) !important;
+  box-shadow:inset 0 0 40px rgba(0,0,0,.3) !important;
 }
 html.dark .glass-badge{
   background:rgba(6,18,48,.90) !important;
-  border:1px solid rgba(120,170,255,.30) !important;
-  box-shadow:0 4px 12px rgba(0,0,0,.35) !important;
+  border:1px solid rgba(59,130,246,.25) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.25) !important;
 }
 html.dark .photo-wrapper:hover .glass-badge{
   background:rgba(6,18,48,.96) !important;
-  box-shadow:0 6px 16px rgba(0,0,0,.45) !important;
+  box-shadow:0 4px 12px rgba(0,0,0,.3) !important;
 }
 html.dark .badge-icon{
-  background:rgba(96,150,255,.20) !important;
-  border:1px solid rgba(120,170,255,.25) !important;
+  background:rgba(59,130,246,.15) !important;
+  border:1px solid rgba(59,130,246,.25) !important;
   color:#8ab4ff !important;
   box-shadow:none !important;
 }
@@ -1001,25 +1000,25 @@ html.dark .faq-preview-sec{
 }
 html.dark .faq-preview-item{
   background:rgba(6,18,48,.85) !important;
-  border:1px solid rgba(120,170,255,.18) !important;
-  box-shadow:0 2px 8px rgba(0,0,0,.35) !important;
+  border:1px solid rgba(59,130,246,.14) !important;
+  box-shadow:0 2px 8px rgba(0,0,0,.3) !important;
 }
 html.dark .faq-preview-item:hover{
-  border-color:rgba(120,170,255,.38) !important;
+  border-color:rgba(59,130,246,.3) !important;
 }
 html.dark .faq-preview-item.faq-open{
-  border-color:rgba(120,170,255,.38) !important;
-  box-shadow:0 4px 14px rgba(0,0,0,.45) !important;
+  border-color:rgba(59,130,246,.3) !important;
+  box-shadow:0 4px 14px rgba(0,0,0,.3) !important;
 }
 html.dark .faq-preview-q{color:#f4f8ff !important}
-html.dark .faq-preview-q:hover{background:rgba(96,150,255,.05) !important}
+html.dark .faq-preview-q:hover{background:rgba(59,130,246,.05) !important}
 html.dark .faq-preview-item.faq-open .faq-preview-q{
   color:#8ab4ff !important;
-  background:rgba(96,150,255,.08) !important;
+  background:rgba(59,130,246,.08) !important;
 }
 html.dark .faq-preview-icon{
-  background:rgba(96,150,255,.14) !important;
-  border-color:rgba(120,170,255,.22) !important;
+  background:rgba(59,130,246,.10) !important;
+  border-color:rgba(59,130,246,.22) !important;
   color:#8ab4ff !important;
 }
 html.dark .faq-preview-item.faq-open .faq-preview-icon{
@@ -1029,13 +1028,13 @@ html.dark .faq-preview-item.faq-open .faq-preview-icon{
 }
 html.dark .faq-preview-a{
   background:rgba(0,10,30,.45) !important;
-  border-top:1px solid rgba(120,170,255,.12) !important;
+  border-top:1px solid rgba(59,130,246,.12) !important;
 }
 html.dark .faq-preview-step{color:#b4c3dc !important}
 html.dark .faq-preview-step-num{background:#2563eb !important;color:#ffffff !important}
 html.dark .faq-preview-note{
-  background:rgba(96,150,255,.10) !important;
-  border-color:rgba(120,170,255,.18) !important;
+  background:rgba(59,130,246,.08) !important;
+  border-color:rgba(59,130,246,.18) !important;
   color:#dbe7ff !important;
 }
 html.dark .faq-preview-link{color:#8ab4ff !important}
@@ -1058,7 +1057,7 @@ html.dark .footer-help-sublink:hover{color:#93c5fd !important}
 html.dark .footer-heading{color:#f4f8ff !important}
 html.dark .footer-list a{color:#b4c3dc !important}
 html.dark .footer-list a:hover{color:#8ab4ff !important}
-html.dark .footer-divider{border-top-color:rgba(120,170,255,.15) !important}
+html.dark .footer-divider{border-top-color:rgba(59,130,246,.15) !important}
 html.dark .footer-copy{color:#8fa3c4 !important}
 </style>
 </head>
@@ -1244,12 +1243,7 @@ $alurLangkah = [
   ]
 ];
 
-// 3 chip kecil
-$alurChips = [
-  ['icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>', 'text' => 'Stok real-time'],
-  ['icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>', 'text' => 'Riwayat tercatat'],
-  ['icon' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>', 'text' => 'Multi-peran']
-];
+
 @endphp
 
 <section class="section feat-bg" id="fitur" style="padding:48px 24px;">
@@ -1278,15 +1272,6 @@ $alurChips = [
         <div class="alur-connector">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
         </div>
-      </div>
-      @endforeach
-    </div>
-
-    <div class="alur-chips-panel">
-      @foreach($alurChips as $chip)
-      <div class="alur-chip">
-        {!! $chip['icon'] !!}
-        <span>{{ $chip['text'] }}</span>
       </div>
       @endforeach
     </div>
@@ -1460,10 +1445,8 @@ $stat = function (int $i, string $key, $default = '') use ($statsCards) {
 <section class="section" id="tentang">
   <div class="section-inner">
     <div class="about-grid-redesigned">
-      {{-- Left column: Content with decorative numbers --}}
+      {{-- Left column: Content --}}
       <div class="about-content-redesigned">
-        <div class="decorative-number">04</div>
-
         <div class="about-eyebrow-redesigned">
           <span class="eyebrow-dot"></span>
           {{ \App\Models\SiteSetting::get('about_eyebrow', 'Tentang Platform SIPBAR') }}

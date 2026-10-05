@@ -37,7 +37,7 @@ class BarangController extends Controller
             $query->where('category_id', $categoryFilter);
         }
 
-        $items = $query->latest()->get();
+        $items = $query->latest()->paginate(12)->withQueryString();
         $categories = Category::orderBy('name')->get();
 
         return view('pages.guru.barang', [

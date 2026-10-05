@@ -63,17 +63,18 @@
         display: flex;
     }
     .modal-content {
-        background: white;
+        background: var(--card);
+        border: 1px solid var(--border);
         border-radius: 12px;
         max-width: 500px;
         width: 90%;
         max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
     }
     .modal-header {
         padding: 16px 20px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--border);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -85,21 +86,123 @@
         display: flex;
         justify-content: space-between;
         padding: 8px 0;
-        border-bottom: 1px solid #f3f4f6;
+        border-bottom: 1px solid var(--border2);
     }
     .modal-row:last-child {
         border-bottom: none;
     }
     .modal-label {
-        color: #6b7280;
+        color: var(--muted);
         font-weight: 500;
         font-size: 13px;
     }
     .modal-value {
-        color: #1f2937;
+        color: var(--text);
         font-weight: 600;
         font-size: 13px;
         text-align: right;
+    }
+    /* 1. Ikon kalender mode gelap */
+    :is(html.dark, html[data-theme="dark"], body.dark) input[type="date"] {
+        color-scheme: dark !important;
+    }
+    :is(html.dark, html[data-theme="dark"], body.dark) input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1) brightness(1.4) !important;
+        opacity: 1 !important;
+        cursor: pointer;
+    }
+
+    /* 2. Ikon dalam input & select mode gelap (#cbd5e1, hover/focus #ffffff) */
+    :is(html.dark, html[data-theme="dark"], body.dark) .relative svg,
+    :is(html.dark, html[data-theme="dark"], body.dark) .s-card svg {
+        color: #cbd5e1 !important;
+        stroke: currentColor;
+        transition: color 0.15s ease;
+    }
+    :is(html.dark, html[data-theme="dark"], body.dark) .relative:focus-within svg,
+    :is(html.dark, html[data-theme="dark"], body.dark) .relative:hover svg {
+        color: #ffffff !important;
+    }
+    :is(html.dark, html[data-theme="dark"], body.dark) select.s-filter-input {
+        color-scheme: dark !important;
+        color: #cbd5e1;
+    }
+    :is(html.dark, html[data-theme="dark"], body.dark) select.s-filter-input:focus,
+    :is(html.dark, html[data-theme="dark"], body.dark) select.s-filter-input:hover {
+        color: #ffffff;
+    }
+
+    /* 3. Mode terang: kalender normal & ikon input #475569 */
+    html:not(.dark) input[type="date"],
+    :root[data-theme="light"] input[type="date"] {
+        color-scheme: light !important;
+    }
+    html:not(.dark) input[type="date"]::-webkit-calendar-picker-indicator,
+    :root[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: none !important;
+        opacity: 1 !important;
+        cursor: pointer;
+    }
+    html:not(.dark) .relative svg,
+    :root[data-theme="light"] .relative svg {
+        color: #475569 !important;
+        stroke: currentColor;
+        transition: color 0.15s ease;
+    }
+    html:not(.dark) .relative:focus-within svg,
+    html:not(.dark) .relative:hover svg,
+    :root[data-theme="light"] .relative:focus-within svg,
+    :root[data-theme="light"] .relative:hover svg {
+        color: #1e293b !important;
+    }
+    html:not(.dark) select.s-filter-input,
+    :root[data-theme="light"] select.s-filter-input {
+        color-scheme: light !important;
+        color: #334155;
+    }
+
+    /* 4. Placeholder input mode gelap: #94a3b8 */
+    .s-filter-input::placeholder {
+        color: #94a3b8;
+    }
+    :is(html.dark, html[data-theme="dark"], body.dark) .s-filter-input::placeholder {
+        color: #94a3b8 !important;
+        opacity: 1;
+    }
+
+    /* 5. Mobile header & stat cards layout safety */
+    .page-header {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: visible;
+    }
+    .page-title {
+        overflow: visible;
+        line-height: 1.3;
+        padding-top: 2px;
+    }
+    .stat-grid-container {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    .stat-grid-item {
+        min-width: 0;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 10px 16px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    @media (min-width: 1024px) {
+        .stat-grid-container {
+            width: auto;
+            min-width: 220px;
+        }
     }
 </style>
 @endpush
@@ -136,7 +239,7 @@
 @endphp
 
 {{-- Page Header --}}
-<div class="page-header">
+<div class="page-header flex flex-col lg:flex-row lg:items-center justify-between gap-4">
     <div class="page-header-left">
         <div class="page-title">
             Riwayat Peminjaman
@@ -144,16 +247,14 @@
         </div>
         <div class="page-subtitle">Seluruh catatan transaksi peminjaman barang kamu</div>
     </div>
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <div style="display:flex;gap:10px">
-            <div style="padding:10px 16px;background:var(--card);border:1px solid var(--border2);border-radius:10px;text-align:center">
-                <div style="font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--text)">{{ $totalAll }}</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:2px">Total</div>
-            </div>
-            <div style="padding:10px 16px;background:var(--s-returned-bg);border:1px solid var(--s-returned-bdr);border-radius:10px;text-align:center">
-                <div style="font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--s-returned)">{{ $totalReturned }}</div>
-                <div style="font-size:11px;color:var(--s-returned);margin-top:2px">Selesai</div>
-            </div>
+    <div class="stat-grid-container">
+        <div class="stat-grid-item" style="background:var(--card);border:1px solid var(--border2)">
+            <div style="font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--text)">{{ $totalAll }}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">Total</div>
+        </div>
+        <div class="stat-grid-item" style="background:var(--s-returned-bg);border:1px solid var(--s-returned-bdr)">
+            <div style="font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--s-returned)">{{ $totalReturned }}</div>
+            <div style="font-size:11px;color:var(--s-returned);margin-top:2px">Selesai</div>
         </div>
     </div>
 </div>
@@ -161,17 +262,17 @@
 {{-- Filter Bar --}}
 <div class="s-card s-card--flat" style="margin-bottom:20px">
     <form method="GET" action="{{ route('student.history') }}">
-        <div class="s-filter-grid">
-            <div class="s-filter-item" style="flex:2;min-width:200px">
-                <label class="s-filter-label">Cari Barang</label>
-                <div style="position:relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--subtle)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    <input type="text" name="search" value="{{ request('search') }}" class="s-filter-input" style="padding-left:38px" placeholder="Nama barang...">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5 items-end">
+            <div>
+                <label class="s-filter-label" style="display:block;margin-bottom:6px">Cari Barang</label>
+                <div class="relative w-full">
+                    <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none flex-shrink-0" style="color:var(--subtle)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="text" name="search" value="{{ request('search') }}" class="s-filter-input w-full" style="padding-left:40px" placeholder="Nama barang...">
                 </div>
             </div>
-            <div class="s-filter-item">
-                <label class="s-filter-label">Status</label>
-                <select name="status" class="s-filter-input">
+            <div>
+                <label class="s-filter-label" style="display:block;margin-bottom:6px">Status</label>
+                <select name="status" class="s-filter-input w-full">
                     <option value="">Semua Status</option>
                     <option value="pending"  {{ request('status')==='pending'  ? 'selected' : '' }}>Menunggu</option>
                     <option value="approved" {{ request('status')==='approved' ? 'selected' : '' }}>Disetujui</option>
@@ -180,21 +281,21 @@
                     <option value="rejected" {{ request('status')==='rejected' ? 'selected' : '' }}>Ditolak</option>
                 </select>
             </div>
-            <div class="s-filter-item">
-                <label class="s-filter-label">Dari Tanggal</label>
-                <input type="date" name="date_from" value="{{ request('date_from') }}" class="s-filter-input">
+            <div>
+                <label class="s-filter-label" style="display:block;margin-bottom:6px">Dari Tanggal</label>
+                <input type="date" name="date_from" value="{{ request('date_from') }}" class="s-filter-input w-full">
             </div>
-            <div class="s-filter-item">
-                <label class="s-filter-label">Sampai Tanggal</label>
-                <input type="date" name="date_to" value="{{ request('date_to') }}" class="s-filter-input">
+            <div>
+                <label class="s-filter-label" style="display:block;margin-bottom:6px">Sampai Tanggal</label>
+                <input type="date" name="date_to" value="{{ request('date_to') }}" class="s-filter-input w-full">
             </div>
-            <div class="s-filter-item" style="flex:none;justify-content:flex-end;flex-direction:row;align-items:flex-end;gap:8px;min-width:auto">
-                <button type="submit" class="s-btn s-btn--primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+            <div class="flex gap-2 w-full">
+                <button type="submit" class="s-btn s-btn--primary w-full flex items-center justify-center gap-2" style="height:44px">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
                     Filter
                 </button>
                 @if(request()->hasAny(['search','status','date_from','date_to']))
-                <a href="{{ route('student.history') }}" class="s-btn s-btn--secondary">Reset</a>
+                <a href="{{ route('student.history') }}" class="s-btn s-btn--secondary w-full flex items-center justify-center" style="height:44px">Reset</a>
                 @endif
             </div>
         </div>

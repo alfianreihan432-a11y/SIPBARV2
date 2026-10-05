@@ -54,3 +54,12 @@ sipbarv2_production_utf8.sql
 screenshots/
 scripts/
 RESPONSIVE_FIX_REPORT.md
+AUDIT_REPORT.md
+
+# Debug/check/test ad-hoc scripts di root (jangan commit ke repo)
+/debug_*.php
+/check_*.php
+/test_*.php
+
+# File backup
+*.bak

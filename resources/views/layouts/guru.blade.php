@@ -20,20 +20,49 @@
         :root{
             --bg:#f8fafc;--bg2:#ffffff;--bg3:#f1f5f9;
             --card:#ffffff;--border:#e2e8f0;--border2:#e2e8f0;
-            --text:#0f172a;--text2:#1e293b;--muted:#475569;--subtle:#64748b;
+            --text:#0f172a;--text2:#1e293b;--muted:#64748b;--subtle:#94a3b8;
             --topbar-bg:#ffffff;--topbar-bdr:#e2e8f0;--content-bg:#f8fafc;
-            --panel-bg:#ffffff;--input-bg:#f8fafc;--scrollbar:#a7f3d0;
+            --panel-bg:#ffffff;--input-bg:#f8fafc;--scrollbar:#cbd5e1;
             --sidebar-bg:#065f46;
             --accent:#10b981;--accent-light:#ecfdf5;--accent-text:#047857;
         }
         html.dark{
-            --bg:#091210;--bg2:#0f201d;--bg3:#162e2a;
-            --card:#0f201d;--border:#1d3d37;--border2:#162e2a;
-            --text:#f0fdf4;--text2:#dcfce7;--muted:#86efac;--subtle:#6ee7b7;
-            --topbar-bg:#091210;--topbar-bdr:#1d3d37;--content-bg:#060d0b;
-            --panel-bg:#0f201d;--input-bg:#091210;--scrollbar:#134e4a;
+            --bg:#050806;--bg2:rgba(255,255,255,.03);--bg3:rgba(255,255,255,.05);
+            --card:rgba(255,255,255,.03);--border:rgba(16,185,129,.14);--border2:rgba(16,185,129,.2);
+            --text:#ecfdf5;--text2:#f1f5f9;--muted:#94a3b8;--subtle:#64748b;
+            --topbar-bg:rgba(6,10,8,.7);--topbar-bdr:rgba(16,185,129,.12);--content-bg:#050806;
+            --panel-bg:rgba(255,255,255,.03);--input-bg:rgba(255,255,255,.05);--scrollbar:rgba(16,185,129,.3);
             --sidebar-bg:#042f24;
             --accent:#10b981;--accent-light:rgba(16,185,129,.18);--accent-text:#34d399;
+        }
+
+        html.dark .topbar {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        html.dark .sidebar {
+            border-right: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        html.dark .content::-webkit-scrollbar-thumb {
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        html.dark .content {
+            background: #050806;
+            background-image:
+                radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.14) 0%, transparent 60%),
+                radial-gradient(circle at 0% 100%, rgba(5, 150, 105, 0.10) 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+
+        html.dark body {
+            background: #050806;
+            background-image:
+                radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.14) 0%, transparent 60%),
+                radial-gradient(circle at 0% 100%, rgba(5, 150, 105, 0.10) 0%, transparent 60%);
+            background-attachment: fixed;
         }
         body{display:flex;background:var(--content-bg);color:var(--text);overflow:hidden;height:100vh;transition:background .25s,color .25s}
         .sidebar{width:220px;flex-shrink:0;background:var(--sidebar-bg);display:flex;flex-direction:column;height:100vh;position:fixed;left:0;top:0;z-index:40;transition:background .25s,transform .3s;box-shadow:2px 0 16px rgba(0,0,0,.08)}
@@ -45,10 +74,10 @@
         .brand-badge{font-size:9.5px;font-weight:800;color:#10b981;background:rgba(255,255,255,.95);padding:2px 6px;border-radius:4px;letter-spacing:.05em;display:inline-block;margin-top:2px}
         .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
         .sidebar-nav::-webkit-scrollbar{width:0}
-        .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:rgba(255,255,255,.82);text-decoration:none;margin-bottom:4px;transition:all .18s ease;position:relative}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;font-size:14px;font-weight:500;color:rgba(255,255,255,.82);text-decoration:none;margin-bottom:4px;transition:all .18s ease;position:relative;min-height:44px}
         .nav-item:hover{background:rgba(255,255,255,.12);color:#ffffff}
-        .nav-item.active{background:rgba(255,255,255,.22);color:#ffffff;font-weight:700;border-left:3.5px solid #34d399;padding-left:9px}
-        .nav-icon{width:18px;height:18px;flex-shrink:0}
+        .nav-item.active{background:rgba(255,255,255,.22);color:#ffffff;font-weight:700;border-left:3.5px solid #34d399;padding-left:11px}
+        .nav-icon{width:20px;height:20px;flex-shrink:0}
         .nav-badge{margin-left:auto;background:#ffffff;color:#065f46;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.18)}
         .sidebar-footer{padding:14px;border-top:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.08)}
         .user-card{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.1);cursor:pointer;text-decoration:none;color:inherit;transition:background .15s}
@@ -203,10 +232,10 @@
                 : 0;
             $menus = [
                 ['Dashboard',        'teacher.dashboard', 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', null, null],
-                ['Permohonan Siswa', 'teacher.requests', 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'pending_requests', $pendingRequestsCount],
-                ['Siswa Bimbingan',  'teacher.students', 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', null, null],
-                ['Barang',           'teacher.barang',    'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', null, null],
-                ['Permohonan',       'teacher.peminjaman-guru', 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4', null, null],
+                ['Permohonan Siswa', 'teacher.requests', 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'pending_requests', $pendingRequestsCount],
+                ['Siswa Bimbingan',  'teacher.students', 'M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z', null, null],
+                ['Barang',           'teacher.barang',    'M21 8a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v3z M3 8v9a2 2 0 002 2h14a2 2 0 002-2V8 M3 13h18', null, null],
+                ['Permohonan',       'teacher.peminjaman-guru', 'M12 4v16m8-8H4', 'pending_requests', $pendingRequestsCount],
                 ['Pengembalian',     'teacher.pengembalian-guru', 'M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6', null, null],
                 ['QR Barang',        'teacher.qr-barang', 'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z', null, null],
                 ['Peminjaman Aktif', 'teacher.loans',    'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4', 'active_loans', $activeLoansCount],
@@ -257,9 +286,9 @@
                 <a href="{{ route('home') }}" class="topbar-icon" title="Beranda" style="text-decoration:none">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                 </a>
-                <button class="topbar-icon" id="themeBtn" title="Ganti Mode (Alt+D)">
-                    <svg class="t-moon" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                    <svg class="t-sun" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/></svg>
+                <button class="topbar-icon" id="themeBtn" title="Ganti Mode (Alt+D)" aria-label="Toggle dark mode">
+                    <svg class="t-moon" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg class="t-sun" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/></svg>
                 </button>
                 @include('partials.notif-widget', ['iconClass' => 'topbar-icon'])
                 {{-- User Profile Dropdown Wrap --}}

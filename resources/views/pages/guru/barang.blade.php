@@ -25,6 +25,126 @@
         margin: 0;
     }
 
+    /* Pagination Styles */
+    .pagination-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+        padding: 10px 14px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+    }
+    .pagination-info {
+        font-size: 13px;
+        color: var(--muted);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .pagination-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+    .pagination-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        cursor: pointer;
+        transition: background .15s;
+        text-decoration: none;
+    }
+    .pagination-btn:hover {
+        background: var(--bg3);
+    }
+    .pagination-btn:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+    html.dark .pagination-btn:focus-visible {
+        outline: 2px solid #10b981;
+        outline-offset: 2px;
+    }
+    .pagination-btn:disabled,
+    .pagination-btn.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    .pagination-indicator {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 58px;
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg3);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text);
+        white-space: nowrap;
+    }
+
+    /* Bottom Pagination */
+    .pagination-bottom {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 24px;
+        padding: 12px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+    }
+    .pagination-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all .15s;
+    }
+    .pagination-link:hover {
+        background: var(--bg3);
+        border-color: var(--accent);
+    }
+    .pagination-link.active {
+        background: var(--accent);
+        color: #ffffff;
+        border-color: var(--accent);
+    }
+    html.dark .pagination-link.active {
+        background: #10b981;
+        border-color: #10b981;
+    }
+    .pagination-link:disabled,
+    .pagination-link.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
     /* Filter & Search styling */
     .filter-card {
         background: var(--card);
@@ -265,6 +385,7 @@
 {{-- ═══ SECTION SEARCH & FILTER ═══ --}}
 <div class="filter-card">
     <form action="{{ route('teacher.barang') }}" method="GET" id="catalogFilterForm">
+        <input type="hidden" name="page" value="1">
         <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">
             <div style="flex:1;min-width:240px">
                 <label for="catalogSearchInput" class="filter-label">Cari Barang</label>
@@ -279,7 +400,7 @@
             </div>
             <div style="min-width:200px">
                 <label for="catalogCategorySelect" class="filter-label">Kategori</label>
-                <select name="categoryFilter" id="catalogCategorySelect" class="catalog-select" onchange="this.form.submit()">
+                <select name="categoryFilter" id="catalogCategorySelect" class="catalog-select" onchange="resetToPage1AndSubmit()">
                     <option value="">Semua Kategori</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" {{ (string)($categoryFilter ?? '') === (string)$cat->id ? 'selected' : '' }}>
@@ -306,19 +427,51 @@
 <div class="section-card">
     <div class="section-header">
         <h2 class="section-title">Katalog Barang Tersedia</h2>
-        <span id="itemsCountDisplay" style="font-size: 13px; color: var(--muted); font-weight: 600;">
-            {{ $items->count() }} barang
-        </span>
     </div>
-    
+
+    {{-- TOP PAGINATION BAR --}}
+    @if($items->total() > 0)
+    <div class="pagination-bar">
+        {{-- Info teks kiri --}}
+        <span class="pagination-info">
+            @if($items->lastPage() > 1)
+                Halaman <strong style="color:var(--text)">{{ $items->currentPage() }}</strong> dari <strong style="color:var(--text)">{{ $items->lastPage() }}</strong>
+                &nbsp;&middot;&nbsp; <span style="color:var(--subtle)">{{ $items->total() }} barang</span>
+            @else
+                Menampilkan <strong style="color:var(--text)">{{ $items->total() }}</strong> barang
+            @endif
+        </span>
+        {{-- Tombol prev / next (tampil hanya jika ada lebih dari 1 halaman) --}}
+        @if($items->lastPage() > 1)
+        <div class="pagination-controls">
+            @if($items->onFirstPage())
+                <span aria-disabled="true" class="pagination-btn disabled">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </span>
+            @else
+                <a href="{{ $items->previousPageUrl() }}" class="pagination-btn" aria-label="Halaman sebelumnya">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+            @endif
+            <span class="pagination-indicator">{{ $items->currentPage() }} / {{ $items->lastPage() }}</span>
+            @if($items->hasMorePages())
+                <a href="{{ $items->nextPageUrl() }}" class="pagination-btn" aria-label="Halaman berikutnya">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            @else
+                <span aria-disabled="true" class="pagination-btn disabled">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </span>
+            @endif
+        </div>
+        @endif
+    </div>
+    @endif
+
     @if($items->count() > 0)
         <div class="items-grid" id="itemsGrid">
             @foreach($items as $item)
-                <div class="item-card"
-                     data-name="{{ strtolower($item->name) }}"
-                     data-code="{{ strtolower($item->code ?? '') }}"
-                     data-desc="{{ strtolower($item->description ?? '') }}"
-                     data-category="{{ $item->category_id }}">
+                <div class="item-card">
                     <div class="item-image">
                         @if($item->photo_path)
                             <img src="{{ asset('storage/' . $item->photo_path) }}" alt="{{ $item->name }}">
@@ -412,15 +565,42 @@
             @endforeach
         </div>
 
-        {{-- Client-side empty state container --}}
-        <div id="clientEmptyState" class="empty-state" style="display:none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
-            <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">Barang tidak ditemukan</div>
-            <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Coba ubah kata kunci atau pilih kategori lain</p>
-            <a href="{{ route('teacher.barang') }}" class="btn-reset-filter" style="display:inline-flex">Reset Pencarian</a>
+        {{-- BOTTOM PAGINATION --}}
+        @if($items->lastPage() > 1)
+        <div class="pagination-bottom">
+            @if($items->onFirstPage())
+                <span class="pagination-link disabled">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </span>
+            @else
+                <a href="{{ $items->previousPageUrl() }}" class="pagination-link" aria-label="Halaman sebelumnya">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+            @endif
+
+            @for($i = 1; $i <= $items->lastPage(); $i++)
+                @if($i == $items->currentPage())
+                    <span class="pagination-link active">{{ $i }}</span>
+                @elseif($i == 1 || $i == $items->lastPage() || ($i >= $items->currentPage() - 1 && $i <= $items->currentPage() + 1))
+                    <a href="{{ $items->url($i) }}" class="pagination-link">{{ $i }}</a>
+                @elseif($i == 2 && $items->currentPage() > 4)
+                    <span class="pagination-link disabled">...</span>
+                @elseif($i == $items->lastPage() - 1 && $items->currentPage() < $items->lastPage() - 3)
+                    <span class="pagination-link disabled">...</span>
+                @endif
+            @endfor
+
+            @if($items->hasMorePages())
+                <a href="{{ $items->nextPageUrl() }}" class="pagination-link" aria-label="Halaman berikutnya">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            @else
+                <span class="pagination-link disabled">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </span>
+            @endif
         </div>
+        @endif
     @else
         <div class="empty-state">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -442,49 +622,24 @@
 </div>
 
 <script>
+let debounceTimer;
+function resetToPage1AndSubmit() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        const form = document.getElementById('catalogFilterForm');
+        const pageInput = form.querySelector('input[name="page"]');
+        if (pageInput) {
+            pageInput.value = '1';
+        }
+        form.submit();
+    }, 400);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('catalogSearchInput');
-    const categorySelect = document.getElementById('catalogCategorySelect');
-    const cards = document.querySelectorAll('.item-card');
-    const emptyState = document.getElementById('clientEmptyState');
-    const countDisplay = document.getElementById('itemsCountDisplay');
-
-    if (!searchInput) return;
-
-    let debounceTimer;
-    searchInput.addEventListener('input', function() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            const query = searchInput.value.toLowerCase().trim();
-            const selectedCat = categorySelect ? categorySelect.value : '';
-            let visibleCount = 0;
-
-            cards.forEach(card => {
-                const name = card.getAttribute('data-name') || '';
-                const code = card.getAttribute('data-code') || '';
-                const desc = card.getAttribute('data-desc') || '';
-                const catId = card.getAttribute('data-category') || '';
-
-                const matchesQuery = !query || name.includes(query) || code.includes(query) || desc.includes(query);
-                const matchesCat = !selectedCat || catId === selectedCat;
-
-                if (matchesQuery && matchesCat) {
-                    card.style.display = '';
-                    visibleCount++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            if (countDisplay) {
-                countDisplay.textContent = visibleCount + ' barang tersedia';
-            }
-
-            if (emptyState) {
-                emptyState.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
-            }
-        }, 120);
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', resetToPage1AndSubmit);
+    }
 });
 </script>
 @endsection

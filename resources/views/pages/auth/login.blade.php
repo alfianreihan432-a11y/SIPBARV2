@@ -10,26 +10,38 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 
-        /* Background gradient - SIPBAR theme colors */
+        /* Background with blue gradient */
         .login-wrapper {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 24px;
-            background: linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 50%, #2563eb 100%);
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 55%, #3b82f6 100%);
+            background-attachment: fixed;
+            position: relative;
+        }
+        .login-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            z-index: 0;
         }
 
-        /* Single centered card */
+        /* Single centered card with backdrop blur */
         .login-card {
             width: 100%;
             max-width: 440px;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
             border-radius: 24px;
-            box-shadow: 0 32px 80px rgba(29, 78, 216, 0.25), 0 8px 24px rgba(0,0,0,.1);
-            padding: 48px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 40px 100px rgba(29, 78, 216, 0.3), 0 12px 32px rgba(0,0,0,.15);
+            padding: 32px 40px;
             position: relative;
             overflow: hidden;
+            z-index: 1;
         }
 
         /* Logo container at top-center */
@@ -38,19 +50,20 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin-bottom: 32px;
+            margin-bottom: 20px;
         }
         .logo-img {
-            width: 80px;
-            height: 80px;
+            width: 200px;
+            height: 200px;
             object-fit: contain;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.15));
         }
         .back-link {
             display: inline-flex;
             align-items: center;
             font-size: 13px;
-            color: #64748b;
+            color: #475569;
             text-decoration: none;
             transition: color .2s;
         }
@@ -70,17 +83,17 @@
             color: #64748b;
             text-align: center;
             line-height: 1.6;
-            margin-bottom: 32px;
+            margin-bottom: 20px;
         }
 
         /* Form */
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
         .form-label {
             display: block;
             font-size: 13px;
             font-weight: 600;
             color: #374151;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         /* Input with icon */
@@ -98,7 +111,8 @@
         .input-icon svg { width: 18px; height: 18px; }
         .form-control {
             width: 100%;
-            padding: 13px 14px 13px 44px;
+            height: 48px;
+            padding: 0 14px 0 44px;
             border: 1.5px solid #e2e8f0;
             border-radius: 12px;
             font-size: 14px;
@@ -106,6 +120,7 @@
             background: #fff;
             outline: none;
             transition: border-color .2s, box-shadow .2s;
+            box-sizing: border-box;
         }
         .form-control:focus {
             border-color: #1d4ed8;
@@ -146,7 +161,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
         .remember-label {
             display: flex;
@@ -218,9 +233,9 @@
         /* Responsive */
         @media (max-width: 480px) {
             .login-wrapper { padding: 16px; }
-            .login-card { padding: 36px 24px; }
+            .login-card { padding: 24px 20px; }
             .login-title { font-size: 24px; }
-            .logo-img { width: 64px; height: 64px; margin-bottom: 10px; }
+            .logo-img { width: 150px; height: 150px; margin-bottom: 6px; }
         }
     </style>
 </head>
