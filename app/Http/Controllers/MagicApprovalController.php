@@ -61,8 +61,9 @@ class MagicApprovalController extends Controller
             abort(403, 'Akses ditolak. Halaman persetujuan ini hanya dapat diakses oleh Kepala Jurusan.');
         }
 
-        $targetKajurId = $borrowingRequest->approved_by_kajur_id;
+        $targetKajurId = $borrowingRequest->approved_by_kajur_id ?? $borrowingRequest->kajur_tujuan_id;
         $targetJurusanId = $borrowingRequest->approvedByKajur?->jurusan_id
+            ?? $borrowingRequest->kajurTujuan?->jurusan_id
             ?? ($targetKajurId ? User::find($targetKajurId)?->jurusan_id : null)
             ?? $borrowingRequest->user?->jurusan_id;
 
@@ -304,18 +305,22 @@ class MagicApprovalController extends Controller
 
             $this->approvalService->approve($borrowingRequest, $approverId);
 
+            // Audit trail: catat kajur yang menyetujui
+            $borrowingRequest->update(['approved_by_kajur_id' => $approverId]);
+
             // Refresh model dan pastikan relasi qrCode ter-generate
             $borrowingRequest->refresh();
             if (! $borrowingRequest->qrCode) {
                 app(QRCodeService::class)->generateForRequest($borrowingRequest);
             }
 
+            $peminjamLabel = $borrowingRequest->tipe_peminjam === 'siswa' ? 'siswa' : 'guru';
             return redirect()
                 ->route('approval-guru.show', array_merge(
                     ['borrowingRequest' => $borrowingRequest->id],
                     $request->query()
                 ))
-                ->with('success', 'Pengajuan guru berhasil disetujui. QR Code peminjaman telah digenerate.');
+                ->with('success', "Pengajuan peminjaman {$peminjamLabel} berhasil disetujui. QR Code peminjaman telah digenerate.");
 
         } catch (\App\Exceptions\InsufficientStockException $e) {
             return redirect()

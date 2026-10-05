@@ -5,7 +5,7 @@
 @section('content')
 <div x-data="{ cancelRequestId: null, showCancelModal: false }" x-cloak>
 @php
-    $requests = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed', 'qrCode', 'teacher'])
+    $requests = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed', 'qrCode', 'teacher', 'kajurTujuan'])
         ->where('user_id', auth()->id())
         ->latest()
         ->get();
@@ -229,15 +229,25 @@
             @if($req->status === 'pending')
                 @php
                     $waService = app(\App\Services\WhatsAppNotificationService::class);
+                    $targetUser = $req->kajur_tujuan_id ? $req->kajurTujuan : $req->teacher;
+                    $targetRoleLabel = $req->kajur_tujuan_id ? 'Kajur' : 'Guru';
+                    $targetPhone = trim((string) ($targetUser?->phone ?? ''));
                     $shareLink = $waService->getDirectWaLink($req);
                     $approvalUrl = $waService->getApprovalUrl($req);
                 @endphp
                 <div style="margin-top:10px;padding-top:12px;border-top:1px solid var(--border2);display:flex;gap:6px;flex-wrap:wrap;">
                     <a href="{{ route('student.loans.edit', $req->id) }}" class="s-btn s-btn--sm s-btn--ghost">Edit</a>
-                    <a href="{{ $shareLink }}" target="_blank" rel="noopener" class="s-btn s-btn--sm s-btn--primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l.7-3.305A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                        WA Guru
-                    </a>
+                    @if($targetPhone !== '')
+                        <a href="{{ $shareLink }}" target="_blank" rel="noopener" class="s-btn s-btn--sm s-btn--primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l.7-3.305A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            WA {{ $targetRoleLabel }}
+                        </a>
+                    @else
+                        <button type="button" onclick="alert('Nomor WhatsApp {{ $targetRoleLabel }} belum terdaftar di sistem. Silakan gunakan tombol Salin Link untuk mengirim tautan persetujuan.');" class="s-btn s-btn--sm s-btn--ghost" style="opacity: 0.85;" title="Nomor WhatsApp belum terdaftar">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l.7-3.305A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            WA {{ $targetRoleLabel }}
+                        </button>
+                    @endif
                     <button type="button" onclick="navigator.clipboard.writeText('{{ $approvalUrl }}'); var btn=this; btn.textContent='Tersalin!'; setTimeout(function(){ btn.textContent='Salin Link'; }, 2000);" class="s-btn s-btn--sm s-btn--ghost">
                         Salin Link
                     </button>

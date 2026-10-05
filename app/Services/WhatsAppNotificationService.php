@@ -29,17 +29,40 @@ class WhatsAppNotificationService
     }
     
     /**
-     * Notify teacher about new borrowing request using a direct WhatsApp link,
-     * without requiring a WhatsApp bot service.
+     * Notify teacher or kajur about new borrowing request using a direct WhatsApp link.
+     * Jika kajur_tujuan_id diisi, kirim ke kajur. Jika tidak, kirim ke guru pembimbing.
      */
     public function notifyNewRequest(BorrowingRequest $request): void
     {
-        $teacherPhone = (string) ($request->teacher->phone ?? '');
+        if ($request->kajur_tujuan_id) {
+            // Kirim ke kajur tujuan
+            $kajurPhone = trim((string) ($request->kajurTujuan?->phone ?? ''));
+
+            if ($kajurPhone === '') {
+                Log::warning('WhatsApp notification new request (kajur) skipped: kajur phone is empty', [
+                    'borrowing_request_id' => $request->id,
+                    'kajur_tujuan_id'      => $request->kajur_tujuan_id,
+                ]);
+                return;
+            }
+
+            $waLink = $this->buildKajurNewRequestWaLink($request, $kajurPhone);
+
+            Log::info('WA direct link generated for kajur approval (siswa ke kajur)', [
+                'borrowing_request_id' => $request->id,
+                'kajur_phone'          => $kajurPhone,
+                'wa_link'              => $waLink,
+            ]);
+            return;
+        }
+
+        // Default: kirim ke guru pembimbing
+        $teacherPhone = (string) ($request->teacher?->phone ?? '');
 
         if ($teacherPhone === '') {
             Log::warning('WhatsApp notification new request skipped: teacher phone is empty', [
                 'borrowing_request_id' => $request->id,
-                'teacher_id' => $request->teacher_id,
+                'teacher_id'           => $request->teacher_id,
             ]);
 
             return;
@@ -49,26 +72,30 @@ class WhatsAppNotificationService
         $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
 
         $payload = [
-            'nomorGuru' => $teacherPhone,
-            'namaSiswa' => $studentName,
-            'kelas' => $request->user?->kelas ?? '',
-            'barang' => $itemName,
-            'jumlah' => $request->quantity,
-            'tglPinjam' => $request->borrow_date ? $request->borrow_date->format('d-m-Y') : '-',
-            'tglKembali' => $request->return_date ? $request->return_date->format('d-m-Y') : '-',
-            'keperluan' => $request->purpose,
-            'linkKeputusan' => $this->getDirectWaLink($request),
+            'nomorGuru'    => $teacherPhone,
+            'namaSiswa'    => $studentName,
+            'kelas'        => $request->user?->kelas ?? '',
+            'barang'       => $itemName,
+            'jumlah'       => $request->quantity,
+            'tglPinjam'    => $request->borrow_date ? $request->borrow_date->format('d-m-Y') : '-',
+            'tglKembali'   => $request->return_date ? $request->return_date->format('d-m-Y') : '-',
+            'keperluan'    => $request->purpose,
+            'linkKeputusan'=> $this->getDirectWaLink($request),
         ];
 
         Log::info('WA direct link generated for teacher approval', [
             'borrowing_request_id' => $request->id,
-            'teacher_phone' => $teacherPhone,
-            'wa_link' => $payload['linkKeputusan'],
+            'teacher_phone'        => $teacherPhone,
+            'wa_link'              => $payload['linkKeputusan'],
         ]);
     }
 
     public function getApprovalUrl(BorrowingRequest $request): string
     {
+        if ($request->kajur_tujuan_id) {
+            return $this->getApprovalUrlForKajur($request);
+        }
+
         return URL::temporarySignedRoute(
             'approval.show',
             now()->addDays(7),
@@ -103,6 +130,11 @@ class WhatsAppNotificationService
 
     public function getDirectWaLink(BorrowingRequest $request): string
     {
+        if ($request->kajur_tujuan_id) {
+            $kajurPhone = (string) ($request->kajurTujuan?->phone ?? '');
+            return $this->buildKajurNewRequestWaLink($request, $kajurPhone);
+        }
+
         $teacherPhone = trim((string) ($request->teacher?->phone ?? ''));
         $approvalUrl = $this->getApprovalUrl($request);
 
@@ -191,10 +223,66 @@ class WhatsAppNotificationService
 
         return "https://api.whatsapp.com/send?text={$message}";
     }
-    
+
+    /**
+     * Bangun WA link untuk notifikasi ke kajur tujuan ketika siswa mengajukan.
+     * Berbeda dari getDirectWaLinkForKajur (yang untuk alur guru → kajur).
+     */
+    public function buildKajurNewRequestWaLink(BorrowingRequest $request, string $kajurPhone): string
+    {
+        $approvalUrl = URL::temporarySignedRoute(
+            'approval-guru.show',
+            now()->addDays(7),
+            ['borrowingRequest' => $request->id]
+        );
+
+        $studentName  = $request->user?->name ?? 'Siswa';
+        $studentClass = $request->user?->kelas ?? '';
+        $jurusanName  = $request->user?->jurusan?->nama ?? '';
+
+        if ($request->items && $request->items->isNotEmpty()) {
+            $itemName = $request->items->map(fn($it) => $it->item?->name ?? ($it->itemWithTrashed?->name ?? 'Barang'))->join(', ');
+            $quantity = $request->items->sum('quantity');
+        } else {
+            $itemName = $request->item?->name ?? ($request->itemWithTrashed?->name ?? 'Barang');
+            $quantity = $request->quantity ?? 1;
+        }
+
+        $submitTime       = ($request->created_at ? $request->created_at->copy() : now())->timezone('Asia/Jakarta');
+        $greeting         = $this->getTimeGreeting($submitTime);
+        $tanggalPengajuan = $submitTime->translatedFormat('d F Y') . ', ' . $submitTime->format('H:i') . ' WIB';
+        $keperluan        = $request->purpose ?: '-';
+
+        $text = "Assalamu'alaikum Wr. Wb. / {$greeting}, Bapak/Ibu Kepala Jurusan 🙏\n\n" .
+            "Terdapat pengajuan peminjaman barang baru dari siswa yang perlu Bapak/Ibu tinjau.\n\n" .
+            "📋 *Detail Pengajuan*\n" .
+            "Nama Siswa   : {$studentName}\n" .
+            ($studentClass ? "Kelas        : {$studentClass}\n" : '') .
+            ($jurusanName ? "Jurusan      : {$jurusanName}\n" : '') .
+            "Barang       : {$itemName}\n" .
+            "Jumlah       : {$quantity} unit\n" .
+            "Keperluan    : {$keperluan}\n" .
+            "Tanggal Ajukan: {$tanggalPengajuan}\n\n" .
+            "Mohon kesediaan Bapak/Ibu untuk meninjau dan memutuskan pengajuan ini melalui link berikut:\n" .
+            "{$approvalUrl}\n\n" .
+            "Terima kasih atas perhatian dan kerja samanya.\n\n" .
+            "Hormat kami,\n" .
+            "Sistem SIPBAR — SMKN 1 Bangsri";
+
+        $message = urlencode($text);
+
+        if ($kajurPhone !== '') {
+            $waPhone = $this->normalizePhone($kajurPhone);
+            return "https://api.whatsapp.com/send?phone={$waPhone}&text={$message}";
+        }
+
+        return "https://api.whatsapp.com/send?text={$message}";
+    }
+
     /**
      * Notify student about rejection
      */
+
     public function getRejectedStudentWaLink(BorrowingRequest $request): string
     {
         $studentPhone = (string) ($request->user?->phone ?? '');
@@ -385,7 +473,7 @@ class WhatsAppNotificationService
     /**
      * Normalisasi nomor WA untuk format wa.me/62xxx.
      */
-    private function normalizePhone(string $phone): string
+    public function normalizePhone(string $phone): string
     {
         $digits = preg_replace('/[^0-9]/', '', $phone ?? '');
 

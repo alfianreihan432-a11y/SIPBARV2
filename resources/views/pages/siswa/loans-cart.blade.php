@@ -644,69 +644,110 @@
                         </div>
                     </div>
 
-                    {{-- Row 2: Jam Kembali & Guru Penanggung Jawab (2 Kolom) --}}
-                    <div class="cart-form-grid">
-                        <div class="cart-field-group">
-                            <label for="return_time" class="cart-label">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="svg-icon-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    {{-- Row 2: Jam Kembali (full width) --}}
+                    <div class="cart-field-group">
+                        <label for="return_time" class="cart-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="svg-icon-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Jam Kembali</span>
+                            <span style="color:var(--s-rejected);font-weight:700;">*</span>
+                        </label>
+                        <input type="time"
+                               id="return_time"
+                               name="return_time"
+                               required
+                               value="{{ old('return_time', $defaultReturnTime) }}"
+                               class="cart-input">
+                    </div>
+
+                    {{-- PILIHAN TARGET PERSETUJUAN: Guru Pembimbing ATAU Kepala Jurusan --}}
+                    <div class="cart-field-group"
+                         x-data="{
+                             targetType: '{{ old('target_type', 'guru') }}',
+                             /* --- Guru state --- */
+                             guruOpen: false,
+                             guruSearch: '',
+                             guruSelectedId: {{ (int) old('teacher_id', 0) }},
+                             teachers: {{ Js::from($teachers->map(fn($t) => ['id' => $t->id, 'name' => $t->name, 'jabatan' => $t->jabatan ?? 'Guru'])) }},
+                             get selectedTeacher() { return this.teachers.find(t => t.id == this.guruSelectedId); },
+                             get filteredTeachers() {
+                                 if (!this.guruSearch.trim()) return this.teachers;
+                                 let q = this.guruSearch.toLowerCase();
+                                 return this.teachers.filter(t => (t.name+' '+t.jabatan).toLowerCase().includes(q));
+                             },
+                             /* --- Kajur state --- */
+                             kajurOpen: false,
+                             kajurSearch: '',
+                             kajurSelectedId: {{ (int) old('kajur_tujuan_id', 0) }},
+                             kajurList: {{ Js::from($kajurList->map(fn($k) => ['id' => $k->id, 'name' => $k->name, 'jabatan' => $k->jabatan ?? 'Kepala Jurusan'])) }},
+                             get selectedKajur() { return this.kajurList.find(k => k.id == this.kajurSelectedId); },
+                             get filteredKajur() {
+                                 if (!this.kajurSearch.trim()) return this.kajurList;
+                                 let q = this.kajurSearch.toLowerCase();
+                                 return this.kajurList.filter(k => (k.name+' '+k.jabatan).toLowerCase().includes(q));
+                             },
+                             getInitials(name) {
+                                 if (!name) return '?';
+                                 return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+                             }
+                         }"
+                    >
+                        {{-- Toggle label --}}
+                        <label class="cart-label" style="margin-bottom:8px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="svg-icon-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            <span>Target Persetujuan</span>
+                            <span style="color:var(--s-rejected);font-weight:700;">*</span>
+                        </label>
+
+                        {{-- Toggle pill --}}
+                        <div style="display:flex;gap:8px;margin-bottom:12px;background:var(--border2,#e4e9ef);border-radius:10px;padding:4px;">
+                            <button type="button"
+                                    @click="targetType='guru'; guruSelectedId=0; guruSearch='';"
+                                    :style="targetType==='guru' ? 'background:var(--card,#fff);box-shadow:0 1px 4px rgba(0,0,0,.1);color:var(--primary);font-weight:600;' : 'background:transparent;color:var(--muted);'"
+                                    style="flex:1;border:none;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
-                                <span>Jam Kembali</span>
-                                <span style="color:var(--s-rejected);font-weight:700;">*</span>
-                            </label>
-                            <input type="time" 
-                                   id="return_time"
-                                   name="return_time" 
-                                   required 
-                                   value="{{ old('return_time', $defaultReturnTime) }}" 
-                                   class="cart-input">
+                                Guru Pembimbing
+                            </button>
+                            <button type="button"
+                                    @click="targetType='kajur'; kajurSelectedId=0; kajurSearch='';"
+                                    :style="targetType==='kajur' ? 'background:var(--card,#fff);box-shadow:0 1px 4px rgba(0,0,0,.1);color:var(--primary);font-weight:600;' : 'background:transparent;color:var(--muted);'"
+                                    :disabled="{{ $kajurList->isEmpty() ? 'true' : 'false' }}"
+                                    :title="{{ $kajurList->isEmpty() ? '\'Belum ada Kepala Jurusan di jurusan Anda\'' : '\'Ajukan langsung ke Kepala Jurusan\'' }}"
+                                    style="flex:1;border:none;border-radius:8px;padding:7px 12px;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                                Kepala Jurusan
+                                @if($kajurList->isEmpty())
+                                    <span style="font-size:10px;opacity:0.6;">(tidak tersedia)</span>
+                                @endif
+                            </button>
                         </div>
 
-                        <div class="cart-field-group"
-                             x-data="{
-                                 open: false,
-                                 search: '',
-                                 selectedId: {{ (int) old('teacher_id', 0) }},
-                                 teachers: {{ Js::from($teachers->map(fn($t) => ['id' => $t->id, 'name' => $t->name, 'jabatan' => $t->jabatan ?? 'Guru'])) }},
-                                 get selectedTeacher() {
-                                     return this.teachers.find(t => t.id == this.selectedId);
-                                 },
-                                 get filteredTeachers() {
-                                     if (!this.search || !this.search.trim()) return this.teachers;
-                                     let q = this.search.toLowerCase().trim();
-                                     return this.teachers.filter(t => (t.name + ' ' + t.jabatan).toLowerCase().includes(q));
-                                 },
-                                 getInitials(name) {
-                                     if (!name) return 'G';
-                                     return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
-                                 },
-                                 select(teacher) {
-                                     this.selectedId = teacher.id;
-                                     this.open = false;
-                                     this.search = '';
-                                 }
-                             }">
-                            <label for="teacher_id" class="cart-label">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="svg-icon-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                </svg>
-                                <span>Guru Penanggung Jawab</span>
-                                <span style="color:var(--s-rejected);font-weight:700;">*</span>
-                            </label>
+                        {{-- Hidden field target_type --}}
+                        <input type="hidden" name="target_type" :value="targetType">
 
-                            <input type="hidden" name="teacher_id" :value="selectedId" required>
+                        {{-- PANEL: Guru Pembimbing --}}
+                        <div x-show="targetType === 'guru'" x-cloak>
+                            <input type="hidden" name="teacher_id" :value="guruSelectedId">
+                            <input type="hidden" name="kajur_tujuan_id" value="">
 
-                            <div class="ts-wrapper" @click.outside="open = false" @keydown.escape.window="open = false" style="position: relative;">
-                                <div @click="open = !open; if(open) { $nextTick(() => { $refs.searchInput && $refs.searchInput.focus() }); }"
-                                     :class="{ 'ts-open': open }"
+                            <div class="ts-wrapper" @click.outside="guruOpen=false" @keydown.escape.window="guruOpen=false" style="position:relative;">
+                                <div @click="guruOpen=!guruOpen; if(guruOpen){$nextTick(()=>{$refs.guruSearch&&$refs.guruSearch.focus();})}"
+                                     :class="{'ts-open':guruOpen}"
                                      class="ts-trigger"
                                      tabindex="0"
                                      role="combobox"
                                      aria-haspopup="listbox"
-                                     :aria-expanded="open.toString()">
+                                     :aria-expanded="guruOpen.toString()">
                                     <div class="ts-trigger-value">
                                         <template x-if="selectedTeacher">
-                                            <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; width: 100%;">
+                                            <div style="display:flex;align-items:center;gap:8px;overflow:hidden;width:100%;">
                                                 <div class="ts-avatar" x-text="getInitials(selectedTeacher.name)"></div>
                                                 <span class="ts-val-name" x-text="selectedTeacher.name"></span>
                                                 <span class="ts-val-jabatan" x-text="selectedTeacher.jabatan"></span>
@@ -716,66 +757,123 @@
                                             <span class="ts-trigger-placeholder">Cari atau pilih guru...</span>
                                         </template>
                                     </div>
-                                    <svg class="ts-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                                         stroke-linecap="round" stroke-linejoin="round">
+                                    <svg class="ts-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                         <polyline points="6 9 12 15 18 9"/>
                                     </svg>
                                 </div>
 
-                                <div x-show="open"
-                                     x-cloak
-                                     class="ts-dropdown ts-active"
-                                     role="listbox">
+                                <div x-show="guruOpen" x-cloak class="ts-dropdown ts-active" role="listbox">
                                     <div class="ts-search-box">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
-                                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
                                         </svg>
-                                        <input x-ref="searchInput"
-                                               x-model="search"
-                                               class="ts-search-input"
-                                               type="text"
-                                               placeholder="Ketik nama guru..."
-                                               autocomplete="off"
-                                               spellcheck="false">
+                                        <input x-ref="guruSearch" x-model="guruSearch" class="ts-search-input" type="text" placeholder="Ketik nama guru..." autocomplete="off" spellcheck="false">
                                     </div>
-
                                     <div class="ts-options">
                                         <template x-for="teacher in filteredTeachers" :key="teacher.id">
-                                            <div @click="select(teacher)"
+                                            <div @click="guruSelectedId=teacher.id;guruOpen=false;guruSearch='';"
                                                  class="ts-option"
-                                                 :class="{ 'ts-selected': selectedId == teacher.id }"
+                                                 :class="{'ts-selected':guruSelectedId==teacher.id}"
                                                  role="option">
                                                 <div class="ts-opt-avatar" x-text="getInitials(teacher.name)"></div>
                                                 <div class="ts-opt-info">
                                                     <div class="ts-opt-name" x-text="teacher.name"></div>
                                                     <div class="ts-opt-jabatan" x-text="teacher.jabatan"></div>
                                                 </div>
-                                                <svg class="ts-check" xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                <svg class="ts-check" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                                     <polyline points="20 6 9 17 4 12"/>
                                                 </svg>
                                             </div>
                                         </template>
-
                                         <template x-if="filteredTeachers.length === 0">
-                                            <div class="ts-empty" style="display: block;">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none"
-                                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                                </svg>
-                                                Guru tidak ditemukan
-                                            </div>
+                                            <div class="ts-empty" style="display:block;">Guru tidak ditemukan</div>
                                         </template>
                                     </div>
                                 </div>
                             </div>
-
                             @error('teacher_id')
-                                <span style="color: var(--s-rejected); font-size: 12px; display: block; margin-top: 6px;">{{ $message }}</span>
+                                <span style="color:var(--s-rejected);font-size:12px;display:block;margin-top:6px;">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        {{-- PANEL: Kepala Jurusan --}}
+                        <div x-show="targetType === 'kajur'" x-cloak>
+                            <input type="hidden" name="teacher_id" value="">
+                            <input type="hidden" name="kajur_tujuan_id" :value="kajurSelectedId">
+
+                            @if($kajurList->isNotEmpty())
+                                <div class="ts-wrapper" @click.outside="kajurOpen=false" @keydown.escape.window="kajurOpen=false" style="position:relative;">
+                                    <div @click="kajurOpen=!kajurOpen; if(kajurOpen){$nextTick(()=>{$refs.kajurSearch&&$refs.kajurSearch.focus();})}"
+                                         :class="{'ts-open':kajurOpen}"
+                                         class="ts-trigger"
+                                         tabindex="0"
+                                         role="combobox"
+                                         aria-haspopup="listbox"
+                                         :aria-expanded="kajurOpen.toString()">
+                                        <div class="ts-trigger-value">
+                                            <template x-if="selectedKajur">
+                                                <div style="display:flex;align-items:center;gap:8px;overflow:hidden;width:100%;">
+                                                    <div class="ts-avatar" style="background:var(--primary-light,#4f46e520);" x-text="getInitials(selectedKajur.name)"></div>
+                                                    <span class="ts-val-name" x-text="selectedKajur.name"></span>
+                                                    <span class="ts-val-jabatan" x-text="selectedKajur.jabatan"></span>
+                                                </div>
+                                            </template>
+                                            <template x-if="!selectedKajur">
+                                                <span class="ts-trigger-placeholder">Pilih Kepala Jurusan...</span>
+                                            </template>
+                                        </div>
+                                        <svg class="ts-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="6 9 12 15 18 9"/>
+                                        </svg>
+                                    </div>
+
+                                    <div x-show="kajurOpen" x-cloak class="ts-dropdown ts-active" role="listbox">
+                                        <div class="ts-search-box">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                                            </svg>
+                                            <input x-ref="kajurSearch" x-model="kajurSearch" class="ts-search-input" type="text" placeholder="Ketik nama kajur..." autocomplete="off" spellcheck="false">
+                                        </div>
+                                        <div class="ts-options">
+                                            <template x-for="k in filteredKajur" :key="k.id">
+                                                <div @click="kajurSelectedId=k.id;kajurOpen=false;kajurSearch='';"
+                                                     class="ts-option"
+                                                     :class="{'ts-selected':kajurSelectedId==k.id}"
+                                                     role="option">
+                                                    <div class="ts-opt-avatar" x-text="getInitials(k.name)"></div>
+                                                    <div class="ts-opt-info">
+                                                        <div class="ts-opt-name" x-text="k.name"></div>
+                                                        <div class="ts-opt-jabatan" x-text="k.jabatan"></div>
+                                                    </div>
+                                                    <svg class="ts-check" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                        <polyline points="20 6 9 17 4 12"/>
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                            <template x-if="filteredKajur.length === 0">
+                                                <div class="ts-empty" style="display:block;">Kajur tidak ditemukan</div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{-- Info: notifikasi dikirim ke kajur --}}
+                                <p style="font-size:11.5px;color:var(--muted);margin-top:6px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:3px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    Pengajuan akan langsung dikirim ke Kepala Jurusan untuk disetujui.
+                                </p>
+                            @else
+                                <div style="background:var(--s-pending-bg,#fff8e1);border:1px solid var(--s-pending,#f59e0b);border-radius:8px;padding:12px;font-size:13px;color:var(--s-pending,#d97706);display:flex;gap:8px;align-items:flex-start;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <span>Belum ada Kepala Jurusan yang terdaftar di jurusan Anda. Silakan pilih Guru Pembimbing.</span>
+                                </div>
+                            @endif
+
+                            @error('kajur_tujuan_id')
+                                <span style="color:var(--s-rejected);font-size:12px;display:block;margin-top:6px;">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>

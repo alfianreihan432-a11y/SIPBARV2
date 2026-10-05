@@ -11,6 +11,7 @@ class BorrowingRequest extends Model
         'user_id',
         'item_id',
         'teacher_id',
+        'kajur_tujuan_id',
         'quantity',
         'purpose',
         'borrow_date',
@@ -216,6 +217,11 @@ class BorrowingRequest extends Model
     public function approvedByKajur(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by_kajur_id');
+    }
+
+    public function kajurTujuan(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'kajur_tujuan_id');
     }
     
     public function whatsappLogs()

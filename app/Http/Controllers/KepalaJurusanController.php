@@ -16,23 +16,32 @@ use Illuminate\View\View;
 class KepalaJurusanController extends Controller
 {
     /**
-     * Scope query untuk permohonan guru yang ditujukan ke Kajur ini:
-     * - Guru yang memilih Kajur ini saat submit form (approved_by_kajur_id == Kajur ID)
-     * - Atau Guru yang memiliki jurusan_id sama dengan jurusan Kajur ini
+     * Scope query untuk permohonan yang masuk ke Kajur ini:
+     * - Guru dengan approved_by_kajur_id == Kajur ID
+     * - Atau Guru/Siswa dengan user.jurusan_id == jurusan Kajur
+     * - Atau Siswa yang memilih kajur ini langsung (kajur_tujuan_id == Kajur ID)
+     *
+     * CATATAN: filter tipe_peminjam harus ditambahkan di caller jika hanya
+     * ingin salah satu jenis peminjam (guru/siswa).
      */
     private function kajurScopeQuery(): \Closure
     {
-        $kajurId = (int) Auth::id();
+        $kajurId   = (int) Auth::id();
         $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
 
         return function ($query) use ($kajurId, $jurusanId) {
             $query->where(function ($q) use ($kajurId, $jurusanId) {
+                // Alur guru: ditujukan langsung / dipilih kajur ini, atau sejurusan
                 $q->where('approved_by_kajur_id', $kajurId);
+
                 if ($jurusanId) {
                     $q->orWhereHas('user', function ($uq) use ($jurusanId) {
                         $uq->where('jurusan_id', $jurusanId);
                     });
                 }
+
+                // Alur siswa: siswa memilih kajur ini sebagai tujuan
+                $q->orWhere('kajur_tujuan_id', $kajurId);
             });
         };
     }
@@ -106,20 +115,39 @@ class KepalaJurusanController extends Controller
     }
 
     /**
-     * Display pending teacher borrowing requests for approval
+     * Display pending borrowing requests (guru + siswa langsung ke kajur) for approval
      */
     public function pendingApprovals(Request $request): View
     {
-        $query = BorrowingRequest::where('tipe_peminjam', 'guru')
-            ->where($this->kajurScopeQuery())
-            ->where('status', BorrowingRequest::STATUS_PENDING)
-            ->with(['user', 'item.category', 'itemWithTrashed.category', 'items.itemWithTrashed.category', 'items.item.category']);
+        $kajurId   = (int) Auth::id();
+        $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
+
+        // Query gabungan: guru (scope lama) UNION siswa yang pilih kajur ini
+        $query = BorrowingRequest::where(function ($q) use ($kajurId, $jurusanId) {
+            // Permohonan guru dalam lingkup kajur
+            $q->where('tipe_peminjam', 'guru')
+              ->where(function ($sq) use ($kajurId, $jurusanId) {
+                  $sq->where('approved_by_kajur_id', $kajurId);
+                  if ($jurusanId) {
+                      $sq->orWhereHas('user', function ($uq) use ($jurusanId) {
+                          $uq->where('jurusan_id', $jurusanId);
+                      });
+                  }
+              });
+        })->orWhere(function ($q) use ($kajurId) {
+            // Permohonan siswa yang memilih kajur ini secara langsung
+            $q->where('tipe_peminjam', 'siswa')
+              ->where('kajur_tujuan_id', $kajurId);
+        })
+        ->where('status', BorrowingRequest::STATUS_PENDING)
+        ->with(['user', 'item.category', 'itemWithTrashed.category', 'items.itemWithTrashed.category', 'items.item.category', 'kajurTujuan']);
 
         if ($search = trim((string) $request->query('search', ''))) {
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($uq) use ($search) {
                     $uq->where('name', 'like', "%{$search}%")
-                       ->orWhere('nip', 'like', "%{$search}%");
+                       ->orWhere('nip', 'like', "%{$search}%")
+                       ->orWhere('nis', 'like', "%{$search}%");
                 })->orWhereHas('items.itemWithTrashed', function ($iq) use ($search) {
                     $iq->where('name', 'like', "%{$search}%")
                        ->orWhere('code', 'like', "%{$search}%");
@@ -131,30 +159,45 @@ class KepalaJurusanController extends Controller
 
         return view('pages.kepala-jurusan.pending-approvals', [
             'pendingRequests' => $pendingRequests,
-            'search' => $search,
+            'search'          => $search,
         ]);
     }
 
     /**
-     * Approve teacher borrowing request
+     * Approve borrowing request (guru atau siswa yang langsung ke kajur)
      */
     public function approveRequest(Request $request, int $id, BorrowingApprovalService $approvalService): RedirectResponse
     {
-        // Role validation: Only kepala_jurusan can approve teacher requests
+        // Role validation: Only kepala_jurusan can approve
         if (!Auth::user()->hasRole('kepala_jurusan')) {
-            abort(403, 'Akses ditolak: Hanya Kepala Jurusan yang dapat menyetujui permohonan peminjaman Guru.');
+            abort(403, 'Akses ditolak: Hanya Kepala Jurusan yang dapat menyetujui permohonan ini.');
         }
 
-        $borrowing = BorrowingRequest::where('tipe_peminjam', 'guru')
-            ->where($this->kajurScopeQuery())
-            ->where('status', BorrowingRequest::STATUS_PENDING)
+        $kajurId   = (int) Auth::id();
+        $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
+
+        // Cari permohonan: guru dalam scope kajur, ATAU siswa yang pilih kajur ini
+        $borrowing = BorrowingRequest::where('status', BorrowingRequest::STATUS_PENDING)
+            ->where(function ($q) use ($kajurId, $jurusanId) {
+                $q->where(function ($sq) use ($kajurId, $jurusanId) {
+                    $sq->where('tipe_peminjam', 'guru')
+                       ->where(function ($gq) use ($kajurId, $jurusanId) {
+                           $gq->where('approved_by_kajur_id', $kajurId);
+                           if ($jurusanId) {
+                               $gq->orWhereHas('user', fn($uq) => $uq->where('jurusan_id', $jurusanId));
+                           }
+                       });
+                })->orWhere(function ($sq) use ($kajurId) {
+                    $sq->where('tipe_peminjam', 'siswa')
+                       ->where('kajur_tujuan_id', $kajurId);
+                });
+            })
             ->findOrFail($id);
 
         try {
-            $kajurId = (int) Auth::id();
             $approvalService->approve($borrowing, $kajurId);
 
-            // Update approved_by_kajur_id
+            // Update approved_by_kajur_id sebagai audit trail
             $borrowing->update(['approved_by_kajur_id' => $kajurId]);
 
             // Refresh model dan pastikan relasi qrCode ter-generate
@@ -163,8 +206,9 @@ class KepalaJurusanController extends Controller
                 app(\App\Services\QRCodeService::class)->generateForRequest($borrowing);
             }
 
+            $tipe = $borrowing->tipe_peminjam === 'siswa' ? 'siswa' : 'guru';
             return redirect()->back()
-                ->with('success', 'Permohonan peminjaman guru berhasil disetujui. QR Code telah diterbitkan.');
+                ->with('success', "Permohonan peminjaman {$tipe} berhasil disetujui. QR Code telah diterbitkan.");
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Gagal menyetujui permohonan: ' . $e->getMessage());
@@ -172,35 +216,51 @@ class KepalaJurusanController extends Controller
     }
 
     /**
-     * Reject teacher borrowing request
+     * Reject borrowing request (guru atau siswa yang langsung ke kajur)
      */
     public function rejectRequest(Request $request, int $id, BorrowingApprovalService $approvalService): RedirectResponse
     {
-        // Role validation: Only kepala_jurusan can reject teacher requests
+        // Role validation
         if (!Auth::user()->hasRole('kepala_jurusan')) {
-            abort(403, 'Akses ditolak: Hanya Kepala Jurusan yang dapat menolak permohonan peminjaman Guru.');
+            abort(403, 'Akses ditolak: Hanya Kepala Jurusan yang dapat menolak permohonan ini.');
         }
 
         $validated = $request->validate([
             'rejection_reason' => 'required|string|min:5|max:500',
         ]);
 
-        $borrowing = BorrowingRequest::where('tipe_peminjam', 'guru')
-            ->where($this->kajurScopeQuery())
-            ->where('status', BorrowingRequest::STATUS_PENDING)
+        $kajurId   = (int) Auth::id();
+        $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
+
+        $borrowing = BorrowingRequest::where('status', BorrowingRequest::STATUS_PENDING)
+            ->where(function ($q) use ($kajurId, $jurusanId) {
+                $q->where(function ($sq) use ($kajurId, $jurusanId) {
+                    $sq->where('tipe_peminjam', 'guru')
+                       ->where(function ($gq) use ($kajurId, $jurusanId) {
+                           $gq->where('approved_by_kajur_id', $kajurId);
+                           if ($jurusanId) {
+                               $gq->orWhereHas('user', fn($uq) => $uq->where('jurusan_id', $jurusanId));
+                           }
+                       });
+                })->orWhere(function ($sq) use ($kajurId) {
+                    $sq->where('tipe_peminjam', 'siswa')
+                       ->where('kajur_tujuan_id', $kajurId);
+                });
+            })
             ->findOrFail($id);
 
         try {
-            $kajurId = (int) Auth::id();
             $approvalService->reject($borrowing, $validated['rejection_reason'], $kajurId);
 
+            $tipe = $borrowing->tipe_peminjam === 'siswa' ? 'siswa' : 'guru';
             return redirect()->back()
-                ->with('success', 'Permohonan peminjaman guru berhasil ditolak.');
+                ->with('success', "Permohonan peminjaman {$tipe} berhasil ditolak.");
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Gagal menolak permohonan: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Show QR scanner page

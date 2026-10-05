@@ -209,7 +209,7 @@
 
 @section('content')
 @php
-    $query = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'teacher', 'itemReturns', 'items.itemWithTrashed'])
+    $query = \App\Models\BorrowingRequest::with(['itemWithTrashed', 'teacher', 'kajurTujuan', 'itemReturns', 'items.itemWithTrashed'])
         ->where('user_id', auth()->id());
     if (request('search')) {
         $query->whereHas('itemWithTrashed', fn($q) => $q->where('name', 'like', '%'.request('search').'%'));
@@ -347,7 +347,7 @@
                 </div>
                 <div class="s-loan-meta-item">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                    Guru: <span style="font-weight:600;color:var(--text2);margin-left:3px">{{ $h->teacher?->name ?? '-' }}</span>
+                    {{ $h->kajur_tujuan_id ? 'Kajur:' : 'Guru:' }} <span style="font-weight:600;color:var(--text2);margin-left:3px">{{ $h->kajur_tujuan_id ? ($h->kajurTujuan?->name ?? '-') : ($h->teacher?->name ?? '-') }}</span>
                 </div>
                 <div class="s-loan-meta-item">
                     {{ $h->purpose }}
@@ -418,7 +418,9 @@
                         'purpose' => $h->purpose ?? '-',
                         'notes' => $h->notes ?? '-',
                         'status' => $st['label'],
-                        'teacher_name' => $h->teacher?->name ?? '-',
+                        'approver_label' => $h->kajur_tujuan_id ? 'Kepala Jurusan' : 'Guru Penanggung Jawab',
+                        'approver_name'  => $h->kajur_tujuan_id ? ($h->kajurTujuan?->name ?? '-') : ($h->teacher?->name ?? '-'),
+                        'teacher_name' => $h->kajur_tujuan_id ? ($h->kajurTujuan?->name ?? '-') : ($h->teacher?->name ?? '-'),
                         'approved_at' => $h->approved_at ? $h->approved_at->format('d F Y H:i') : '-',
                         'borrowed_at' => $h->borrowed_at ? $h->borrowed_at->format('d F Y H:i') : '-',
                         'returned_at' => $h->returned_at ? $h->returned_at->format('d F Y H:i') : '-',
@@ -518,7 +520,9 @@
                             'purpose' => $h->purpose ?? '-',
                             'notes' => $h->notes ?? '-',
                             'status' => $st['label'],
-                            'teacher_name' => $h->teacher?->name ?? '-',
+                            'approver_label' => $h->kajur_tujuan_id ? 'Kepala Jurusan' : 'Guru Penanggung Jawab',
+                            'approver_name'  => $h->kajur_tujuan_id ? ($h->kajurTujuan?->name ?? '-') : ($h->teacher?->name ?? '-'),
+                            'teacher_name' => $h->kajur_tujuan_id ? ($h->kajurTujuan?->name ?? '-') : ($h->teacher?->name ?? '-'),
                             'approved_at' => $h->approved_at ? $h->approved_at->format('d F Y H:i') : '-',
                             'borrowed_at' => $h->borrowed_at ? $h->borrowed_at->format('d F Y H:i') : '-',
                             'returned_at' => $h->returned_at ? $h->returned_at->format('d F Y H:i') : '-',
@@ -656,8 +660,8 @@ function openDetailModal(data) {
             <span class="modal-value">${data.notes}</span>
         </div>
         <div class="modal-row">
-            <span class="modal-label">Guru Penanggung Jawab</span>
-            <span class="modal-value">${data.teacher_name}</span>
+            <span class="modal-label">${data.approver_label || 'Guru Penanggung Jawab'}</span>
+            <span class="modal-value">${data.approver_name || data.teacher_name || '-'}</span>
         </div>
         <div class="modal-row">
             <span class="modal-label">Status</span>
