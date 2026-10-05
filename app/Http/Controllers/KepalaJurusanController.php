@@ -385,7 +385,7 @@ class KepalaJurusanController extends Controller
 
         $borrowing = $itemReturn->borrowingRequest;
 
-        // Update ItemReturn status
+        // Update ItemReturn status and BorrowingRequest within DB transaction
         $conditionEnumMap = [
             'Baik'        => 'baik',
             'Rusak Ringan'=> 'rusak_ringan',
@@ -393,37 +393,43 @@ class KepalaJurusanController extends Controller
             'Hilang'      => 'hilang',
         ];
 
-        $itemReturn->update([
-            'status'             => \App\Models\ItemReturn::STATUS_DISETUJUI,
-            'kondisi_barang'     => $conditionEnumMap[$validated['verified_condition']] ?? 'baik',
-            'catatan'            => $validated['verified_notes'] ?? $itemReturn->catatan,
-            'diverifikasi_oleh'  => $kajurId,
-            'tanggal_verifikasi' => now(),
-        ]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($itemReturn, $borrowing, $validated, $conditionEnumMap, $kajurId) {
+            $now = now();
 
-        // Update BorrowingRequest to sync with ItemReturn
-        $borrowing->update([
-            'return_condition' => $validated['verified_condition'],
-            'return_notes'     => $validated['verified_notes'] ?? $borrowing->return_notes,
-            'checkin_by'       => $kajurId,
-        ]);
+            $itemReturn->update([
+                'status'             => \App\Models\ItemReturn::STATUS_DISETUJUI,
+                'kondisi_barang'     => $conditionEnumMap[$validated['verified_condition']] ?? 'baik',
+                'catatan'            => $validated['verified_notes'] ?? $itemReturn->catatan,
+                'diverifikasi_oleh'  => $kajurId,
+                'tanggal_verifikasi' => $now,
+            ]);
 
-        // Update kondisi item sesuai verifikasi
-        $item = $borrowing->item;
-        if ($item) {
-            if ($validated['verified_condition'] === 'Hilang') {
-                $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
-            } elseif ($validated['verified_condition'] === 'Rusak Berat') {
-                $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
-                $item->increment('stock', $borrowing->quantity);
-            } else {
-                // Baik atau Rusak Ringan — kembalikan stok
-                $item->increment('stock', $borrowing->quantity);
-                if ($validated['verified_condition'] === 'Rusak Ringan') {
-                    $item->update(['condition' => 'Rusak Ringan']);
+            // Update BorrowingRequest to sync with ItemReturn
+            $borrowing->update([
+                'status'           => \App\Models\BorrowingRequest::STATUS_RETURNED,
+                'returned_at'      => $borrowing->returned_at ?? $now,
+                'return_condition' => $validated['verified_condition'],
+                'return_notes'     => $validated['verified_notes'] ?? $borrowing->return_notes,
+                'checkin_by'       => $kajurId,
+            ]);
+
+            // Update kondisi item sesuai verifikasi
+            $item = $borrowing->item;
+            if ($item) {
+                if ($validated['verified_condition'] === 'Hilang') {
+                    $item->update(['status' => 'Hilang', 'condition' => 'Hilang']);
+                } elseif ($validated['verified_condition'] === 'Rusak Berat') {
+                    $item->update(['status' => 'Rusak', 'condition' => 'Rusak Berat']);
+                    $item->increment('stock', $borrowing->quantity);
+                } else {
+                    // Baik atau Rusak Ringan — kembalikan stok
+                    $item->increment('stock', $borrowing->quantity);
+                    if ($validated['verified_condition'] === 'Rusak Ringan') {
+                        $item->update(['condition' => 'Rusak Ringan']);
+                    }
                 }
             }
-        }
+        });
 
         // Notifikasi in-app ke guru
         try {
