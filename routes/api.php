@@ -38,7 +38,7 @@ Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
         Route::get('{id}/qr-code', [BorrowingApiController::class, 'getQRCode'])
             ->name('api.borrowings.qr-code');
 
-        // Teacher/Admin endpoints
+        // Endpoint Guru/Admin
         Route::get('statistics', [BorrowingApiController::class, 'statistics'])
             ->middleware('role:guru|admin')
             ->name('api.borrowings.statistics');

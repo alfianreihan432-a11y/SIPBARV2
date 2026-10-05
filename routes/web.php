@@ -77,7 +77,7 @@ Route::get('/oauth/callback', [SipintuAuthController::class, 'callback'])->name(
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ─── ADMIN ONLY routes (role:admin or superadmin can access) ────────────
+    // ─── Route KHUSUS ADMIN (role:admin atau superadmin dapat mengakses) ────────────
     Route::middleware('role:admin|superadmin')->group(function () {
         // Inventory & barang
         Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
@@ -163,7 +163,7 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('/{id}', [SuperadminLaporanJurusanController::class, 'destroy'])->name('laporan-jurusan.destroy');
         });
 
-        // Admin Reports (receive and approve/reject consolidation reports from admin)
+        // Laporan Admin (menerima dan menyetujui/menolak laporan konsolidasi dari admin)
         Route::prefix('laporan-admin')->group(function () {
             Route::get('/', [SuperadminLaporanAdminController::class, 'index'])->name('laporan-admin');
             Route::get('/{id}', [SuperadminLaporanAdminController::class, 'show'])->name('laporan-admin.show');

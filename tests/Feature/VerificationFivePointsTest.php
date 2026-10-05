@@ -296,7 +296,7 @@ class VerificationFivePointsTest extends TestCase
         $loan->refresh();
         $this->assertEquals(BorrowingRequest::STATUS_APPROVED, $loan->status);
 
-        // 3. Create another loan for Rejection Test
+        // 3. Buat peminjaman lain untuk Pengujian Penolakan
         $loanReject = BorrowingRequest::create([
             'user_id' => $this->guru->id,
             'tipe_peminjam' => 'guru',

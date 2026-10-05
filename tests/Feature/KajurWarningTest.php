@@ -342,7 +342,7 @@ class KajurWarningTest extends TestCase
             'tipe_peminjam' => 'guru',
         ]);
 
-        // 1. Dry Run test: Database must NOT change
+        // 1. Pengujian Dry Run: Database TIDAK boleh berubah
         $this->artisan('guru:backfill-jurusan')
             ->expectsOutputToContain('Mode: DRY-RUN')
             ->expectsOutputToContain('Guru PPLG Backfill')
