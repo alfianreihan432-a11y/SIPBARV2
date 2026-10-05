@@ -29,27 +29,9 @@ class KepalaJurusanWarningController extends Controller
     {
         $kajur = Auth::user();
         $jurusanId = (int) ($kajur->jurusan_id ?? 0);
+        $unassignedOverdueCount = $this->warningService->countUnassignedOverdue();
 
-        if (!$jurusanId) {
-            // If kajur has no jurusan_id assigned, return empty view state
-            return view('pages.kepala-jurusan.warnings', [
-                'borrowings' => collect(),
-                'summary' => [
-                    'total_overdue' => 0,
-                    'overdue_gt_3'  => 0,
-                    'overdue_gt_7'  => 0,
-                    'warned_today'  => 0,
-                ],
-                'classrooms' => collect(),
-                'activeFilter' => [
-                    'q' => '',
-                    'kelas' => '',
-                    'level' => 'all',
-                ],
-            ]);
-        }
-
-        $baseQuery = $this->warningService->getOverdueQuery($jurusanId);
+        $baseQuery = $this->warningService->getOverdueQuery($kajur);
 
         // ── Summary Cards Calculations ──
         $allOverdue = (clone $baseQuery)->get();
@@ -156,6 +138,8 @@ class KepalaJurusanWarningController extends Controller
                 'level' => $levelFilter,
             ],
             'warningService' => $this->warningService,
+            'unassignedOverdueCount' => $unassignedOverdueCount,
+            'kajurHasJurusan' => ($jurusanId > 0),
         ]);
     }
 
@@ -167,8 +151,8 @@ class KepalaJurusanWarningController extends Controller
         $kajur = Auth::user();
         $borrowing = BorrowingRequest::with(['user.jurusan', 'items.itemWithTrashed', 'itemWithTrashed'])->findOrFail($id);
 
-        // Security / Scope Authorization: Kajur ONLY can send warnings to their own jurusan's borrowers
-        if ((int) ($borrowing->user?->jurusan_id ?? 0) !== (int) ($kajur->jurusan_id ?? -1)) {
+        // Security / Scope Authorization: Validate scope strictly
+        if (!$this->warningService->isBorrowingInKajurScope($borrowing, $kajur)) {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => false,
@@ -201,18 +185,12 @@ class KepalaJurusanWarningController extends Controller
     }
 
     /**
-     * Send bulk warnings to all overdue loans in kajur's jurusan (max 50).
+     * Send bulk warnings to all overdue loans in kajur scope (max 50).
      */
     public function sendAll(Request $request): RedirectResponse
     {
         $kajur = Auth::user();
-        $jurusanId = (int) ($kajur->jurusan_id ?? 0);
-
-        if (!$jurusanId) {
-            return redirect()->back()->with('error', 'Akun Anda belum ditautkan ke jurusan manapun.');
-        }
-
-        $stats = $this->warningService->sendBulkWarnings($jurusanId, $kajur, 50);
+        $stats = $this->warningService->sendBulkWarnings($kajur, $kajur, 50);
 
         $msg = "Proses peringatan massal selesai: {$stats['sent']} terkirim";
         if ($stats['skipped_antispam'] > 0) {
@@ -240,7 +218,7 @@ class KepalaJurusanWarningController extends Controller
         $kajur = Auth::user();
         $borrowing = BorrowingRequest::with(['user.jurusan', 'items.itemWithTrashed', 'itemWithTrashed'])->findOrFail($id);
 
-        if ((int) ($borrowing->user?->jurusan_id ?? 0) !== (int) ($kajur->jurusan_id ?? -1)) {
+        if (!$this->warningService->isBorrowingInKajurScope($borrowing, $kajur)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

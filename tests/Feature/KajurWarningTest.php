@@ -209,4 +209,156 @@ class KajurWarningTest extends TestCase
         // Count remains 1 because second attempt is rejected by anti-spam
         $this->assertEquals(1, LateWarningLog::where('borrowing_request_id', $loanA->id)->count());
     }
+
+    public function test_teacher_without_jurusan_directed_to_kajur_a_appears_in_kajur_a_and_not_in_kajur_b(): void
+    {
+        $kajurB = User::factory()->create([
+            'name' => 'Kajur AKL',
+            'email' => 'kajur.akl@smkn1bangsri.sch.id',
+            'jurusan_id' => $this->jurusanB->id,
+        ]);
+        $kajurB->assignRole('kepala_jurusan');
+
+        // Guru without jurusan_id
+        $guruNullJurusan = User::factory()->create([
+            'name' => 'Guru Tanpa Jurusan',
+            'email' => 'guru.null@smkn1bangsri.sch.id',
+            'jurusan_id' => null,
+            'nip' => '198405142011011012',
+        ]);
+        $guruNullJurusan->assignRole('guru');
+
+        // Overdue borrowing directed to Kajur A
+        $loanTeacher = BorrowingRequest::create([
+            'user_id' => $guruNullJurusan->id,
+            'approved_by_kajur_id' => $this->kajurA->id,
+            'item_id' => $this->item->id,
+            'quantity' => 1,
+            'purpose' => 'KBM Lab',
+            'borrow_date' => now()->subDays(10),
+            'return_date' => now()->subDays(3),
+            'status' => BorrowingRequest::STATUS_OVERDUE,
+            'tipe_peminjam' => 'guru',
+        ]);
+
+        // Kajur A can see this teacher loan
+        $resA = $this->actingAs($this->kajurA)->get(route('kajur.warnings.index'));
+        $resA->assertStatus(200);
+        $resA->assertSee('Guru Tanpa Jurusan');
+
+        // Kajur B cannot see this teacher loan
+        $resB = $this->actingAs($kajurB)->get(route('kajur.warnings.index'));
+        $resB->assertStatus(200);
+        $resB->assertDontSee('Guru Tanpa Jurusan');
+
+        // Kajur A can send warning
+        $sendA = $this->actingAs($this->kajurA)->post(route('kajur.warnings.send', $loanTeacher->id));
+        $sendA->assertRedirect();
+        $sendA->assertSessionHas('success');
+
+        // Kajur B cannot send warning (403)
+        $sendB = $this->actingAs($kajurB)->post(route('kajur.warnings.send', $loanTeacher->id));
+        $sendB->assertStatus(403);
+    }
+
+    public function test_unassigned_borrowing_counted_in_banner(): void
+    {
+        // Peminjam without jurusan and without kajur tujuan
+        $userNoJurusan = User::factory()->create([
+            'name' => 'User Lepas',
+            'email' => 'lepas@smkn1bangsri.sch.id',
+            'jurusan_id' => null,
+        ]);
+        $userNoJurusan->assignRole('guru');
+
+        BorrowingRequest::create([
+            'user_id' => $userNoJurusan->id,
+            'approved_by_kajur_id' => null,
+            'item_id' => $this->item->id,
+            'quantity' => 1,
+            'purpose' => 'Kegiatan',
+            'borrow_date' => now()->subDays(5),
+            'return_date' => now()->subDays(2),
+            'status' => BorrowingRequest::STATUS_OVERDUE,
+            'tipe_peminjam' => 'guru',
+        ]);
+
+        $response = $this->actingAs($this->kajurA)->get(route('kajur.warnings.index'));
+        $response->assertStatus(200);
+        $response->assertSee('peminjaman terlambat tidak terhubung ke jurusan manapun, hubungi admin');
+    }
+
+    public function test_backfill_command_dry_run_and_apply_and_ambiguous(): void
+    {
+        $guru1 = User::factory()->create([
+            'name' => 'Guru PPLG Backfill',
+            'email' => 'guru.pplg.backfill@smkn1bangsri.sch.id',
+            'jurusan_id' => null,
+        ]);
+        $guru1->assignRole('guru');
+
+        $guru2Ambigu = User::factory()->create([
+            'name' => 'Guru Ambigu Backfill',
+            'email' => 'guru.ambigu@smkn1bangsri.sch.id',
+            'jurusan_id' => null,
+        ]);
+        $guru2Ambigu->assignRole('guru');
+
+        $kajurB = User::factory()->create([
+            'name' => 'Kajur AKL 2',
+            'email' => 'kajur.akl2@smkn1bangsri.sch.id',
+            'jurusan_id' => $this->jurusanB->id,
+        ]);
+        $kajurB->assignRole('kepala_jurusan');
+
+        // Guru 1 borrows consistently to Kajur A (PPLG)
+        BorrowingRequest::create([
+            'user_id' => $guru1->id,
+            'approved_by_kajur_id' => $this->kajurA->id,
+            'item_id' => $this->item->id,
+            'borrow_date' => now()->subDays(5),
+            'return_date' => now()->subDays(2),
+            'status' => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'guru',
+        ]);
+
+        // Guru 2 borrows to both Kajur A (PPLG) and Kajur B (AKL) -> Ambigu
+        BorrowingRequest::create([
+            'user_id' => $guru2Ambigu->id,
+            'approved_by_kajur_id' => $this->kajurA->id,
+            'item_id' => $this->item->id,
+            'borrow_date' => now()->subDays(5),
+            'return_date' => now()->subDays(2),
+            'status' => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'guru',
+        ]);
+        BorrowingRequest::create([
+            'user_id' => $guru2Ambigu->id,
+            'approved_by_kajur_id' => $kajurB->id,
+            'item_id' => $this->item->id,
+            'borrow_date' => now()->subDays(5),
+            'return_date' => now()->subDays(2),
+            'status' => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'guru',
+        ]);
+
+        // 1. Dry Run test: Database must NOT change
+        $this->artisan('guru:backfill-jurusan')
+            ->expectsOutputToContain('Mode: DRY-RUN')
+            ->expectsOutputToContain('Guru PPLG Backfill')
+            ->expectsOutputToContain('Ambigu (>1 Jurusan)')
+            ->assertExitCode(0);
+
+        $this->assertNull($guru1->fresh()->jurusan_id);
+        $this->assertNull($guru2Ambigu->fresh()->jurusan_id);
+
+        // 2. Apply test: guru1 gets jurusanA, guru2 remains null (ambiguous)
+        $this->artisan('guru:backfill-jurusan', ['--apply' => true])
+            ->expectsOutputToContain('Mode: APPLY')
+            ->assertExitCode(0);
+
+        $this->assertEquals($this->jurusanA->id, $guru1->fresh()->jurusan_id);
+        $this->assertNull($guru2Ambigu->fresh()->jurusan_id);
+    }
 }
+

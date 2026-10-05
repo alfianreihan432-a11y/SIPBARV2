@@ -224,10 +224,17 @@
         text-decoration: none;
         transition: all 0.15s;
     }
-    .btn-warn:hover {
+    .btn-warn:hover:not(:disabled) {
         background: #dc2626;
         color: #ffffff;
         border-color: #dc2626;
+    }
+    .btn-warn:disabled, .btn-warn[disabled] {
+        opacity: 0.65;
+        cursor: not-allowed;
+        background: var(--bg3);
+        color: var(--muted);
+        border-color: var(--border);
     }
     .btn-warn svg {
         width: 14px;
@@ -527,6 +534,15 @@
     }
 </style>
 
+@if(isset($unassignedOverdueCount) && $unassignedOverdueCount > 0)
+<div class="flash-alert" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--blue, #2563eb);">
+    <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <span>Terdapat <strong>{{ $unassignedOverdueCount }}</strong> peminjaman terlambat tidak terhubung ke jurusan manapun, hubungi admin.</span>
+</div>
+@endif
+
 @if(session('success'))
 <div class="flash-alert flash-success">
     <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -653,7 +669,13 @@
         <div class="empty-icon-wrap">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-        <div class="empty-title">Tidak Ada Keterlambatan</div>
+        @if(!$kajurHasJurusan && $summary['total_overdue'] === 0)
+        <div class="empty-title">Akun Belum Terhubung ke Jurusan</div>
+        <div class="empty-desc">
+            Akun Kepala Jurusan Anda belum terhubung ke jurusan manapun. Silakan hubungi Administrator untuk mengatur jurusan pada akun Anda.
+        </div>
+        @else
+        <div class="empty-title">Tidak Ada Keterlambatan di Jurusan Anda</div>
         <div class="empty-desc">
             @if(!empty($activeFilter['q']) || !empty($activeFilter['kelas']) || $activeFilter['level'] !== 'all')
             Tidak ditemukan peminjaman terlambat yang sesuai dengan filter pencarian Anda.
@@ -661,6 +683,7 @@
             Semua peminjaman siswa dan guru jurusan Anda saat ini berstatus tertib atau telah dikembalikan tepat waktu.
             @endif
         </div>
+        @endif
     </div>
     @else
 
@@ -750,9 +773,9 @@
 
                             <form method="POST" action="{{ route('kajur.warnings.send', $b->id) }}" onsubmit="return confirm('Kirim peringatan keterlambatan ke {{ $b->user?->name }}?')">
                                 @csrf
-                                <button type="submit" class="btn-warn" {{ $hasRecentWarning ? 'title=Sudah_diperingatkan_hari_ini' : '' }}>
+                                <button type="submit" class="btn-warn" {{ $hasRecentWarning ? 'disabled title="Sudah diperingatkan dalam 24 jam terakhir"' : '' }}>
                                     <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                                    Kirim Peringatan
+                                    {{ $hasRecentWarning ? 'Sudah Diperingatkan Hari Ini' : 'Kirim Peringatan' }}
                                 </button>
                             </form>
                         </div>
@@ -828,9 +851,9 @@
                 @endif
                 <form method="POST" action="{{ route('kajur.warnings.send', $b->id) }}" style="flex:1" onsubmit="return confirm('Kirim peringatan keterlambatan ke {{ $b->user?->name }}?')">
                     @csrf
-                    <button type="submit" class="btn-warn" style="width:100%;justify-content:center;height:38px">
+                    <button type="submit" class="btn-warn" style="width:100%;justify-content:center;height:38px" {{ $hasRecentWarning ? 'disabled title="Sudah diperingatkan dalam 24 jam terakhir"' : '' }}>
                         <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                        Kirim Peringatan
+                        {{ $hasRecentWarning ? 'Sudah Diperingatkan Hari Ini' : 'Kirim Peringatan' }}
                     </button>
                 </form>
             </div>

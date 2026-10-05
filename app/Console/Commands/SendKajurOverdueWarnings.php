@@ -66,7 +66,7 @@ class SendKajurOverdueWarnings extends Command
                 continue;
             }
 
-            $stats = $this->warningService->sendBulkWarnings($jurusan->id, $kajur, 50);
+            $stats = $this->warningService->sendBulkWarnings($kajur, $kajur, 50);
 
             $totalSent += $stats['sent'];
             $totalSkipped += $stats['skipped_antispam'];

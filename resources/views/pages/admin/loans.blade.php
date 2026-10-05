@@ -53,6 +53,87 @@
         </div>
     </div>
 
+    @php
+        $nowJakarta = now()->timezone('Asia/Jakarta');
+        $unassignedOverdueList = \App\Models\BorrowingRequest::with(['user', 'itemWithTrashed', 'items.itemWithTrashed'])
+            ->where(function ($q) {
+                $q->whereNull('approved_by_kajur_id')
+                  ->where(function ($uq) {
+                      $uq->whereDoesntHave('user')
+                         ->orWhereHas('user', function ($sub) {
+                             $sub->whereNull('jurusan_id');
+                         });
+                  });
+            })
+            ->where(function ($q) use ($nowJakarta) {
+                $q->where('status', \App\Models\BorrowingRequest::STATUS_OVERDUE)
+                    ->orWhere(function ($sub) use ($nowJakarta) {
+                        $sub->where('status', \App\Models\BorrowingRequest::STATUS_BORROWED)
+                            ->where(function ($dateSub) use ($nowJakarta) {
+                                $dateSub->whereDate('return_date', '<', $nowJakarta->toDateString())
+                                    ->orWhere(function ($timeSub) use ($nowJakarta) {
+                                        $timeSub->whereDate('return_date', '=', $nowJakarta->toDateString())
+                                            ->whereNotNull('return_time')
+                                            ->whereTime('return_time', '<', $nowJakarta->toTimeString());
+                                    });
+                            });
+                    });
+            })
+            ->get();
+    @endphp
+
+    @if($unassignedOverdueList->isNotEmpty())
+    <div style="background: rgba(239,68,68,0.06); border: 1.5px dashed rgba(239,68,68,0.4); border-radius: 16px; padding: 18px 22px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,0.15);color:#dc2626;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <div>
+                <div style="font-size:14px;font-weight:800;color:var(--text-primary)">
+                    Peminjaman Terlambat Tanpa Jurusan & Kajur ({{ $unassignedOverdueList->count() }})
+                </div>
+                <div style="font-size:12px;color:var(--text-muted)">
+                    Peminjaman berikut tidak terhubung ke jurusan atau Kepala Jurusan manapun. Perlu ditindaklanjuti secara manual oleh Admin/TU.
+                </div>
+            </div>
+        </div>
+        <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+                <thead>
+                    <tr style="border-bottom:1px solid rgba(239,68,68,0.2);text-align:left;color:var(--text-muted);font-size:11px;text-transform:uppercase">
+                        <th style="padding:8px">No</th>
+                        <th style="padding:8px">Peminjam</th>
+                        <th style="padding:8px">Barang</th>
+                        <th style="padding:8px">Batas Kembali</th>
+                        <th style="padding:8px">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($unassignedOverdueList as $idx => $uo)
+                    <tr style="border-bottom:1px solid rgba(0,0,0,0.05)">
+                        <td style="padding:8px">#BR-{{ str_pad($uo->id, 4, '0', STR_PAD_LEFT) }}</td>
+                        <td style="padding:8px;font-weight:700;color:var(--text-primary)">
+                            {{ $uo->user?->name ?? 'User #' . $uo->user_id }}
+                            <span style="font-size:11px;color:var(--text-muted);font-weight:normal">({{ ucfirst($uo->tipe_peminjam ?? 'siswa') }})</span>
+                        </td>
+                        <td style="padding:8px;color:var(--text-primary)">{{ $uo->item_display_name }} ({{ $uo->totalQuantity() }} unit)</td>
+                        <td style="padding:8px;color:#dc2626;font-weight:700">
+                            {{ $uo->return_date ? $uo->return_date->format('d/m/Y') : '-' }}
+                            @if($uo->return_time) · {{ $uo->return_time }}@endif
+                        </td>
+                        <td style="padding:8px">
+                            <span style="display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(239,68,68,0.15);color:#dc2626">Terlambat</span>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
     {{-- Livewire component --}}
     @livewire('loan-manager')
 

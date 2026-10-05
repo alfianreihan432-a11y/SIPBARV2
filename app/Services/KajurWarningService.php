@@ -16,16 +16,42 @@ use Illuminate\Support\Facades\Mail;
 class KajurWarningService
 {
     /**
-     * Get Eloquent query for overdue loans belonging to the given jurusan.
-     * Note: Filter is strictly on user.jurusan_id == $jurusanId.
+     * Get Eloquent query for overdue loans belonging to the kajur scope:
+     * (user.jurusan_id == kajur.jurusan_id) OR (tipe_peminjam == 'guru' AND approved_by_kajur_id == kajur.id)
      */
-    public function getOverdueQuery(int $jurusanId): Builder
+    public function getOverdueQuery(User|int $kajurOrJurusanId): Builder
     {
+        $kajur = $kajurOrJurusanId instanceof User ? $kajurOrJurusanId : User::find($kajurOrJurusanId);
+        $jurusanId = (int) ($kajur?->jurusan_id ?? ($kajurOrJurusanId instanceof User ? 0 : (int) $kajurOrJurusanId));
+        $kajurId = (int) ($kajur?->id ?? 0);
         $nowJakarta = now()->timezone('Asia/Jakarta');
 
         return BorrowingRequest::query()
-            ->whereHas('user', function ($q) use ($jurusanId) {
-                $q->where('jurusan_id', $jurusanId);
+            ->where(function ($scopeQuery) use ($jurusanId, $kajurId) {
+                $hasClause = false;
+                if ($jurusanId > 0) {
+                    $scopeQuery->whereHas('user', function ($uq) use ($jurusanId) {
+                        $uq->where('jurusan_id', $jurusanId);
+                    });
+                    $hasClause = true;
+                }
+
+                if ($kajurId > 0) {
+                    $method = $hasClause ? 'orWhere' : 'where';
+                    $scopeQuery->$method(function ($teacherQuery) use ($kajurId) {
+                        $teacherQuery->where('approved_by_kajur_id', $kajurId)
+                            ->where(function ($tq) {
+                                $tq->where('tipe_peminjam', 'guru')
+                                   ->orWhereHas('user', function ($uq) {
+                                       $uq->whereHas('roles', function ($rq) {
+                                           $rq->where('name', 'guru');
+                                       });
+                                   });
+                            });
+                    });
+                } elseif (!$hasClause) {
+                    $scopeQuery->whereRaw('1 = 0');
+                }
             })
             ->where(function ($q) use ($nowJakarta) {
                 $q->where('status', BorrowingRequest::STATUS_OVERDUE)
@@ -49,6 +75,58 @@ class KajurWarningService
                 'lateWarningLogs.sender',
                 'latestLateWarning.sender',
             ]);
+    }
+
+    /**
+     * Check if a specific borrowing request falls strictly into the kajur's authorization scope.
+     * Scope: (user.jurusan_id == kajur.jurusan_id) OR (tipe_peminjam == 'guru' AND approved_by_kajur_id == kajur.id)
+     */
+    public function isBorrowingInKajurScope(BorrowingRequest $borrowing, User $kajur): bool
+    {
+        $kajurJurusanId = (int) ($kajur->jurusan_id ?? 0);
+        $borrowerJurusanId = (int) ($borrowing->user?->jurusan_id ?? 0);
+        $isSameJurusan = ($kajurJurusanId > 0 && $borrowerJurusanId === $kajurJurusanId);
+
+        $isTeacherToThisKajur = (
+            (int) $borrowing->approved_by_kajur_id === (int) $kajur->id
+            && ($borrowing->tipe_peminjam === 'guru' || ($borrowing->user && $borrowing->user->hasRole('guru')))
+        );
+
+        return $isSameJurusan || $isTeacherToThisKajur;
+    }
+
+    /**
+     * Count overdue borrowings that are completely unassigned (no user jurusan_id AND no approved_by_kajur_id).
+     */
+    public function countUnassignedOverdue(): int
+    {
+        $nowJakarta = now()->timezone('Asia/Jakarta');
+
+        return BorrowingRequest::query()
+            ->where(function ($q) {
+                $q->whereNull('approved_by_kajur_id')
+                  ->where(function ($uq) {
+                      $uq->whereDoesntHave('user')
+                         ->orWhereHas('user', function ($sub) {
+                             $sub->whereNull('jurusan_id');
+                         });
+                  });
+            })
+            ->where(function ($q) use ($nowJakarta) {
+                $q->where('status', BorrowingRequest::STATUS_OVERDUE)
+                    ->orWhere(function ($sub) use ($nowJakarta) {
+                        $sub->where('status', BorrowingRequest::STATUS_BORROWED)
+                            ->where(function ($dateSub) use ($nowJakarta) {
+                                $dateSub->whereDate('return_date', '<', $nowJakarta->toDateString())
+                                    ->orWhere(function ($timeSub) use ($nowJakarta) {
+                                        $timeSub->whereDate('return_date', '=', $nowJakarta->toDateString())
+                                            ->whereNotNull('return_time')
+                                            ->whereTime('return_time', '<', $nowJakarta->toTimeString());
+                                    });
+                            });
+                    });
+            })
+            ->count();
     }
 
     /**
@@ -186,13 +264,13 @@ class KajurWarningService
             }
         }
 
-        // 3. Fallback / complementary Email notification
+        // 3. Fallback / complementary Email notification (synchronous with safe try/catch)
         if (!empty($email)) {
             try {
-                Mail::to($email)->queue(new LateBorrowingWarningMail($borrowing, $sender, $daysOverdue));
+                Mail::to($email)->send(new LateBorrowingWarningMail($borrowing, $sender, $daysOverdue));
                 $channelsUsed[] = 'email';
             } catch (\Exception $e) {
-                Log::warning('Gagal mengantrekan email late warning: ' . $e->getMessage(), [
+                Log::warning('Gagal mengirim email late warning: ' . $e->getMessage(), [
                     'borrowing_id' => $borrowing->id,
                     'email' => $email,
                 ]);
@@ -244,7 +322,7 @@ class KajurWarningService
     }
 
     /**
-     * Send bulk warnings to all overdue loans in jurusan (max 50 per execution).
+     * Send bulk warnings to all overdue loans in kajur scope (max 50 per execution).
      * 
      * @return array [
      *    'total' => int,
@@ -253,9 +331,21 @@ class KajurWarningService
      *    'failed' => int,
      * ]
      */
-    public function sendBulkWarnings(int $jurusanId, User $sender, int $limit = 50): array
+    public function sendBulkWarnings(User|int $kajurOrJurusanId, ?User $senderUser = null, int $limit = 50): array
     {
-        $overdueLoans = $this->getOverdueQuery($jurusanId)
+        $kajur = $kajurOrJurusanId instanceof User ? $kajurOrJurusanId : ($senderUser ?? User::find($kajurOrJurusanId));
+        $sender = $senderUser ?? ($kajurOrJurusanId instanceof User ? $kajurOrJurusanId : User::find($kajurOrJurusanId));
+
+        if (!$kajur || !$sender) {
+            return [
+                'total' => 0,
+                'sent' => 0,
+                'skipped_antispam' => 0,
+                'failed' => 0,
+            ];
+        }
+
+        $overdueLoans = $this->getOverdueQuery($kajur)
             ->limit($limit)
             ->get();
 
