@@ -338,38 +338,6 @@ html.theme-fade, html.theme-fade * {
   background:var(--border);
   margin:2px 0;
 }
-.nav-mob-theme-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:11px 16px;
-  border-radius:10px;
-  background:var(--bg3);
-  border:1px solid var(--border);
-  min-height:44px;
-}
-.nav-mob-theme-info{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:13px;
-  font-weight:700;
-  color:var(--text);
-}
-.nav-mob-theme-btn{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:6px 12px;
-  border-radius:8px;
-  border:1px solid var(--border);
-  background:var(--card);
-  color:var(--text);
-  font-size:12px;
-  font-weight:700;
-  cursor:pointer;
-  transition:all .2s;
-}
 .nav-mob-login{
   display:flex;
   align-items:center;
@@ -395,10 +363,7 @@ html.theme-fade, html.theme-fade * {
 html.dark .icon-sun{display:block}
 html.dark .icon-moon{display:none}
 
-.mob-t-sun{display:none}
-.mob-t-moon{display:inline-flex;align-items:center;gap:4px}
-html.dark .mob-t-sun{display:inline-flex;align-items:center;gap:4px}
-html.dark .mob-t-moon{display:none}
+
 
 /* ─── HERO ─── */
 .hero{
@@ -1159,26 +1124,6 @@ html.dark .footer-copy{color:#8fa3c4 !important}
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
         <span>{{ \App\Models\SiteSetting::get('nav_link_help_mobile', 'Bantuan & FAQ') }}</span>
       </a>
-    </div>
-
-    <div class="nav-mob-divider"></div>
-
-    {{-- Mobile Drawer Theme Switcher Row --}}
-    <div class="nav-mob-theme-row">
-      <div class="nav-mob-theme-info">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-        <span>Tema Tampilan</span>
-      </div>
-      <button type="button" class="nav-mob-theme-btn theme-toggle-btn" aria-label="Ganti Tema">
-        <span class="mob-t-sun">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z"/></svg>
-          Mode Terang
-        </span>
-        <span class="mob-t-moon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-          Mode Gelap
-        </span>
-      </button>
     </div>
 
     <div class="nav-mobile-footer">
