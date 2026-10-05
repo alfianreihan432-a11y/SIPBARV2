@@ -211,12 +211,18 @@ class KepalaJurusanController extends Controller
     }
 
     /**
-     * Verify QR code (reusing AdminQRVerificationController logic)
+     * Verifikasi kode QR untuk peminjaman guru maupun siswa oleh Kepala Jurusan.
      */
     public function verifyQR(string $token): View
     {
         $qrRecord = \App\Models\QRCode::where('code', $token)
-            ->with(['borrowingRequest.user', 'borrowingRequest.itemWithTrashed', 'borrowingRequest.items.itemWithTrashed'])
+            ->with([
+                'borrowingRequest.user.classroom',
+                'borrowingRequest.user.jurusan',
+                'borrowingRequest.itemWithTrashed',
+                'borrowingRequest.items.itemWithTrashed',
+                'borrowingRequest.teacher',
+            ])
             ->first();
 
         if (!$qrRecord) {
@@ -242,17 +248,20 @@ class KepalaJurusanController extends Controller
             ]);
         }
 
-        // Check if this is a teacher borrowing for this Kajur / Jurusan
-        $kajurId = (int) Auth::id();
-        $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
-        $isAssignedKajur = ($borrowingRequest->approved_by_kajur_id && (int) $borrowingRequest->approved_by_kajur_id === $kajurId);
-        $isSameJurusan = ($jurusanId && $borrowingRequest->user?->jurusan_id && (int) $borrowingRequest->user->jurusan_id === $jurusanId);
+        // Jika peminjaman guru: batasi sesuai scope kajur (assigned kajur atau jurusan yang sama)
+        // Jika peminjaman siswa: izinkan dari jurusan apa saja (aturan bisnis: JANGAN membatasi berdasarkan jurusan_id)
+        if ($borrowingRequest->tipe_peminjam === 'guru') {
+            $kajurId = (int) Auth::id();
+            $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
+            $isAssignedKajur = ($borrowingRequest->approved_by_kajur_id && (int) $borrowingRequest->approved_by_kajur_id === $kajurId);
+            $isSameJurusan = ($jurusanId && $borrowingRequest->user?->jurusan_id && (int) $borrowingRequest->user->jurusan_id === $jurusanId);
 
-        if ($borrowingRequest->tipe_peminjam !== 'guru' || (!$isAssignedKajur && !$isSameJurusan)) {
-            return view('pages.kepala-jurusan.qr-verify', [
-                'valid' => false,
-                'message' => 'QR Code ini bukan untuk peminjaman guru yang ditujukan ke Anda / jurusan Anda.',
-            ]);
+            if (!$isAssignedKajur && !$isSameJurusan) {
+                return view('pages.kepala-jurusan.qr-verify', [
+                    'valid' => false,
+                    'message' => 'QR Code ini bukan untuk peminjaman guru yang ditujukan ke Anda / jurusan Anda.',
+                ]);
+            }
         }
 
         if (!$qrRecord->is_active && $borrowingRequest->status !== BorrowingRequest::STATUS_REJECTED) {
@@ -270,47 +279,33 @@ class KepalaJurusanController extends Controller
     }
 
     /**
-     * Confirm checkout via QR scan
+     * Konfirmasi pengambilan barang (checkout) via QR scan oleh Kepala Jurusan.
      */
-    public function confirmCheckout(Request $request, int $id): RedirectResponse
+    public function confirmCheckout(Request $request, int $id, BorrowingApprovalService $approvalService): RedirectResponse
     {
-        $borrowingRequest = BorrowingRequest::where('tipe_peminjam', 'guru')
-            ->where($this->kajurScopeQuery())
-            ->with('itemWithTrashed', 'qrCode')
+        $borrowingRequest = BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed', 'qrCode', 'user'])
             ->findOrFail($id);
 
-        if (!in_array($borrowingRequest->status, ['approved', 'qr_ready'])) {
-            return redirect()->back()->with('error', 'Status peminjaman saat ini (' . $borrowingRequest->status_label . ') tidak dapat dikonfirmasi pengambilan.');
-        }
+        // Jika guru: validasi bahwa permohonan ditujukan ke Kajur ini atau jurusan yang sama
+        if ($borrowingRequest->tipe_peminjam === 'guru') {
+            $kajurId = (int) Auth::id();
+            $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
+            $isAssignedKajur = ($borrowingRequest->approved_by_kajur_id && (int) $borrowingRequest->approved_by_kajur_id === $kajurId);
+            $isSameJurusan = ($jurusanId && $borrowingRequest->user?->jurusan_id && (int) $borrowingRequest->user->jurusan_id === $jurusanId);
 
-        // Cek stok barang jika item masih ada di inventaris aktif
-        $item = $borrowingRequest->item;
-        if ($item) {
-            if ($item->stock < $borrowingRequest->quantity) {
-                return redirect()->back()->with('error', 'Stok barang tidak mencukupi untuk memenuhi peminjaman.');
+            if (!$isAssignedKajur && !$isSameJurusan) {
+                return redirect()->back()->with('error', 'Akses ditolak: Peminjaman guru ini bukan untuk jurusan Anda.');
             }
-            // Kurangi stok barang
-            $item->decrement('stock', $borrowingRequest->quantity);
         }
 
-        // Update status peminjaman menjadi borrowed / barang diambil
-        $borrowingRequest->update([
-            'status' => BorrowingRequest::STATUS_BORROWED,
-            'borrowed_at' => now(),
-            'checkout_by' => Auth::id(),
-        ]);
+        try {
+            $approvalService->processCheckout($borrowingRequest, (int) Auth::id());
 
-        // Catat aktivitas scan pada record QR Code
-        if ($borrowingRequest->qrCode) {
-            $borrowingRequest->qrCode->update([
-                'scanned_at' => $borrowingRequest->qrCode->scanned_at ?? now(),
-                'last_scanned_at' => now(),
-                'scan_count' => ($borrowingRequest->qrCode->scan_count ?? 0) + 1,
-            ]);
+            return redirect()->route('kajur.qr.verify', ['token' => $borrowingRequest->qrCode->code ?? ''])
+                ->with('success', 'Pengambilan barang berhasil dikonfirmasi! Status kini menjadi Dipinjam.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-
-        return redirect()->route('kajur.qr-scanner')
-            ->with('success', 'Pengambilan barang berhasil dikonfirmasi! Status kini menjadi Dipinjam.');
     }
 
     /**

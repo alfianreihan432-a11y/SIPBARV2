@@ -45,7 +45,7 @@ Route::prefix('v1')->middleware(['auth:sanctum'])->group(function () {
     });
 
     // QR Scanner Endpoints
-    Route::prefix('qr')->middleware('role:guru|admin')->group(function () {
+    Route::prefix('qr')->middleware('role:guru|admin|kepala_jurusan')->group(function () {
         Route::post('validate', [BorrowingApiController::class, 'validateQR'])
             ->name('api.qr.validate');
     });

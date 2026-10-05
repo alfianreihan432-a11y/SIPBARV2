@@ -258,13 +258,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('siswa/peminjaman/{id}/qrcode/data', [StudentQRCodeController::class, 'data'])
         ->name('student.qrcode.data');
 
-    // Admin QR Verification — verifikasi token QR saat scan & konfirmasi pengambilan
+    // Admin & Kajur QR Verification — verifikasi token QR saat scan & konfirmasi pengambilan
+    Route::middleware('role:admin|kepala_jurusan')->group(function () {
+        Route::get('admin/qr/verify/{token}', [AdminQRVerificationController::class, 'verify'])->name('admin.qr.verify');
+        Route::get('admin/verifikasi-pengambilan/{token}', [AdminQRVerificationController::class, 'verify'])->name('admin.qr.verify.alias');
+    });
+
     Route::middleware('role:admin')->group(function () {
         Route::get('admin/qr/scan', function() {
             return view('pages.admin.qr-scanner');
         })->name('admin.qr.scan');
-        Route::get('admin/qr/verify/{token}', [AdminQRVerificationController::class, 'verify'])->name('admin.qr.verify');
-        Route::get('admin/verifikasi-pengambilan/{token}', [AdminQRVerificationController::class, 'verify'])->name('admin.qr.verify.alias');
         Route::post('admin/qr/confirm-checkout/{id}', [AdminQRVerificationController::class, 'confirmCheckout'])->name('admin.qr.confirm-checkout');
         Route::post('admin/qr/reject-checkout/{id}', [AdminQRVerificationController::class, 'rejectCheckout'])->name('admin.qr.reject-checkout');
     });

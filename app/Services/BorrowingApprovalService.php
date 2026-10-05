@@ -159,7 +159,54 @@ class BorrowingApprovalService
     }
     
     /**
-     * Get available stock for an item
+     * Proses checkout / serah terima barang fisik dari QR scan (oleh admin atau kepala jurusan).
+     *
+     * @throws InsufficientStockException
+     * @throws \InvalidArgumentException
+     */
+    public function processCheckout(BorrowingRequest $borrowingRequest, int $processorId): void
+    {
+        if (! in_array($borrowingRequest->status, [BorrowingRequest::STATUS_APPROVED, 'qr_ready'])) {
+            throw new \InvalidArgumentException('Status peminjaman saat ini (' . $borrowingRequest->status_label . ') tidak dapat dikonfirmasi pengambilan.');
+        }
+
+        DB::transaction(function () use ($borrowingRequest, $processorId) {
+            $items = $borrowingRequest->items->isNotEmpty() ? $borrowingRequest->items : collect([$borrowingRequest]);
+
+            foreach ($items as $detail) {
+                $item = $detail instanceof BorrowingRequest ? $detail->item : $detail->item;
+
+                if ($item) {
+                    $needed = (int) ($detail->quantity ?? 0);
+
+                    if ($item->stock < $needed) {
+                        throw new InsufficientStockException('Stok barang "' . $item->name . '" tidak mencukupi untuk memenuhi peminjaman.');
+                    }
+
+                    $item->decrement('stock', $needed);
+                }
+            }
+
+            // Update status peminjaman menjadi borrowed / barang diambil
+            $borrowingRequest->update([
+                'status'      => BorrowingRequest::STATUS_BORROWED,
+                'borrowed_at' => now(),
+                'checkout_by' => $processorId,
+            ]);
+
+            // Catat aktivitas scan pada record QR Code
+            if ($borrowingRequest->qrCode) {
+                $borrowingRequest->qrCode->update([
+                    'scanned_at'      => $borrowingRequest->qrCode->scanned_at ?? now(),
+                    'last_scanned_at' => now(),
+                    'scan_count'      => ($borrowingRequest->qrCode->scan_count ?? 0) + 1,
+                ]);
+            }
+        });
+    }
+
+    /**
+     * Dapatkan stok yang tersedia untuk sebuah barang
      */
     public function getAvailableStock(Item $item): int
     {

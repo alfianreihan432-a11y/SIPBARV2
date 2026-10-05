@@ -15,6 +15,10 @@ class AdminQRVerificationController extends Controller
      */
     public function verify(string $token)
     {
+        if (Auth::user()?->hasRole('kepala_jurusan')) {
+            return redirect()->route('kajur.qr.verify', ['token' => $token]);
+        }
+
         $qrRecord = QRCode::where('code', $token)
             ->with([
                 'borrowingRequest.user.classroom',
@@ -64,47 +68,18 @@ class AdminQRVerificationController extends Controller
     /**
      * Konfirmasi bahwa siswa telah mengambil barang secara fisik (update status ke borrowed).
      */
-    public function confirmCheckout(Request $request, int $id)
+    public function confirmCheckout(Request $request, int $id, \App\Services\BorrowingApprovalService $approvalService)
     {
-        $borrowingRequest = BorrowingRequest::with('itemWithTrashed', 'qrCode')->findOrFail($id);
+        $borrowingRequest = BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed', 'qrCode'])->findOrFail($id);
 
-        if (! in_array($borrowingRequest->status, ['approved', 'qr_ready'])) {
-            return redirect()->back()->with('error', 'Status peminjaman saat ini (' . $borrowingRequest->status_label . ') tidak dapat dikonfirmasi pengambilan.');
+        try {
+            $approvalService->processCheckout($borrowingRequest, (int) Auth::id());
+
+            return redirect()->route('admin.qr.verify', ['token' => $borrowingRequest->qrCode->code ?? ''])
+                ->with('success', 'Pengambilan barang berhasil dikonfirmasi! Status kini menjadi Dipinjam.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-
-        // Cek stok barang jika item masih ada di inventaris aktif
-        foreach ($borrowingRequest->items->isNotEmpty() ? $borrowingRequest->items : collect([$borrowingRequest]) as $detail) {
-            $item = $detail instanceof \App\Models\BorrowingRequest ? $detail->item : $detail->item;
-
-            if ($item) {
-                $needed = $detail instanceof \App\Models\BorrowingRequest ? (int) ($detail->quantity ?? 0) : (int) ($detail->quantity ?? 0);
-
-                if ($item->stock < $needed) {
-                    return redirect()->back()->with('error', 'Stok barang tidak mencukupi untuk memenuhi peminjaman.');
-                }
-
-                $item->decrement('stock', $needed);
-            }
-        }
-
-        // Update status peminjaman menjadi borrowed / barang diambil
-        $borrowingRequest->update([
-            'status'      => BorrowingRequest::STATUS_BORROWED,
-            'borrowed_at' => now(),
-            'checkout_by' => Auth::id(),
-        ]);
-
-        // Catat aktivitas scan pada record QR Code
-        if ($borrowingRequest->qrCode) {
-            $borrowingRequest->qrCode->update([
-                'scanned_at'      => $borrowingRequest->qrCode->scanned_at ?? now(),
-                'last_scanned_at' => now(),
-                'scan_count'      => ($borrowingRequest->qrCode->scan_count ?? 0) + 1,
-            ]);
-        }
-
-        return redirect()->route('admin.qr.verify', ['token' => $borrowingRequest->qrCode->code ?? ''])
-            ->with('success', 'Pengambilan barang berhasil dikonfirmasi! Status kini menjadi Dipinjam.');
     }
 
     /**

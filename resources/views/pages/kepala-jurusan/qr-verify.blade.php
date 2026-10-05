@@ -134,40 +134,64 @@
         </div>
         
         <div class="borrowing-details">
-            <div class="detail-row">
-                <span class="detail-label">Guru Peminjam</span>
-                <span class="detail-value">{{ $borrowingRequest->user->name }}</span>
-            </div>
+            @if($borrowingRequest->tipe_peminjam === 'siswa')
+                <div class="detail-row">
+                    <span class="detail-label">Siswa Peminjam</span>
+                    <span class="detail-value">{{ $borrowingRequest->user->name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Kelas / Jurusan</span>
+                    <span class="detail-value">
+                        {{ $borrowingRequest->user->classroom?->name ?? $borrowingRequest->user->kelas ?? ($borrowingRequest->user->jurusan?->nama ?? '-') }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Guru Pembimbing</span>
+                    <span class="detail-value">{{ $borrowingRequest->teacher?->name ?? '-' }}</span>
+                </div>
+            @else
+                <div class="detail-row">
+                    <span class="detail-label">Guru Peminjam</span>
+                    <span class="detail-value">{{ $borrowingRequest->user->name }}</span>
+                </div>
+                @if($borrowingRequest->user?->jurusan)
+                    <div class="detail-row">
+                        <span class="detail-label">Jurusan</span>
+                        <span class="detail-value">{{ $borrowingRequest->user->jurusan->nama }}</span>
+                    </div>
+                @endif
+            @endif
+
             <div class="detail-row">
                 <span class="detail-label">Barang</span>
                 <span class="detail-value">
-                    @php $items = $borrowingRequest->items->count() ? $borrowingRequest->items : collect([$borrowingRequest->item])->filter(); @endphp
+                    @php $items = $borrowingRequest->items->isNotEmpty() ? $borrowingRequest->items : collect([$borrowingRequest]); @endphp
                     @foreach($items as $detail)
-                        {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia' }} ({{ $detail->quantity ?? 1 }}){{ !$loop->last ? ', ' : '' }}
+                        {{ $detail->itemWithTrashed?->name ?? $detail->item?->name ?? 'Barang tidak tersedia' }} ({{ $detail->quantity ?? 1 }} unit){{ !$loop->last ? ', ' : '' }}
                     @endforeach
                 </span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Jumlah</span>
+                <span class="detail-label">Jumlah Total</span>
                 <span class="detail-value">{{ $borrowingRequest->items->sum('quantity') ?: ($borrowingRequest->quantity ?? 0) }} unit</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Tanggal Pinjam</span>
-                <span class="detail-value">{{ $borrowingRequest->borrow_date->format('d/m/Y') }}</span>
+                <span class="detail-value">{{ $borrowingRequest->borrow_date?->format('d/m/Y') }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Tanggal Kembali</span>
-                <span class="detail-value">{{ $borrowingRequest->return_date->format('d/m/Y') }} {{ $borrowingRequest->return_time }}</span>
+                <span class="detail-value">{{ $borrowingRequest->return_date?->format('d/m/Y') }} {{ $borrowingRequest->return_time ?? '' }}</span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Tujuan</span>
+                <span class="detail-label">Tujuan / Keperluan</span>
                 <span class="detail-value">{{ $borrowingRequest->purpose }}</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">Status Saat Ini</span>
                 <span class="detail-value">
-                    @if($borrowingRequest->status === 'approved')
-                        <span class="status-badge status-approved">Disetujui</span>
+                    @if(in_array($borrowingRequest->status, ['approved', 'qr_ready']))
+                        <span class="status-badge status-approved">Disetujui / Siap Ambil</span>
                     @elseif($borrowingRequest->status === 'borrowed')
                         <span class="status-badge status-borrowed">Dipinjam</span>
                     @else
@@ -180,7 +204,7 @@
         @if(in_array($borrowingRequest->status, ['approved', 'qr_ready']))
             <form method="POST" action="{{ route('kajur.qr.confirm-checkout', $borrowingRequest->id) }}">
                 @csrf
-                <button type="submit" class="action-btn btn-confirm" onclick="return confirm('Konfirmasi pengambilan barang oleh guru?')">
+                <button type="submit" class="action-btn btn-confirm" onclick="return confirm('Konfirmasi pengambilan barang?')">
                     <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
@@ -189,7 +213,7 @@
             </form>
         @elseif($borrowingRequest->status === 'borrowed')
             <div style="text-align: center; padding: 16px; background: var(--accent-light); border-radius: 10px; color: var(--accent-text); font-size: 13px; font-weight: 600;">
-                Barang sudah diambil oleh guru pada {{ $borrowingRequest->borrowed_at->format('d/m/Y H:i') }}
+                Barang sudah diambil pada {{ $borrowingRequest->borrowed_at?->format('d/m/Y H:i') }}
             </div>
         @else
             <div style="text-align: center; padding: 16px; background: rgba(245, 158, 11, 0.12); border-radius: 10px; color: #f59e0b; font-size: 13px; font-weight: 600;">
