@@ -13,6 +13,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ItemImportController;
 use App\Http\Controllers\KepalaJurusanController;
+use App\Http\Controllers\KepalaJurusanWarningController;
 use App\Http\Controllers\MagicApprovalController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SettingsController;
@@ -360,6 +361,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('history', [KepalaJurusanController::class, 'history'])->name('history');
         Route::get('reporting', [KepalaJurusanController::class, 'reporting'])->name('reporting');
         Route::post('reporting/create', [KepalaJurusanController::class, 'createReport'])->name('create-report');
+        // Peringatan Keterlambatan
+        Route::get('warnings', [KepalaJurusanWarningController::class, 'index'])->name('warnings.index');
+        Route::post('warnings/{id}/send', [KepalaJurusanWarningController::class, 'send'])->name('warnings.send');
+        Route::post('warnings/send-all', [KepalaJurusanWarningController::class, 'sendAll'])->name('warnings.send-all');
+        Route::get('warnings/{id}/preview', [KepalaJurusanWarningController::class, 'preview'])->name('warnings.preview');
         // Profil Kepala Jurusan
         Route::get('profil', [KepalaJurusanController::class, 'profile'])->name('profile');
         Route::post('profil/foto', [SettingsController::class, 'updateProfilePhoto'])->name('profile.photo.update');

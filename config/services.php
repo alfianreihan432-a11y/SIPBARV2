@@ -45,4 +45,8 @@ return [
         'key' => env('BOT_API_KEY'),
     ],
 
+    'kajur_warning' => [
+        'auto_send' => env('KAJUR_AUTO_WARNING', false),
+    ],
+
 ];

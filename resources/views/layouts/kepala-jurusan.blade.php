@@ -270,11 +270,32 @@
                 ->where('status', \App\Models\ItemReturn::STATUS_MENUNGGU)
                 ->count();
 
+            $nowJakarta = now()->timezone('Asia/Jakarta');
+            $overdueCount = $kajurJurusanId
+                ? \App\Models\BorrowingRequest::whereHas('user', fn($q) => $q->where('jurusan_id', $kajurJurusanId))
+                    ->where(function ($q) use ($nowJakarta) {
+                        $q->where('status', \App\Models\BorrowingRequest::STATUS_OVERDUE)
+                            ->orWhere(function ($sub) use ($nowJakarta) {
+                                $sub->where('status', \App\Models\BorrowingRequest::STATUS_BORROWED)
+                                    ->where(function ($dateSub) use ($nowJakarta) {
+                                        $dateSub->whereDate('return_date', '<', $nowJakarta->toDateString())
+                                            ->orWhere(function ($timeSub) use ($nowJakarta) {
+                                                $timeSub->whereDate('return_date', '=', $nowJakarta->toDateString())
+                                                    ->whereNotNull('return_time')
+                                                    ->whereTime('return_time', '<', $nowJakarta->toTimeString());
+                                            });
+                                    });
+                            });
+                    })
+                    ->count()
+                : 0;
+
             $menus = [
                 ['Dashboard', 'kajur.dashboard', 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', null],
                 ['Permohonan Peminjaman', 'kajur.pending-approvals', 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'pending_approvals', $pendingApprovalsCount],
                 ['Scan QR', 'kajur.qr-scanner', 'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z', null],
                 ['Pengembalian', 'kajur.pending-returns', 'M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6', 'pending_returns', $pendingReturnsCount],
+                ['Peringatan Keterlambatan', 'kajur.warnings.index', 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', 'late_warnings', $overdueCount],
                 ['Riwayat Peminjaman', 'kajur.history', 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', null],
                 ['Pelaporan', 'kajur.reporting', 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', null],
                 ['Profil', 'kajur.profile', 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', null],

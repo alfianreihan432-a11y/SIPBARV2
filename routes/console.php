@@ -30,3 +30,11 @@ Schedule::command('sipintu:sync-users')
     ->onOneServer()
     ->runInBackground();
 
+// Schedule Kajur overdue loan warnings (default disabled via KAJUR_AUTO_WARNING flag)
+Schedule::command('kajur:send-overdue-warnings')
+    ->dailyAt('08:30')
+    ->timezone('Asia/Jakarta')
+    ->withoutOverlapping()
+    ->onOneServer();
+
+

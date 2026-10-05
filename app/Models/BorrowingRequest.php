@@ -228,6 +228,16 @@ class BorrowingRequest extends Model
         return $this->hasMany(ItemReturn::class, 'borrowing_request_id');
     }
 
+    public function lateWarningLogs()
+    {
+        return $this->hasMany(LateWarningLog::class, 'borrowing_request_id');
+    }
+
+    public function latestLateWarning()
+    {
+        return $this->hasOne(LateWarningLog::class, 'borrowing_request_id')->latestOfMany('sent_at');
+    }
+
     public function latestReturn()
     {
         return $this->hasOne(ItemReturn::class, 'borrowing_request_id')->latestOfMany();
