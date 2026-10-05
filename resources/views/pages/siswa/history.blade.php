@@ -289,7 +289,8 @@
     <div class="desktop-table-view">
         @foreach($histories as $h)
         @php 
-            $st = $statusMap[$h->status] ?? $statusMap['pending']; 
+            $stKey = $h->is_overdue ? 'overdue' : $h->status;
+            $st = $statusMap[$stKey] ?? ($statusMap[$h->status] ?? $statusMap['pending']); 
             // Cek apakah benar-benar dikembalikan (status returned ATAU memiliki pengembalian barang yang disetujui)
             $isReturned = ($h->status === 'returned') || 
                           ($h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->status === 'disetujui');
@@ -415,11 +416,12 @@
     <div class="mobile-cards-view">
         @foreach($histories as $h)
         @php 
-            $st = $statusMap[$h->status] ?? $statusMap['pending']; 
+            $stKey = $h->is_overdue ? 'overdue' : $h->status;
+            $st = $statusMap[$stKey] ?? ($statusMap[$h->status] ?? $statusMap['pending']); 
             $isReturned = ($h->status === 'returned') || 
                           ($h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->status === 'disetujui');
-            $cardStatusClass = 'mc-card--' . ($h->status ?? 'pending');
-            $badgeClass = 'mc-badge--' . ($h->status ?? 'pending');
+            $cardStatusClass = 'mc-card--' . ($stKey ?? 'pending');
+            $badgeClass = 'mc-badge--' . ($stKey ?? 'pending');
             $badgeLabel = $st['label'];
         @endphp
         <div class="mc-card {{ $cardStatusClass }}">

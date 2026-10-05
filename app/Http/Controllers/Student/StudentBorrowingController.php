@@ -309,13 +309,7 @@ class StudentBorrowingController extends Controller
                       ->orWhereHas('itemReturns', fn ($returnQ) => $returnQ->where('status', \App\Models\ItemReturn::STATUS_DISETUJUI));
                 });
             } elseif ($stFilter === 'overdue') {
-                $query->where(function ($q) {
-                    $q->where('status', BorrowingRequest::STATUS_OVERDUE)
-                      ->orWhere(function ($sq) {
-                          $sq->whereIn('status', [BorrowingRequest::STATUS_APPROVED, BorrowingRequest::STATUS_BORROWED])
-                             ->where('return_date', '<', now());
-                      });
-                });
+                $query->overdue();
             } else {
                 $query->where('status', $stFilter);
             }
