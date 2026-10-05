@@ -284,4 +284,65 @@ class KajurScanStudentQRTest extends TestCase
         $response = $this->get(route('admin.qr.verify', ['token' => $qrCode->code]));
         $response->assertRedirect(route('kajur.qr.verify', ['token' => $qrCode->code]));
     }
+
+    public function test_kajur_checkout_with_insufficient_stock_shows_error_and_does_not_change_stock_or_status(): void
+    {
+        // Item stock = 1, requested = 2
+        $this->item->update(['stock' => 1]);
+        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaTkj, $this->guruTkj, 2);
+
+        $this->actingAs($this->kajurTkj);
+
+        $response = $this->post(route('kajur.qr.confirm-checkout', ['id' => $borrowing->id]));
+        $response->assertSessionHas('error');
+
+        $borrowing->refresh();
+        $this->item->refresh();
+
+        $this->assertEquals(BorrowingRequest::STATUS_APPROVED, $borrowing->status);
+        $this->assertEquals(1, $this->item->stock);
+        $this->assertNull($borrowing->checkout_by);
+    }
+
+    public function test_admin_checkout_with_insufficient_stock_shows_error_and_does_not_change_stock_or_status(): void
+    {
+        // Item stock = 1, requested = 2
+        $this->item->update(['stock' => 1]);
+        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaTkj, $this->guruTkj, 2);
+
+        $this->actingAs($this->admin);
+
+        $response = $this->post(route('admin.qr.confirm-checkout', ['id' => $borrowing->id]));
+        $response->assertSessionHas('error');
+
+        $borrowing->refresh();
+        $this->item->refresh();
+
+        $this->assertEquals(BorrowingRequest::STATUS_APPROVED, $borrowing->status);
+        $this->assertEquals(1, $this->item->stock);
+        $this->assertNull($borrowing->checkout_by);
+    }
+
+    public function test_admin_checkout_with_invalid_status_shows_error_and_does_not_change_status(): void
+    {
+        $pendingBorrowing = BorrowingRequest::create([
+            'user_id' => $this->siswaTkj->id,
+            'teacher_id' => $this->guruTkj->id,
+            'item_id' => $this->item->id,
+            'quantity' => 1,
+            'tipe_peminjam' => 'siswa',
+            'status' => BorrowingRequest::STATUS_PENDING,
+            'borrow_date' => now(),
+            'return_date' => now()->addDays(2),
+            'purpose' => 'Pending Loan',
+        ]);
+
+        $this->actingAs($this->admin);
+
+        $response = $this->post(route('admin.qr.confirm-checkout', ['id' => $pendingBorrowing->id]));
+        $response->assertSessionHas('error');
+
+        $pendingBorrowing->refresh();
+        $this->assertEquals(BorrowingRequest::STATUS_PENDING, $pendingBorrowing->status);
+    }
 }
