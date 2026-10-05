@@ -7,16 +7,16 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Jalankan migration.
      */
     public function up(): void
     {
-        // 1. Ensure unique constraint on jurusan_id in laporan_jurusans so only 1 active row per jurusan exists
+        // 1. Pastikan constraint unik pada jurusan_id di laporan_jurusans sehingga hanya ada 1 baris aktif per jurusan
         Schema::table('laporan_jurusans', function (Blueprint $table) {
             $table->unique('jurusan_id');
         });
 
-        // 2. Create history table to archive previous submissions
+        // 2. Buat tabel riwayat untuk mengarsipkan pengajuan sebelumnya
         Schema::create('laporan_jurusan_histories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('laporan_jurusan_id')->constrained('laporan_jurusans')->onDelete('cascade');
@@ -33,7 +33,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Batalkan migration.
      */
     public function down(): void
     {

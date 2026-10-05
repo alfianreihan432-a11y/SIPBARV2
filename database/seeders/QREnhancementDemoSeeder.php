@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 class QREnhancementDemoSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Jalankan seeder database.
      * 
      * Creates demo data for testing QR enhancement features:
      * - Sample users (teacher, students)
@@ -25,7 +25,7 @@ class QREnhancementDemoSeeder extends Seeder
     {
         $this->command->info('🌱 Seeding QR Enhancement Demo Data...');
         
-        // 1. Create Demo Teacher
+        // 1. Buat Guru Demo
         $teacher = $this->createTeacher();
         $this->command->info('✓ Demo teacher created');
         
@@ -37,7 +37,7 @@ class QREnhancementDemoSeeder extends Seeder
         $items = $this->createItems();
         $this->command->info('✓ Demo items created (5)');
         
-        // 4. Create Borrowing Requests in Various Statuses
+        // 4. Buat Pengajuan Peminjaman dalam Berbagai Status
         $this->createBorrowingRequests($teacher, $students, $items);
         $this->command->info('✓ Borrowing requests created in various statuses');
         

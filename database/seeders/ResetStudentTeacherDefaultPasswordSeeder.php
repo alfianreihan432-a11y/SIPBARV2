@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 class ResetStudentTeacherDefaultPasswordSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Jalankan seeder database.
      */
     public function run(): void
     {

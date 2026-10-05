@@ -24,7 +24,7 @@ class AdminUserSeeder extends Seeder
             $this->command->info('Old admin account disabled: admin@smkn1bangsri.sch.id');
         }
 
-        // Create/update admin user with new credentials
+        // Buat/perbarui pengguna admin dengan kredensial baru
         $admin = User::updateOrCreate(
             ['email' => 'admintu@smkn1bangsri.sch.id'],
             [

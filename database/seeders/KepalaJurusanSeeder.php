@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 class KepalaJurusanSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Jalankan seeder database.
      */
     public function run(): void
     {
