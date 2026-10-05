@@ -80,14 +80,17 @@
     .condition-rusak-berat { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
     
     .verification-badge {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
         padding: 4px 10px;
-        border-radius: 6px;
+        border-radius: 20px;
         font-size: 11px;
-        font-weight: 600;
+        font-weight: 700;
+        letter-spacing: .02em;
+        white-space: nowrap;
     }
-    .verification-verified { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-    .verification-pending { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+    .verification-verified { background: rgba(16, 185, 129, 0.12); color: #065f46; }
+    .verification-pending { background: rgba(245, 158, 11, 0.12); color: #b45309; }
     
     .empty-state {
         text-align: center;
@@ -278,9 +281,15 @@
                             <td>{{ Str::limit($return->return_notes ?? '-', 30) }}</td>
                             <td>
                                 @if($return->checkin_by)
-                                    <span class="verification-badge verification-verified">Terverifikasi</span>
+                                    <span class="verification-badge verification-verified">
+                                        <span style="width:6px;height:6px;border-radius:50%;background:#059669;display:inline-block;margin-right:4px"></span>
+                                        Terverifikasi
+                                    </span>
                                 @else
-                                    <span class="verification-badge verification-pending">Menunggu Verifikasi</span>
+                                    <span class="verification-badge verification-pending">
+                                        <span style="width:6px;height:6px;border-radius:50%;background:#f59e0b;display:inline-block;margin-right:4px"></span>
+                                        Menunggu Kajur
+                                    </span>
                                 @endif
                             </td>
                         </tr>
@@ -302,7 +311,7 @@
                 } elseif($return->return_condition === 'Rusak Berat') {
                     $conditionClass = 'mc-card--rejected';
                 }
-                $verifiedBadge = $return->checkin_by ? 'Terverifikasi' : 'Menunggu';
+                $verifiedBadge = $return->checkin_by ? 'Terverifikasi' : 'Menunggu Kajur';
                 $verifiedClass = $return->checkin_by ? 'mc-badge--returned' : 'mc-badge--pending';
             @endphp
             <div class="mc-card {{ $conditionClass }}">

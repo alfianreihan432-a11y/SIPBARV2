@@ -482,4 +482,50 @@ class RiwayatPeminjamanTest extends TestCase
         $this->assertEquals(7, $this->itemA->fresh()->stock); // 5 + 2
         $this->assertEquals(4, $this->itemB->fresh()->stock); // 3 + 1
     }
+
+    /**
+     * Riwayat guru menampilkan badge "Menunggu Kajur" saat checkin_by null dan "Terverifikasi" saat checkin_by terisi.
+     */
+    public function test_guru_history_displays_menunggu_kajur_and_terverifikasi_badges(): void
+    {
+        $kajur = User::factory()->create(['name' => 'Kajur PPLG Test']);
+        $kajur->assignRole('kepala_jurusan');
+
+        // Peminjaman 1: Menunggu verifikasi (checkin_by null)
+        BorrowingRequest::create([
+            'user_id' => $this->teacher->id,
+            'item_id' => $this->itemA->id,
+            'quantity' => 1,
+            'purpose' => 'Peminjaman Belum Verif Kajur',
+            'borrow_date' => now()->subDays(3)->toDateString(),
+            'return_date' => now()->subDay()->toDateString(),
+            'status' => BorrowingRequest::STATUS_RETURNED,
+            'returned_at' => now()->subDay(),
+            'checkin_by' => null,
+            'tipe_peminjam' => 'guru',
+        ]);
+
+        // Peminjaman 2: Sudah terverifikasi (checkin_by terisi ID kajur)
+        BorrowingRequest::create([
+            'user_id' => $this->teacher->id,
+            'item_id' => $this->itemB->id,
+            'quantity' => 1,
+            'purpose' => 'Peminjaman Sudah Verif Kajur',
+            'borrow_date' => now()->subDays(4)->toDateString(),
+            'return_date' => now()->subDays(2)->toDateString(),
+            'status' => BorrowingRequest::STATUS_RETURNED,
+            'returned_at' => now()->subDays(2),
+            'checkin_by' => $kajur->id,
+            'tipe_peminjam' => 'guru',
+        ]);
+
+        $response = $this->actingAs($this->teacher)->get(route('teacher.pengembalian-guru.history'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Proyektor Epson EB-X400');
+        $response->assertSee('Kamera DSLR Canon EOS');
+        $response->assertSeeInOrder(['Proyektor Epson EB-X400', 'Menunggu Kajur']);
+        $response->assertSeeInOrder(['Kamera DSLR Canon EOS', 'Terverifikasi']);
+    }
 }
+
