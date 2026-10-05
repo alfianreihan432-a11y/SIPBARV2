@@ -123,17 +123,20 @@ class AdminReturnController extends Controller
 
                 // 2. Update status BorrowingRequest -> returned
                 $borrowing = $return->borrowingRequest;
+                $conditionMap = [
+                    'baik'         => 'Baik',
+                    'rusak_ringan' => 'Rusak Ringan',
+                    'rusak_berat'  => 'Rusak Berat',
+                    'hilang'       => 'Hilang',
+                ];
+                $kondisi = strtolower($return->kondisi_barang ?? 'baik');
+                $returnCondition = $conditionMap[$kondisi] ?? ($return->kondisi_barang ?? 'Baik');
+
                 $borrowing->update([
                     'status'           => BorrowingRequest::STATUS_RETURNED,
-                    'returned_at'      => $now,
-                    'return_condition' => match($return->kondisi_barang) {
-                        'baik'         => 'good',
-                        'rusak_ringan' => 'damaged',
-                        'rusak_berat'  => 'damaged',
-                        'hilang'       => 'lost',
-                        default        => 'good'
-                    },
-                    'return_notes'     => $return->catatan,
+                    'returned_at'      => $borrowing->returned_at ?? $now,
+                    'return_condition' => $returnCondition,
+                    'return_notes'     => $return->catatan ?? $borrowing->return_notes,
                     'checkin_by'       => $adminId,
                 ]);
 
