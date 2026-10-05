@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\BorrowingRequest;
 use App\Models\Item;
+use Illuminate\Support\Facades\DB;
 
 /**
  * ReturnStockService
@@ -19,21 +20,32 @@ use App\Models\Item;
  *  - baik         : stok dikembalikan (increment sesuai quantity).
  *  - rusak_ringan : stok dikembalikan (unit masih bisa dipakai meski kondisinya berkurang).
  *
- * Setelah setiap perubahan stok, recalculateStatus() dipanggil agar kolom `status`
- * item master (Tersedia/Dipinjam) mengikuti jumlah stok secara akurat.
- * recalculateStatus() TIDAK pernah mengubah status menjadi 'Hilang' atau 'Rusak' —
- * ia hanya memilih antara 'Tersedia' (stock > 0) dan 'Dipinjam' (stock = 0),
- * sehingga status master mencerminkan ketersediaan unit yang masih ada, bukan
- * kondisi unit yang sudah hilang/rusak.
+ * Aturan status master item:
+ *  - Stok > 0  : 'Tersedia'
+ *  - Stok <= 0 :
+ *      - Jika masih ada peminjaman aktif (approved / borrowed / overdue) -> 'Dipinjam'
+ *      - Jika tidak ada peminjaman aktif -> 'Hilang' (jika kondisi hilang) atau 'Rusak' (jika rusak berat)
+ *  - Status 'Maintenance' tidak diubah otomatis.
  *
- * CATATAN DESAIN — kolom `condition` master item:
- * Kode ini TIDAK mengubah kolom `condition` master item secara diam-diam.
- * Perubahan condition (misalnya mencatat 'Rusak Ringan') sebaiknya dilakukan
- * melalui proses inspeksi/maintenance manual oleh admin, bukan otomatis saat
- * pengembalian, karena satu barang bisa memiliki banyak unit dengan kondisi berbeda.
+ * Aturan kolom `condition` master item:
+ *  - Keputusan desain lama yang disengaja: saat kondisi 'rusak_ringan', kolom `condition`
+ *    pada master item diperbarui menjadi 'Rusak Ringan'.
+ *  - Kondisi 'hilang' dan 'rusak_berat' TIDAK mengubah kolom `condition` master.
  */
 class ReturnStockService
 {
+    /**
+     * Cek apakah peminjaman memiliki lebih dari satu jenis item (multi-item).
+     */
+    public function isMultiItem(BorrowingRequest $borrowing): bool
+    {
+        $count = $borrowing->relationLoaded('items')
+            ? $borrowing->items->count()
+            : $borrowing->items()->count();
+
+        return $count > 1;
+    }
+
     /**
      * Terapkan perubahan stok pada semua item dalam satu BorrowingRequest
      * berdasarkan kondisi pengembalian.
@@ -62,10 +74,10 @@ class ReturnStockService
     {
         match (true) {
             // Hilang: unit tidak kembali ke stok tersedia sama sekali
-            in_array($kondisi, ['hilang', 'lost']) => $this->handleHilang($item),
+            in_array($kondisi, ['hilang', 'lost']) => $this->handleHilang($item, $kondisi),
 
             // Rusak Berat: unit dikembalikan secara fisik tapi tidak dapat dipakai lagi
-            in_array($kondisi, ['rusak_berat', 'rusak berat']) => $this->handleRusakBerat($item),
+            in_array($kondisi, ['rusak_berat', 'rusak berat']) => $this->handleRusakBerat($item, $kondisi),
 
             // Baik atau Rusak Ringan: unit kembali ke inventaris (masih bisa dipakai)
             default => $this->handleKembali($item, $qty, $kondisi),
@@ -77,43 +89,108 @@ class ReturnStockService
     // -----------------------------------------------------------------------
 
     /**
-     * Unit hilang: stok master TIDAK bertambah, status direkalkukasi.
-     * Tidak menyentuh kolom `condition` — dicatat hanya melalui ItemReturn.
+     * Unit hilang: stok master TIDAK bertambah.
+     * Kolom condition TIDAK diubah.
+     * Status disinkronkan (jika stok 0 & tidak ada pinjaman aktif -> 'Hilang').
      */
-    private function handleHilang(Item $item): void
+    private function handleHilang(Item $item, string $kondisi): void
     {
         // Tidak ada increment stok — unit dianggap hilang permanen
-        $item->recalculateStatus();
+        $this->syncItemStatus($item, $kondisi);
     }
 
     /**
      * Unit rusak berat: stok master TIDAK dikembalikan ke inventaris.
-     * Unit fisik ada tapi tidak layak pakai. Status direkalkukasi.
-     * Tidak menyentuh kolom `condition` — kondisi master harus diperbarui
-     * secara manual oleh admin melalui halaman manajemen inventaris.
+     * Kolom condition TIDAK diubah otomatis.
+     * Status disinkronkan (jika stok 0 & tidak ada pinjaman aktif -> 'Rusak').
      */
-    private function handleRusakBerat(Item $item): void
+    private function handleRusakBerat(Item $item, string $kondisi): void
     {
         // Tidak ada increment stok — unit rusak berat tidak masuk stok tersedia
-        $item->recalculateStatus();
+        $this->syncItemStatus($item, $kondisi);
     }
 
     /**
      * Unit baik atau rusak ringan: stok dikembalikan.
-     * Status master direkalkukasi setelah increment.
      *
-     * CATATAN: Kolom `condition` master item TIDAK diubah secara otomatis
-     * untuk kondisi 'rusak_ringan'. Alasan: satu item master bisa punya banyak
-     * unit; mencatat 'Rusak Ringan' di level master saat satu unit kembali rusak
-     * ringan adalah menyesatkan. Kondisi sebaiknya diperbarui manual via admin.
-     * Informasi kondisi pengembalian sudah tersimpan di kolom ItemReturn.kondisi_barang
-     * dan BorrowingRequest.return_condition.
+     * CATATAN DESAIN: Keputusan desain lama yang disengaja:
+     * Saat unit dikembalikan dengan kondisi 'rusak_ringan', kolom `condition` pada
+     * master item diperbarui menjadi 'Rusak Ringan'.
      */
     private function handleKembali(Item $item, int $qty, string $kondisi): void
     {
         $item->increment('stock', $qty);
-        // Setelah stok bertambah, status master mungkin berubah dari 'Dipinjam' → 'Tersedia'
-        $item->recalculateStatus();
+
+        // Keputusan desain lama: perbarui condition master saat rusak ringan
+        if (in_array($kondisi, ['rusak_ringan', 'rusak ringan'])) {
+            $item->condition = 'Rusak Ringan';
+            $item->saveQuietly();
+        }
+
+        $this->syncItemStatus($item, $kondisi);
+    }
+
+    /**
+     * Sinkronisasi status master item berdasarkan jumlah stok dan pinjaman aktif.
+     *
+     * Logika:
+     * - Status 'Maintenance' tidak diubah.
+     * - Stok > 0 -> 'Tersedia'
+     * - Stok <= 0:
+     *     - Ada pinjaman aktif -> 'Dipinjam'
+     *     - Tidak ada pinjaman aktif:
+     *         - 'hilang' -> 'Hilang'
+     *         - 'rusak_berat' / 'rusak' -> 'Rusak'
+     *         - Default -> 'Dipinjam'
+     */
+    public function syncItemStatus(Item $item, string $kondisi = 'baik'): void
+    {
+        // Refresh instance untuk mendapatkan nilai stok terbaru dari DB
+        $item->refresh();
+
+        if ($item->status === 'Maintenance') {
+            return;
+        }
+
+        if ($item->stock > 0) {
+            $item->status = 'Tersedia';
+            $item->saveQuietly();
+            return;
+        }
+
+        // Stok <= 0: Cek apakah masih ada peminjaman aktif untuk item ini
+        $hasActiveBorrowing = DB::table('borrowing_request_items')
+            ->join('borrowing_requests', 'borrowing_requests.id', '=', 'borrowing_request_items.borrowing_request_id')
+            ->where('borrowing_request_items.item_id', $item->id)
+            ->whereIn('borrowing_requests.status', [
+                BorrowingRequest::STATUS_APPROVED,
+                BorrowingRequest::STATUS_BORROWED,
+                BorrowingRequest::STATUS_OVERDUE,
+            ])
+            ->exists();
+
+        if (!$hasActiveBorrowing) {
+            // Cek juga fallback untuk borrowing_requests legacy tanpa detail borrowing_request_items
+            $hasActiveBorrowing = BorrowingRequest::where('item_id', $item->id)
+                ->whereIn('status', [
+                    BorrowingRequest::STATUS_APPROVED,
+                    BorrowingRequest::STATUS_BORROWED,
+                    BorrowingRequest::STATUS_OVERDUE,
+                ])
+                ->exists();
+        }
+
+        if ($hasActiveBorrowing) {
+            $item->status = 'Dipinjam';
+        } else {
+            $item->status = match (true) {
+                in_array($kondisi, ['hilang', 'lost'])                      => 'Hilang',
+                in_array($kondisi, ['rusak_berat', 'rusak berat', 'rusak']) => 'Rusak',
+                default                                                    => 'Dipinjam',
+            };
+        }
+
+        $item->saveQuietly();
     }
 
     // -----------------------------------------------------------------------
@@ -153,3 +230,4 @@ class ReturnStockService
         return $result;
     }
 }
+

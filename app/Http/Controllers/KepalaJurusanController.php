@@ -404,12 +404,19 @@ class KepalaJurusanController extends Controller
         ];
         $kondisiInternal = $conditionEnumMap[$validated['verified_condition']] ?? 'baik';
 
+        $returnStockService = app(\App\Services\ReturnStockService::class);
+
+        // Guard: Multi-item dengan kondisi hilang atau rusak berat memerlukan penanganan manual per barang
+        if ($returnStockService->isMultiItem($borrowing) && in_array($kondisiInternal, ['hilang', 'rusak_berat', 'lost', 'rusak berat'])) {
+            return redirect()->back()->with('error', 'Pengembalian multi-item dengan kondisi rusak berat atau hilang memerlukan penanganan manual per barang.');
+        }
+
         // Tangkap ringkasan nama barang sebelum transaction
         // itemSummary() menangani single-item maupun multi-item dengan benar
         $itemSummary = $borrowing->itemSummary();
 
         // ── DB::transaction hanya untuk operasi DB ─────────────────────────
-        \Illuminate\Support\Facades\DB::transaction(function () use ($itemReturn, $borrowing, $validated, $kondisiInternal, $kajurId, $itemSummary) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($itemReturn, $borrowing, $validated, $kondisiInternal, $kajurId, $itemSummary, $returnStockService) {
             $now = now();
 
             // 1. Update status ItemReturn
@@ -433,7 +440,7 @@ class KepalaJurusanController extends Controller
             // 3. Terapkan perubahan stok via ReturnStockService.
             //    Single-item dan multi-item menggunakan jalur kode yang sama
             //    melalui collectItemsWithQuantities() — tidak ada duplikasi blok.
-            app(ReturnStockService::class)->applyStockForReturn($borrowing, $kondisiInternal);
+            $returnStockService->applyStockForReturn($borrowing, $kondisiInternal);
 
             // 4. Notifikasi in-app ke guru
             //    Menggunakan $itemSummary agar multi-item tampil dengan nama barang yang benar.

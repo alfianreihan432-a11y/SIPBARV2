@@ -529,228 +529,7 @@ class RiwayatPeminjamanTest extends TestCase
     }
 
     /**
-     * AdminReturnController::approve pada multi-item:
-     * - Kondisi 'hilang': stok TIDAK bertambah, status item 'Hilang', condition 'Hilang'
-     * - Kondisi 'rusak_berat': stok bertambah, status item 'Rusak', condition 'Rusak Berat'
-     * - Kondisi 'rusak_ringan': stok bertambah, condition 'Rusak Ringan'
-     */
-    public function test_admin_approve_multi_item_conditions_hilang_rusak_berat_and_rusak_ringan(): void
-    {
-        // ──────────────────────────────────────────────────────────────────────
-        // PERILAKU BARU (setelah ReturnStockService):
-        //
-        // hilang    → stok TIDAK dikembalikan; recalculateStatus() dipanggil.
-        //             status master = 'Tersedia' jika stok > 0, 'Dipinjam' jika stok = 0.
-        //             condition master TIDAK diubah secara otomatis.
-        //
-        // rusak_berat → stok TIDAK dikembalikan; recalculateStatus() dipanggil.
-        //               status master = 'Tersedia'/'Dipinjam' berdasarkan stok.
-        //               condition master TIDAK diubah secara otomatis.
-        //
-        // rusak_ringan / baik → stok DIKEMBALIKAN (increment); recalculateStatus().
-        // ──────────────────────────────────────────────────────────────────────
-
-        // 1. Kondisi Hilang — itemA stock=5, dipinjam 2 unit
-        //    Harapan: stok tetap 5 (tidak bertambah), status recalculate→Tersedia (stok>0),
-        //             condition tetap 'Baik' (tidak diubah otomatis)
-        $this->itemA->update(['stock' => 5, 'status' => 'Dipinjam', 'condition' => 'Baik']);
-        $reqHilang = BorrowingRequest::create([
-            'user_id'        => $this->studentA->id,
-            'quantity'       => 2,
-            'borrow_date'    => now()->subDays(2)->toDateString(),
-            'return_date'    => now()->toDateString(),
-            'status'         => BorrowingRequest::STATUS_BORROWED,
-            'tipe_peminjam'  => 'siswa',
-        ]);
-        BorrowingRequestItem::create([
-            'borrowing_request_id' => $reqHilang->id,
-            'item_id'              => $this->itemA->id,
-            'quantity'             => 2,
-        ]);
-        $retHilang = ItemReturn::create([
-            'borrowing_request_id' => $reqHilang->id,
-            'user_id'              => $this->studentA->id,
-            'tipe_peminjam'        => 'siswa',
-            'kondisi_barang'       => 'hilang',
-            'status'               => ItemReturn::STATUS_MENUNGGU,
-        ]);
-
-        $this->actingAs($this->admin)->post(route('admin.returns.approve', $retHilang->id));
-        $freshA = $this->itemA->fresh();
-        $this->assertEquals(5, $freshA->stock);         // Stok TIDAK bertambah
-        $this->assertEquals('Tersedia', $freshA->status); // recalculateStatus: stok 5 > 0 → Tersedia
-        $this->assertEquals('Baik', $freshA->condition);  // Condition TIDAK diubah otomatis
-
-        // 2. Kondisi Rusak Berat — itemB stock=3, dipinjam 1 unit
-        //    Harapan: stok tetap 3 (tidak bertambah), status recalculate→Tersedia,
-        //             condition tetap 'Baik'
-        $this->itemB->update(['stock' => 3, 'status' => 'Dipinjam', 'condition' => 'Baik']);
-        $reqRusakBerat = BorrowingRequest::create([
-            'user_id'       => $this->studentA->id,
-            'quantity'      => 1,
-            'borrow_date'   => now()->subDays(2)->toDateString(),
-            'return_date'   => now()->toDateString(),
-            'status'        => BorrowingRequest::STATUS_BORROWED,
-            'tipe_peminjam' => 'siswa',
-        ]);
-        BorrowingRequestItem::create([
-            'borrowing_request_id' => $reqRusakBerat->id,
-            'item_id'              => $this->itemB->id,
-            'quantity'             => 1,
-        ]);
-        $retRusakBerat = ItemReturn::create([
-            'borrowing_request_id' => $reqRusakBerat->id,
-            'user_id'              => $this->studentA->id,
-            'tipe_peminjam'        => 'siswa',
-            'kondisi_barang'       => 'rusak_berat',
-            'status'               => ItemReturn::STATUS_MENUNGGU,
-        ]);
-
-        $this->actingAs($this->admin)->post(route('admin.returns.approve', $retRusakBerat->id));
-        $freshB = $this->itemB->fresh();
-        $this->assertEquals(3, $freshB->stock);          // Stok TIDAK bertambah
-        $this->assertEquals('Tersedia', $freshB->status); // recalculateStatus: stok 3 > 0 → Tersedia
-        $this->assertEquals('Baik', $freshB->condition);  // Condition TIDAK diubah otomatis
-    }
-
-    /**
-     * AdminReturnController::approve dua kali tidak menambah stok dua kali.
-     */
-    public function test_admin_approve_twice_does_not_increment_stock_twice(): void
-    {
-        $this->itemA->update(['stock' => 5]);
-
-        $req = BorrowingRequest::create([
-            'user_id' => $this->studentA->id,
-            'quantity' => 2,
-            'borrow_date' => now()->subDays(2)->toDateString(),
-            'return_date' => now()->toDateString(),
-            'status' => BorrowingRequest::STATUS_BORROWED,
-            'tipe_peminjam' => 'siswa',
-        ]);
-        BorrowingRequestItem::create([
-            'borrowing_request_id' => $req->id,
-            'item_id' => $this->itemA->id,
-            'quantity' => 2,
-        ]);
-        $ret = ItemReturn::create([
-            'borrowing_request_id' => $req->id,
-            'user_id' => $this->studentA->id,
-            'tipe_peminjam' => 'siswa',
-            'kondisi_barang' => 'baik',
-            'status' => ItemReturn::STATUS_MENUNGGU,
-        ]);
-
-        // First approve
-        $res1 = $this->actingAs($this->admin)->post(route('admin.returns.approve', $ret->id));
-        $res1->assertSessionHas('success');
-        $this->assertEquals(7, $this->itemA->fresh()->stock); // 5 + 2 = 7
-
-        // Second approve attempt on already approved return
-        $res2 = $this->actingAs($this->admin)->post(route('admin.returns.approve', $ret->id));
-        $res2->assertSessionHas('error');
-        $this->assertEquals(7, $this->itemA->fresh()->stock); // Tetap 7, tidak menjadi 9
-    }
-
-    /**
-     * KepalaJurusanController::verifyReturn pada multi-item kondisi Hilang, Rusak Berat, Rusak Ringan dan proteksi double verify.
-     */
-    public function test_kajur_verify_multi_item_conditions_and_double_verify_protection(): void
-    {
-        $kajur = User::factory()->create(['name' => 'Kajur Multi Test']);
-        $kajur->assignRole('kepala_jurusan');
-
-        // ──────────────────────────────────────────────────────────────────────
-        // PERILAKU BARU (ReturnStockService):
-        // hilang    → stok tidak bertambah; recalculateStatus → Tersedia jika stok>0
-        // rusak_berat → stok tidak bertambah; recalculateStatus → Tersedia jika stok>0
-        // condition TIDAK diubah otomatis pada kolom master item
-        // ──────────────────────────────────────────────────────────────────────
-
-        // 1. Kondisi Hilang — itemA stock=4, dipinjam 2 unit
-        //    Harapan: stok tetap 4, status→Tersedia (4>0), condition tetap 'Baik'
-        $this->itemA->update(['stock' => 4, 'status' => 'Dipinjam', 'condition' => 'Baik']);
-        $reqHilang = BorrowingRequest::create([
-            'user_id'              => $this->teacher->id,
-            'quantity'             => 2,
-            'borrow_date'          => now()->subDays(3)->toDateString(),
-            'return_date'          => now()->toDateString(),
-            'status'               => BorrowingRequest::STATUS_RETURNED,
-            'approved_by_kajur_id' => $kajur->id,
-            'tipe_peminjam'        => 'guru',
-        ]);
-        BorrowingRequestItem::create([
-            'borrowing_request_id' => $reqHilang->id,
-            'item_id'              => $this->itemA->id,
-            'quantity'             => 2,
-        ]);
-        $retHilang = ItemReturn::create([
-            'borrowing_request_id' => $reqHilang->id,
-            'user_id'              => $this->teacher->id,
-            'kajur_id'             => $kajur->id,
-            'tipe_peminjam'        => 'guru',
-            'kondisi_barang'       => 'hilang',
-            'status'               => ItemReturn::STATUS_MENUNGGU,
-        ]);
-
-        $this->actingAs($kajur)->post(route('kajur.verify-return', $retHilang->id), [
-            'verified_condition' => 'Hilang',
-            'verified_notes'     => 'Barang hilang saat praktikum',
-        ]);
-
-        $freshA = $this->itemA->fresh();
-        $this->assertEquals(4, $freshA->stock);          // Stok TIDAK bertambah
-        $this->assertEquals('Tersedia', $freshA->status); // recalculateStatus: stok 4 > 0
-        $this->assertEquals('Baik', $freshA->condition);  // Condition TIDAK diubah otomatis
-
-        // 2. Kondisi Rusak Berat — itemB stock=2, dipinjam 1 unit & Double Verify
-        //    First verify: stok tetap 2 (tidak bertambah), status→Tersedia
-        //    Second verify: ditolak, stok tetap 2
-        $this->itemB->update(['stock' => 2, 'status' => 'Dipinjam', 'condition' => 'Baik']);
-        $reqRusak = BorrowingRequest::create([
-            'user_id'              => $this->teacher->id,
-            'quantity'             => 1,
-            'borrow_date'          => now()->subDays(3)->toDateString(),
-            'return_date'          => now()->toDateString(),
-            'status'               => BorrowingRequest::STATUS_RETURNED,
-            'approved_by_kajur_id' => $kajur->id,
-            'tipe_peminjam'        => 'guru',
-        ]);
-        BorrowingRequestItem::create([
-            'borrowing_request_id' => $reqRusak->id,
-            'item_id'              => $this->itemB->id,
-            'quantity'             => 1,
-        ]);
-        $retRusak = ItemReturn::create([
-            'borrowing_request_id' => $reqRusak->id,
-            'user_id'              => $this->teacher->id,
-            'kajur_id'             => $kajur->id,
-            'tipe_peminjam'        => 'guru',
-            'kondisi_barang'       => 'rusak_berat',
-            'status'               => ItemReturn::STATUS_MENUNGGU,
-        ]);
-
-        // First verify
-        $res1 = $this->actingAs($kajur)->post(route('kajur.verify-return', $retRusak->id), [
-            'verified_condition' => 'Rusak Berat',
-            'verified_notes'     => 'Layar LCD pecah',
-        ]);
-        $res1->assertSessionHas('success');
-        $freshB = $this->itemB->fresh();
-        $this->assertEquals(2, $freshB->stock);           // Stok TIDAK bertambah (rusak berat)
-        $this->assertEquals('Tersedia', $freshB->status); // recalculateStatus: stok 2 > 0
-        $this->assertEquals('Baik', $freshB->condition);  // Condition TIDAK diubah otomatis
-
-        // Second verify attempt — harus ditolak, stok tidak berubah
-        $res2 = $this->actingAs($kajur)->post(route('kajur.verify-return', $retRusak->id), [
-            'verified_condition' => 'Rusak Berat',
-        ]);
-        $res2->assertSessionHas('error');
-        $this->assertEquals(2, $this->itemB->fresh()->stock); // Tetap 2
-    }
-
-    /**
-     * Admin approve single-item 'baik' -> stok bertambah, status 'Tersedia'.
+     * AdminReturnController::approve single-item 'baik' -> stok bertambah, status 'Tersedia'.
      */
     public function test_admin_approve_single_item_baik_increments_stock(): void
     {
@@ -787,7 +566,46 @@ class RiwayatPeminjamanTest extends TestCase
     }
 
     /**
-     * Admin approve single-item 'hilang' -> stok TIDAK bertambah.
+     * AdminReturnController::approve single-item 'rusak_ringan' -> stok bertambah,
+     * status 'Tersedia', dan kolom condition master diperbarui menjadi 'Rusak Ringan'.
+     */
+    public function test_admin_approve_single_item_rusak_ringan_increments_stock_and_updates_condition(): void
+    {
+        $this->itemA->update(['stock' => 1, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+
+        $req = BorrowingRequest::create([
+            'user_id'       => $this->studentA->id,
+            'item_id'       => $this->itemA->id,
+            'quantity'      => 1,
+            'borrow_date'   => now()->subDays(3)->toDateString(),
+            'return_date'   => now()->toDateString(),
+            'status'        => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        $itemReturn = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->studentA->id,
+            'kondisi_barang'       => 'rusak_ringan',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam'        => 'siswa',
+        ]);
+
+        $res = $this->actingAs($this->admin)->post(route('admin.returns.approve', $itemReturn->id), [
+            'kondisi' => 'rusak_ringan',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('success');
+
+        $fresh = $this->itemA->fresh();
+        $this->assertEquals(2, $fresh->stock); // 1 + 1 = 2
+        $this->assertEquals('Tersedia', $fresh->status);
+        $this->assertEquals('Rusak Ringan', $fresh->condition); // Perilaku lama: diperbarui jadi Rusak Ringan
+    }
+
+    /**
+     * AdminReturnController::approve single-item 'hilang' (stok > 0) -> stok TIDAK bertambah,
+     * status tetap 'Tersedia', condition tidak berubah.
      */
     public function test_admin_approve_single_item_hilang_does_not_increment_stock(): void
     {
@@ -824,11 +642,50 @@ class RiwayatPeminjamanTest extends TestCase
     }
 
     /**
-     * Admin approve single-item 'rusak_ringan' -> stok bertambah, condition tidak berubah otomatis.
+     * AdminReturnController::approve single-item 'rusak_berat' (stok > 0) -> stok TIDAK bertambah,
+     * status tetap 'Tersedia', condition tidak berubah.
      */
-    public function test_admin_approve_single_item_rusak_ringan_increments_stock_no_condition_change(): void
+    public function test_admin_approve_single_item_rusak_berat_does_not_increment_stock(): void
     {
-        $this->itemA->update(['stock' => 1, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+        $this->itemB->update(['stock' => 4, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+
+        $req = BorrowingRequest::create([
+            'user_id'       => $this->studentA->id,
+            'item_id'       => $this->itemB->id,
+            'quantity'      => 1,
+            'borrow_date'   => now()->subDays(3)->toDateString(),
+            'return_date'   => now()->toDateString(),
+            'status'        => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        $itemReturn = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->studentA->id,
+            'kondisi_barang'       => 'rusak_berat',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam'        => 'siswa',
+        ]);
+
+        $res = $this->actingAs($this->admin)->post(route('admin.returns.approve', $itemReturn->id), [
+            'kondisi' => 'rusak_berat',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('success');
+
+        $fresh = $this->itemB->fresh();
+        $this->assertEquals(4, $fresh->stock); // Stok tidak bertambah
+        $this->assertEquals('Tersedia', $fresh->status);
+        $this->assertEquals('Baik', $fresh->condition);
+    }
+
+    /**
+     * AdminReturnController::approve single-item 'hilang' saat stok 0 dan TIDAK ada pinjaman aktif lain
+     * -> status master item menjadi 'Hilang'.
+     */
+    public function test_admin_approve_single_item_hilang_stock_zero_without_active_loans_sets_status_hilang(): void
+    {
+        $this->itemA->update(['stock' => 0, 'status' => 'Dipinjam', 'condition' => 'Baik']);
 
         $req = BorrowingRequest::create([
             'user_id'       => $this->studentA->id,
@@ -839,6 +696,129 @@ class RiwayatPeminjamanTest extends TestCase
             'status'        => BorrowingRequest::STATUS_BORROWED,
             'tipe_peminjam' => 'siswa',
         ]);
+
+        $itemReturn = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->studentA->id,
+            'kondisi_barang'       => 'hilang',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam'        => 'siswa',
+        ]);
+
+        $res = $this->actingAs($this->admin)->post(route('admin.returns.approve', $itemReturn->id), [
+            'kondisi' => 'hilang',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('success');
+
+        $fresh = $this->itemA->fresh();
+        $this->assertEquals(0, $fresh->stock);
+        $this->assertEquals('Hilang', $fresh->status); // Aturan baru: stok 0 tanpa pinjaman aktif -> Hilang
+    }
+
+    /**
+     * AdminReturnController::approve single-item 'hilang' saat stok 0 tetapi MASIH ADA pinjaman aktif lain
+     * -> status master item tetap 'Dipinjam'.
+     */
+    public function test_admin_approve_single_item_hilang_stock_zero_with_active_loans_sets_status_dipinjam(): void
+    {
+        $this->itemA->update(['stock' => 0, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+
+        // Peminjaman lain yang masih aktif
+        BorrowingRequest::create([
+            'user_id'       => $this->studentB->id,
+            'item_id'       => $this->itemA->id,
+            'quantity'      => 1,
+            'borrow_date'   => now()->subDays(1)->toDateString(),
+            'return_date'   => now()->addDays(2)->toDateString(),
+            'status'        => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        $req = BorrowingRequest::create([
+            'user_id'       => $this->studentA->id,
+            'item_id'       => $this->itemA->id,
+            'quantity'      => 1,
+            'borrow_date'   => now()->subDays(3)->toDateString(),
+            'return_date'   => now()->toDateString(),
+            'status'        => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        $itemReturn = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->studentA->id,
+            'kondisi_barang'       => 'hilang',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam'        => 'siswa',
+        ]);
+
+        $res = $this->actingAs($this->admin)->post(route('admin.returns.approve', $itemReturn->id), [
+            'kondisi' => 'hilang',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('success');
+
+        $fresh = $this->itemA->fresh();
+        $this->assertEquals(0, $fresh->stock);
+        $this->assertEquals('Dipinjam', $fresh->status); // Masih ada active loans -> Dipinjam
+    }
+
+    /**
+     * AdminReturnController::approve single-item 'rusak_berat' saat stok 0 dan TIDAK ada pinjaman aktif lain
+     * -> status master item menjadi 'Rusak'.
+     */
+    public function test_admin_approve_single_item_rusak_berat_stock_zero_without_active_loans_sets_status_rusak(): void
+    {
+        $this->itemB->update(['stock' => 0, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+
+        $req = BorrowingRequest::create([
+            'user_id'       => $this->studentA->id,
+            'item_id'       => $this->itemB->id,
+            'quantity'      => 1,
+            'borrow_date'   => now()->subDays(3)->toDateString(),
+            'return_date'   => now()->toDateString(),
+            'status'        => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        $itemReturn = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->studentA->id,
+            'kondisi_barang'       => 'rusak_berat',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam'        => 'siswa',
+        ]);
+
+        $res = $this->actingAs($this->admin)->post(route('admin.returns.approve', $itemReturn->id), [
+            'kondisi' => 'rusak_berat',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('success');
+
+        $fresh = $this->itemB->fresh();
+        $this->assertEquals(0, $fresh->stock);
+        $this->assertEquals('Rusak', $fresh->status); // Aturan baru: stok 0 tanpa pinjaman aktif -> Rusak
+    }
+
+    /**
+     * Multi-item: kondisi 'baik' dan 'rusak_ringan' menambah stok tiap item secara normal.
+     */
+    public function test_admin_approve_multi_item_baik_and_rusak_ringan_increments_stock(): void
+    {
+        $this->itemA->update(['stock' => 2, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+        $this->itemB->update(['stock' => 3, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+
+        $req = BorrowingRequest::create([
+            'user_id'       => $this->studentA->id,
+            'quantity'      => 3,
+            'borrow_date'   => now()->subDays(3)->toDateString(),
+            'return_date'   => now()->toDateString(),
+            'status'        => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+        BorrowingRequestItem::create(['borrowing_request_id' => $req->id, 'item_id' => $this->itemA->id, 'quantity' => 2]);
+        BorrowingRequestItem::create(['borrowing_request_id' => $req->id, 'item_id' => $this->itemB->id, 'quantity' => 1]);
 
         $itemReturn = ItemReturn::create([
             'borrowing_request_id' => $req->id,
@@ -854,10 +834,303 @@ class RiwayatPeminjamanTest extends TestCase
         $res->assertRedirect();
         $res->assertSessionHas('success');
 
+        $freshA = $this->itemA->fresh();
+        $freshB = $this->itemB->fresh();
+        $this->assertEquals(4, $freshA->stock); // 2 + 2 = 4
+        $this->assertEquals(4, $freshB->stock); // 3 + 1 = 4
+        $this->assertEquals('Tersedia', $freshA->status);
+        $this->assertEquals('Tersedia', $freshB->status);
+        $this->assertEquals('Rusak Ringan', $freshA->condition);
+        $this->assertEquals('Rusak Ringan', $freshB->condition);
+    }
+
+    /**
+     * Multi-item: kondisi 'hilang' atau 'rusak_berat' DITOLAK oleh Admin untuk penanganan manual.
+     * Status return tetap 'menunggu', stok dan status item tidak berubah.
+     */
+    public function test_admin_approve_multi_item_hilang_or_rusak_berat_rejected_for_manual_handling(): void
+    {
+        $this->itemA->update(['stock' => 5, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+        $this->itemB->update(['stock' => 2, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+
+        $req = BorrowingRequest::create([
+            'user_id'       => $this->studentA->id,
+            'quantity'      => 2,
+            'borrow_date'   => now()->subDays(3)->toDateString(),
+            'return_date'   => now()->toDateString(),
+            'status'        => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+        BorrowingRequestItem::create(['borrowing_request_id' => $req->id, 'item_id' => $this->itemA->id, 'quantity' => 1]);
+        BorrowingRequestItem::create(['borrowing_request_id' => $req->id, 'item_id' => $this->itemB->id, 'quantity' => 1]);
+
+        $itemReturn = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->studentA->id,
+            'kondisi_barang'       => 'hilang',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam'        => 'siswa',
+        ]);
+
+        $res = $this->actingAs($this->admin)->post(route('admin.returns.approve', $itemReturn->id), [
+            'kondisi' => 'hilang',
+        ]);
+        $res->assertSessionHas('error');
+
+        // Status return tetap 'menunggu'
+        $this->assertEquals(ItemReturn::STATUS_MENUNGGU, $itemReturn->fresh()->status);
+        // Status borrowing tetap 'borrowed'
+        $this->assertEquals(BorrowingRequest::STATUS_BORROWED, $req->fresh()->status);
+        // Stok dan status item tidak berubah
+        $this->assertEquals(5, $this->itemA->fresh()->stock);
+        $this->assertEquals(2, $this->itemB->fresh()->stock);
+    }
+
+    /**
+     * AdminReturnController::approve dua kali tidak menambah stok dua kali.
+     */
+    public function test_admin_approve_twice_does_not_increment_stock_twice(): void
+    {
+        $this->itemA->update(['stock' => 5]);
+
+        $req = BorrowingRequest::create([
+            'user_id'       => $this->studentA->id,
+            'item_id'       => $this->itemA->id,
+            'quantity'      => 2,
+            'borrow_date'   => now()->subDays(2)->toDateString(),
+            'return_date'   => now()->toDateString(),
+            'status'        => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        $ret = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->studentA->id,
+            'tipe_peminjam'        => 'siswa',
+            'kondisi_barang'       => 'baik',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+        ]);
+
+        // First approve
+        $res1 = $this->actingAs($this->admin)->post(route('admin.returns.approve', $ret->id));
+        $res1->assertSessionHas('success');
+        $this->assertEquals(7, $this->itemA->fresh()->stock); // 5 + 2 = 7
+
+        // Second approve attempt on already approved return
+        $res2 = $this->actingAs($this->admin)->post(route('admin.returns.approve', $ret->id));
+        $res2->assertSessionHas('error');
+        $this->assertEquals(7, $this->itemA->fresh()->stock); // Tetap 7, tidak menjadi 9
+    }
+
+    /**
+     * KepalaJurusanController::verifyReturn single-item kondisi Baik & Rusak Ringan.
+     */
+    public function test_kajur_verify_single_item_baik_and_rusak_ringan(): void
+    {
+        $kajur = User::factory()->create(['name' => 'Kajur Single Test']);
+        $kajur->assignRole('kepala_jurusan');
+
+        $this->itemA->update(['stock' => 4, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+
+        $req = BorrowingRequest::create([
+            'user_id'              => $this->teacher->id,
+            'quantity'             => 1,
+            'borrow_date'          => now()->subDays(3)->toDateString(),
+            'return_date'          => now()->toDateString(),
+            'status'               => BorrowingRequest::STATUS_BORROWED,
+            'approved_by_kajur_id' => $kajur->id,
+            'tipe_peminjam'        => 'guru',
+        ]);
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $req->id,
+            'item_id'              => $this->itemA->id,
+            'quantity'             => 1,
+        ]);
+        $ret = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->teacher->id,
+            'kajur_id'             => $kajur->id,
+            'tipe_peminjam'        => 'guru',
+            'kondisi_barang'       => 'rusak_ringan',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+        ]);
+
+        $res = $this->actingAs($kajur)->post(route('kajur.verify-return', $ret->id), [
+            'verified_condition' => 'Rusak Ringan',
+            'verified_notes'     => 'Kabel sedikit terkelupas',
+        ]);
+        $res->assertSessionHas('success');
+
         $fresh = $this->itemA->fresh();
-        $this->assertEquals(2, $fresh->stock); // 1 + 1 = 2
+        $this->assertEquals(5, $fresh->stock); // 4 + 1 = 5
         $this->assertEquals('Tersedia', $fresh->status);
-        $this->assertEquals('Baik', $fresh->condition); // Tetap 'Baik'
+        $this->assertEquals('Rusak Ringan', $fresh->condition);
+    }
+
+    /**
+     * KepalaJurusanController::verifyReturn single-item kondisi Hilang & Rusak Berat (stok 0 tanpa pinjaman aktif).
+     */
+    public function test_kajur_verify_single_item_hilang_and_rusak_berat_sets_status_correctly(): void
+    {
+        $kajur = User::factory()->create(['name' => 'Kajur Status Test']);
+        $kajur->assignRole('kepala_jurusan');
+
+        // 1. Kondisi Hilang dengan stok 0 -> status master menjadi 'Hilang'
+        $this->itemA->update(['stock' => 0, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+        $reqHilang = BorrowingRequest::create([
+            'user_id'              => $this->teacher->id,
+            'quantity'             => 1,
+            'borrow_date'          => now()->subDays(3)->toDateString(),
+            'return_date'          => now()->toDateString(),
+            'status'               => BorrowingRequest::STATUS_BORROWED,
+            'approved_by_kajur_id' => $kajur->id,
+            'tipe_peminjam'        => 'guru',
+        ]);
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $reqHilang->id,
+            'item_id'              => $this->itemA->id,
+            'quantity'             => 1,
+        ]);
+        $retHilang = ItemReturn::create([
+            'borrowing_request_id' => $reqHilang->id,
+            'user_id'              => $this->teacher->id,
+            'kajur_id'             => $kajur->id,
+            'tipe_peminjam'        => 'guru',
+            'kondisi_barang'       => 'hilang',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+        ]);
+
+        $res1 = $this->actingAs($kajur)->post(route('kajur.verify-return', $retHilang->id), [
+            'verified_condition' => 'Hilang',
+            'verified_notes'     => 'Hilang',
+        ]);
+        $res1->assertSessionHas('success');
+
+        $freshA = $this->itemA->fresh();
+        $this->assertEquals(0, $freshA->stock);
+        $this->assertEquals('Hilang', $freshA->status);
+
+        // 2. Kondisi Rusak Berat dengan stok 0 -> status master menjadi 'Rusak'
+        $this->itemB->update(['stock' => 0, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+        $reqRusak = BorrowingRequest::create([
+            'user_id'              => $this->teacher->id,
+            'quantity'             => 1,
+            'borrow_date'          => now()->subDays(3)->toDateString(),
+            'return_date'          => now()->toDateString(),
+            'status'               => BorrowingRequest::STATUS_BORROWED,
+            'approved_by_kajur_id' => $kajur->id,
+            'tipe_peminjam'        => 'guru',
+        ]);
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $reqRusak->id,
+            'item_id'              => $this->itemB->id,
+            'quantity'             => 1,
+        ]);
+        $retRusak = ItemReturn::create([
+            'borrowing_request_id' => $reqRusak->id,
+            'user_id'              => $this->teacher->id,
+            'kajur_id'             => $kajur->id,
+            'tipe_peminjam'        => 'guru',
+            'kondisi_barang'       => 'rusak_berat',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+        ]);
+
+        $res2 = $this->actingAs($kajur)->post(route('kajur.verify-return', $retRusak->id), [
+            'verified_condition' => 'Rusak Berat',
+            'verified_notes'     => 'Patah total',
+        ]);
+        $res2->assertSessionHas('success');
+
+        $freshB = $this->itemB->fresh();
+        $this->assertEquals(0, $freshB->stock);
+        $this->assertEquals('Rusak', $freshB->status);
+    }
+
+    /**
+     * KepalaJurusanController::verifyReturn multi-item: kondisi 'hilang' atau 'rusak_berat' DITOLAK.
+     */
+    public function test_kajur_verify_multi_item_hilang_or_rusak_berat_rejected_for_manual_handling(): void
+    {
+        $kajur = User::factory()->create(['name' => 'Kajur Multi Reject Test']);
+        $kajur->assignRole('kepala_jurusan');
+
+        $this->itemA->update(['stock' => 3, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+        $this->itemB->update(['stock' => 2, 'status' => 'Dipinjam', 'condition' => 'Baik']);
+
+        $req = BorrowingRequest::create([
+            'user_id'              => $this->teacher->id,
+            'quantity'             => 2,
+            'borrow_date'          => now()->subDays(3)->toDateString(),
+            'return_date'          => now()->toDateString(),
+            'status'               => BorrowingRequest::STATUS_BORROWED,
+            'approved_by_kajur_id' => $kajur->id,
+            'tipe_peminjam'        => 'guru',
+        ]);
+        BorrowingRequestItem::create(['borrowing_request_id' => $req->id, 'item_id' => $this->itemA->id, 'quantity' => 1]);
+        BorrowingRequestItem::create(['borrowing_request_id' => $req->id, 'item_id' => $this->itemB->id, 'quantity' => 1]);
+
+        $itemReturn = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->teacher->id,
+            'kajur_id'             => $kajur->id,
+            'tipe_peminjam'        => 'guru',
+            'kondisi_barang'       => 'rusak_berat',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+        ]);
+
+        $res = $this->actingAs($kajur)->post(route('kajur.verify-return', $itemReturn->id), [
+            'verified_condition' => 'Rusak Berat',
+        ]);
+        $res->assertSessionHas('error');
+
+        $this->assertEquals(ItemReturn::STATUS_MENUNGGU, $itemReturn->fresh()->status);
+        $this->assertEquals(3, $this->itemA->fresh()->stock);
+        $this->assertEquals(2, $this->itemB->fresh()->stock);
+    }
+
+    /**
+     * KepalaJurusanController::verifyReturn proteksi verifikasi ganda.
+     */
+    public function test_kajur_verify_twice_does_not_increment_stock_twice(): void
+    {
+        $kajur = User::factory()->create(['name' => 'Kajur Double Test']);
+        $kajur->assignRole('kepala_jurusan');
+
+        $this->itemA->update(['stock' => 5]);
+
+        $req = BorrowingRequest::create([
+            'user_id'              => $this->teacher->id,
+            'quantity'             => 1,
+            'borrow_date'          => now()->subDays(2)->toDateString(),
+            'return_date'          => now()->toDateString(),
+            'status'               => BorrowingRequest::STATUS_BORROWED,
+            'approved_by_kajur_id' => $kajur->id,
+            'tipe_peminjam'        => 'guru',
+        ]);
+        BorrowingRequestItem::create(['borrowing_request_id' => $req->id, 'item_id' => $this->itemA->id, 'quantity' => 1]);
+
+        $ret = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->teacher->id,
+            'kajur_id'             => $kajur->id,
+            'tipe_peminjam'        => 'guru',
+            'kondisi_barang'       => 'baik',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+        ]);
+
+        // First verify
+        $res1 = $this->actingAs($kajur)->post(route('kajur.verify-return', $ret->id), [
+            'verified_condition' => 'Baik',
+        ]);
+        $res1->assertSessionHas('success');
+        $this->assertEquals(6, $this->itemA->fresh()->stock); // 5 + 1 = 6
+
+        // Second verify attempt
+        $res2 = $this->actingAs($kajur)->post(route('kajur.verify-return', $ret->id), [
+            'verified_condition' => 'Baik',
+        ]);
+        $res2->assertSessionHas('error');
+        $this->assertEquals(6, $this->itemA->fresh()->stock); // Tetap 6
     }
 
     /**
@@ -896,6 +1169,42 @@ class RiwayatPeminjamanTest extends TestCase
         // Pastikan kedua item bertambah stoknya
         $this->assertEquals(3, $this->itemA->fresh()->stock); // 2 + 1 = 3
         $this->assertEquals(4, $this->itemB->fresh()->stock); // 3 + 1 = 4
+    }
+
+    /**
+     * Notifikasi reject admin multi-item menggunakan itemSummary.
+     */
+    public function test_admin_reject_notification_uses_item_summary_for_multi_item(): void
+    {
+        $this->itemA->update(['stock' => 2, 'status' => 'Dipinjam', 'name' => 'Kabel LAN']);
+        $this->itemB->update(['stock' => 3, 'status' => 'Dipinjam', 'name' => 'Switch D-Link']);
+
+        $req = BorrowingRequest::create([
+            'user_id'       => $this->studentA->id,
+            'quantity'      => 2,
+            'borrow_date'   => now()->subDays(3)->toDateString(),
+            'return_date'   => now()->toDateString(),
+            'status'        => BorrowingRequest::STATUS_BORROWED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+        BorrowingRequestItem::create(['borrowing_request_id' => $req->id, 'item_id' => $this->itemA->id, 'quantity' => 1]);
+        BorrowingRequestItem::create(['borrowing_request_id' => $req->id, 'item_id' => $this->itemB->id, 'quantity' => 1]);
+
+        $itemReturn = ItemReturn::create([
+            'borrowing_request_id' => $req->id,
+            'user_id'              => $this->studentA->id,
+            'kondisi_barang'       => 'baik',
+            'status'               => ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam'        => 'siswa',
+        ]);
+
+        $res = $this->actingAs($this->admin)->post(route('admin.returns.reject', $itemReturn->id), [
+            'alasan_ditolak' => 'Barang fisik belum diterima di lab',
+        ]);
+        $res->assertRedirect();
+        $res->assertSessionHas('success');
+
+        $this->assertEquals(ItemReturn::STATUS_DITOLAK, $itemReturn->fresh()->status);
     }
 }
 

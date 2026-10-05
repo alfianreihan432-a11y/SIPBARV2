@@ -121,11 +121,18 @@ class AdminReturnController extends Controller
             'rusak_berat'  => 'Rusak Berat',
             'hilang'       => 'Hilang',
         ];
-        $kondisi         = strtolower($return->kondisi_barang ?? 'baik');
+        $kondisi         = strtolower($request->input('kondisi', $return->kondisi_barang ?? 'baik'));
         $returnCondition = $conditionMap[$kondisi] ?? ($return->kondisi_barang ?? 'Baik');
         $adminId         = Auth::id();
         $now             = now();
         $borrowing       = $return->borrowingRequest;
+
+        $returnStockService = app(ReturnStockService::class);
+
+        // Guard: Multi-item dengan kondisi hilang atau rusak berat memerlukan penanganan manual per barang
+        if ($returnStockService->isMultiItem($borrowing) && in_array($kondisi, ['hilang', 'rusak_berat', 'lost', 'rusak berat'])) {
+            return back()->with('error', 'Pengembalian multi-item dengan kondisi rusak berat atau hilang memerlukan penanganan manual per barang.');
+        }
 
         // Tangkap ringkasan nama barang SEBELUM transaction agar dapat dipakai di notifikasi.
         // itemSummary() menangani single-item maupun multi-item dengan benar.
@@ -133,7 +140,7 @@ class AdminReturnController extends Controller
 
         try {
             // ── DB::transaction hanya untuk operasi DB ─────────────────────────
-            DB::transaction(function () use ($return, $borrowing, $kondisi, $returnCondition, $adminId, $now, $itemSummary) {
+            DB::transaction(function () use ($return, $borrowing, $kondisi, $returnCondition, $adminId, $now, $itemSummary, $returnStockService) {
                 // 1. Update status ItemReturn
                 $return->update([
                     'status'             => ItemReturn::STATUS_DISETUJUI,
@@ -153,7 +160,7 @@ class AdminReturnController extends Controller
                 // 3. Terapkan perubahan stok via ReturnStockService.
                 //    Single-item dan multi-item menggunakan jalur kode yang sama
                 //    melalui collectItemsWithQuantities() — tidak ada duplikasi blok.
-                app(ReturnStockService::class)->applyStockForReturn($borrowing, $kondisi);
+                $returnStockService->applyStockForReturn($borrowing, $kondisi);
 
                 // 4. Notifikasi in-app untuk Siswa.
                 //    Menggunakan $itemSummary (sudah di-capture sebelum closure)
