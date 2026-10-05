@@ -235,9 +235,8 @@
         </div>
 
         <style>
-            @media (max-width: 640px) {
+            @media (max-width: 768px) {
                 .s-history-table-wrap { display: none !important; }
-                .s-history-cards-mobile { display: flex !important; }
             }
         </style>
 

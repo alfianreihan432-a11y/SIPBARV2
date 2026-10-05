@@ -301,18 +301,29 @@
                 </div>
                 @endif
 
-                <div class="mc-card-actions">
+                <div class="mc-card-actions" style="flex-wrap:wrap">
                     @if($req->status === 'pending')
                         @php
                             $waLink = $waService->getDirectWaLinkForKajur($req);
                             $approvalUrl = $waService->getApprovalUrlForKajur($req);
                         @endphp
-                        <a href="{{ route('teacher.peminjaman-guru.edit', $req->id) }}" class="mc-card-btn mc-card-btn-secondary">
+                        <a href="{{ route('teacher.peminjaman-guru.edit', $req->id) }}" class="mc-card-btn mc-card-btn-secondary" style="flex:0 1 auto;min-width:0">
                             Edit
                         </a>
-                        <a href="{{ $waLink }}" target="_blank" rel="noopener" class="mc-card-btn mc-card-btn-primary">
+                        <a href="{{ $waLink }}" target="_blank" rel="noopener" class="mc-card-btn mc-card-btn-primary" style="flex:1 1 auto;min-width:0">
                             Kirim WA
                         </a>
+                        <button type="button"
+                            onclick="copyLink('{{ $approvalUrl }}', this)"
+                            class="mc-card-btn mc-card-btn-secondary" style="flex:0 1 auto;min-width:0">
+                            Salin Link
+                        </button>
+                        <form method="POST" action="{{ route('teacher.peminjaman-guru.cancel', $req->id) }}" onsubmit="return confirm('Yakin ingin membatalkan permohonan peminjaman ini?')" style="flex:1 1 auto;min-width:0">
+                            @csrf
+                            <button type="submit" class="mc-card-btn" style="width:100%;background:rgba(239,68,68,.1);color:#b91c1c;border:1px solid rgba(239,68,68,.25)">
+                                Batalkan
+                            </button>
+                        </form>
                     @elseif(in_array($req->status, ['approved', 'qr_ready']))
                         <button type="button" onclick="openQRModal({{ $req->id }}, '{{ addslashes($req->item_display_name) }}')" class="mc-card-btn mc-card-btn-primary">
                             Lihat QR
@@ -325,9 +336,11 @@
                             Kembalikan
                         </a>
                     @else
-                        <button type="button" class="mc-card-btn mc-card-btn-secondary" disabled>
-                            Detail
-                        </button>
+                        @if($req->status === 'rejected' && $req->rejection_reason)
+                        <div style="width:100%;padding:8px 10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;font-size:12px;color:#b91c1c">
+                            <strong>Ditolak:</strong> {{ $req->rejection_reason }}
+                        </div>
+                        @endif
                     @endif
                 </div>
             </div>
