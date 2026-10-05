@@ -1,7 +1,7 @@
 @extends('layouts.kepala-jurusan')
 
-@section('title', 'Persetujuan Peminjaman')
-@section('page-heading', 'Persetujuan Peminjaman')
+@section('title', 'Permohonan Peminjaman Guru')
+@section('page-heading', 'Permohonan Peminjaman Guru')
 
 @section('content')
 <style>
@@ -172,7 +172,7 @@
 
 <div class="section-card">
     <div class="section-header">
-        <h2 class="section-title">Daftar Permohonan Menunggu Persetujuan</h2>
+        <h2 class="section-title">Permohonan Peminjaman Guru</h2>
         <span style="font-size: 13px; color: var(--muted);">
             {{ $pendingRequests->total() }} permohonan
         </span>
@@ -185,7 +185,7 @@
                 <table class="table" style="min-width: 680px;">
                     <thead>
                         <tr>
-                            <th>Peminjam</th>
+                            <th>Guru</th>
                             <th>Barang</th>
                             <th>Jumlah</th>
                             <th>Tanggal Pinjam</th>
@@ -199,20 +199,10 @@
                             @php 
                                 $items = $request->items->count() ? $request->items : collect([$request->item])->filter(); 
                                 $totalQty = $request->totalQuantity();
-                                $isSiswa = ($request->tipe_peminjam === 'siswa');
                             @endphp
                             <tr>
                                 <td>
-                                    <div style="font-weight: 700; color: var(--text);">{{ $request->user->name ?? 'Peminjam' }}</div>
-                                    <div style="font-size: 11.5px; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 6px;">
-                                        @if($isSiswa)
-                                            <span style="display:inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; background: rgba(59, 130, 246, 0.12); color: #2563eb;">SISWA</span>
-                                            <span>NIS: {{ $request->user->nis ?? '-' }}</span>
-                                        @else
-                                            <span style="display:inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; background: rgba(133, 30, 42, 0.12); color: var(--accent);">GURU</span>
-                                            <span>NIP: {{ $request->user->nip ?? '-' }}</span>
-                                        @endif
-                                    </div>
+                                    <div style="font-weight: 700; color: var(--text);">{{ $request->user->name ?? 'Guru' }}</div>
                                 </td>
                                 <td>
                                     @foreach($items as $detail)
@@ -259,19 +249,12 @@
                 @php 
                     $items = $request->items->count() ? $request->items : collect([$request->item])->filter(); 
                     $totalQty = $request->totalQuantity();
-                    $isSiswa = ($request->tipe_peminjam === 'siswa');
                 @endphp
                 <div class="mc-card mc-card--pending">
                     <div class="mc-card-header">
                         <div>
-                            <div class="mc-card-user">{{ $request->user->name ?? 'Peminjam' }}</div>
-                            <div class="mc-card-user-sub">
-                                @if($isSiswa)
-                                    <span style="font-weight: 700; color: #2563eb;">[Siswa]</span> NIS: {{ $request->user->nis ?? '-' }}
-                                @else
-                                    <span style="font-weight: 700; color: var(--accent);">[Guru]</span> NIP: {{ $request->user->nip ?? '-' }}
-                                @endif
-                            </div>
+                            <div class="mc-card-user">{{ $request->user->name ?? 'Guru' }}</div>
+                            <div class="mc-card-user-sub">NIP: {{ $request->user->nip ?? '-' }}</div>
                         </div>
                         <span class="mc-badge mc-badge--pending">
                             <span class="mc-badge-dot"></span>

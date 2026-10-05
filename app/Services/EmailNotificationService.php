@@ -12,41 +12,27 @@ use Illuminate\Support\Facades\Mail;
 class EmailNotificationService
 {
     /**
-     * Notify teacher or kajur about a new borrowing request.
-     * Jika kajur_tujuan_id diisi, kirim email ke kajur tersebut.
-     * Jika teacher_id diisi, kirim email ke guru pembimbing.
+     * Notify teacher about a new borrowing request.
+     * Email berisi detail pengajuan + magic link approval (berlaku 3 hari).
      */
     public function notifyNewRequest(BorrowingRequest $request): void
     {
         try {
-            // Tentukan penerima: kajur atau guru pembimbing
-            $recipientEmail = null;
-            $recipientLabel = 'guru';
+            $teacherEmail = $request->teacher?->email;
 
-            if ($request->kajur_tujuan_id) {
-                $recipientEmail = $request->kajurTujuan?->email;
-                $recipientLabel = 'kajur';
-            } elseif ($request->teacher_id) {
-                $recipientEmail = $request->teacher?->email;
-                $recipientLabel = 'guru';
-            }
-
-            if (empty($recipientEmail)) {
-                Log::warning('Email notifikasi pengajuan baru dilewati: penerima tidak memiliki email', [
+            if (empty($teacherEmail)) {
+                Log::warning('Email notifikasi pengajuan baru dilewati: guru tidak memiliki email', [
                     'borrowing_request_id' => $request->id,
                     'teacher_id'           => $request->teacher_id,
-                    'kajur_tujuan_id'      => $request->kajur_tujuan_id,
-                    'recipient_label'      => $recipientLabel,
                 ]);
                 return;
             }
 
-            Mail::to($recipientEmail)->queue(new NewBorrowingRequestMail($request));
+            Mail::to($teacherEmail)->queue(new NewBorrowingRequestMail($request));
 
             Log::info('Email notifikasi pengajuan baru diantrekan', [
                 'borrowing_request_id' => $request->id,
-                'to'                   => $recipientEmail,
-                'recipient_type'       => $recipientLabel,
+                'to'                   => $teacherEmail,
             ]);
         } catch (\Exception $e) {
             Log::error('Gagal mengantrekan email notifikasi pengajuan baru', [
