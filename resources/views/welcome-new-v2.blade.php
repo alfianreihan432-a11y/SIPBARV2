@@ -119,7 +119,7 @@
     </style>
 </head>
 <body>
-    <!-- NAVBAR -->
+    {{-- NAVBAR --}}
     <nav class="navbar">
         <div class="nav-container">
             <a href="/" class="logo">
@@ -155,7 +155,7 @@
         </div>
     </nav>
 
-    <!-- HERO -->
+    {{-- HERO --}}
     <section class="hero" id="beranda">
         <div class="hero-container">
             <div class="hero-content">
@@ -186,7 +186,7 @@
         </div>
     </section>
 
-    <!-- FEATURES -->
+    {{-- FEATURES --}}
     <section class="features" id="fitur">
         <div class="features-container">
             <div class="section-header">
@@ -225,7 +225,7 @@
         </div>
     </section>
 
-    <!-- STATS -->
+    {{-- STATS --}}
     <section class="stats">
         <div class="stats-container">
             <div class="stat-item">
@@ -247,7 +247,7 @@
         </div>
     </section>
 
-    <!-- CTA -->
+    {{-- CTA --}}
     <section class="cta">
         <div class="cta-container">
             <h2>Siap Memulai?</h2>
@@ -256,7 +256,7 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
+    {{-- FOOTER --}}
     <footer class="footer" id="kontak">
         <div class="footer-container">
             <div class="footer-col">
@@ -284,7 +284,7 @@
                 <h4>Kontak</h4>
                 <ul>
                     <li><a href="mailto:sipbar@smkn1bangsri.sch.id">sipbar@smkn1bangsri.sch.id</a></li>
-                    <!-- TODO: Ganti dengan nomor telepon sekolah sebelum go-live -->
+                    {{-- TODO: Ganti dengan nomor telepon sekolah sebelum go-live --}}
                     <li><a href="tel:">[NOMOR TELEPON SEKOLAH - ISI SEBELUM GO-LIVE]</a></li>
                     <li><a href="#">SMKN 1 Bangsri</a></li>
                 </ul>
@@ -295,7 +295,7 @@
         </div>
     </footer>
 
-    <!-- THEME TOGGLE SCRIPT -->
+    {{-- THEME TOGGLE SCRIPT --}}
     <script>
         const toggle=document.getElementById('themeToggle');
         const html=document.documentElement;

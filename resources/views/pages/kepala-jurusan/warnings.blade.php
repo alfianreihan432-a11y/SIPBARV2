@@ -570,7 +570,7 @@
 </div>
 @endif
 
-<!-- Summary Cards -->
+{{-- Summary Cards --}}
 <div class="summary-grid">
     <div class="summary-card">
         <div class="summary-icon-wrap icon-danger">
@@ -613,7 +613,7 @@
     </div>
 </div>
 
-<!-- Main Section -->
+{{-- Main Section --}}
 <div class="section-card">
     <div class="section-header">
         <div>
@@ -630,7 +630,7 @@
         @endif
     </div>
 
-    <!-- Filter Bar -->
+    {{-- Filter Bar --}}
     <form method="GET" action="{{ route('kajur.warnings.index') }}" class="filter-bar">
         <div class="filter-input-wrap">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -664,7 +664,7 @@
     </form>
 
     @if($borrowings->isEmpty())
-    <!-- Empty State -->
+    {{-- Empty State --}}
     <div class="empty-state">
         <div class="empty-icon-wrap">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -687,7 +687,7 @@
     </div>
     @else
 
-    <!-- Desktop Table -->
+    {{-- Desktop Table --}}
     <div class="table-container">
         <table class="table">
             <thead>
@@ -786,7 +786,7 @@
         </table>
     </div>
 
-    <!-- Mobile Card Stack -->
+    {{-- Mobile Card Stack --}}
     <div class="mobile-cards">
         @foreach($borrowings as $b)
         @php
@@ -861,14 +861,14 @@
         @endforeach
     </div>
 
-    <!-- Pagination -->
+    {{-- Paginasi --}}
     <div style="margin-top:20px">
         {{ $borrowings->links() }}
     </div>
     @endif
 </div>
 
-<!-- Bulk Warning Confirmation Modal -->
+{{-- Bulk Warning Confirmation Modal --}}
 <div class="modal-overlay" id="bulkModal">
     <div class="modal-card">
         <div class="modal-title">

@@ -193,7 +193,7 @@
     </div>
 @endif
 
-<!-- Header -->
+{{-- Header / Judul --}}
 <div class="detail-header">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
         <div>
@@ -254,9 +254,9 @@
     @endif
 </div>
 
-<!-- Info Grid -->
+{{-- Info Grid --}}
 <div class="grid-2col">
-    <!-- Report Info -->
+    {{-- Report Info --}}
     <div class="info-card">
         <h2 class="info-card-title">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -292,7 +292,7 @@
         @endif
     </div>
 
-    <!-- Statistics -->
+    {{-- Statistics --}}
     <div class="info-card">
         <h2 class="info-card-title">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -329,7 +329,7 @@
     </div>
 </div>
 
-<!-- Borrowing Requests -->
+{{-- Borrowing Requests --}}
 @if($borrowingRequests && $borrowingRequests->count() > 0)
 <div class="info-card">
     <h2 class="info-card-title">
@@ -373,7 +373,7 @@
 </div>
 @endif
 
-<!-- Action Buttons -->
+{{-- Action Buttons --}}
 <div class="action-bar">
     <a href="{{ route('superadmin.laporan-jurusan') }}" class="btn btn-secondary">
         <svg style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -383,7 +383,7 @@
     </a>
 </div>
 
-<!-- Approve Modal -->
+{{-- Approve Modal --}}
 <div id="approveModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(3px);">
     <div style="background:var(--bg-card);border-radius:16px;padding:28px;width:100%;max-width:480px;border:1px solid var(--border-alt);box-shadow:0 20px 48px rgba(0,0,0,0.18);">
         <h3 style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px;">Setujui Laporan</h3>
@@ -401,7 +401,7 @@
     </div>
 </div>
 
-<!-- Reject Modal -->
+{{-- Reject Modal --}}
 <div id="rejectModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(3px);">
     <div style="background:var(--bg-card);border-radius:16px;padding:28px;width:100%;max-width:480px;border:1px solid var(--border-alt);box-shadow:0 20px 48px rgba(0,0,0,0.18);">
         <h3 style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:16px;">Tolak Laporan</h3>
@@ -419,7 +419,7 @@
     </div>
 </div>
 
-<!-- Detail Modal -->
+{{-- Detail Modal --}}
 <div id="detailModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(3px);">
     <div style="background:var(--bg-card);border-radius:16px;padding:28px;width:100%;max-width:600px;border:1px solid var(--border-alt);box-shadow:0 20px 48px rgba(0,0,0,0.18);max-height:90vh;overflow-y:auto;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">

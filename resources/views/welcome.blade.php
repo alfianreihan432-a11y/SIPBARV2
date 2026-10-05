@@ -1295,7 +1295,7 @@ $stats = Cache::remember('homepage_stats', 900, function () {
     // Total borrowing transactions
     $totalBorrowings = BorrowingRequest::count();
 
-    // Calculate completion rate
+    // Hitung persentase penyelesaian
     $completedBorrowings = BorrowingRequest::where('status', BorrowingRequest::STATUS_RETURNED)->count();
     $completionRate = $totalBorrowings > 0 ? round(($completedBorrowings / $totalBorrowings) * 100, 1) : 0;
 

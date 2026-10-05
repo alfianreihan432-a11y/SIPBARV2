@@ -398,7 +398,7 @@
     @endif
 </div>
 
-<!-- Verify Modal -->
+{{-- Verify Modal --}}
 <div id="verifyModal" class="modal">
     <div class="modal-content">
         <h3 class="modal-title">Verifikasi Pengembalian Barang</h3>

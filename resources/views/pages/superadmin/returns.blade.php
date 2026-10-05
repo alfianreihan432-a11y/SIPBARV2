@@ -128,7 +128,7 @@
     }
     .search-input-wrap input::placeholder { color: var(--text-muted); }
 
-    /* Returns Table Panel */
+    /* Panel Tabel Pengembalian */
     .table-panel {
         background: var(--bg-card);
         border: 1px solid var(--border-alt);
@@ -437,7 +437,7 @@
         </form>
     </div>
 
-    {{-- Main Returns Table Panel --}}
+    {{-- Panel Utama Tabel Pengembalian --}}
     <div class="table-panel">
         @if($returns->count() > 0)
             {{-- Desktop Table View --}}

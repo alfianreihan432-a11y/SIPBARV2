@@ -420,7 +420,7 @@
 </head>
 <body>
 
-    <!-- Top bar -->
+    {{-- Top bar --}}
     <div class="topbar">
         <div class="brand">
             <div class="brand-icon">
@@ -433,10 +433,10 @@
         </div>
     </div>
 
-    <!-- Main card -->
+    {{-- Main card --}}
     <div class="card">
 
-        <!-- Header -->
+        {{-- Header / Judul --}}
         <div class="card-header">
             <div class="card-header-badge" style="display:inline-flex;align-items:center;gap:6px">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
@@ -450,7 +450,7 @@
             $status = $borrowingRequest->status;
         @endphp
 
-        <!-- Status banner if already processed -->
+        {{-- Status banner if already processed --}}
         @if($status === \App\Models\BorrowingRequest::STATUS_APPROVED)
             <div class="status-banner approved" style="display:flex;align-items:center;justify-content:center;gap:8px">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
@@ -468,7 +468,7 @@
             </div>
         @endif
 
-        <!-- Body -->
+        {{-- Konten Utama --}}
         <div class="card-body">
 
             {{-- Flash messages --}}
@@ -497,7 +497,7 @@
                 </div>
             @endif
 
-            <!-- Detail pengajuan -->
+            {{-- Detail pengajuan --}}
             <p class="section-title" style="display:flex;align-items:center;gap:6px">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;color:var(--teal-600)" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Detail Pengajuan

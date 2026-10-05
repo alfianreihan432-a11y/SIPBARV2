@@ -175,14 +175,14 @@
 </head>
 <body>
     <div class="wrapper">
-        <!-- Header -->
+        {{-- Header / Judul --}}
         <div class="header">
             <div class="header-badge">Disetujui</div>
             <h1>Pengajuan Peminjaman<br>Kamu Disetujui!</h1>
             <p>Tunjukkan QR Code di bawah saat mengambil barang</p>
         </div>
 
-        <!-- Body -->
+        {{-- Konten Utama --}}
         <div class="body">
             <p class="greeting">Halo, {{ $borrowingRequest->user?->name ?? 'Siswa' }}!</p>
             <p class="intro">
@@ -191,7 +191,7 @@
                 saat pengambilan barang.
             </p>
 
-            <!-- Info Card -->
+            {{-- Kartu Informasi --}}
             <div class="info-card">
                 <h3>Detail Peminjaman</h3>
                 <div class="info-row">
@@ -216,7 +216,7 @@
                 </div>
             </div>
 
-            <!-- QR Code -->
+            {{-- QR Code --}}
             <div class="qr-section">
                 <h3>QR Code Pengambilan</h3>
                 <p>Screenshot atau cetak QR Code ini.<br>Tunjukkan kepada petugas saat mengambil barang.</p>
@@ -226,7 +226,7 @@
                 >
             </div>
 
-            <!-- Instructions -->
+            {{-- Instructions --}}
             <div class="instructions">
                 <h3>Langkah Selanjutnya</h3>
                 <ol>
@@ -238,7 +238,7 @@
             </div>
         </div>
 
-        <!-- Footer -->
+        {{-- Footer --}}
         <div class="footer">
             <p>
                 Email ini dikirim otomatis oleh sistem

@@ -24,7 +24,7 @@
                 return saved;
             }
 
-            // Check if user has theme in admin layout (for consistency)
+            // Cek apakah pengguna memiliki tema di layout admin (untuk konsistensi)
             var adminTheme = localStorage.getItem('sipbar-dash-theme');
             if (adminTheme === 'light' || adminTheme === 'dark') {
                 return adminTheme;

@@ -440,7 +440,7 @@
     </div>
 @endif
 
-<!-- Approve Modal -->
+{{-- Approve Modal --}}
 <div id="approveModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);">
@@ -492,7 +492,7 @@
     </div>
 </div>
 
-<!-- Reject Modal -->
+{{-- Reject Modal --}}
 <div id="rejectModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border);">
@@ -549,7 +549,7 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+{{-- Delete Confirmation Modal --}}
 <div id="deleteModal" class="modal">
     <div class="modal-content">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--border);">

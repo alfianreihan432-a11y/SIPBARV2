@@ -317,7 +317,7 @@
         @foreach($histories as $h)
         @php 
             $st = $statusMap[$h->status] ?? $statusMap['pending']; 
-            // Check if truly returned (either status returned OR has approved item return)
+            // Cek apakah benar-benar dikembalikan (status returned ATAU memiliki pengembalian barang yang disetujui)
             $isReturned = ($h->status === 'returned') || 
                           ($h->itemReturns && $h->itemReturns->isNotEmpty() && $h->itemReturns->first()->status === 'disetujui');
         @endphp
@@ -581,7 +581,7 @@
             </button>
         </div>
         <div class="modal-body" id="modalBody">
-            <!-- Content will be populated by JavaScript -->
+            {{-- Content will be populated by JavaScript --}}
         </div>
     </div>
 </div>

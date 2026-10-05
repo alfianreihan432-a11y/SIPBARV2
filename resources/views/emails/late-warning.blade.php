@@ -162,14 +162,14 @@
 </head>
 <body>
     <div class="wrapper">
-        <!-- Header -->
+        {{-- Header / Judul --}}
         <div class="header">
             <div class="header-badge">Peringatan Keterlambatan</div>
             <h1>Peminjaman Melewati Batas Waktu</h1>
             <p>Mohon segera lakukan pengembalian barang ke petugas</p>
         </div>
 
-        <!-- Body -->
+        {{-- Konten Utama --}}
         <div class="body">
             <p class="greeting">Halo, {{ $borrowingRequest->user?->name ?? 'Peminjam' }},</p>
             <p class="intro">
@@ -184,7 +184,7 @@
                 </div>
             </div>
 
-            <!-- Info Card -->
+            {{-- Kartu Informasi --}}
             <div class="info-card">
                 <h3>Detail Peminjaman</h3>
                 <div class="info-row">
@@ -218,7 +218,7 @@
                 @endif
             </div>
 
-            <!-- Action Advice -->
+            {{-- Action Advice --}}
             <div class="action-box">
                 <h3>Tindakan yang Harus Dilakukan</h3>
                 <p>
@@ -229,7 +229,7 @@
             </div>
         </div>
 
-        <!-- Footer -->
+        {{-- Footer --}}
         <div class="footer">
             <p>
                 Email ini dikirim atas instruksi Kepala Jurusan melalui sistem

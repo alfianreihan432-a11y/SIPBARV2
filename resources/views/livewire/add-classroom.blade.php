@@ -3,7 +3,7 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-50 py-8 px-4">
     <div class="max-w-3xl mx-auto">
-        <!-- Header -->
+        {{-- Header / Judul --}}
         <div class="mb-10 text-center">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl mb-4 shadow-lg">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,7 +34,7 @@
 
         <form wire:submit="submit" class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Nama Kelas -->
+                {{-- Nama Kelas --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Nama Kelas <span class="text-red-500">*</span>
@@ -48,7 +48,7 @@
                     @error('name') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Kode Kelas -->
+                {{-- Kode Kelas --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Kode Kelas <span class="text-red-500">*</span>
@@ -62,7 +62,7 @@
                     @error('kode') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Ketua Kelas -->
+                {{-- Ketua Kelas --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Ketua Kelas</label>
                     <div class="relative">
@@ -79,7 +79,7 @@
                     @error('class_leader_id') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Wali Kelas -->
+                {{-- Wali Kelas --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Wali Kelas</label>
                     <div class="relative">
@@ -96,7 +96,7 @@
                     @error('class_advisor_id') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Nomor HP Wali Kelas -->
+                {{-- Nomor HP Wali Kelas --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor HP Wali Kelas</label>
                     <div class="relative">
@@ -108,7 +108,7 @@
                     @error('class_advisor_phone') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Status PKL -->
+                {{-- Status PKL --}}
                 <div class="flex items-center gap-3">
                     <input wire:model="is_pkl" type="checkbox" id="is_pkl" class="w-5 h-5 text-green-600 rounded focus:ring-green-500">
                     <label for="is_pkl" class="text-sm font-semibold text-gray-700">Kelas PKL</label>

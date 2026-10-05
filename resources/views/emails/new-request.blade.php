@@ -183,14 +183,14 @@
 </head>
 <body>
     <div class="wrapper">
-        <!-- Header -->
+        {{-- Header / Judul --}}
         <div class="header">
             <div class="header-badge">Pengajuan Baru</div>
             <h1>Ada Pengajuan Peminjaman<br>yang Perlu Ditinjau</h1>
             <p>Sistem Peminjaman Barang Sekolah — SIPBAR</p>
         </div>
 
-        <!-- Body -->
+        {{-- Konten Utama --}}
         <div class="body">
             <p class="greeting">Yth. {{ $borrowingRequest->teacher?->name ?? 'Bapak/Ibu Guru' }},</p>
             <p class="intro">
@@ -198,7 +198,7 @@
                 persetujuan Bapak/Ibu. Silakan tinjau detail di bawah dan ambil keputusan.
             </p>
 
-            <!-- Info Card -->
+            {{-- Kartu Informasi --}}
             <div class="info-card">
                 <h3>Detail Pengajuan</h3>
                 <div class="info-row">
@@ -233,13 +233,13 @@
                 @endif
             </div>
 
-            <!-- Purpose -->
+            {{-- Purpose --}}
             <div class="purpose-box">
                 <h3>Keperluan</h3>
                 <p>{{ $borrowingRequest->purpose }}</p>
             </div>
 
-            <!-- CTA -->
+            {{-- CTA --}}
             <div class="cta-section">
                 <p>
                     Klik tombol di bawah untuk membuka halaman konfirmasi.
@@ -255,14 +255,14 @@
                 </div>
             </div>
 
-            <!-- Fallback link -->
+            {{-- Fallback link --}}
             <p class="link-fallback">
                 Jika tombol tidak berfungsi, salin link berikut ke browser:<br>
                 {{ $approvalUrl }}
             </p>
         </div>
 
-        <!-- Footer -->
+        {{-- Footer --}}
         <div class="footer">
             <p>
                 Email ini dikirim otomatis oleh sistem

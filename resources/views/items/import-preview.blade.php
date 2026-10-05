@@ -9,7 +9,7 @@
 <body class="bg-gray-50">
     <div class="min-h-screen p-6">
         <div class="max-w-7xl mx-auto">
-            <!-- Header -->
+            {{-- Header / Judul --}}
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
                 <div class="flex items-center justify-between">
                     <div>
@@ -23,7 +23,7 @@
                     </div>
                 </div>
 
-                <!-- Summary Stats -->
+                {{-- Ringkasan Statistik --}}
                 <div class="grid grid-cols-4 gap-4 mt-6">
                     <div class="bg-blue-50 rounded-lg p-4">
                         <div class="text-2xl font-bold text-blue-600">{{ count($previewData) }}</div>
@@ -44,7 +44,7 @@
                 </div>
             </div>
 
-            <!-- Errors Section -->
+            {{-- Bagian Kesalahan (Errors) --}}
             @if(count($errors) > 0)
             <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
                 <h3 class="font-semibold text-red-800 mb-2">Error ({{ count($errors) }} baris)</h3>
@@ -56,7 +56,7 @@
             </div>
             @endif
 
-            <!-- Skipped Section -->
+            {{-- Skipped Section --}}
             @if(count($skipped) > 0)
             <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
                 <h3 class="font-semibold text-yellow-800 mb-2">Dilewati ({{ count($skipped) }} baris)</h3>
@@ -68,7 +68,7 @@
             </div>
             @endif
 
-            <!-- Preview Table -->
+            {{-- Preview Table --}}
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
@@ -136,7 +136,7 @@
                 </div>
             </div>
 
-            <!-- Confirm Button -->
+            {{-- Confirm Button --}}
             <div class="mt-6 flex justify-end">
                 <form method="POST" action="{{ route('items.import.confirm') }}">
                     @csrf

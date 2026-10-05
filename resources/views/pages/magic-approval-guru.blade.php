@@ -446,7 +446,7 @@
 </head>
 <body>
 
-    <!-- Top bar -->
+    {{-- Top bar --}}
     <div class="topbar">
         <div class="brand">
             <div class="brand-icon">
@@ -461,10 +461,10 @@
         </div>
     </div>
 
-    <!-- Main card -->
+    {{-- Main card --}}
     <div class="card">
 
-        <!-- Header -->
+        {{-- Header / Judul --}}
         <div class="card-header">
             <div class="card-header-badge">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -483,7 +483,7 @@
             $kajur = $borrowingRequest->approvedByKajur;
         @endphp
 
-        <!-- Status banner if already processed -->
+        {{-- Status banner if already processed --}}
         @if($status === \App\Models\BorrowingRequest::STATUS_APPROVED)
             <div class="status-banner approved">
                 <svg xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
@@ -501,7 +501,7 @@
             </div>
         @endif
 
-        <!-- Body -->
+        {{-- Konten Utama --}}
         <div class="card-body">
 
             {{-- Flash messages --}}
@@ -530,7 +530,7 @@
                 </div>
             @endif
 
-            <!-- ─── Section 1: Profil Pengaju & Penerima ─── -->
+            {{-- ─── Section 1: Profil Pengaju & Penerima ─── --}}
             <div class="section-header">
                 <div class="section-header-bar"></div>
                 Informasi Pemohon & Persetujuan
@@ -553,7 +553,7 @@
                 </div>
             </div>
 
-            <!-- ─── Section 2: Detail Barang & Peminjaman ─── -->
+            {{-- ─── Section 2: Detail Barang & Peminjaman ─── --}}
             <div class="section-header">
                 <div class="section-header-bar"></div>
                 Detail Barang & Waktu Peminjaman

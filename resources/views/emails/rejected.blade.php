@@ -163,14 +163,14 @@
 </head>
 <body>
     <div class="wrapper">
-        <!-- Header -->
+        {{-- Header / Judul --}}
         <div class="header">
             <div class="header-badge">Ditolak</div>
             <h1>Pengajuan Peminjaman<br>Tidak Disetujui</h1>
             <p>Jangan menyerah — kamu bisa mengajukan kembali</p>
         </div>
 
-        <!-- Body -->
+        {{-- Konten Utama --}}
         <div class="body">
             <p class="greeting">Halo, {{ $borrowingRequest->user?->name ?? 'Siswa' }},</p>
             <p class="intro">
@@ -179,7 +179,7 @@
                 dan alasan dari guru.
             </p>
 
-            <!-- Info Card -->
+            {{-- Kartu Informasi --}}
             <div class="info-card">
                 <h3>Detail Pengajuan</h3>
                 <div class="info-row">
@@ -204,13 +204,13 @@
                 </div>
             </div>
 
-            <!-- Rejection Reason -->
+            {{-- Rejection Reason --}}
             <div class="reason-box">
                 <h3>Alasan Penolakan</h3>
                 <p>{{ $borrowingRequest->rejection_reason ?? 'Tidak ada alasan yang diberikan.' }}</p>
             </div>
 
-            <!-- Advice -->
+            {{-- Advice --}}
             <div class="advice-box">
                 <h3>Langkah Selanjutnya</h3>
                 <p>
@@ -221,7 +221,7 @@
             </div>
         </div>
 
-        <!-- Footer -->
+        {{-- Footer --}}
         <div class="footer">
             <p>
                 Email ini dikirim otomatis oleh sistem

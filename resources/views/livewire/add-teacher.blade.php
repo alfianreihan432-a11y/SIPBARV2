@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 py-8 px-4">
     <div class="max-w-3xl mx-auto">
-        <!-- Header -->
+        {{-- Header / Judul --}}
         <div class="mb-10 text-center">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl mb-4 shadow-lg">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +31,7 @@
 
         <form wire:submit="submit" class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- NIP -->
+                {{-- NIP --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         NIP <span class="text-red-500">*</span>
@@ -45,7 +45,7 @@
                     @error('nip') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Nama -->
+                {{-- Nama --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Nama Lengkap <span class="text-red-500">*</span>
@@ -59,7 +59,7 @@
                     @error('name') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Jabatan -->
+                {{-- Jabatan --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Jabatan <span class="text-red-500">*</span>
@@ -73,7 +73,7 @@
                     @error('jabatan') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Jurusan -->
+                {{-- Jurusan --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Jurusan <span class="text-red-500">*</span>
@@ -87,7 +87,7 @@
                     @error('jurusan') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Tanggal Lahir -->
+                {{-- Tanggal Lahir --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Tanggal Lahir <span class="text-red-500">*</span>
@@ -101,7 +101,7 @@
                     @error('tanggal_lahir') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Nomor HP -->
+                {{-- Nomor HP --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Nomor HP <span class="text-red-500">*</span>
@@ -115,7 +115,7 @@
                     @error('phone') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Alamat -->
+                {{-- Alamat --}}
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat</label>
                     <div class="relative">

@@ -262,7 +262,7 @@
                     <div class="user-avatar">{{ auth()->check() ? strtoupper(substr(auth()->user()->name,0,2)) : 'GR' }}</div>
                 @endif
                 <div>
-                    {{-- Explicit inline color #ffffff !important prevents CSS bleeding/FOUC from child page styles (e.g. table .user-name in loans/returns) --}}
+                    {{-- Warna inline eksplisit #ffffff !important mencegah kebocoran CSS/FOUC dari gaya halaman turunan (misal .user-name pada tabel peminjaman/pengembalian) --}}
                     <div class="user-name" style="color:#ffffff !important;">{{ auth()->check() ? auth()->user()->name : 'Budi Santoso' }}</div>
                     <div class="user-role" style="color:rgba(255,255,255,.75) !important;">Guru Penanggung Jawab</div>
                 </div>

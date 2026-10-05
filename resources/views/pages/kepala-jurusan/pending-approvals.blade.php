@@ -337,7 +337,7 @@
     @endif
 </div>
 
-<!-- Reject Modal -->
+{{-- Reject Modal --}}
 <div id="rejectModal" class="modal">
     <div class="modal-content">
         <h3 class="modal-title">Tolak Permohonan Peminjaman</h3>

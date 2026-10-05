@@ -3,7 +3,7 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50 to-amber-50 py-8 px-4">
     <div class="max-w-3xl mx-auto">
-        <!-- Header -->
+        {{-- Header / Judul --}}
         <div class="mb-10 text-center">
             <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-orange-600 to-amber-600 rounded-2xl mb-4 shadow-lg">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,7 +34,7 @@
 
         <form wire:submit="submit" class="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Nama Ekstrakurikuler -->
+                {{-- Nama Ekstrakurikuler --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
                         Nama Ekstrakurikuler <span class="text-red-500">*</span>
@@ -48,7 +48,7 @@
                     @error('name') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Kode -->
+                {{-- Kode --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Kode</label>
                     <div class="relative">
@@ -60,7 +60,7 @@
                     @error('kode') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Pembina -->
+                {{-- Pembina --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Pembina</label>
                     <div class="relative">
@@ -72,7 +72,7 @@
                     @error('pembina') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Nomor HP Pembina -->
+                {{-- Nomor HP Pembina --}}
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Nomor HP Pembina</label>
                     <div class="relative">
@@ -84,7 +84,7 @@
                     @error('pembina_phone') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Jadwal -->
+                {{-- Jadwal --}}
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Jadwal</label>
                     <div class="relative">
@@ -96,7 +96,7 @@
                     @error('jadwal') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Deskripsi -->
+                {{-- Deskripsi --}}
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi</label>
                     <div class="relative">
@@ -108,7 +108,7 @@
                     @error('description') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <!-- Status -->
+                {{-- Status --}}
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
                     <div class="relative">
