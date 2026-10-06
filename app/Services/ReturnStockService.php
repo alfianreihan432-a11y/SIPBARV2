@@ -66,6 +66,10 @@ class ReturnStockService
     /**
      * Terapkan logika stok ke satu item dengan quantity tertentu.
      *
+     * CATATAN PENTING: Pada single-item (peminjaman legacy tanpa tabel borrowing_request_items),
+     * seluruh quantity dianggap hilang/rusak_berat saat dilaporkan dengan kondisi tersebut.
+     * Form saat ini belum mendukung input jumlah parsial untuk kondisi hilang/rusak_berat.
+     *
      * @param Item   $item    Instance item yang stoknya akan disesuaikan
      * @param int    $qty     Jumlah unit yang dipinjam (akan dikembalikan jika kondisi memungkinkan)
      * @param string $kondisi Kondisi pengembalian ('baik'|'rusak_ringan'|'rusak_berat'|'hilang')

@@ -265,4 +265,242 @@ class DynamicItemCatalogStatusTest extends TestCase
         $req3->delete();
         $item->delete();
     }
+
+    public function test_recalculate_status_preserves_hilang_when_stock_zero()
+    {
+        $category = Category::firstOrCreate(['name' => 'Elektronik'], ['slug' => 'elektronik']);
+        $item = Item::create([
+            'name' => 'Laptop Hilang Test',
+            'code' => 'TEST-HILANG-001',
+            'inventory_number' => 'INV-HILANG-001',
+            'stock' => 0,
+            'status' => 'Hilang',
+            'condition' => 'Hilang',
+            'category_id' => $category->id,
+        ]);
+
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'siswa', 'guard_name' => 'web']);
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'guru', 'guard_name' => 'web']);
+
+        $student = User::firstOrCreate(['email' => 'siswa_test@example.com'], [
+            'name' => 'Siswa Test',
+            'password' => bcrypt('password'),
+        ]);
+        $student->assignRole('siswa');
+
+        $teacher = User::firstOrCreate(['email' => 'guru_test@example.com'], [
+            'name' => 'Guru Test',
+            'password' => bcrypt('password'),
+        ]);
+        $teacher->assignRole('guru');
+
+        // Simulasi: return 'hilang' disetujui, stok tetap 0
+        $borrowRequest = BorrowingRequest::create([
+            'user_id' => $student->id,
+            'teacher_id' => $teacher->id,
+            'purpose' => 'Test',
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(1)->toDateString(),
+            'return_time' => '12:00',
+            'status' => BorrowingRequest::STATUS_RETURNED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $borrowRequest->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+            'kondisi_kembali' => 'hilang',
+        ]);
+
+        // Item status sudah 'Hilang', stok 0
+        $item->status = 'Hilang';
+        $item->saveQuietly();
+
+        // Panggil recalculateStatus - seharusnya tetap 'Hilang' karena stok = 0
+        $item->recalculateStatus();
+        $this->assertEquals('Hilang', $item->fresh()->status);
+
+        // Simulasi transisi BorrowingStateMachine pada peminjaman lain
+        $req2 = BorrowingRequest::create([
+            'user_id' => $student->id,
+            'teacher_id' => $teacher->id,
+            'purpose' => 'Test 2',
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(1)->toDateString(),
+            'return_time' => '12:00',
+            'status' => BorrowingRequest::STATUS_PENDING,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $req2->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        // Setelah transisi, status tetap 'Hilang'
+        $item->recalculateStatus();
+        $this->assertEquals('Hilang', $item->fresh()->status);
+
+        // Cleanup
+        BorrowingRequestItem::where('borrowing_request_id', $borrowRequest->id)->delete();
+        BorrowingRequestItem::where('borrowing_request_id', $req2->id)->delete();
+        $borrowRequest->delete();
+        $req2->delete();
+        $item->delete();
+    }
+
+    public function test_recalculate_status_preserves_rusak_when_stock_zero()
+    {
+        $category = Category::firstOrCreate(['name' => 'Elektronik'], ['slug' => 'elektronik']);
+        $item = Item::create([
+            'name' => 'Laptop Rusak Test',
+            'code' => 'TEST-RUSAK-001',
+            'inventory_number' => 'INV-RUSAK-001',
+            'stock' => 0,
+            'status' => 'Rusak',
+            'condition' => 'rusak_berat',
+            'category_id' => $category->id,
+        ]);
+
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'siswa', 'guard_name' => 'web']);
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'guru', 'guard_name' => 'web']);
+
+        $student = User::firstOrCreate(['email' => 'siswa_test@example.com'], [
+            'name' => 'Siswa Test',
+            'password' => bcrypt('password'),
+        ]);
+        $student->assignRole('siswa');
+
+        $teacher = User::firstOrCreate(['email' => 'guru_test@example.com'], [
+            'name' => 'Guru Test',
+            'password' => bcrypt('password'),
+        ]);
+        $teacher->assignRole('guru');
+
+        // Simulasi: return 'rusak_berat' disetujui, stok tetap 0
+        $borrowRequest = BorrowingRequest::create([
+            'user_id' => $student->id,
+            'teacher_id' => $teacher->id,
+            'purpose' => 'Test',
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(1)->toDateString(),
+            'return_time' => '12:00',
+            'status' => BorrowingRequest::STATUS_RETURNED,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $borrowRequest->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+            'kondisi_kembali' => 'rusak_berat',
+        ]);
+
+        // Item status sudah 'Rusak', stok 0
+        $item->status = 'Rusak';
+        $item->saveQuietly();
+
+        // Panggil recalculateStatus - seharusnya tetap 'Rusak' karena stok = 0
+        $item->recalculateStatus();
+        $this->assertEquals('Rusak', $item->fresh()->status);
+
+        // Simulasi transisi BorrowingStateMachine pada peminjaman lain
+        $req2 = BorrowingRequest::create([
+            'user_id' => $student->id,
+            'teacher_id' => $teacher->id,
+            'purpose' => 'Test 2',
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(1)->toDateString(),
+            'return_time' => '12:00',
+            'status' => BorrowingRequest::STATUS_PENDING,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $req2->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        // Setelah transisi, status tetap 'Rusak'
+        $item->recalculateStatus();
+        $this->assertEquals('Rusak', $item->fresh()->status);
+
+        // Cleanup
+        BorrowingRequestItem::where('borrowing_request_id', $borrowRequest->id)->delete();
+        BorrowingRequestItem::where('borrowing_request_id', $req2->id)->delete();
+        $borrowRequest->delete();
+        $req2->delete();
+        $item->delete();
+    }
+
+    public function test_recalculate_status_restores_tersedia_when_hilang_and_stock_increases()
+    {
+        $category = Category::firstOrCreate(['name' => 'Elektronik'], ['slug' => 'elektronik']);
+        $item = Item::create([
+            'name' => 'Laptop Hilang Recovery Test',
+            'code' => 'TEST-HILANG-REC-001',
+            'inventory_number' => 'INV-HILANG-REC-001',
+            'stock' => 0,
+            'status' => 'Hilang',
+            'condition' => 'Hilang',
+            'category_id' => $category->id,
+        ]);
+
+        // Item status 'Hilang', stok 0
+        $this->assertEquals('Hilang', $item->status);
+        $this->assertEquals(0, $item->stock);
+
+        // Panggil recalculateStatus - seharusnya tetap 'Hilang' karena stok = 0
+        $item->recalculateStatus();
+        $this->assertEquals('Hilang', $item->fresh()->status);
+
+        // Stok bertambah (misalnya barang ditemukan)
+        $item->stock = 2;
+        $item->saveQuietly();
+
+        // Panggil recalculateStatus - seharusnya jadi 'Tersedia' karena stok > 0
+        $item->recalculateStatus();
+        $this->assertEquals('Tersedia', $item->fresh()->status);
+
+        // Cleanup
+        $item->delete();
+    }
+
+    public function test_recalculate_status_preserves_maintenance()
+    {
+        $category = Category::firstOrCreate(['name' => 'Elektronik'], ['slug' => 'elektronik']);
+        $item = Item::create([
+            'name' => 'Laptop Maintenance Test',
+            'code' => 'TEST-MAINT-001',
+            'inventory_number' => 'INV-MAINT-001',
+            'stock' => 1,
+            'status' => 'Maintenance',
+            'condition' => 'Baik',
+            'category_id' => $category->id,
+        ]);
+
+        // Item status 'Maintenance', stok > 0
+        $this->assertEquals('Maintenance', $item->status);
+        $this->assertEquals(1, $item->stock);
+
+        // Panggil recalculateStatus - seharusnya tetap 'Maintenance' (tidak diubah)
+        $item->recalculateStatus();
+        $this->assertEquals('Maintenance', $item->fresh()->status);
+
+        // Bahkan jika stok = 0, status Maintenance tetap tidak diubah
+        $item->stock = 0;
+        $item->saveQuietly();
+        $item->recalculateStatus();
+        $this->assertEquals('Maintenance', $item->fresh()->status);
+
+        // Cleanup
+        $item->delete();
+    }
 }

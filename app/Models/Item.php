@@ -266,6 +266,10 @@ class Item extends Model
      * - 'Dipinjam'  : stok tersedia = 0 (semua unit sedang dipinjam/disetujui)
      *
      * TIDAK mengubah status 'Maintenance' — perubahan maintenance harus manual.
+     *
+     * Perubahan untuk status 'Hilang' dan 'Rusak':
+     * - Jika status saat ini 'Hilang' atau 'Rusak' dan stok tersedia <= 0, status TIDAK ditimpa
+     * - Jika stok tersedia > 0, status dipulihkan ke 'Tersedia'
      */
     public function recalculateStatus(): void
     {
@@ -274,8 +278,19 @@ class Item extends Model
         }
 
         $availableStock = $this->available_stock;
-        $newStatus      = $availableStock > 0 ? 'Tersedia' : 'Dipinjam';
 
+        // Khusus untuk status 'Hilang' dan 'Rusak': hanya ubah jika stok > 0
+        if (in_array($this->status, ['Hilang', 'Rusak'])) {
+            if ($availableStock > 0) {
+                $this->status = 'Tersedia';
+                $this->saveQuietly();
+            }
+            // Jika stok <= 0, jangan ubah status (tetap Hilang/Rusak)
+            return;
+        }
+
+        // Perilaku default untuk status lain
+        $newStatus = $availableStock > 0 ? 'Tersedia' : 'Dipinjam';
         $this->status = $newStatus;
         $this->saveQuietly();
     }

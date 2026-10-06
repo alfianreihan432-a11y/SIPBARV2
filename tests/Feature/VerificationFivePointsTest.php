@@ -325,4 +325,173 @@ class VerificationFivePointsTest extends TestCase
         $this->assertEquals(BorrowingRequest::STATUS_REJECTED, $loanReject->status);
         $this->assertEquals('Barang sedang dalam perbaikan', $loanReject->rejection_reason);
     }
+
+    /**
+     * KAJUR - STOK 0 DENGAN PEMINJAMAN AKTIF (DIPINJAM)
+     */
+    public function test_kajur_stock_zero_with_active_borrowing(): void
+    {
+        $item = $this->createTestItem('Kamera DSLR Canon Stock Zero Active', 'CAM-STOCK-ZERO-ACTIVE-01', 1);
+
+        $loan = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Peminjaman Stock Zero Active Test',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $loan->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        // Set stock to 0 to simulate all units borrowed
+        $item->stock = 0;
+        $item->saveQuietly();
+
+        // Item status should be Dipinjam
+        $item->recalculateStatus();
+        $this->assertEquals('Dipinjam', $item->status);
+
+        // Cleanup
+        BorrowingRequestItem::where('borrowing_request_id', $loan->id)->delete();
+        $loan->delete();
+        $item->delete();
+    }
+
+    /**
+     * KAJUR - STOK 0 TANPA PEMINJAMAN AKTIF (HILANG/RUSAK)
+     */
+    public function test_kajur_stock_zero_without_active_borrowing(): void
+    {
+        // Test Hilang
+        $itemHilang = $this->createTestItem('Kamera DSLR Canon Hilang Stock Zero', 'CAM-HILANG-ZERO-01', 0);
+        $itemHilang->status = 'Hilang';
+        $itemHilang->condition = 'hilang';
+        $itemHilang->saveQuietly();
+
+        $itemHilang->recalculateStatus();
+        $this->assertEquals('Hilang', $itemHilang->status);
+
+        // Test Rusak
+        $itemRusak = $this->createTestItem('Kamera DSLR Canon Rusak Stock Zero', 'CAM-RUSAK-ZERO-01', 0);
+        $itemRusak->status = 'Rusak';
+        $itemRusak->condition = 'rusak_berat';
+        $itemRusak->saveQuietly();
+
+        $itemRusak->recalculateStatus();
+        $this->assertEquals('Rusak', $itemRusak->status);
+
+        // Cleanup
+        $itemHilang->delete();
+        $itemRusak->delete();
+    }
+
+    /**
+     * ADMIN DAN KAJUR - RUSAK BERAT STOK 0 DENGAN PEMINJAMAN AKTIF (DIPINJAM)
+     */
+    public function test_admin_and_kajur_rusak_berat_stock_zero_with_active_borrowing(): void
+    {
+        $superadmin = User::factory()->create([
+            'name' => 'Superadmin Test',
+            'email' => 'superadmin@test.sipbar.id',
+        ]);
+        $superadmin->assignRole('superadmin');
+
+        $item = $this->createTestItem('Kamera DSLR Canon Rusak Berat Active', 'CAM-RUSAK-BERAT-ACTIVE-01', 1);
+
+        $loan = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Peminjaman Rusak Berat Active Test',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $loan->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        // Set stock to 0, status to Rusak
+        $item->stock = 0;
+        $item->status = 'Rusak';
+        $item->condition = 'rusak_berat';
+        $item->saveQuietly();
+
+        // Item status should remain Rusak even with active borrowing
+        $item->recalculateStatus();
+        $this->assertEquals('Rusak', $item->status);
+
+        // Cleanup
+        BorrowingRequestItem::where('borrowing_request_id', $loan->id)->delete();
+        $loan->delete();
+        $item->delete();
+        $superadmin->delete();
+    }
+
+    /**
+     * QUANTITY > 1 PADA SATU JENIS BARANG - DEFAULT BEHAVIOR
+     *
+     * Test ini mendokumentasikan perilaku saat ini:
+     * - Pada single-item (legacy), seluruh quantity dianggap hilang/rusak_berat saat dilaporkan
+     * - Form belum mendukung input jumlah parsial untuk kondisi hilang/rusak_berat
+     * - 1 jenis barang, quantity 3, 'hilang' -> stok tidak bertambah
+     */
+    public function test_single_item_quantity_gt_1_hilang_does_not_increment_stock(): void
+    {
+        $item = $this->createTestItem('Laptop Dell Quantity Test', 'LAP-QTY-TEST-01', 5);
+
+        // Create single-item borrowing request with quantity 3
+        $loan = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => $item->id,
+            'quantity' => 3,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Peminjaman Quantity Test',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        // Reduce stock to simulate borrowed items
+        $item->stock = 2;
+        $item->saveQuietly();
+
+        // Teacher submits return request as hilang
+        $loan->update(['status' => BorrowingRequest::STATUS_RETURNED]);
+
+        // Admin approves with condition 'hilang'
+        // Pada single-item legacy, seluruh quantity (3) dianggap hilang
+        $service = new \App\Services\ReturnStockService();
+        $service->applyToItem($item, 3, 'hilang');
+
+        // Stock should NOT increase (all 3 units considered lost)
+        $item->refresh();
+        $this->assertEquals(2, $item->stock);
+        // Status becomes 'Tersedia' because stock > 0 (perilaku ReturnStockService::syncItemStatus)
+        // Catatan: perilaku ini berbeda dengan Item::recalculateStatus() yang baru
+        $this->assertEquals('Tersedia', $item->status);
+
+        // Cleanup
+        $loan->delete();
+        $item->delete();
+    }
 }
