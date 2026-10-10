@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Teacher;
 use App\Http\Controllers\Controller;
 use App\Models\BorrowingRequest;
 use App\Models\ItemReturn;
+use App\Services\ReturnStockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -101,6 +102,10 @@ class PengembalianGuruController extends Controller
         $conditionDisplay = $conditionDisplayMap[$rawCondition] ?? 'Baik';
         $conditionEnum = $conditionEnumMap[$rawCondition] ?? 'baik';
         $notes = $request->input('catatan') ?? $request->input('return_notes') ?? null;
+
+        if (app(ReturnStockService::class)->isMultiItem($borrowing) && in_array($conditionEnum, ['hilang', 'rusak_berat'], true)) {
+            return back()->with('error', 'Pengembalian multi-item dengan kondisi hilang atau rusak berat belum bisa diajukan lewat form. Hubungi admin untuk penanganan manual.');
+        }
 
         // Handle upload foto bukti
         $fotoPath = null;

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BorrowingRequest;
 use App\Models\ItemReturn;
 use App\Models\Notification;
+use App\Services\ReturnStockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -101,6 +102,10 @@ class StudentReturnController extends Controller
         if (!in_array($borrowing->status, [BorrowingRequest::STATUS_BORROWED, BorrowingRequest::STATUS_APPROVED])) {
             return redirect()->route('student.returns.index')
                 ->with('error', 'Status peminjaman tidak valid untuk pengembalian.');
+        }
+
+        if (app(ReturnStockService::class)->isMultiItem($borrowing) && in_array($request->kondisi_barang, ['hilang', 'rusak_berat'], true)) {
+            return back()->with('error', 'Pengembalian multi-item dengan kondisi hilang atau rusak berat belum bisa diajukan lewat form. Hubungi admin untuk penanganan manual.');
         }
 
         // Cek duplikasi pengajuan yang berstatus 'menunggu'
