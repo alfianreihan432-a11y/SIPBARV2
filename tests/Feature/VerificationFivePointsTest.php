@@ -396,9 +396,9 @@ class VerificationFivePointsTest extends TestCase
     }
 
     /**
-     * ADMIN DAN KAJUR - RUSAK BERAT STOK 0 DENGAN PEMINJAMAN AKTIF (DIPINJAM)
+     * ADMIN - RUSAK BERAT STOK 0 DENGAN PEMINJAMAN AKTIF (DIPINJAM)
      */
-    public function test_admin_and_kajur_rusak_berat_stock_zero_with_active_borrowing(): void
+    public function test_admin_rusak_berat_stock_zero_with_active_borrowing(): void
     {
         $superadmin = User::factory()->create([
             'name' => 'Superadmin Test',
@@ -434,15 +434,334 @@ class VerificationFivePointsTest extends TestCase
         $item->condition = 'rusak_berat';
         $item->saveQuietly();
 
-        // Item status should remain Rusak even with active borrowing
+        // Aturan yang benar: rusak_berat, stok 0, ada peminjaman aktif -> status 'Dipinjam'
         $item->recalculateStatus();
-        $this->assertEquals('Rusak', $item->status);
+        $this->assertEquals('Dipinjam', $item->status);
 
         // Cleanup
         BorrowingRequestItem::where('borrowing_request_id', $loan->id)->delete();
         $loan->delete();
         $item->delete();
         $superadmin->delete();
+    }
+
+    /**
+     * KAJUR - RUSAK BERAT STOK 0 DENGAN PEMINJAMAN AKTIF (DIPINJAM)
+     */
+    public function test_kajur_rusak_berat_stock_zero_with_active_borrowing(): void
+    {
+        $item = $this->createTestItem('Kamera DSLR Canon Rusak Berat Active Kajur', 'CAM-RUSAK-BERAT-ACTIVE-KAJUR-01', 1);
+
+        $loan = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Peminjaman Rusak Berat Active Test Kajur',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $loan->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        // Set stock to 0, status to Rusak
+        $item->stock = 0;
+        $item->status = 'Rusak';
+        $item->condition = 'rusak_berat';
+        $item->saveQuietly();
+
+        // Aturan yang benar: rusak_berat, stok 0, ada peminjaman aktif -> status 'Dipinjam'
+        $item->recalculateStatus();
+        $this->assertEquals('Dipinjam', $item->status);
+
+        // Cleanup
+        BorrowingRequestItem::where('borrowing_request_id', $loan->id)->delete();
+        $loan->delete();
+        $item->delete();
+    }
+
+    /**
+     * KAJUR - MULTI-ITEM BAIK DAN RUSAK_RINGAN: STOK NAIK SESUAI QUANTITY
+     */
+    public function test_kajur_multi_item_baik_rusak_ringan_stock_increases(): void
+    {
+        $item1 = $this->createTestItem('Kamera DSLR Canon Test Multi 1', 'CAM-MULTI-01', 3);
+        $item2 = $this->createTestItem('Tripod Takara Test Multi 2', 'TRP-MULTI-02', 5);
+
+        // Create multi-item borrowing request
+        $loan = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => null,
+            'quantity' => null,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Test Multi-Item Baik dan Rusak Ringan',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $loan->id,
+            'item_id' => $item1->id,
+            'quantity' => 2,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $loan->id,
+            'item_id' => $item2->id,
+            'quantity' => 3,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        // Set stock to simulate borrowed items
+        $item1->stock = 1; // 3 - 2 borrowed
+        $item1->saveQuietly();
+        $item2->stock = 2; // 5 - 3 borrowed
+        $item2->saveQuietly();
+
+        // Use ReturnStockService directly (same logic as controller)
+        $returnStockService = app(\App\Services\ReturnStockService::class);
+        $returnStockService->applyStockForReturn($loan, 'baik');
+
+        // Stock should increase: item1 from 1 to 3 (+2), item2 from 2 to 5 (+3)
+        $item1->refresh();
+        $item2->refresh();
+        $this->assertEquals(3, $item1->stock);
+        $this->assertEquals(5, $item2->stock);
+        $this->assertEquals('Tersedia', $item1->status);
+        $this->assertEquals('Tersedia', $item2->status);
+
+        // Cleanup
+        BorrowingRequestItem::where('borrowing_request_id', $loan->id)->delete();
+        $loan->delete();
+        $item1->delete();
+        $item2->delete();
+    }
+
+    /**
+     * KAJUR - NOTIFIKASI VERIFY MULTI-ITEM MEMUAT itemSummary()
+     */
+    public function test_kajur_verify_multi_item_notification_uses_item_summary(): void
+    {
+        $item1 = $this->createTestItem('Kamera DSLR Canon Test Summary 1', 'CAM-SUM-01', 3);
+        $item2 = $this->createTestItem('Tripod Takara Test Summary 2', 'TRP-SUM-02', 5);
+
+        // Create multi-item borrowing request
+        $loan = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => null,
+            'quantity' => null,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Test Multi-Item Notifikasi',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $loan->id,
+            'item_id' => $item1->id,
+            'quantity' => 2,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        BorrowingRequestItem::create([
+            'borrowing_request_id' => $loan->id,
+            'item_id' => $item2->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        // Test itemSummary() method
+        $summary = $loan->itemSummary();
+        $this->assertStringContainsString('Kamera DSLR Canon Test Summary 1', $summary);
+        $this->assertStringContainsString('Tripod Takara Test Summary 2', $summary);
+        // Format itemSummary mungkin berbeda, yang penting nama barang muncul
+        $this->assertNotEmpty($summary);
+
+        // Cleanup
+        BorrowingRequestItem::where('borrowing_request_id', $loan->id)->delete();
+        $loan->delete();
+        $item1->delete();
+        $item2->delete();
+    }
+
+    /**
+     * KAJUR - SINGLE-ITEM BAIK: CEK STOK, STATUS MASTER, CONDITION
+     */
+    public function test_kajur_single_item_baik(): void
+    {
+        $item = $this->createTestItem('Laptop Dell Baik Test', 'LAP-BAIK-01', 5);
+
+        $loan = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => $item->id,
+            'quantity' => 2,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Test Single-Item Baik',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        // Simulate stock after borrowing
+        $item->stock = 3; // 5 - 2
+        $item->saveQuietly();
+
+        // Use ReturnStockService directly
+        $returnStockService = app(\App\Services\ReturnStockService::class);
+        $returnStockService->applyStockForReturn($loan, 'baik');
+
+        // Stock should increase from 3 to 5 (+2)
+        $item->refresh();
+        $this->assertEquals(5, $item->stock);
+        $this->assertEquals('Tersedia', $item->status);
+        $this->assertEquals('Baik', $item->condition);
+
+        // Cleanup
+        $loan->delete();
+        $item->delete();
+    }
+
+    /**
+     * KAJUR - SINGLE-ITEM RUSAK_RINGAN: CEK STOK, STATUS MASTER, CONDITION
+     */
+    public function test_kajur_single_item_rusak_ringan(): void
+    {
+        $item = $this->createTestItem('Laptop Dell Rusak Ringan Test', 'LAP-RR-01', 5);
+
+        $loan = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => $item->id,
+            'quantity' => 2,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Test Single-Item Rusak Ringan',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        // Simulate stock after borrowing
+        $item->stock = 3; // 5 - 2
+        $item->saveQuietly();
+
+        // Use ReturnStockService directly
+        $returnStockService = app(\App\Services\ReturnStockService::class);
+        $returnStockService->applyStockForReturn($loan, 'rusak_ringan');
+
+        // Stock should increase from 3 to 5 (+2)
+        $item->refresh();
+        $this->assertEquals(5, $item->stock);
+        $this->assertEquals('Tersedia', $item->status);
+        // Condition should be updated to 'Rusak Ringan' (legacy behavior)
+        $this->assertEquals('Rusak Ringan', $item->condition);
+
+        // Cleanup
+        $loan->delete();
+        $item->delete();
+    }
+
+    /**
+     * KAJUR - SINGLE-ITEM HILANG: CEK STOK, STATUS MASTER, CONDITION
+     */
+    public function test_kajur_single_item_hilang(): void
+    {
+        $item = $this->createTestItem('Laptop Dell Hilang Test', 'LAP-HILANG-01', 2);
+
+        $loan = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => $item->id,
+            'quantity' => 2,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Test Single-Item Hilang',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        // Simulate stock after borrowing (semua stok dipinjam)
+        $item->stock = 0; // 2 - 2 borrowed
+        $item->saveQuietly();
+
+        // Update loan status to simulate return process (menghilangkan active borrowing)
+        $loan->update(['status' => BorrowingRequest::STATUS_RETURNED]);
+
+        // Use ReturnStockService directly
+        $returnStockService = app(\App\Services\ReturnStockService::class);
+        $returnStockService->applyStockForReturn($loan, 'hilang');
+
+        // Stock should NOT increase (hilang tidak menambah stok)
+        $item->refresh();
+        $this->assertEquals(0, $item->stock);
+        $this->assertEquals('Hilang', $item->status);
+        // Condition should NOT be updated to 'Hilang' (per design)
+        $this->assertEquals('Baik', $item->condition);
+
+        // Cleanup
+        $loan->delete();
+        $item->delete();
+    }
+
+    /**
+     * KAJUR - SINGLE-ITEM RUSAK_BERAT: CEK STOK, STATUS MASTER, CONDITION
+     */
+    public function test_kajur_single_item_rusak_berat(): void
+    {
+        $item = $this->createTestItem('Laptop Dell Rusak Berat Test', 'LAP-RB-01', 2);
+
+        $loan = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => $item->id,
+            'quantity' => 2,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Test Single-Item Rusak Berat',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        // Simulate stock after borrowing (semua stok dipinjam)
+        $item->stock = 0; // 2 - 2 borrowed
+        $item->saveQuietly();
+
+        // Update loan status to simulate return process (menghilangkan active borrowing)
+        $loan->update(['status' => BorrowingRequest::STATUS_RETURNED]);
+
+        // Use ReturnStockService directly
+        $returnStockService = app(\App\Services\ReturnStockService::class);
+        $returnStockService->applyStockForReturn($loan, 'rusak_berat');
+
+        // Stock should NOT increase (rusak berat tidak menambah stok)
+        $item->refresh();
+        $this->assertEquals(0, $item->stock);
+        $this->assertEquals('Rusak', $item->status);
+        // Condition should NOT be updated to 'rusak_berat' (per design)
+        $this->assertEquals('Baik', $item->condition);
+
+        // Cleanup
+        $loan->delete();
+        $item->delete();
     }
 
     /**
