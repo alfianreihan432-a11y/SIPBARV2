@@ -238,29 +238,6 @@ html.dark .mob-t-sun{display:inline-flex;align-items:center;gap:4px}html.dark .m
 #faqNotFound p{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
 #faqNotFound span{font-size:13.5px}
 
-/* ── FOOTER ── */
-.footer{background:#fff;color:#475569;padding:72px 24px 32px;border-top:1px solid #e2e8f0;position:relative}
-.footer-inner{max-width:1200px;margin:0 auto}
-.footer-grid{display:grid;grid-template-columns:1.8fr 1fr;gap:48px 60px;margin-bottom:48px;align-items:start}
-.footer-brand{display:flex;flex-direction:column;align-items:flex-start}
-.footer-logo-wrap{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-.footer-logo-box{width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;box-shadow:0 2px 10px rgba(0,0,0,.08);border:1px solid #e2e8f0;flex-shrink:0}
-.footer-brand-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;color:#0f172a;letter-spacing:-.01em;line-height:1.2}
-.footer-brand-sub{font-size:11px;color:#1d4ed8;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.footer-desc{font-size:13.5px;line-height:1.7;color:#64748b;max-width:340px;font-weight:400;margin:0 0 12px 0}
-.footer-brand-extra{margin-top:2px}
-.footer-help-sublink{font-size:13px;font-weight:600;color:#1d4ed8;text-decoration:none;transition:color .2s}
-.footer-help-sublink:hover{color:#1e40af;text-decoration:underline}
-.footer-col{display:flex;flex-direction:column}
-.footer-heading{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:#0f172a;margin-bottom:18px;letter-spacing:.04em;text-transform:uppercase}
-.footer-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin:0;padding:0}
-.footer-list li{margin:0;padding:0}
-.footer-list a{font-size:13.5px;color:#64748b;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;font-weight:500}
-.footer-list a:hover{color:#1d4ed8;transform:translateX(4px)}
-.footer-divider{border:none;border-top:1px solid #e2e8f0;margin-bottom:24px}
-.footer-bottom{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px}
-.footer-copy{text-align:center;font-size:12.5px;color:#64748b;font-weight:400;margin:0}
-
 @media(max-width:768px){
   .nav-inner{height:68px;padding:0 16px;gap:12px}
   .nav-links,.nav-actions{display:none!important}
@@ -268,11 +245,9 @@ html.dark .mob-t-sun{display:inline-flex;align-items:center;gap:4px}html.dark .m
   .nav-ham{display:flex!important}
   .faq-h1{font-size:28px}
   .faq-page{padding:40px 16px 60px}
-  .footer-grid{grid-template-columns:1fr;gap:28px}
 }
 @media(max-width:480px){
   .faq-h1{font-size:24px}
-  .footer{padding:48px 20px 24px}
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -443,26 +418,6 @@ html.dark .faq-note{
 html.dark #faqNotFound p{color:#f4f8ff !important}
 html.dark #faqNotFound span{color:#b4c3dc !important}
 
-html.dark .footer{
-  background-color:transparent !important;
-  background-image:none !important;
-  border-top:none !important;
-}
-html.dark .footer-logo-box{
-  background:rgba(255,255,255,.95) !important;
-  border-color:rgba(255,255,255,.8) !important;
-  box-shadow:none !important;
-}
-html.dark .footer-brand-name{color:#f4f8ff !important}
-html.dark .footer-brand-sub{color:#8ab4ff !important}
-html.dark .footer-desc{color:#b4c3dc !important}
-html.dark .footer-help-sublink{color:#8ab4ff !important}
-html.dark .footer-help-sublink:hover{color:#93c5fd !important}
-html.dark .footer-heading{color:#f4f8ff !important}
-html.dark .footer-list a{color:#b4c3dc !important}
-html.dark .footer-list a:hover{color:#8ab4ff !important}
-html.dark .footer-divider{border-top-color:rgba(120,170,255,.15) !important}
-html.dark .footer-copy{color:#8fa3c4 !important}
 </style>
 </head>
 <body>
@@ -924,40 +879,11 @@ html.dark .footer-copy{color:#8fa3c4 !important}
   </div>
 </main>
 
-<footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <div class="footer-logo-wrap">
-          <div class="footer-logo-box">
-            <img src="{{ \App\Models\SiteSetting::get('site_logo_landing') ?: \App\Models\SiteSetting::get('site_logo', '/logossmkn1.png') }}" alt="Logo" class="nav-brand-img">
-          </div>
-          <div>
-            <div class="footer-brand-name">{{ \App\Models\SiteSetting::get('site_name', 'SIPBAR') }}</div>
-            <div class="footer-brand-sub">{{ \App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 BANGSRI') }}</div>
-          </div>
-        </div>
-        <p class="footer-desc">{{ \App\Models\SiteSetting::get('footer_description', 'Sistem peminjaman barang berbasis web yang lebih efektif, efisien, dan transparan untuk sekolah.') }}</p>
-        <div class="footer-brand-extra">
-          <a href="{{ route('home') }}" class="footer-help-sublink">&larr; Kembali ke Beranda</a>
-        </div>
-      </div>
-
-      <div class="footer-col">
-        <div class="footer-heading">Bantuan</div>
-        <ul class="footer-list">
-          <li><a href="{{ route('faq') }}">FAQ</a></li>
-          <li><a href="{{ route('home') }}#bantuan">Bantuan Singkat</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <hr class="footer-divider">
-    <div class="footer-bottom">
-      <p class="footer-copy">&copy; {{ date('Y') }} {{ \App\Models\SiteSetting::get('site_name', 'SIPBAR') }} {{ \App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 BANGSRI') }}. Hak cipta dilindungi.</p>
-    </div>
-  </div>
-</footer>
+<x-footer
+  :logo="\App\Models\SiteSetting::get('site_logo_landing') ?: \App\Models\SiteSetting::get('site_logo', '/logossmkn1.png')"
+  :brand-name="\App\Models\SiteSetting::get('site_name', 'SIPBAR')"
+  :brand-subtitle="\App\Models\SiteSetting::get('site_subtitle', 'SMKN 1 BANGSRI')"
+/>
 
 <script>
 document.addEventListener('DOMContentLoaded', function(){
