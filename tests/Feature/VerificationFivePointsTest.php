@@ -400,59 +400,124 @@ class VerificationFivePointsTest extends TestCase
      */
     public function test_admin_rusak_berat_stock_zero_with_active_borrowing(): void
     {
-        $superadmin = User::factory()->create([
-            'name' => 'Superadmin Test',
-            'email' => 'superadmin@test.sipbar.id',
+        Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $admin = User::factory()->create([
+            'name' => 'Admin Test',
+            'email' => 'admin_rt@test.sipbar.id',
         ]);
-        $superadmin->assignRole('superadmin');
+        $admin->assignRole('admin');
 
-        $item = $this->createTestItem('Kamera DSLR Canon Rusak Berat Active', 'CAM-RUSAK-BERAT-ACTIVE-01', 1);
+        $item = $this->createTestItem('Kamera DSLR Canon Admin Active Return', 'CAM-ADM-ACT-01', 2);
 
-        $loan = BorrowingRequest::create([
-            'user_id' => $this->guru->id,
-            'tipe_peminjam' => 'guru',
-            'approved_by_kajur_id' => $this->kajur->id,
+        // Peminjaman 1 Siswa
+        $loanA = BorrowingRequest::create([
+            'user_id' => $this->siswa->id,
+            'tipe_peminjam' => 'siswa',
             'item_id' => $item->id,
             'quantity' => 1,
             'borrow_date' => now()->toDateString(),
             'return_date' => now()->addDays(2)->toDateString(),
             'return_time' => '14:00',
-            'purpose' => 'Peminjaman Rusak Berat Active Test',
+            'purpose' => 'Peminjaman A Siswa',
             'status' => BorrowingRequest::STATUS_BORROWED,
         ]);
 
-        BorrowingRequestItem::create([
-            'borrowing_request_id' => $loan->id,
+        $itemA = BorrowingRequestItem::create([
+            'borrowing_request_id' => $loanA->id,
             'item_id' => $item->id,
             'quantity' => 1,
             'kondisi_saat_pinjam' => 'baik',
         ]);
 
-        // Set stock to 0, status to Rusak
+        // Peminjaman 2 Siswa
+        $loanB = BorrowingRequest::create([
+            'user_id' => $this->siswa->id,
+            'tipe_peminjam' => 'siswa',
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Peminjaman B Siswa',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        $itemB = BorrowingRequestItem::create([
+            'borrowing_request_id' => $loanB->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        // Simulasi kedua unit sudah checkout: stok fisik menjadi 0, status 'Dipinjam'
         $item->stock = 0;
-        $item->status = 'Rusak';
-        $item->condition = 'rusak_berat';
+        $item->status = 'Dipinjam';
         $item->saveQuietly();
 
-        // Aturan yang benar: rusak_berat, stok 0, ada peminjaman aktif -> status 'Dipinjam'
-        $item->recalculateStatus();
+        // 1. Proses pengembalian A dengan kondisi 'rusak_berat'
+        $returnA = \App\Models\ItemReturn::create([
+            'borrowing_request_id' => $loanA->id,
+            'user_id' => $this->siswa->id,
+            'tanggal_pengembalian' => now()->toDateString(),
+            'kondisi_barang' => 'rusak_berat',
+            'status' => \App\Models\ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        $responseA = $this->actingAs($admin)->post(
+            route('admin.returns.approve', $returnA->id),
+            ['kondisi' => 'rusak_berat']
+        );
+        $responseA->assertRedirect();
+
+        // Verifikasi setelah return A disetujui:
+        // Stok tetap 0 (rusak berat tidak menambah stok), status tetap 'Dipinjam' (karena peminjaman B masih aktif)
+        $item->refresh();
+        $this->assertEquals(0, $item->stock);
         $this->assertEquals('Dipinjam', $item->status);
 
+        // 2. Proses pengembalian B dengan kondisi 'baik'
+        $returnB = \App\Models\ItemReturn::create([
+            'borrowing_request_id' => $loanB->id,
+            'user_id' => $this->siswa->id,
+            'tanggal_pengembalian' => now()->toDateString(),
+            'kondisi_barang' => 'baik',
+            'status' => \App\Models\ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam' => 'siswa',
+        ]);
+
+        $responseB = $this->actingAs($admin)->post(
+            route('admin.returns.approve', $returnB->id),
+            ['kondisi' => 'baik']
+        );
+        $responseB->assertRedirect();
+
+        // Verifikasi setelah return B disetujui:
+        // Stok bertambah menjadi 1 (+1 unit baik), status pulih menjadi 'Tersedia'
+        $item->refresh();
+        $this->assertEquals(1, $item->stock);
+        $this->assertEquals('Tersedia', $item->status);
+
         // Cleanup
-        BorrowingRequestItem::where('borrowing_request_id', $loan->id)->delete();
-        $loan->delete();
+        $itemA->delete();
+        $itemB->delete();
+        $returnA->delete();
+        $returnB->delete();
+        $loanA->delete();
+        $loanB->delete();
         $item->delete();
-        $superadmin->delete();
+        $admin->delete();
     }
 
     /**
-     * KAJUR - RUSAK BERAT STOK 0 DENGAN PEMINJAMAN AKTIF (DIPINJAM)
+     * KAJUR - RUSAK BERAT STOK 0 DENGAN PEMINJAMAN AKTIF (DIPINJAM) LALU KEMBALI BAIK (TERSEDIA)
      */
     public function test_kajur_rusak_berat_stock_zero_with_active_borrowing(): void
     {
-        $item = $this->createTestItem('Kamera DSLR Canon Rusak Berat Active Kajur', 'CAM-RUSAK-BERAT-ACTIVE-KAJUR-01', 1);
+        $item = $this->createTestItem('Kamera DSLR Canon Kajur Active Return', 'CAM-KJR-ACT-01', 2);
 
-        $loan = BorrowingRequest::create([
+        // Peminjaman 1 Guru
+        $loanA = BorrowingRequest::create([
             'user_id' => $this->guru->id,
             'tipe_peminjam' => 'guru',
             'approved_by_kajur_id' => $this->kajur->id,
@@ -461,30 +526,98 @@ class VerificationFivePointsTest extends TestCase
             'borrow_date' => now()->toDateString(),
             'return_date' => now()->addDays(2)->toDateString(),
             'return_time' => '14:00',
-            'purpose' => 'Peminjaman Rusak Berat Active Test Kajur',
+            'purpose' => 'Peminjaman A Guru',
             'status' => BorrowingRequest::STATUS_BORROWED,
         ]);
 
-        BorrowingRequestItem::create([
-            'borrowing_request_id' => $loan->id,
+        $itemA = BorrowingRequestItem::create([
+            'borrowing_request_id' => $loanA->id,
             'item_id' => $item->id,
             'quantity' => 1,
             'kondisi_saat_pinjam' => 'baik',
         ]);
 
-        // Set stock to 0, status to Rusak
+        // Peminjaman 2 Guru
+        $loanB = BorrowingRequest::create([
+            'user_id' => $this->guru->id,
+            'tipe_peminjam' => 'guru',
+            'approved_by_kajur_id' => $this->kajur->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'borrow_date' => now()->toDateString(),
+            'return_date' => now()->addDays(2)->toDateString(),
+            'return_time' => '14:00',
+            'purpose' => 'Peminjaman B Guru',
+            'status' => BorrowingRequest::STATUS_BORROWED,
+        ]);
+
+        $itemB = BorrowingRequestItem::create([
+            'borrowing_request_id' => $loanB->id,
+            'item_id' => $item->id,
+            'quantity' => 1,
+            'kondisi_saat_pinjam' => 'baik',
+        ]);
+
+        // Simulasi kedua unit sudah checkout: stok fisik menjadi 0, status 'Dipinjam'
         $item->stock = 0;
-        $item->status = 'Rusak';
-        $item->condition = 'rusak_berat';
+        $item->status = 'Dipinjam';
         $item->saveQuietly();
 
-        // Aturan yang benar: rusak_berat, stok 0, ada peminjaman aktif -> status 'Dipinjam'
-        $item->recalculateStatus();
+        // 1. Buat pengembalian A guru dengan kondisi 'rusak_berat'
+        $returnA = \App\Models\ItemReturn::create([
+            'borrowing_request_id' => $loanA->id,
+            'user_id' => $this->guru->id,
+            'kajur_id' => $this->kajur->id,
+            'tanggal_pengembalian' => now()->toDateString(),
+            'kondisi_barang' => 'rusak_berat',
+            'status' => \App\Models\ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam' => 'guru',
+        ]);
+
+        // Kajur verifikasi pengembalian A sebagai 'Rusak Berat' lewat endpoint controller
+        $responseA = $this->actingAs($this->kajur)->post(
+            route('kajur.verify-return', $returnA->id),
+            ['verified_condition' => 'Rusak Berat']
+        );
+        $responseA->assertRedirect();
+
+        // Verifikasi setelah return A disetujui:
+        // Stok tetap 0, status tetap 'Dipinjam' karena peminjaman B masih aktif
+        $item->refresh();
+        $this->assertEquals(0, $item->stock);
         $this->assertEquals('Dipinjam', $item->status);
 
+        // 2. Buat pengembalian B guru dengan kondisi 'baik'
+        $returnB = \App\Models\ItemReturn::create([
+            'borrowing_request_id' => $loanB->id,
+            'user_id' => $this->guru->id,
+            'kajur_id' => $this->kajur->id,
+            'tanggal_pengembalian' => now()->toDateString(),
+            'kondisi_barang' => 'baik',
+            'status' => \App\Models\ItemReturn::STATUS_MENUNGGU,
+            'tipe_peminjam' => 'guru',
+        ]);
+
+        // Kajur verifikasi pengembalian B sebagai 'Baik' lewat endpoint controller
+        $responseB = $this->actingAs($this->kajur)->post(
+            route('kajur.verify-return', $returnB->id),
+            ['verified_condition' => 'Baik']
+        );
+        $responseB->assertRedirect();
+
+        // Verifikasi setelah return B disetujui:
+        // Stok bertambah menjadi 1, status pulih menjadi 'Tersedia'
+        $item->refresh();
+        $this->assertEquals(1, $item->stock);
+        $this->assertEquals('Tersedia', $item->status);
+
         // Cleanup
-        BorrowingRequestItem::where('borrowing_request_id', $loan->id)->delete();
-        $loan->delete();
+        $itemA->delete();
+        $itemB->delete();
+        $returnA->delete();
+        $returnB->delete();
+        $loanA->delete();
+        $loanB->delete();
         $item->delete();
     }
 

@@ -268,9 +268,7 @@ class Item extends Model
      * TIDAK mengubah status 'Maintenance' — perubahan maintenance harus manual.
      *
      * Perubahan untuk status 'Hilang' dan 'Rusak':
-     * - Jika status saat ini 'Hilang' atau 'Rusak' dan stok tersedia <= 0:
-     *   - Jika ada peminjaman aktif (approved/borrowed), ubah ke 'Dipinjam'
-     *   - Jika tidak ada peminjaman aktif, tetap 'Hilang'/'Rusak'
+     * - Jika status saat ini 'Hilang' atau 'Rusak' dan stok tersedia <= 0, status TIDAK ditimpa
      * - Jika stok tersedia > 0, status dipulihkan ke 'Tersedia'
      */
     public function recalculateStatus(): void
@@ -281,20 +279,13 @@ class Item extends Model
 
         $availableStock = $this->available_stock;
 
-        // Khusus untuk status 'Hilang' dan 'Rusak'
+        // Khusus untuk status 'Hilang' dan 'Rusak': hanya ubah jika stok > 0
         if (in_array($this->status, ['Hilang', 'Rusak'])) {
             if ($availableStock > 0) {
                 $this->status = 'Tersedia';
                 $this->saveQuietly();
-            } else {
-                // Jika stok = 0, cek apakah ada peminjaman aktif
-                $hasActiveBorrowing = $this->activeBorrowingRequests()->exists();
-                if ($hasActiveBorrowing) {
-                    $this->status = 'Dipinjam';
-                    $this->saveQuietly();
-                }
-                // Jika tidak ada peminjaman aktif, tetap Hilang/Rusak
             }
+            // Jika stok <= 0, jangan ubah status (tetap Hilang/Rusak)
             return;
         }
 

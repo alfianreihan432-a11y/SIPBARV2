@@ -371,9 +371,8 @@ class DynamicItemCatalogStatusTest extends TestCase
             'kondisi_saat_pinjam' => 'baik',
         ]);
 
-        // Jalankan transisi state machine nyata (bypass stock validation untuk test purposes)
-        // Kita langsung update status ke approved untuk mensimulasikan transisi
-        $req2->update(['status' => BorrowingRequest::STATUS_APPROVED]);
+        // Jalankan transisi penolakan nyata via BorrowingApprovalService (memanggil BorrowingStateMachine -> recalculateStatus)
+        $approvalService->reject($req2, 'Barang hilang/tidak tersedia', $teacher->id);
 
         // Setelah transisi, status tetap 'Hilang' (tidak tertimpa oleh Dipinjam karena stok = 0)
         $item->refresh();
@@ -494,9 +493,8 @@ class DynamicItemCatalogStatusTest extends TestCase
             'kondisi_saat_pinjam' => 'baik',
         ]);
 
-        // Jalankan transisi state machine nyata (bypass stock validation untuk test purposes)
-        // Kita langsung update status ke approved untuk mensimulasikan transisi
-        $req2->update(['status' => BorrowingRequest::STATUS_APPROVED]);
+        // Jalankan transisi penolakan nyata via BorrowingApprovalService (memanggil BorrowingStateMachine -> recalculateStatus)
+        $approvalService->reject($req2, 'Barang rusak berat/tidak tersedia', $teacher->id);
 
         // Setelah transisi, status tetap 'Rusak' (tidak tertimpa oleh Dipinjam karena stok = 0)
         $item->refresh();
