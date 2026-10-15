@@ -68,6 +68,22 @@ Route::post(
     '/approval-guru/{borrowingRequest}/reject',
     [MagicApprovalController::class, 'rejectGuru']
 )->name('approval-guru.reject');
+
+// Siswa → Kepala Jurusan pemberi pinjaman (magic link bertanda tangan)
+Route::get(
+    '/approval-siswa-kajur/{borrowingRequest}',
+    [MagicApprovalController::class, 'showStudentKajur']
+)->middleware('signed')->name('approval-siswa-kajur.show');
+
+Route::post(
+    '/approval-siswa-kajur/{borrowingRequest}/approve',
+    [MagicApprovalController::class, 'approveStudentKajur']
+)->middleware('signed')->name('approval-siswa-kajur.approve');
+
+Route::post(
+    '/approval-siswa-kajur/{borrowingRequest}/reject',
+    [MagicApprovalController::class, 'rejectStudentKajur']
+)->middleware('signed')->name('approval-siswa-kajur.reject');
 // ────────────────────────────────────────────────────────────────────────────
 
 // ─── SIPINTU OAUTH 2.0 SSO (public — sebelum middleware auth) ───
@@ -360,7 +376,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('qr/verify/{token}', [KepalaJurusanController::class, 'verifyQR'])->name('qr.verify');
         Route::post('qr/confirm-checkout/{id}', [KepalaJurusanController::class, 'confirmCheckout'])->name('qr.confirm-checkout');
         Route::get('pending-returns', [KepalaJurusanController::class, 'pendingReturns'])->name('pending-returns');
+        Route::get('pending-returns/{id}', [KepalaJurusanController::class, 'showReturn'])->name('pending-returns.show');
         Route::post('pending-returns/{id}/verify', [KepalaJurusanController::class, 'verifyReturn'])->name('verify-return');
+        Route::post('pending-returns/{id}/reject', [KepalaJurusanController::class, 'rejectReturn'])->name('pending-returns.reject');
         Route::get('history', [KepalaJurusanController::class, 'history'])->name('history');
         Route::get('reporting', [KepalaJurusanController::class, 'reporting'])->name('reporting');
         Route::post('reporting/create', [KepalaJurusanController::class, 'createReport'])->name('create-report');

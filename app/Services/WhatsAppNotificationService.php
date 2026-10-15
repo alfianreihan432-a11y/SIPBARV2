@@ -85,6 +85,44 @@ class WhatsAppNotificationService
         );
     }
 
+    public function getApprovalUrlForStudentKajur(BorrowingRequest $request): string
+    {
+        return URL::temporarySignedRoute(
+            'approval-siswa-kajur.show',
+            now()->addDays(7),
+            ['borrowingRequest' => $request->id]
+        );
+    }
+
+    public function getDirectWaLinkForStudentKajur(BorrowingRequest $request): string
+    {
+        $kajurPhone = trim((string) ($request->lenderKajur?->phone ?? ''));
+        if ($kajurPhone === '') {
+            return '';
+        }
+
+        $studentName = $request->user?->name ?? 'Siswa';
+        $items = $request->items;
+        $itemName = $items->isNotEmpty()
+            ? $items->map(fn ($item) => $item->item?->name ?? $item->itemWithTrashed?->name ?? 'Barang')->join(', ')
+            : ($request->item?->name ?? $request->itemWithTrashed?->name ?? 'Barang');
+        $quantity = $items->isNotEmpty() ? $items->sum('quantity') : ($request->quantity ?? 1);
+        $submittedAt = ($request->created_at ?? now())->copy()->timezone('Asia/Jakarta');
+        $approvalUrl = $this->getApprovalUrlForStudentKajur($request);
+
+        $text = "Assalamu'alaikum Wr. Wb. / {$this->getTimeGreeting($submittedAt)}, Bapak/Ibu Kepala Jurusan 🙏\n\n" .
+            "Ada pengajuan peminjaman siswa yang perlu ditinjau melalui SIPBAR.\n\n" .
+            "Nama Siswa: {$studentName}\n" .
+            "Barang: {$itemName}\n" .
+            "Jumlah: {$quantity} unit\n" .
+            "Keperluan: " . ($request->purpose ?: '-') . "\n" .
+            "Tanggal Ajukan: " . $submittedAt->translatedFormat('d F Y, H:i') . " WIB\n\n" .
+            "Silakan tinjau dan putuskan melalui tautan berikut:\n{$approvalUrl}\n\n" .
+            "Sistem SIPBAR — SMKN 1 Bangsri";
+
+        return 'https://api.whatsapp.com/send?phone='.$this->normalizePhone($kajurPhone).'&text='.urlencode($text);
+    }
+
     public function getTimeGreeting(?\Carbon\CarbonInterface $time = null): string
     {
         $dt = ($time ? $time->copy() : now())->timezone('Asia/Jakarta');

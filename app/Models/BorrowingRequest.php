@@ -32,6 +32,8 @@ class BorrowingRequest extends Model
         'checkin_by',
         'tipe_peminjam',
         'approved_by_kajur_id',
+        'lender_type',
+        'lender_kajur_id',
     ];
 
     protected $appends = ['display_status'];
@@ -242,6 +244,18 @@ class BorrowingRequest extends Model
     public function approvedByKajur(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by_kajur_id');
+    }
+
+    public function lenderKajur(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'lender_kajur_id');
+    }
+
+    public function isStudentLoanForKajur(): bool
+    {
+        return $this->tipe_peminjam === 'siswa'
+            && $this->lender_type === 'kajur'
+            && $this->lender_kajur_id !== null;
     }
     
     public function whatsappLogs()

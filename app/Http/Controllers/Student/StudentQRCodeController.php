@@ -80,6 +80,8 @@ class StudentQRCodeController extends Controller
                 'borrowing_id' => $borrowingRequest->id,
                 'user_id'      => $borrowingRequest->user_id,
                 'item_id'      => $borrowingRequest->item_id,
+                'lender_type'  => $borrowingRequest->lender_type ?: 'admin',
+                'lender_kajur_id' => $borrowingRequest->lender_kajur_id,
                 'token'        => $token,
                 'issued_at'    => now()->toIso8601String(),
             ]);
@@ -97,7 +99,9 @@ class StudentQRCodeController extends Controller
         }
 
         // URL verifikasi untuk discan oleh petugas inventaris
-        $verifyUrl = route('admin.qr.verify', ['token' => $qrCodeRecord->code]);
+        $verifyUrl = $borrowingRequest->isStudentLoanForKajur()
+            ? route('kajur.qr.verify', ['token' => $qrCodeRecord->code])
+            : route('admin.qr.verify', ['token' => $qrCodeRecord->code]);
 
         // Generate QR Code menggunakan Endroid QR Code v6
         $qrCode = new EndroidQrCode(
@@ -131,6 +135,10 @@ class StudentQRCodeController extends Controller
             'expires_at'   => $qrCodeRecord->expires_at?->format('d M Y, H:i'),
             'status'       => $borrowingRequest->status,
             'status_label' => $statusLabel,
+            'lender_type'  => $borrowingRequest->lender_type ?: 'admin',
+            'lender_name'  => $borrowingRequest->isStudentLoanForKajur()
+                ? $borrowingRequest->lenderKajur?->name
+                : null,
         ];
     }
 }

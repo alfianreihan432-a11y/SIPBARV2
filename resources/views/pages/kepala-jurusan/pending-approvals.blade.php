@@ -218,23 +218,33 @@
                                 <td>{{ $request->return_date ? $request->return_date->format('d/m/Y') : '-' }}</td>
                                 <td>{{ Str::limit($request->purpose ?? '-', 30) }}</td>
                                 <td>
-                                    <div style="display: flex; gap: 8px;">
-                                        <form method="POST" action="{{ route('kajur.approve-request', $request->id) }}" style="display: inline;">
-                                            @csrf
-                                            <button type="submit" class="action-btn btn-approve" onclick="return confirm('Setujui permohonan peminjaman ini?')">
-                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                                </svg>
-                                                Setujui
-                                            </button>
-                                        </form>
-                                        <button type="button" class="action-btn btn-reject" onclick="showRejectModal({{ $request->id }})">
+                                    @if($request->tipe_peminjam === 'siswa')
+                                        <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('approval-siswa-kajur.show', now()->addDays(7), ['borrowingRequest' => $request->id]) }}" class="action-btn" style="background: rgba(59, 130, 246, 0.1); color: #2563eb; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                                             <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
-                                            Tolak
-                                        </button>
-                                    </div>
+                                            Tinjau
+                                        </a>
+                                    @else
+                                        <div style="display: flex; gap: 8px;">
+                                            <form method="POST" action="{{ route('kajur.approve-request', $request->id) }}" style="display: inline;">
+                                                @csrf
+                                                <button type="submit" class="action-btn btn-approve" onclick="return confirm('Setujui permohonan peminjaman ini?')">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                    Setujui
+                                                </button>
+                                            </form>
+                                            <button type="button" class="action-btn btn-reject" onclick="showRejectModal({{ $request->id }})">
+                                                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                </svg>
+                                                Tolak
+                                            </button>
+                                        </div>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -294,15 +304,21 @@
                     </div>
 
                     <div class="mc-card-actions">
-                        <form method="POST" action="{{ route('kajur.approve-request', $request->id) }}" style="flex: 1;">
-                            @csrf
-                            <button type="submit" class="mc-card-btn mc-card-btn-primary" onclick="return confirm('Setujui permohonan peminjaman ini?')">
-                                Setujui
+                        @if($request->tipe_peminjam === 'siswa')
+                            <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('approval-siswa-kajur.show', now()->addDays(7), ['borrowingRequest' => $request->id]) }}" class="mc-card-btn mc-card-btn-primary" style="text-decoration: none; text-align: center; display: block; flex: 1;">
+                                Tinjau
+                            </a>
+                        @else
+                            <form method="POST" action="{{ route('kajur.approve-request', $request->id) }}" style="flex: 1;">
+                                @csrf
+                                <button type="submit" class="mc-card-btn mc-card-btn-primary" onclick="return confirm('Setujui permohonan peminjaman ini?')">
+                                    Setujui
+                                </button>
+                            </form>
+                            <button type="button" class="mc-card-btn mc-card-btn-secondary" onclick="showRejectModal({{ $request->id }})">
+                                Tolak
                             </button>
-                        </form>
-                        <button type="button" class="mc-card-btn mc-card-btn-secondary" onclick="showRejectModal({{ $request->id }})">
-                            Tolak
-                        </button>
+                        @endif
                     </div>
                 </div>
             @endforeach

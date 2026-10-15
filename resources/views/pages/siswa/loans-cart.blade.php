@@ -395,7 +395,7 @@
     $defaultWaNumber = old('whatsapp_number', auth()->user()->phone ?? '');
 @endphp
 
-<div class="cart-container">
+<div class="cart-container" x-data="{ lenderType: @js(old('lender_type', 'admin')) }">
     {{-- Page Header --}}
     <div class="page-header">
         <div class="page-header-left">
@@ -438,7 +438,34 @@
     @endif
 
     @if($errors->any())
-        <div style="background: var(--s-rejected-bg, #fef2f2); border: 1px solid var(--s-rejected-bdr, #fecaca); color: var(--s-rejected, #dc2626); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px;">
+        @php
+            $teacherErrors = collect($errors->get('teacher_id'));
+            $kajurErrors = collect($errors->get('lender_kajur_id'));
+            $otherErrors = collect($errors->all())->filter(function($msg) use ($teacherErrors, $kajurErrors) {
+                if ($teacherErrors->contains($msg) || str_contains($msg, 'Guru Pembimbing') || str_contains($msg, 'pengajuan ke Admin')) {
+                    return false;
+                }
+                if ($kajurErrors->contains($msg) || str_contains($msg, 'Kepala Jurusan') || str_contains($msg, 'pengajuan ke Kajur')) {
+                    return false;
+                }
+                return true;
+            })->values();
+
+            $allTeacherErrors = collect($errors->all())->filter(function($msg) use ($teacherErrors) {
+                return $teacherErrors->contains($msg) || str_contains($msg, 'Guru Pembimbing') || str_contains($msg, 'pengajuan ke Admin');
+            })->unique()->values();
+
+            $allKajurErrors = collect($errors->all())->filter(function($msg) use ($kajurErrors) {
+                return $kajurErrors->contains($msg) || str_contains($msg, 'Kepala Jurusan') || str_contains($msg, 'pengajuan ke Kajur');
+            })->unique()->values();
+
+            $hasOther = $otherErrors->isNotEmpty();
+            $hasTeacher = $allTeacherErrors->isNotEmpty();
+            $hasKajur = $allKajurErrors->isNotEmpty();
+        @endphp
+        <div x-show="{{ $hasOther ? 'true' : 'false' }} || (lenderType === 'admin' && {{ $hasTeacher ? 'true' : 'false' }}) || (lenderType === 'kajur' && {{ $hasKajur ? 'true' : 'false' }})"
+             x-cloak
+             style="background: var(--s-rejected-bg, #fef2f2); border: 1px solid var(--s-rejected-bdr, #fecaca); color: var(--s-rejected, #dc2626); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px;">
             <div style="font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" class="svg-icon-18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -446,8 +473,14 @@
                 <span>Periksa kembali data yang dimasukkan:</span>
             </div>
             <ul style="padding-left: 26px; list-style-type: disc;">
-                @foreach($errors->all() as $error)
+                @foreach($otherErrors as $error)
                     <li style="margin-top: 2px;">{{ $error }}</li>
+                @endforeach
+                @foreach($allTeacherErrors as $error)
+                    <li style="margin-top: 2px;" x-show="lenderType === 'admin'">{{ $error }}</li>
+                @endforeach
+                @foreach($allKajurErrors as $error)
+                    <li style="margin-top: 2px;" x-show="lenderType === 'kajur'">{{ $error }}</li>
                 @endforeach
             </ul>
         </div>
@@ -607,6 +640,17 @@
                 <form id="borrow-cart-form" method="POST" action="{{ route('student.loans.cart.submit') }}">
                     @csrf
 
+                    <div class="cart-field-group">
+                        <label for="lender_type" class="cart-label">Tujuan Peminjaman <span style="color:var(--s-rejected);font-weight:700;">*</span></label>
+                        <select id="lender_type" name="lender_type" class="cart-input" x-model="lenderType">
+                            <option value="admin">Admin TU</option>
+                            <option value="kajur" {{ $kajursWithPhone->isEmpty() ? 'disabled' : '' }}>Kajur</option>
+                        </select>
+                        @if($kajursWithPhone->isEmpty())
+                            <p style="margin:6px 0 0;font-size:12px;color:var(--muted);">Belum ada Kajur dengan nomor WhatsApp. Hubungi admin jika ingin mengajukan melalui Kajur.</p>
+                        @endif
+                    </div>
+
                     {{-- Row 1: Tanggal Pinjam & Tanggal Kembali (2 Kolom) --}}
                     <div class="cart-form-grid">
                         <div class="cart-field-group">
@@ -662,7 +706,7 @@
                                    class="cart-input">
                         </div>
 
-                        <div class="cart-field-group"
+                            <div class="cart-field-group" x-show="lenderType === 'admin'" x-cloak
                              x-data="{
                                  open: false,
                                  search: '',
@@ -694,7 +738,7 @@
                                 <span style="color:var(--s-rejected);font-weight:700;">*</span>
                             </label>
 
-                            <input type="hidden" name="teacher_id" :value="selectedId" required>
+                            <input type="hidden" name="teacher_id" :value="lenderType === 'admin' ? selectedId : ''" :disabled="lenderType !== 'admin'">
 
                             <div class="ts-wrapper" @click.outside="open = false" @keydown.escape.window="open = false" style="position: relative;">
                                 <div @click="open = !open; if(open) { $nextTick(() => { $refs.searchInput && $refs.searchInput.focus() }); }"
@@ -778,6 +822,25 @@
                                 <span style="color: var(--s-rejected); font-size: 12px; display: block; margin-top: 6px;">{{ $message }}</span>
                             @enderror
                         </div>
+                    </div>
+
+                    <div class="cart-field-group" x-show="lenderType === 'kajur'" x-cloak>
+                        <label for="lender_kajur_id" class="cart-label">
+                            <span>Pilih Kepala Jurusan</span>
+                            <span style="color:var(--s-rejected);font-weight:700;">*</span>
+                        </label>
+                        <select id="lender_kajur_id" name="lender_kajur_id" class="cart-input" :required="lenderType === 'kajur'" :disabled="lenderType !== 'kajur'">
+                            <option value="">Pilih Kajur</option>
+                            @foreach($kajurs as $kajur)
+                                @php $kajurHasPhone = trim((string) $kajur->phone) !== ''; @endphp
+                                <option value="{{ $kajur->id }}" {{ $kajurHasPhone ? '' : 'disabled' }} {{ (string) old('lender_kajur_id') === (string) $kajur->id ? 'selected' : '' }}>
+                                    {{ $kajur->name }}{{ $kajur->jurusan?->nama ? ' - '.$kajur->jurusan->nama : '' }}{{ $kajurHasPhone ? '' : ' (nomor WhatsApp belum tersedia)' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('lender_kajur_id')
+                            <span style="color:var(--s-rejected);font-size:12px;display:block;margin-top:6px;">{{ $message }}</span>
+                        @enderror
                     </div>
 
                     {{-- FITUR 2: INPUT NOMOR WHATSAPP SISWA --}}
@@ -960,8 +1023,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" class="svg-icon-16" style="color:var(--muted);margin-top:1px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p style="font-size:11px;color:var(--muted);line-height:1.5;margin:0;">
+                    <p x-show="lenderType === 'admin'" style="font-size:11px;color:var(--muted);line-height:1.5;margin:0;">
                         Setelah diajukan, permohonan peminjaman akan otomatis diteruskan ke guru pembimbing untuk diverifikasi.
+                    </p>
+                    <p x-show="lenderType === 'kajur'" x-cloak style="font-size:11px;color:var(--muted);line-height:1.5;margin:0;">
+                        Setelah diajukan, permohonan akan diteruskan langsung ke Kepala Jurusan yang dipilih untuk diverifikasi.
                     </p>
                 </div>
             </div>

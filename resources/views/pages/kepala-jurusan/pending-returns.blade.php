@@ -259,7 +259,8 @@
                             @endphp
                             <tr>
                                 <td>
-                                    <div style="font-weight: 700; color: var(--text);">{{ $return->user->name ?? 'Guru' }}</div>
+                                    <div style="font-weight: 700; color: var(--text);">{{ $return->user->name ?? 'Pengguna' }}</div>
+                                    <span style="font-size: 11px; color: var(--muted);">Return-{{ $return->id }}</span>
                                 </td>
                                 <td>
                                     <div>{{ $itemName }}</div>

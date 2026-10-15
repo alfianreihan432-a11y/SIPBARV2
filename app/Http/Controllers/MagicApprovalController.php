@@ -76,6 +76,106 @@ class MagicApprovalController extends Controller
         return null;
     }
 
+    private function authorizeStudentKajurApproval(BorrowingRequest $borrowingRequest): ?\Illuminate\Http\RedirectResponse
+    {
+        if (! Auth::check()) {
+            return redirect()->guest(route('login'))
+                ->with('info', 'Silakan login sebagai Kajur pemberi pinjaman untuk mengakses persetujuan.');
+        }
+
+        $user = Auth::user();
+        if (! $user->hasRole('kepala_jurusan')) {
+            abort(403, 'Persetujuan ini hanya dapat dilakukan oleh Kepala Jurusan.');
+        }
+
+        if (! $borrowingRequest->isStudentLoanForKajur()
+            || (int) $borrowingRequest->lender_kajur_id !== (int) $user->id) {
+            abort(403, 'Anda bukan Kajur pemberi pinjaman untuk pengajuan ini.');
+        }
+
+        if ($borrowingRequest->status !== BorrowingRequest::STATUS_PENDING) {
+            abort(403, 'Tautan persetujuan tidak lagi aktif karena pengajuan sudah diproses.');
+        }
+
+        return null;
+    }
+
+    public function showStudentKajur(BorrowingRequest $borrowingRequest)
+    {
+        $borrowingRequest->load([
+            'user.jurusan',
+            'item.category',
+            'itemWithTrashed.category',
+            'items.item.category',
+            'items.itemWithTrashed.category',
+            'lenderKajur.jurusan',
+        ]);
+
+        if ($authRedirect = $this->authorizeStudentKajurApproval($borrowingRequest)) {
+            return $authRedirect;
+        }
+
+        $expiresAt = now()->addDays(7);
+
+        return view('pages.magic-approval-siswa-kajur', [
+            'borrowingRequest' => $borrowingRequest,
+            'approveUrl' => \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'approval-siswa-kajur.approve',
+                $expiresAt,
+                ['borrowingRequest' => $borrowingRequest->id]
+            ),
+            'rejectUrl' => \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'approval-siswa-kajur.reject',
+                $expiresAt,
+                ['borrowingRequest' => $borrowingRequest->id]
+            ),
+        ]);
+    }
+
+    public function approveStudentKajur(Request $request, BorrowingRequest $borrowingRequest)
+    {
+        $borrowingRequest->load(['user', 'items.item', 'items.itemWithTrashed', 'item', 'itemWithTrashed', 'lenderKajur']);
+
+        if ($authRedirect = $this->authorizeStudentKajurApproval($borrowingRequest)) {
+            return $authRedirect;
+        }
+
+        try {
+            app(BorrowingApprovalService::class)->approve($borrowingRequest, (int) Auth::id());
+
+            return redirect()->route('kajur.history')
+                ->with('success', 'Pengajuan siswa berhasil disetujui. QR Code telah diterbitkan.');
+        } catch (\App\Exceptions\InsufficientStockException $exception) {
+            return redirect()->route('kajur.history')
+                ->with('error', $exception->getMessage());
+        } catch (\Exception $exception) {
+            Log::error('Student Kajur approval failed', [
+                'borrowing_request_id' => $borrowingRequest->id,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return redirect()->route('kajur.history')
+                ->with('error', 'Terjadi kesalahan saat menyetujui pengajuan.');
+        }
+    }
+
+    public function rejectStudentKajur(Request $request, BorrowingRequest $borrowingRequest)
+    {
+        $borrowingRequest->load(['user', 'lenderKajur']);
+        if ($authRedirect = $this->authorizeStudentKajurApproval($borrowingRequest)) {
+            return $authRedirect;
+        }
+
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|min:10|max:500',
+        ]);
+
+        app(BorrowingApprovalService::class)->reject($borrowingRequest, $validated['rejection_reason'], (int) Auth::id());
+
+        return redirect()->route('kajur.history')
+            ->with('success', 'Pengajuan siswa berhasil ditolak.');
+    }
+
     /**
      * Show the magic link approval page for student borrowing (read-only).
      *

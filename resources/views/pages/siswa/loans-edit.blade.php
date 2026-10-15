@@ -178,8 +178,20 @@
             </div>
         </div>
 
-        {{-- Teacher Selection (Custom Searchable Dropdown via Alpine.js) --}}
-        <div style="margin-bottom: 16px;"
+        <div style="margin-bottom: 16px;">
+            <label style="display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Tujuan Peminjaman *</label>
+            <select name="lender_type" id="edit_lender_type" class="s-filter-input">
+                <option value="admin" {{ old('lender_type', $borrowing->lender_type ?: 'admin') === 'admin' ? 'selected' : '' }}>Admin TU</option>
+                <option value="kajur" {{ old('lender_type', $borrowing->lender_type ?: 'admin') === 'kajur' ? 'selected' : '' }} {{ $kajursWithPhone->isEmpty() ? 'disabled' : '' }}>Kajur</option>
+            </select>
+            @if($kajursWithPhone->isEmpty())
+                <p style="margin:6px 0 0;font-size:12px;color:var(--muted);">Belum ada Kajur dengan nomor WhatsApp.</p>
+            @endif
+        </div>
+
+        {{-- Guru Penanggung Jawab untuk jalur Admin --}}
+        <div id="edit_teacher_field" style="margin-bottom: 16px;">
+            <div
              x-data="{
                  open: false,
                  search: '',
@@ -208,7 +220,7 @@
             </label>
 
             {{-- Hidden input drives standard form POST/PUT --}}
-            <input type="hidden" name="teacher_id" :value="selectedId" required>
+            <input type="hidden" name="teacher_id" :value="selectedId" id="edit_teacher_id" required>
 
             {{-- Custom dropdown wrapper --}}
             <div class="ts-wrapper" @click.outside="open = false" @keydown.escape.window="open = false" style="position: relative;">
@@ -294,6 +306,21 @@
             @error('teacher_id')
                 <span style="color: var(--s-rejected); font-size: 12px; display: block; margin-top: 6px;">{{ $message }}</span>
             @enderror
+            </div>
+        </div>
+
+        <div id="edit_kajur_field" style="display:none;margin-bottom:16px;">
+            <label for="lender_kajur_id" style="display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Pilih Kepala Jurusan *</label>
+            <select name="lender_kajur_id" id="lender_kajur_id" class="s-filter-input">
+                <option value="">Pilih Kajur</option>
+                @foreach($kajurs as $kajur)
+                    @php $hasPhone = $kajursWithPhone->contains('id', $kajur->id); @endphp
+                    <option value="{{ $kajur->id }}" {{ ! $hasPhone ? 'disabled' : '' }} {{ (string) old('lender_kajur_id', $borrowing->lender_kajur_id) === (string) $kajur->id ? 'selected' : '' }}>{{ $kajur->name }}{{ $kajur->jurusan?->nama ? ' - '.$kajur->jurusan->nama : '' }}{{ ! $hasPhone ? ' (nomor WhatsApp belum tersedia)' : '' }}</option>
+                @endforeach
+            </select>
+            @error('lender_kajur_id')
+                <span style="color:var(--s-rejected);font-size:12px;display:block;margin-top:6px;">{{ $message }}</span>
+            @enderror
         </div>
 
         {{-- Notes --}}
@@ -328,4 +355,26 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const lenderType = document.getElementById('edit_lender_type');
+        const teacherField = document.getElementById('edit_teacher_field');
+        const teacherInput = document.getElementById('edit_teacher_id');
+        const kajurField = document.getElementById('edit_kajur_field');
+        const kajurInput = document.getElementById('lender_kajur_id');
+
+        function syncLenderFields() {
+            const kajurSelected = lenderType.value === 'kajur';
+            teacherField.style.display = kajurSelected ? 'none' : '';
+            teacherInput.required = !kajurSelected;
+            kajurField.style.display = kajurSelected ? '' : 'none';
+            kajurInput.required = kajurSelected;
+        }
+
+        lenderType.addEventListener('change', syncLenderFields);
+        syncLenderFields();
+    });
+</script>
+
 @endsection

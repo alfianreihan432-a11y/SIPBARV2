@@ -24,8 +24,12 @@ class AdminReturnController extends Controller
         $search = $request->query('q');
         $isSuperadmin = Auth::check() && Auth::user()->hasRole('superadmin');
 
-        // Admin hanya menangani pengembalian SISWA
-        $query = ItemReturn::siswa()->with([
+        // Admin hanya menangani pengembalian SISWA untuk peminjaman ke Admin
+        $query = ItemReturn::siswa()->where(function ($q) {
+            $q->whereDoesntHave('borrowingRequest', function ($bq) {
+                $bq->where('lender_type', 'kajur');
+            });
+        })->with([
             'borrowingRequest.item.category',
             'user',
             'verifier'
@@ -80,6 +84,10 @@ class AdminReturnController extends Controller
             'verifier'
         ])->findOrFail($id);
 
+        if ($return->borrowingRequest && $return->borrowingRequest->isStudentLoanForKajur()) {
+            abort(403, 'Pengembalian pinjaman Kajur hanya dapat diproses oleh Kajur pemberi pinjaman.');
+        }
+
         if (request()->wantsJson()) {
             return response()->json([
                 'success' => true,
@@ -103,6 +111,10 @@ class AdminReturnController extends Controller
             'borrowingRequest.items.item',
             'user',
         ])->findOrFail($id);
+
+        if ($return->borrowingRequest && $return->borrowingRequest->isStudentLoanForKajur()) {
+            abort(403, 'Pengembalian pinjaman Kajur hanya dapat diproses oleh Kajur pemberi pinjaman.');
+        }
 
         // Guard: Admin tidak boleh verifikasi pengembalian GURU
         if ($return->tipe_peminjam === 'guru') {
@@ -208,6 +220,10 @@ class AdminReturnController extends Controller
         ]);
 
         $return = ItemReturn::with(['borrowingRequest.item', 'borrowingRequest.items.itemWithTrashed', 'user'])->findOrFail($id);
+
+        if ($return->borrowingRequest && $return->borrowingRequest->isStudentLoanForKajur()) {
+            abort(403, 'Pengembalian pinjaman Kajur hanya dapat diproses oleh Kajur pemberi pinjaman.');
+        }
 
         // Guard: Admin tidak boleh verifikasi pengembalian GURU
         if ($return->tipe_peminjam === 'guru') {

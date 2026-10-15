@@ -461,7 +461,7 @@
 
 <div class="section-card">
     <div class="section-header">
-        <h2 class="section-title">Riwayat Peminjaman Guru</h2>
+        <h2 class="section-title">Riwayat Peminjaman</h2>
         
         <button type="button" id="btnKirimLaporan" class="btn-send-report" disabled onclick="openSendReportModal()">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -476,7 +476,7 @@
         <form method="GET" action="{{ route('kajur.history') }}" class="filter-form">
             <div class="form-group" style="min-width: 200px; flex: 1;">
                 <label class="form-label">Cari Riwayat</label>
-                <input type="text" name="search" class="form-input" style="width: 100%; min-width: 180px;" value="{{ request('search') }}" placeholder="Cari nama guru atau barang...">
+                <input type="text" name="search" class="form-input" style="width: 100%; min-width: 180px;" value="{{ request('search') }}" placeholder="Cari nama peminjam atau barang...">
             </div>
 
             <div class="form-group">
@@ -512,6 +512,67 @@
     </div>
     
     @if($history->count() > 0)
+        @php
+            $buildModalData = function($item) {
+                $isSiswa = ($item->tipe_peminjam === 'siswa');
+                $isReturned = ($item->status === 'returned');
+                $firstItem = $item->itemWithTrashed ?? $item->item;
+                $userJurusanName = $item->user->jurusan->nama ?? ($item->user->jurusan ?? (auth()->user()->jurusan->nama ?? '-'));
+                $userClassName = $item->user->classroom?->name ?? ($item->user->kelas ?? null);
+                if ($isSiswa && !empty($userClassName)) {
+                    $userDeptClass = $userJurusanName !== '-' ? ($userJurusanName . ' (' . $userClassName . ')') : $userClassName;
+                } else {
+                    $userDeptClass = $userJurusanName;
+                }
+                $itemCategory = $firstItem?->category?->name ?? '-';
+                $itemLocation = $firstItem?->location?->name ?? '-';
+                $itemInitialCondition = $firstItem?->condition ?? 'Baik';
+
+                $isMulti = $item->items->isNotEmpty();
+                $itemsPayload = $isMulti ? $item->items->map(function($detail) {
+                    $it = $detail->itemWithTrashed ?? $detail->item;
+                    return [
+                        'name' => $it?->name ?? 'Barang tidak tersedia',
+                        'category' => $it?->category?->name ?? '-',
+                        'condition' => $detail->kondisi_saat_pinjam ?? ($it?->condition ?? 'Baik'),
+                        'location' => $it?->location?->name ?? '-',
+                        'quantity' => (int) ($detail->quantity ?? 1),
+                    ];
+                })->values()->toArray() : [];
+
+                return [
+                    'id' => $item->id,
+                    'tipe_peminjam' => $item->tipe_peminjam ?? 'guru',
+                    'borrower_name' => $item->user->name ?? ($isSiswa ? 'Siswa' : 'Guru'),
+                    'borrower_id' => $isSiswa ? ($item->user->nis ?? '-') : ($item->user->nip ?? '-'),
+                    'borrower_dept_class' => $userDeptClass,
+                    'borrower_phone' => $item->user->phone ?? '-',
+                    'guru_name' => $item->user->name ?? ($isSiswa ? 'Siswa' : 'Guru'),
+                    'guru_nip' => $isSiswa ? ($item->user->nis ?? '-') : ($item->user->nip ?? '-'),
+                    'guru_jurusan' => $userDeptClass,
+                    'guru_phone' => $item->user->phone ?? '-',
+                    'items' => $itemsPayload,
+                    'item_name' => $firstItem?->name ?? ($isMulti ? $item->item_display_name : 'Barang'),
+                    'item_category' => $itemCategory,
+                    'item_condition' => $itemInitialCondition,
+                    'item_location' => $itemLocation,
+                    'quantity' => $item->totalQuantity(),
+                    'borrow_date' => $item->borrow_date ? $item->borrow_date->format('d F Y') : '-',
+                    'return_date' => $item->return_date ? $item->return_date->format('d F Y') : '-',
+                    'return_time' => $item->return_time ?? '-',
+                    'purpose' => $item->purpose ?? '-',
+                    'notes' => $item->notes ?? '-',
+                    'status' => $item->status_label ?? ucfirst($item->status),
+                    'approved_by' => $item->approvedByKajur->name ?? (auth()->user()->name ?? 'Kepala Jurusan'),
+                    'approved_at' => $item->approved_at ? $item->approved_at->format('d F Y H:i') : ($item->created_at ? $item->created_at->format('d F Y H:i') : '-'),
+                    'is_returned' => $isReturned,
+                    'returned_at' => $item->returned_at ? $item->returned_at->format('d F Y H:i') : ($item->updated_at && $isReturned ? $item->updated_at->format('d F Y H:i') : '-'),
+                    'return_condition' => in_array($item->return_condition, ['good', 'Baik']) ? 'Baik' : (in_array($item->return_condition, ['damaged', 'Rusak Ringan']) ? 'Rusak Ringan' : (in_array($item->return_condition, ['lost', 'Rusak Berat']) ? 'Rusak Berat' : ($item->return_condition ?? '-'))),
+                    'return_notes' => $item->return_notes ?? '-',
+                    'verified_by' => $item->checkinBy->name ?? ($isReturned ? (auth()->user()->name ?? 'Kepala Jurusan') : '-')
+                ];
+            };
+        @endphp
         <div class="table-container">
             <table class="table">
                 <thead>
@@ -519,7 +580,7 @@
                         <th style="width: 40px; text-align: center;">
                             <input type="checkbox" id="selectAllCheckbox" class="custom-checkbox" title="Pilih Semua di Halaman Ini">
                         </th>
-                        <th>Guru</th>
+                        <th>Peminjam</th>
                         <th>Barang</th>
                         <th>Jumlah</th>
                         <th>Tanggal Pinjam</th>
@@ -531,21 +592,26 @@
                 <tbody>
                     @foreach($history as $item)
                         @php
-                            $isReturned = ($item->status === 'returned');
-                            $itemJurusan = $item->user->jurusan->nama ?? ($item->user->jurusan ?? (auth()->user()->jurusan->nama ?? '-'));
-                            $itemCategory = $item->itemWithTrashed?->category?->name ?? ($item->item?->category?->name ?? '-');
-                            $itemLocation = $item->itemWithTrashed?->location?->name ?? ($item->item?->location?->name ?? '-');
-                            $itemInitialCondition = $item->itemWithTrashed?->condition ?? ($item->item?->condition ?? 'Baik');
+                            $modalData = $buildModalData($item);
+                            $isSiswa = ($modalData['tipe_peminjam'] === 'siswa');
+                            $isReturned = $modalData['is_returned'];
                         @endphp
                         <tr>
                             <td style="text-align: center;">
                                 <input type="checkbox" class="row-checkbox custom-checkbox" value="{{ $item->id }}" data-date="{{ $item->borrow_date->format('Y-m-d') }}">
                             </td>
                             <td>
-                                <strong>{{ $item->user->name ?? 'Guru' }}</strong>
-                                @if($item->user && $item->user->phone)
-                                    <div style="font-size: 11.5px; color: var(--muted);">WA: {{ $item->user->phone }}</div>
-                                @endif
+                                <strong>{{ $item->user->name ?? ($isSiswa ? 'Siswa' : 'Guru') }}</strong>
+                                <div style="font-size: 11.5px; color: var(--muted); margin-top: 2px;">
+                                    @if($isSiswa)
+                                        <span>NIS: {{ $item->user->nis ?? '-' }}</span>
+                                    @else
+                                        <span>NIP: {{ $item->user->nip ?? '-' }}</span>
+                                    @endif
+                                    @if($item->user && $item->user->phone)
+                                        <span> • WA: {{ $item->user->phone }}</span>
+                                    @endif
+                                </div>
                             </td>
                             <td>
                                 <strong>{{ $item->item_display_name }}</strong>
@@ -586,31 +652,7 @@
                                 <button type="button" 
                                         class="btn-detail-link {{ $isReturned ? 'is-returned' : 'is-not-returned' }}"
                                         title="{{ $isReturned ? 'Barang sudah dikembalikan (Klik untuk detail)' : 'Barang belum dikembalikan (Klik untuk detail)' }}"
-                                        onclick="openDetailModal({{ json_encode([
-                                            'id' => $item->id,
-                                            'guru_name' => $item->user->name ?? '-',
-                                            'guru_nip' => $item->user->nip ?? '-',
-                                            'guru_jurusan' => $itemJurusan,
-                                            'guru_phone' => $item->user->phone ?? '-',
-                                            'item_name' => $item->itemWithTrashed?->name ?? ($item->item?->name ?? 'Barang'),
-                                            'item_category' => $itemCategory,
-                                            'item_condition' => $itemInitialCondition,
-                                            'item_location' => $itemLocation,
-                                            'quantity' => $item->quantity,
-                                            'borrow_date' => $item->borrow_date ? $item->borrow_date->format('d F Y') : '-',
-                                            'return_date' => $item->return_date ? $item->return_date->format('d F Y') : '-',
-                                            'return_time' => $item->return_time ?? '-',
-                                            'purpose' => $item->purpose ?? '-',
-                                            'notes' => $item->notes ?? '-',
-                                            'status' => $item->status_label ?? ucfirst($item->status),
-                                            'approved_by' => $item->approvedByKajur->name ?? (auth()->user()->name ?? 'Kepala Jurusan'),
-                                            'approved_at' => $item->approved_at ? $item->approved_at->format('d F Y H:i') : ($item->created_at ? $item->created_at->format('d F Y H:i') : '-'),
-                                            'is_returned' => $isReturned,
-                                            'returned_at' => $item->returned_at ? $item->returned_at->format('d F Y H:i') : ($item->updated_at && $isReturned ? $item->updated_at->format('d F Y H:i') : '-'),
-                                            'return_condition' => in_array($item->return_condition, ['good', 'Baik']) ? 'Baik' : (in_array($item->return_condition, ['damaged', 'Rusak Ringan']) ? 'Rusak Ringan' : (in_array($item->return_condition, ['lost', 'Rusak Berat']) ? 'Rusak Berat' : ($item->return_condition ?? '-'))),
-                                            'return_notes' => $item->return_notes ?? '-',
-                                            'verified_by' => $item->checkinBy->name ?? ($isReturned ? (auth()->user()->name ?? 'Kepala Jurusan') : '-')
-                                        ]) }})">
+                                        onclick="openDetailModal({{ json_encode($modalData) }})">
                                     Detail
                                 </button>
                             </td>
@@ -624,11 +666,9 @@
         <div class="mobile-cards-view">
             @foreach($history as $item)
                 @php
-                    $isReturned = ($item->status === 'returned');
-                    $itemJurusan = $item->user->jurusan->nama ?? ($item->user->jurusan ?? (auth()->user()->jurusan->nama ?? '-'));
-                    $itemCategory = $item->itemWithTrashed?->category?->name ?? ($item->item?->category?->name ?? '-');
-                    $itemLocation = $item->itemWithTrashed?->location?->name ?? ($item->item?->location?->name ?? '-');
-                    $itemInitialCondition = $item->itemWithTrashed?->condition ?? ($item->item?->condition ?? 'Baik');
+                    $modalData = $buildModalData($item);
+                    $isSiswa = ($modalData['tipe_peminjam'] === 'siswa');
+                    $isReturned = $modalData['is_returned'];
                     $cardStatusClass = 'mc-card--' . ($item->status ?? 'pending');
                     $badgeClass = 'mc-badge--' . ($item->status ?? 'pending');
                     $badgeLabel = $item->status === 'pending' ? 'Pending' : ($item->status === 'approved' ? 'Disetujui' : ($item->status === 'borrowed' ? 'Dipinjam' : ($item->status === 'returned' ? 'Dikembalikan' : ($item->status === 'rejected' ? 'Ditolak' : ($item->status === 'cancelled' ? 'Dibatalkan' : ucfirst($item->status))))));
@@ -636,8 +676,8 @@
                 <div class="mc-card {{ $cardStatusClass }}">
                     <div class="mc-card-header">
                         <div>
-                            <div class="mc-card-user">{{ $item->user->name ?? 'Guru' }}</div>
-                            <div class="mc-card-user-sub">NIP: {{ $item->user->nip ?? '-' }}</div>
+                            <div class="mc-card-user">{{ $item->user->name ?? ($isSiswa ? 'Siswa' : 'Guru') }}</div>
+                            <div class="mc-card-user-sub">{{ $isSiswa ? ('NIS: ' . ($item->user->nis ?? '-')) : ('NIP: ' . ($item->user->nip ?? '-')) }}</div>
                         </div>
                         <span class="mc-badge {{ $badgeClass }}">
                             <span class="mc-badge-dot"></span>
@@ -685,31 +725,7 @@
                         <input type="checkbox" class="row-checkbox custom-checkbox" value="{{ $item->id }}" data-date="{{ $item->borrow_date->format('Y-m-d') }}" style="width: 16px; height: 16px;">
                         <button type="button"
                                 class="mc-card-btn mc-card-btn-primary"
-                                onclick="openDetailModal({{ json_encode([
-                                    'id' => $item->id,
-                                    'guru_name' => $item->user->name ?? '-',
-                                    'guru_nip' => $item->user->nip ?? '-',
-                                    'guru_jurusan' => $itemJurusan,
-                                    'guru_phone' => $item->user->phone ?? '-',
-                                    'item_name' => $item->itemWithTrashed?->name ?? ($item->item?->name ?? 'Barang'),
-                                    'item_category' => $itemCategory,
-                                    'item_condition' => $itemInitialCondition,
-                                    'item_location' => $itemLocation,
-                                    'quantity' => $item->quantity,
-                                    'borrow_date' => $item->borrow_date ? $item->borrow_date->format('d F Y') : '-',
-                                    'return_date' => $item->return_date ? $item->return_date->format('d F Y') : '-',
-                                    'return_time' => $item->return_time ?? '-',
-                                    'purpose' => $item->purpose ?? '-',
-                                    'notes' => $item->notes ?? '-',
-                                    'status' => $item->status_label ?? ucfirst($item->status),
-                                    'approved_by' => $item->approvedByKajur->name ?? (auth()->user()->name ?? 'Kepala Jurusan'),
-                                    'approved_at' => $item->approved_at ? $item->approved_at->format('d F Y H:i') : ($item->created_at ? $item->created_at->format('d F Y H:i') : '-'),
-                                    'is_returned' => $isReturned,
-                                    'returned_at' => $item->returned_at ? $item->returned_at->format('d F Y H:i') : ($item->updated_at && $isReturned ? $item->updated_at->format('d F Y H:i') : '-'),
-                                    'return_condition' => in_array($item->return_condition, ['good', 'Baik']) ? 'Baik' : (in_array($item->return_condition, ['damaged', 'Rusak Ringan']) ? 'Rusak Ringan' : (in_array($item->return_condition, ['lost', 'Rusak Berat']) ? 'Rusak Berat' : ($item->return_condition ?? '-'))),
-                                    'return_notes' => $item->return_notes ?? '-',
-                                    'verified_by' => $item->checkinBy->name ?? ($isReturned ? (auth()->user()->name ?? 'Kepala Jurusan') : '-')
-                                ]) }})">
+                                onclick="openDetailModal({{ json_encode($modalData) }})">
                             Detail
                         </button>
                     </div>
@@ -746,18 +762,18 @@
         </div>
 
         {{-- Section 1: Data Peminjam --}}
-        <div class="modal-section-title">Data Peminjam (Guru)</div>
+        <div class="modal-section-title" id="dBorrowerSectionTitle">Data Peminjam (Guru)</div>
         <div class="modal-grid">
             <div class="modal-item">
-                <div class="modal-lbl">Nama Guru</div>
+                <div class="modal-lbl" id="dBorrowerNameLbl">Nama Guru</div>
                 <div class="modal-val" id="dGuruName">-</div>
             </div>
             <div class="modal-item">
-                <div class="modal-lbl">NIP</div>
+                <div class="modal-lbl" id="dBorrowerIdLbl">NIP</div>
                 <div class="modal-val" id="dGuruNip">-</div>
             </div>
             <div class="modal-item">
-                <div class="modal-lbl">Jurusan</div>
+                <div class="modal-lbl" id="dBorrowerDeptLbl">Jurusan</div>
                 <div class="modal-val" id="dGuruJurusan">-</div>
             </div>
             <div class="modal-item">
@@ -768,7 +784,7 @@
 
         {{-- Section 2: Data Barang --}}
         <div class="modal-section-title">Data Barang</div>
-        <div class="modal-grid">
+        <div id="singleItemSection" class="modal-grid">
             <div class="modal-item modal-grid-full">
                 <div class="modal-lbl">Nama Barang</div>
                 <div class="modal-val" id="dItemName" style="color: #851e2a; font-size: 14px;">-</div>
@@ -790,6 +806,7 @@
                 <div class="modal-val" id="dQuantity">-</div>
             </div>
         </div>
+        <div id="multiItemSection" style="display: none; flex-direction: column; gap: 10px;"></div>
 
         {{-- Section 3: Data Peminjaman --}}
         <div class="modal-section-title">Data Peminjaman</div>
@@ -930,32 +947,102 @@ rowCheckboxes.forEach(function(cb) {
     });
 });
 
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Modal Detail Logic
 function openDetailModal(data) {
     document.getElementById('modalHeaderTitle').innerText = 'Detail Riwayat #' + data.id;
     
-    // Peminjam
-    document.getElementById('dGuruName').innerText = data.guru_name;
-    document.getElementById('dGuruNip').innerText = data.guru_nip || '-';
-    document.getElementById('dGuruJurusan').innerText = data.guru_jurusan || '-';
-    document.getElementById('dGuruPhone').innerText = data.guru_phone || '-';
+    var isSiswa = (data.tipe_peminjam === 'siswa');
 
-    // Barang
-    document.getElementById('dItemName').innerText = data.item_name;
-    document.getElementById('dItemCategory').innerText = data.item_category;
-    document.getElementById('dItemCondition').innerText = data.item_condition;
-    document.getElementById('dItemLocation').innerText = data.item_location;
-    document.getElementById('dQuantity').innerText = data.quantity + ' Unit';
+    // Section 1: Peminjam
+    var secTitle = document.getElementById('dBorrowerSectionTitle');
+    if (secTitle) secTitle.innerText = isSiswa ? 'DATA PEMINJAM (SISWA)' : 'DATA PEMINJAM (GURU)';
 
-    // Peminjaman
-    document.getElementById('dBorrowDate').innerText = data.borrow_date;
-    document.getElementById('dReturnDate').innerText = data.return_date + (data.return_time && data.return_time !== '-' ? ' (' + data.return_time + ')' : '');
-    document.getElementById('dStatus').innerText = data.status;
-    document.getElementById('dApprovedInfo').innerText = data.approved_by + ' (' + data.approved_at + ')';
-    document.getElementById('dPurpose').innerText = data.purpose;
-    document.getElementById('dNotes').innerText = data.notes;
+    var nameLbl = document.getElementById('dBorrowerNameLbl');
+    if (nameLbl) nameLbl.innerText = isSiswa ? 'Nama Siswa' : 'Nama Guru';
 
-    // Pengembalian (KONDISIONAL)
+    var idLbl = document.getElementById('dBorrowerIdLbl');
+    if (idLbl) idLbl.innerText = isSiswa ? 'NIS' : 'NIP';
+
+    var deptLbl = document.getElementById('dBorrowerDeptLbl');
+    if (deptLbl) deptLbl.innerText = isSiswa ? 'Jurusan / Kelas' : 'Jurusan';
+
+    document.getElementById('dGuruName').innerText = data.borrower_name || data.guru_name || '-';
+    document.getElementById('dGuruNip').innerText = data.borrower_id || data.guru_nip || '-';
+    document.getElementById('dGuruJurusan').innerText = data.borrower_dept_class || data.guru_jurusan || '-';
+    document.getElementById('dGuruPhone').innerText = data.borrower_phone || data.guru_phone || '-';
+
+    // Section 2: Barang
+    var singleItemSec = document.getElementById('singleItemSection');
+    var multiItemSec = document.getElementById('multiItemSection');
+
+    if (data.items && data.items.length > 0) {
+        if (singleItemSec) singleItemSec.style.display = 'none';
+        if (multiItemSec) {
+            multiItemSec.style.display = 'flex';
+            multiItemSec.innerHTML = '';
+            data.items.forEach(function(it, idx) {
+                var card = document.createElement('div');
+                card.className = 'modal-grid';
+                card.style.cssText = 'background: rgba(133, 30, 42, 0.03); border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 8px;';
+                card.innerHTML = `
+                    <div class="modal-item modal-grid-full">
+                        <div class="modal-lbl">Barang #${idx + 1}</div>
+                        <div class="modal-val" style="color: #851e2a; font-size: 13.5px; font-weight: 700;">${escapeHtml(it.name || 'Barang')}</div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-lbl">Kategori</div>
+                        <div class="modal-val">${escapeHtml(it.category || '-')}</div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-lbl">Kondisi Awal</div>
+                        <div class="modal-val">${escapeHtml(it.condition || '-')}</div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-lbl">Lokasi Penyimpanan</div>
+                        <div class="modal-val">${escapeHtml(it.location || '-')}</div>
+                    </div>
+                    <div class="modal-item">
+                        <div class="modal-lbl">Jumlah Dipinjam</div>
+                        <div class="modal-val">${escapeHtml(it.quantity || 1)} Unit</div>
+                    </div>
+                `;
+                multiItemSec.appendChild(card);
+            });
+        }
+    } else {
+        if (multiItemSec) {
+            multiItemSec.style.display = 'none';
+            multiItemSec.innerHTML = '';
+        }
+        if (singleItemSec) {
+            singleItemSec.style.display = 'grid';
+            document.getElementById('dItemName').innerText = data.item_name || '-';
+            document.getElementById('dItemCategory').innerText = data.item_category || '-';
+            document.getElementById('dItemCondition').innerText = data.item_condition || '-';
+            document.getElementById('dItemLocation').innerText = data.item_location || '-';
+            document.getElementById('dQuantity').innerText = (data.quantity || 1) + ' Unit';
+        }
+    }
+
+    // Section 3: Peminjaman
+    document.getElementById('dBorrowDate').innerText = data.borrow_date || '-';
+    document.getElementById('dReturnDate').innerText = (data.return_date || '-') + (data.return_time && data.return_time !== '-' ? ' (' + data.return_time + ')' : '');
+    document.getElementById('dStatus').innerText = data.status || '-';
+    document.getElementById('dApprovedInfo').innerText = (data.approved_by || '-') + ' (' + (data.approved_at || '-') + ')';
+    document.getElementById('dPurpose').innerText = data.purpose || '-';
+    document.getElementById('dNotes').innerText = data.notes || '-';
+
+    // Section 4: Pengembalian (KONDISIONAL)
     var filledSection = document.getElementById('returnFilledSection');
     var emptySection = document.getElementById('returnEmptySection');
 
@@ -974,6 +1061,9 @@ function openDetailModal(data) {
     } else {
         filledSection.style.display = 'none';
         emptySection.style.display = 'block';
+        emptySection.innerText = isSiswa
+            ? 'Belum ada data pengembalian (Barang belum dikembalikan oleh siswa)'
+            : 'Belum ada data pengembalian (Barang belum dikembalikan oleh guru)';
     }
 
     document.getElementById('historyDetailModal').classList.add('show');

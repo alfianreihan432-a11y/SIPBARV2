@@ -110,12 +110,26 @@ class KepalaJurusanController extends Controller
      */
     public function pendingApprovals(Request $request): View
     {
-        $query = BorrowingRequest::where('tipe_peminjam', 'guru')
-            ->where($this->kajurScopeQuery())
+        $kajurId = (int) Auth::id();
+        $search = trim((string) $request->query('search', ''));
+
+        $query = BorrowingRequest::where(function ($outer) use ($kajurId) {
+                // Peminjaman guru sesuai scope kajur
+                $outer->where(function ($q) {
+                    $q->where('tipe_peminjam', 'guru')
+                      ->where($this->kajurScopeQuery());
+                })
+                // Peminjaman siswa yang ditujukan ke kajur ini
+                ->orWhere(function ($q) use ($kajurId) {
+                    $q->where('tipe_peminjam', 'siswa')
+                      ->where('lender_type', 'kajur')
+                      ->where('lender_kajur_id', $kajurId);
+                });
+            })
             ->where('status', BorrowingRequest::STATUS_PENDING)
             ->with(['user', 'item.category', 'itemWithTrashed.category', 'items.itemWithTrashed.category', 'items.item.category']);
 
-        if ($search = trim((string) $request->query('search', ''))) {
+        if ($search !== '') {
             $query->where(function ($q) use ($search) {
                 $q->whereHas('user', function ($uq) use ($search) {
                     $uq->where('name', 'like', "%{$search}%")
@@ -248,8 +262,24 @@ class KepalaJurusanController extends Controller
             ]);
         }
 
+        if ($borrowingRequest->tipe_peminjam === 'siswa'
+            && $borrowingRequest->lender_type !== 'kajur') {
+            return view('pages.kepala-jurusan.qr-verify', [
+                'valid' => false,
+                'message' => 'QR Admin hanya dapat diproses oleh Admin.',
+            ]);
+        }
+
+        if ($borrowingRequest->isStudentLoanForKajur()
+            && (int) $borrowingRequest->lender_kajur_id !== (int) Auth::id()) {
+            return view('pages.kepala-jurusan.qr-verify', [
+                'valid' => false,
+                'message' => 'QR ini hanya dapat diproses oleh Kajur pemberi pinjaman.',
+            ]);
+        }
+
         // Jika peminjaman guru: batasi sesuai scope kajur (assigned kajur atau jurusan yang sama)
-        // Jika peminjaman siswa: izinkan dari jurusan apa saja (aturan bisnis: JANGAN membatasi berdasarkan jurusan_id)
+        // Jika peminjaman siswa: hanya dapat diproses oleh Kajur pemberi pinjaman (lender_kajur_id) tanpa membatasi jurusan asal siswa
         if ($borrowingRequest->tipe_peminjam === 'guru') {
             $kajurId = (int) Auth::id();
             $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
@@ -286,6 +316,16 @@ class KepalaJurusanController extends Controller
         $borrowingRequest = BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed', 'qrCode', 'user'])
             ->findOrFail($id);
 
+        if ($borrowingRequest->tipe_peminjam === 'siswa') {
+            if ($borrowingRequest->lender_type !== 'kajur') {
+                return redirect()->back()->with('error', 'QR Admin hanya dapat diproses oleh Admin.');
+            }
+
+            if ((int) $borrowingRequest->lender_kajur_id !== (int) Auth::id()) {
+                return redirect()->back()->with('error', 'QR ini hanya dapat diproses oleh Kajur pemberi pinjaman.');
+            }
+        }
+
         // Jika guru: validasi bahwa permohonan ditujukan ke Kajur ini atau jurusan yang sama
         if ($borrowingRequest->tipe_peminjam === 'guru') {
             $kajurId = (int) Auth::id();
@@ -311,25 +351,51 @@ class KepalaJurusanController extends Controller
     /**
      * Display pending teacher returns for verification
      */
+    private function canKajurManageReturn(\App\Models\ItemReturn $itemReturn, int $kajurId, ?int $jurusanId): bool
+    {
+        if ($itemReturn->tipe_peminjam === 'guru') {
+            return (int) $itemReturn->kajur_id === $kajurId
+                || ($jurusanId && (int) $itemReturn->user?->jurusan_id === $jurusanId);
+        }
+
+        if ($itemReturn->tipe_peminjam === 'siswa') {
+            $borrowing = $itemReturn->borrowingRequest;
+            return $borrowing && $borrowing->isStudentLoanForKajur() && (int) $borrowing->lender_kajur_id === $kajurId;
+        }
+
+        return false;
+    }
+
     public function pendingReturns(Request $request): View
     {
         $kajurId = (int) Auth::id();
         $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
 
-        // Use ItemReturn table with proper filtering for guru returns assigned to this Kajur
-        $query = \App\Models\ItemReturn::guru()
-            ->where(function ($query) use ($kajurId, $jurusanId) {
-                $query->where('kajur_id', $kajurId);
-                if ($jurusanId) {
-                    $query->orWhereHas('user', function ($uq) use ($jurusanId) {
-                        $uq->where('jurusan_id', $jurusanId);
-                    });
-                }
+        $query = \App\Models\ItemReturn::where(function ($query) use ($kajurId, $jurusanId) {
+                $query->where(function ($gq) use ($kajurId, $jurusanId) {
+                    $gq->where('tipe_peminjam', 'guru')
+                       ->where(function ($sub) use ($kajurId, $jurusanId) {
+                           $sub->where('kajur_id', $kajurId);
+                           if ($jurusanId) {
+                               $sub->orWhereHas('user', function ($uq) use ($jurusanId) {
+                                   $uq->where('jurusan_id', $jurusanId);
+                               });
+                           }
+                       });
+                })->orWhere(function ($sq) use ($kajurId) {
+                    $sq->where('tipe_peminjam', 'siswa')
+                       ->whereHas('borrowingRequest', function ($bq) use ($kajurId) {
+                           $bq->where('lender_type', 'kajur')
+                              ->where('lender_kajur_id', $kajurId);
+                       });
+                });
             })
             ->where('status', \App\Models\ItemReturn::STATUS_MENUNGGU)
             ->with([
                 'borrowingRequest.item.category',
                 'borrowingRequest.itemWithTrashed.category',
+                'borrowingRequest.items.item.category',
+                'borrowingRequest.items.itemWithTrashed.category',
                 'user',
                 'kajur'
             ]);
@@ -356,8 +422,25 @@ class KepalaJurusanController extends Controller
         ]);
     }
 
+    public function showReturn(int $id)
+    {
+        $kajurId   = (int) Auth::id();
+        $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
+
+        $itemReturn = \App\Models\ItemReturn::with(['borrowingRequest', 'user'])->findOrFail($id);
+
+        if (! $this->canKajurManageReturn($itemReturn, $kajurId, $jurusanId)) {
+            abort(403, 'Aksi tidak diizinkan untuk pengembalian ini.');
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $itemReturn,
+        ]);
+    }
+
     /**
-     * Verify and approve teacher return
+     * Verify and approve teacher / student return
      */
     public function verifyReturn(Request $request, int $id): RedirectResponse
     {
@@ -369,17 +452,7 @@ class KepalaJurusanController extends Controller
         $kajurId   = (int) Auth::id();
         $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
 
-        // Cari ItemReturn milik guru yang relevan untuk Kajur ini
-        $itemReturn = \App\Models\ItemReturn::guru()
-            ->where(function ($query) use ($kajurId, $jurusanId) {
-                $query->where('kajur_id', $kajurId);
-                if ($jurusanId) {
-                    $query->orWhereHas('user', function ($uq) use ($jurusanId) {
-                        $uq->where('jurusan_id', $jurusanId);
-                    });
-                }
-            })
-            ->with([
+        $itemReturn = \App\Models\ItemReturn::with([
                 'borrowingRequest.item',
                 'borrowingRequest.itemWithTrashed',
                 'borrowingRequest.items.item',
@@ -387,6 +460,10 @@ class KepalaJurusanController extends Controller
                 'user',
             ])
             ->findOrFail($id);
+
+        if (! $this->canKajurManageReturn($itemReturn, $kajurId, $jurusanId)) {
+            abort(403, 'Aksi tidak diizinkan untuk pengembalian ini.');
+        }
 
         // Guard: Proteksi verifikasi ganda
         if ($itemReturn->status !== \App\Models\ItemReturn::STATUS_MENUNGGU) {
@@ -460,19 +537,66 @@ class KepalaJurusanController extends Controller
             ->with('success', 'Pengembalian barang berhasil diverifikasi dan stok diperbarui.');
     }
 
+    public function rejectReturn(Request $request, int $id): RedirectResponse
+    {
+        $validated = $request->validate([
+            'alasan_ditolak' => 'required|string|min:5|max:500',
+        ]);
+
+        $kajurId   = (int) Auth::id();
+        $jurusanId = Auth::user()->jurusan_id ? (int) Auth::user()->jurusan_id : null;
+
+        $itemReturn = \App\Models\ItemReturn::with(['borrowingRequest', 'user'])->findOrFail($id);
+
+        if (! $this->canKajurManageReturn($itemReturn, $kajurId, $jurusanId)) {
+            abort(403, 'Aksi tidak diizinkan untuk pengembalian ini.');
+        }
+
+        if ($itemReturn->status !== \App\Models\ItemReturn::STATUS_MENUNGGU) {
+            return redirect()->back()->with('error', 'Pengembalian ini sudah diproses sebelumnya.');
+        }
+
+        $itemReturn->update([
+            'status' => \App\Models\ItemReturn::STATUS_DITOLAK,
+            'diverifikasi_oleh' => $kajurId,
+            'tanggal_verifikasi' => now(),
+            'catatan' => $validated['alasan_ditolak'],
+        ]);
+
+        return redirect()->back()->with('success', 'Pengajuan pengembalian berhasil ditolak.');
+    }
+
     /**
      * Display borrowing history for the jurusan
      */
     public function history(Request $request): View
     {
-        $query = BorrowingRequest::where('tipe_peminjam', 'guru')
-            ->where($this->kajurScopeQuery())
+        $kajurId = (int) Auth::id();
+
+        $query = BorrowingRequest::where(function ($outer) use ($kajurId) {
+                // Peminjaman guru sesuai scope kajur
+                $outer->where(function ($q) {
+                    $q->where('tipe_peminjam', 'guru')
+                      ->where($this->kajurScopeQuery());
+                })
+                // Peminjaman siswa yang ditujukan ke kajur ini
+                ->orWhere(function ($q) use ($kajurId) {
+                    $q->where('tipe_peminjam', 'siswa')
+                      ->where('lender_type', 'kajur')
+                      ->where('lender_kajur_id', $kajurId);
+                });
+            })
             ->with([
                 'user.jurusan',
+                'user.classroom',
                 'item.category',
                 'item.location',
                 'itemWithTrashed.category',
                 'itemWithTrashed.location',
+                'items.item.category',
+                'items.item.location',
+                'items.itemWithTrashed.category',
+                'items.itemWithTrashed.location',
                 'approvedByKajur',
                 'checkoutBy',
                 'checkinBy'

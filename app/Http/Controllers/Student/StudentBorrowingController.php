@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class StudentBorrowingController extends Controller
@@ -36,6 +37,8 @@ class StudentBorrowingController extends Controller
             'items' => $items,
             'cartItems' => $cartItems,
             'teachers' => User::role('guru')->get(),
+            'kajurs' => User::role('kepala_jurusan')->orderBy('name')->get(),
+            'kajursWithPhone' => User::role('kepala_jurusan')->orderBy('name')->get()->filter(fn (User $kajur) => trim((string) $kajur->phone) !== '')->values(),
         ]);
     }
 
@@ -114,20 +117,42 @@ class StudentBorrowingController extends Controller
             ? ['nullable']
             : ['required', 'regex:/^(\+?62|0)[0-9]{9,13}$/'];
 
+        $user = Auth::user();
+        $tipePeminjam = ($user && ($user->hasRole('guru') || $user->hasRole('kepala_jurusan'))) ? 'guru' : 'siswa';
+        $lenderType = $tipePeminjam === 'siswa' ? $request->input('lender_type', 'admin') : 'admin';
+
         $validated = $request->validate([
-            'teacher_id'   => 'required|integer|min:1|exists:users,id',
+            'lender_type'  => ['sometimes', Rule::in(['admin', 'kajur'])],
+            'teacher_id'   => ($tipePeminjam === 'siswa' && $lenderType === 'admin')
+                ? ['required', 'integer', 'min:1', 'exists:users,id']
+                : ['nullable'],
+            'lender_kajur_id' => [Rule::requiredIf($tipePeminjam === 'siswa' && $lenderType === 'kajur'), 'nullable', 'integer', 'min:1', 'exists:users,id'],
             'borrow_date'  => 'required|date|after_or_equal:today',
             'return_date'  => 'required|date|after_or_equal:borrow_date',
             'return_time'  => 'required|date_format:H:i',
             'whatsapp_number' => $waRule,
             'notes'        => 'nullable|string|max:500',
         ], [
-            'teacher_id.required' => 'Guru Pembimbing wajib dipilih.',
-            'teacher_id.min'      => 'Guru Pembimbing wajib dipilih.',
+            'teacher_id.required' => 'Guru Pembimbing wajib dipilih untuk pengajuan ke Admin.',
+            'teacher_id.min'      => 'Guru Pembimbing wajib dipilih untuk pengajuan ke Admin.',
             'teacher_id.exists'   => 'Guru Pembimbing yang dipilih tidak valid.',
+            'lender_kajur_id.required' => 'Kepala Jurusan wajib dipilih untuk pengajuan ke Kajur.',
+            'lender_kajur_id.min' => 'Kepala Jurusan wajib dipilih untuk pengajuan ke Kajur.',
+            'lender_kajur_id.exists' => 'Kepala Jurusan yang dipilih tidak valid.',
             'whatsapp_number.required' => 'Nomor WhatsApp wajib diisi.',
             'whatsapp_number.regex'    => 'Format nomor WhatsApp tidak valid (harus 10-14 digit angka, diawali 0 atau 62).',
         ]);
+
+        $lenderKajur = null;
+        if ($tipePeminjam === 'siswa' && $lenderType === 'kajur') {
+            $lenderKajur = User::role('kepala_jurusan')->find($validated['lender_kajur_id']);
+
+            if (! $lenderKajur || trim((string) $lenderKajur->phone) === '') {
+                return back()->withInput()->withErrors([
+                    'lender_kajur_id' => 'Kajur yang dipilih tidak valid atau belum memiliki nomor WhatsApp. Pilih Kajur lain atau hubungi admin.',
+                ]);
+            }
+        }
 
         $waNumber = $request->input('whatsapp_number') ?? Auth::user()->phone;
 
@@ -138,10 +163,7 @@ class StudentBorrowingController extends Controller
 
         // Cast teacher_id: nilai 0 atau falsy dari form harus jadi NULL agar tidak melanggar FK constraint
         $teacherId = (int) ($validated['teacher_id'] ?? 0);
-        $teacherId = $teacherId > 0 ? $teacherId : null;
-
-        $user = Auth::user();
-        $tipePeminjam = ($user && ($user->hasRole('guru') || $user->hasRole('kepala_jurusan'))) ? 'guru' : 'siswa';
+        $teacherId = ($tipePeminjam === 'siswa' && $lenderType === 'admin') ? ($teacherId > 0 ? $teacherId : null) : null;
 
         $requestHeader = BorrowingRequest::create([
             'user_id'        => Auth::id(),
@@ -154,6 +176,8 @@ class StudentBorrowingController extends Controller
             'notes'          => $validated['notes'] ?? null,
             'status'         => BorrowingRequest::STATUS_PENDING,
             'tipe_peminjam'  => $tipePeminjam,
+            'lender_type'    => $tipePeminjam === 'siswa' ? $lenderType : 'admin',
+            'lender_kajur_id' => ($tipePeminjam === 'siswa' && $lenderType === 'kajur') ? $lenderKajur?->id : null,
         ]);
 
         foreach ($cart as $itemId => $entry) {
@@ -187,10 +211,14 @@ class StudentBorrowingController extends Controller
         }
 
         $teachers = User::role('guru')->get();
+        $kajurs = User::role('kepala_jurusan')->orderBy('name')->get();
+        $kajursWithPhone = $kajurs->filter(fn (User $kajur) => trim((string) $kajur->phone) !== '')->values();
 
         return view('pages.siswa.loans-edit', [
             'borrowing' => $borrowing,
             'teachers' => $teachers,
+            'kajurs' => $kajurs,
+            'kajursWithPhone' => $kajursWithPhone,
         ]);
     }
 
@@ -208,6 +236,9 @@ class StudentBorrowingController extends Controller
         // Untuk peminjaman cart (item_id = NULL), validasi quantity tidak dibatasi stok karena
         // barang disimpan di tabel borrowing_request_items, bukan di kolom item_id.
         $item = $borrowing->item_id ? Item::find($borrowing->item_id) : null;
+        $user = Auth::user();
+        $tipePeminjam = $borrowing->tipe_peminjam ?: (($user && ($user->hasRole('guru') || $user->hasRole('kepala_jurusan'))) ? 'guru' : 'siswa');
+        $lenderType = $tipePeminjam === 'siswa' ? $request->input('lender_type', $borrowing->lender_type ?: 'admin') : 'admin';
 
         $data = $request->validate([
             'quantity'    => $item
@@ -217,14 +248,30 @@ class StudentBorrowingController extends Controller
             'borrow_date' => 'required|date|after_or_equal:today',
             'return_date' => 'required|date|after_or_equal:borrow_date',
             'return_time' => 'required|date_format:H:i',
-            'teacher_id'  => 'required|integer|min:1|exists:users,id',
+            'lender_type' => ['sometimes', Rule::in(['admin', 'kajur'])],
+            'teacher_id'  => [Rule::requiredIf($tipePeminjam === 'siswa' && $lenderType === 'admin'), 'nullable', 'integer', 'min:1', 'exists:users,id'],
+            'lender_kajur_id' => [Rule::requiredIf($tipePeminjam === 'siswa' && $lenderType === 'kajur'), 'nullable', 'integer', 'min:1', 'exists:users,id'],
             'notes'       => 'nullable|string|max:500',
         ], [
-            'teacher_id.required' => 'Guru Pembimbing wajib dipilih.',
-            'teacher_id.min'      => 'Guru Pembimbing wajib dipilih.',
+            'teacher_id.required' => 'Guru Pembimbing wajib dipilih untuk pengajuan ke Admin.',
+            'teacher_id.min'      => 'Guru Pembimbing wajib dipilih untuk pengajuan ke Admin.',
             'teacher_id.exists'   => 'Guru Pembimbing yang dipilih tidak valid.',
+            'lender_kajur_id.required' => 'Kepala Jurusan wajib dipilih untuk pengajuan ke Kajur.',
+            'lender_kajur_id.min' => 'Kepala Jurusan wajib dipilih untuk pengajuan ke Kajur.',
+            'lender_kajur_id.exists' => 'Kepala Jurusan yang dipilih tidak valid.',
             'purpose.min'         => 'Keperluan peminjaman minimal 5 karakter.',
         ]);
+
+        $lenderKajur = null;
+        if ($tipePeminjam === 'siswa' && $lenderType === 'kajur') {
+            $lenderKajur = User::role('kepala_jurusan')->find($data['lender_kajur_id']);
+
+            if (! $lenderKajur || trim((string) $lenderKajur->phone) === '') {
+                return redirect()->back()->withInput()->withErrors([
+                    'lender_kajur_id' => 'Kajur yang dipilih tidak valid atau belum memiliki nomor WhatsApp. Pilih Kajur lain atau hubungi admin.',
+                ]);
+            }
+        }
 
         if ($data['return_date'] === $data['borrow_date'] && $data['return_date'] === now()->toDateString()) {
             $currentHour = now()->format('H:i');
@@ -240,7 +287,9 @@ class StudentBorrowingController extends Controller
             'borrow_date' => $data['borrow_date'],
             'return_date' => $data['return_date'],
             'return_time' => $data['return_time'],
-            'teacher_id'  => (int) $data['teacher_id'] ?: null,
+            'teacher_id'  => ($tipePeminjam === 'siswa' && $lenderType === 'admin') ? ((int) ($data['teacher_id'] ?? 0) ?: null) : null,
+            'lender_type' => $tipePeminjam === 'siswa' ? $lenderType : 'admin',
+            'lender_kajur_id' => ($tipePeminjam === 'siswa' && $lenderType === 'kajur') ? $lenderKajur?->id : null,
             'notes'       => $data['notes'] ?? null,
         ];
 

@@ -51,6 +51,8 @@ class QRCodeService
                     'borrowing_request_id' => $request->id,
                     'student_name' => $studentName,
                     'item_name' => $itemName,
+                    'lender_type' => $request->lender_type ?: 'admin',
+                    'lender_kajur_id' => $request->lender_kajur_id,
                 ]),
                 'image_path' => $filename,
                 'is_active' => true,

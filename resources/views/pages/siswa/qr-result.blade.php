@@ -139,7 +139,13 @@
 <div class="qr-page-container">
     <div class="qr-card">
         <h1 class="qr-title">QR Code Peminjaman</h1>
-        <p class="qr-subtitle">Tunjukkan QR Code ini kepada petugas / admin saat mengambil barang</p>
+        <p class="qr-subtitle">
+            @if(($lender_type ?? 'admin') === 'kajur')
+                Diambil di Kajur {{ $lender_name ?? '' }}
+            @else
+                Diambil di Admin TU
+            @endif
+        </p>
 
         <div class="qr-image-wrapper">
             <img src="{{ $qr_image }}" alt="QR Code Peminjaman #{{ $borrowing_id }}">

@@ -19,6 +19,7 @@ class KajurScanStudentQRTest extends TestCase
 
     private User $admin;
     private User $kajurTkj;
+    private User $kajurRpl;
     private User $guruTkj;
     private User $guruRpl;
     private User $siswaTkj;
@@ -48,6 +49,11 @@ class KajurScanStudentQRTest extends TestCase
             'jurusan_id' => $this->jurusanTkj->id,
         ]);
         $this->kajurTkj->assignRole('kepala_jurusan');
+
+        $this->kajurRpl = User::factory()->create([
+            'jurusan_id' => $this->jurusanRpl->id,
+        ]);
+        $this->kajurRpl->assignRole('kepala_jurusan');
 
         $this->guruTkj = User::factory()->create([
             'jurusan_id' => $this->jurusanTkj->id,
@@ -89,7 +95,7 @@ class KajurScanStudentQRTest extends TestCase
         ]);
     }
 
-    private function createApprovedStudentBorrowing(User $student, User $teacher, int $quantity = 2): array
+    private function createApprovedStudentBorrowing(User $student, User $teacher, int $quantity = 2, string $lenderType = 'admin', ?User $lenderKajur = null): array
     {
         $borrowing = BorrowingRequest::create([
             'user_id' => $student->id,
@@ -97,6 +103,8 @@ class KajurScanStudentQRTest extends TestCase
             'item_id' => $this->item->id,
             'quantity' => $quantity,
             'tipe_peminjam' => 'siswa',
+            'lender_type' => $lenderType,
+            'lender_kajur_id' => $lenderKajur?->id,
             'status' => BorrowingRequest::STATUS_APPROVED,
             'approved_at' => now(),
             'borrow_date' => now(),
@@ -118,7 +126,7 @@ class KajurScanStudentQRTest extends TestCase
 
     public function test_kajur_can_verify_and_confirm_checkout_student_qr_same_jurusan(): void
     {
-        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaTkj, $this->guruTkj, 2);
+        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaTkj, $this->guruTkj, 2, 'kajur', $this->kajurTkj);
 
         $this->actingAs($this->kajurTkj);
 
@@ -142,30 +150,41 @@ class KajurScanStudentQRTest extends TestCase
         $this->assertEquals(8, $this->item->stock); // 10 - 2 = 8
     }
 
-    public function test_kajur_can_process_student_qr_from_other_jurusan(): void
+    public function test_only_lender_kajur_can_process_student_qr_from_other_jurusan(): void
     {
-        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaRpl, $this->guruRpl, 3);
+        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaRpl, $this->guruRpl, 3, 'kajur', $this->kajurRpl);
 
         $this->actingAs($this->kajurTkj);
 
         $verifyResponse = $this->get(route('kajur.qr.verify', ['token' => $qrCode->code]));
         $verifyResponse->assertStatus(200);
-        $verifyResponse->assertSee($this->siswaRpl->name);
+        $verifyResponse->assertSee('QR ini hanya dapat diproses oleh Kajur pemberi pinjaman.');
 
         $checkoutResponse = $this->post(route('kajur.qr.confirm-checkout', ['id' => $borrowing->id]));
-        $checkoutResponse->assertRedirect(route('kajur.qr.verify', ['token' => $qrCode->code]));
+        $checkoutResponse->assertSessionHas('error', 'QR ini hanya dapat diproses oleh Kajur pemberi pinjaman.');
 
         $borrowing->refresh();
         $this->item->refresh();
+        $this->assertEquals(BorrowingRequest::STATUS_APPROVED, $borrowing->status);
+        $this->assertEquals(10, $this->item->stock);
 
+        $this->actingAs($this->kajurRpl);
+        $verifyByLender = $this->get(route('kajur.qr.verify', ['token' => $qrCode->code]));
+        $verifyByLender->assertStatus(200);
+        $verifyByLender->assertSee($this->siswaRpl->name);
+
+        $checkoutByLender = $this->post(route('kajur.qr.confirm-checkout', ['id' => $borrowing->id]));
+        $checkoutByLender->assertRedirect(route('kajur.qr.verify', ['token' => $qrCode->code]));
+        $borrowing->refresh();
+        $this->item->refresh();
         $this->assertEquals(BorrowingRequest::STATUS_BORROWED, $borrowing->status);
-        $this->assertEquals($this->kajurTkj->id, $borrowing->checkout_by);
+        $this->assertEquals($this->kajurRpl->id, $borrowing->checkout_by);
         $this->assertEquals(7, $this->item->stock);
     }
 
     public function test_kajur_can_process_student_qr_without_jurusan(): void
     {
-        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaNoJurusan, $this->guruTkj, 1);
+        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaNoJurusan, $this->guruTkj, 1, 'kajur', $this->kajurTkj);
 
         $this->actingAs($this->kajurTkj);
 
@@ -193,6 +212,8 @@ class KajurScanStudentQRTest extends TestCase
             'item_id' => $this->item->id,
             'quantity' => 1,
             'tipe_peminjam' => 'siswa',
+            'lender_type' => 'kajur',
+            'lender_kajur_id' => $this->kajurTkj->id,
             'status' => BorrowingRequest::STATUS_PENDING,
             'borrow_date' => now(),
             'return_date' => now()->addDays(2),
@@ -228,7 +249,7 @@ class KajurScanStudentQRTest extends TestCase
 
     public function test_admin_can_still_verify_and_confirm_checkout_student_qr(): void
     {
-        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaTkj, $this->guruTkj, 1);
+        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaTkj, $this->guruTkj, 1, 'admin');
 
         $this->actingAs($this->admin);
 
@@ -275,21 +296,38 @@ class KajurScanStudentQRTest extends TestCase
         $this->assertEquals($this->kajurTkj->id, $teacherBorrowing->checkout_by);
     }
 
-    public function test_kajur_accessing_admin_qr_verify_url_redirects_to_kajur_qr_verify(): void
+    public function test_kajur_cannot_process_admin_qr_but_admin_can_process_same_qr(): void
     {
-        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaTkj, $this->guruTkj, 1);
+        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaTkj, $this->guruTkj, 1, 'admin');
 
         $this->actingAs($this->kajurTkj);
 
         $response = $this->get(route('admin.qr.verify', ['token' => $qrCode->code]));
         $response->assertRedirect(route('kajur.qr.verify', ['token' => $qrCode->code]));
+        $kajurPage = $this->get(route('kajur.qr.verify', ['token' => $qrCode->code]));
+        $kajurPage->assertStatus(200);
+        $kajurPage->assertSee('QR Admin hanya dapat diproses oleh Admin.');
+        $this->post(route('kajur.qr.confirm-checkout', ['id' => $borrowing->id]))
+            ->assertSessionHas('error', 'QR Admin hanya dapat diproses oleh Admin.');
+        $this->assertSame(BorrowingRequest::STATUS_APPROVED, $borrowing->fresh()->status);
+        $this->assertEquals(10, $this->item->fresh()->stock);
+
+        $this->actingAs($this->admin);
+        $adminPage = $this->get(route('admin.qr.verify', ['token' => $qrCode->code]));
+        $adminPage->assertStatus(200);
+        $adminPage->assertSee($this->siswaTkj->name);
+        $adminCheckout = $this->post(route('admin.qr.confirm-checkout', ['id' => $borrowing->id]));
+        $adminCheckout->assertRedirect(route('admin.qr.verify', ['token' => $qrCode->code]));
+        $this->assertSame(BorrowingRequest::STATUS_BORROWED, $borrowing->fresh()->status);
+        $this->assertEquals($this->admin->id, $borrowing->fresh()->checkout_by);
+        $this->assertEquals(9, $this->item->fresh()->stock);
     }
 
     public function test_kajur_checkout_with_insufficient_stock_shows_error_and_does_not_change_stock_or_status(): void
     {
         // Item stock = 1, requested = 2
         $this->item->update(['stock' => 1]);
-        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaTkj, $this->guruTkj, 2);
+        [$borrowing, $qrCode] = $this->createApprovedStudentBorrowing($this->siswaTkj, $this->guruTkj, 2, 'kajur', $this->kajurTkj);
 
         $this->actingAs($this->kajurTkj);
 

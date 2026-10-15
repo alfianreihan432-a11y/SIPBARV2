@@ -51,6 +51,13 @@ class AdminQRVerificationController extends Controller
             ]);
         }
 
+        if ($borrowingRequest->isStudentLoanForKajur()) {
+            return view('pages.admin.qr-verify', [
+                'valid' => false,
+                'message' => 'QR Kajur hanya dapat diproses oleh Kajur pemberi pinjaman.',
+            ]);
+        }
+
         if (! $qrRecord->is_active && $borrowingRequest->status !== BorrowingRequest::STATUS_REJECTED) {
             return view('pages.admin.qr-verify', [
                 'valid'   => false,
@@ -71,6 +78,10 @@ class AdminQRVerificationController extends Controller
     public function confirmCheckout(Request $request, int $id, \App\Services\BorrowingApprovalService $approvalService)
     {
         $borrowingRequest = BorrowingRequest::with(['itemWithTrashed', 'items.itemWithTrashed', 'qrCode'])->findOrFail($id);
+
+        if ($borrowingRequest->isStudentLoanForKajur()) {
+            return redirect()->back()->with('error', 'QR Kajur hanya dapat diproses oleh Kajur pemberi pinjaman.');
+        }
 
         try {
             $approvalService->processCheckout($borrowingRequest, (int) Auth::id());
@@ -97,6 +108,10 @@ class AdminQRVerificationController extends Controller
         ]);
 
         $borrowingRequest = BorrowingRequest::with(['itemWithTrashed', 'qrCode'])->findOrFail($id);
+
+        if ($borrowingRequest->isStudentLoanForKajur()) {
+            return redirect()->back()->with('error', 'QR Kajur hanya dapat diproses oleh Kajur pemberi pinjaman.');
+        }
 
         if (! in_array($borrowingRequest->status, ['approved', 'qr_ready'])) {
             return redirect()->back()->with('error', 'Peminjaman dengan status saat ini (' . $borrowingRequest->status_label . ') tidak dapat ditolak.');
